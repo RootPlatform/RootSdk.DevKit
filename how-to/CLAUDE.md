@@ -35,6 +35,8 @@ how-to/<domain>/
 
 Every source file follows: **SUBSCRIBE > OPERATIONS > COMMAND HANDLER > EVENT HANDLERS**
 
+Simpler APIs may skip sections that don't apply (e.g., no events, no command handler).
+
 ```
 // ============================================================================
 // How-To: <Title>
@@ -130,32 +132,45 @@ Copy from `messages/` and change only:
 
 Derived from the `rootServer` type in `@rootsdk/server-bot`. 15 bots, ~28 source files.
 
-| Bot | Clients | Source files |
-|-----|---------|-------------|
-| `messages/` | channelMessages | `send.ts`, `reactions.ts`, `pins.ts`, `mentions.ts`, `flag.ts` |
-| `channels/` | channels, channelGroups | `crud.ts`, `groups.ts` |
-| `access-rules/` | accessRules | `access-rules.ts` |
-| `roles/` | communityRoles, communityMemberRoles | `roles.ts`, `member-roles.ts` |
-| `members/` | communityMembers | `members.ts` |
-| `kick-ban/` | communityMemberBans | `kick-ban.ts` |
-| `invites/` | communityMemberInvites | `invites.ts` |
-| `files/` | channelFiles, channelDirectories | `crud.ts`, `directories.ts` |
-| `key-value-store/` | dataStore.appData | `kv-store.ts` |
-| `jobs/` | jobScheduler | `scheduler.ts` |
-| `emojis/` | communityEmojis | `emojis.ts` |
-| `community/` | communities | `community.ts` |
-| `global-settings/` | globalSettings | `settings.ts` |
-| `voice/` | channelWebRtcs | `sessions.ts`, `tracks.ts` |
-| `member-groups/` | memberGroups | `member-groups.ts` |
-| `app-logs/` | dataStore.logs.community | `app-logs.ts` |
+| Bot | Clients | Source files | Status |
+|-----|---------|-------------|--------|
+| `messages/` | channelMessages | `send.ts`, `reactions.ts`, `pins.ts`, `mentions.ts`, `flag.ts` | Done |
+| `app-logs/` | dataStore.logs.community | `app-logs.ts` | Done |
+| `channels/` | channels, channelGroups | `crud.ts`, `groups.ts` | Planned |
+| `access-rules/` | accessRules | `access-rules.ts` | Planned |
+| `roles/` | communityRoles, communityMemberRoles | `roles.ts`, `member-roles.ts` | Planned |
+| `members/` | communityMembers | `members.ts` | Planned |
+| `kick-ban/` | communityMemberBans | `kick-ban.ts` | Planned |
+| `invites/` | communityMemberInvites | `invites.ts` | Planned |
+| `files/` | channelFiles, channelDirectories | `crud.ts`, `directories.ts` | Planned |
+| `key-value-store/` | dataStore.appData | `kv-store.ts` | Planned |
+| `jobs/` | jobScheduler | `scheduler.ts` | Planned |
+| `emojis/` | communityEmojis | `emojis.ts` | Planned |
+| `community/` | communities | `community.ts` | Planned |
+| `global-settings/` | globalSettings | `settings.ts` | Planned |
+| `voice/` | channelWebRtcs | `sessions.ts`, `tracks.ts` | Planned |
+| `member-groups/` | memberGroups | `member-groups.ts` | Planned |
 
 ## Build Order
 
-1. `messages/` — complete (proof of concept)
+1. `messages/`, `app-logs/` — complete
 2. `channels/`, `access-rules/`, `roles/` — channel structure and permissions
 3. `members/`, `kick-ban/`, `invites/` — member management
 4. `files/`, `key-value-store/`, `jobs/` — content and automation
-5. `emojis/`, `community/`, `global-settings/`, `voice/`, `member-groups/`, `app-logs/` — remaining domains
+5. `emojis/`, `community/`, `global-settings/`, `voice/`, `member-groups/` — remaining domains
+
+## Research
+
+Before writing a how-to bot, research the API surface using these locations:
+
+| Purpose | Path |
+|---------|------|
+| SDK client types, request/response types, enums, events | `RootApp.AppSdk/sdk/server-bot/` or `sdk/server-app/` |
+| Permissions per SDK method | `Docs.Developer/content/api-supplements/api-method-permissions.json` |
+| Developer-facing documentation | `Docs.Developer/dist/` |
+| Integration tests (real usage patterns) | `Ops.Testing/test-server-multi/tests/test-cases/src/` |
+
+**Note:** `server-multi` is the multi-tenant SDK where all methods take a `communityId` parameter. The integration tests also use `server-multi`. In `server-app` and `server-bot`, the community ID is handled automatically. Use `server-bot` or `server-app` types as the reference for how-to code — `server-multi` types will have extra parameters that don't apply.
 
 ## Verification
 

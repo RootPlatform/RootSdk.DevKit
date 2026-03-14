@@ -1,0 +1,22 @@
+{
+  "name": "@rootsdk-howto/app-logs",
+  "author": "Root Communications, Inc.",
+  "description": "How-To: App Logs — write structured logs visible in the Root dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@rootsdk/server-bot": "*"
+  },
+  "devDependencies": {
+    "@rootsdk/dev-tools": "*",
+    "typescript": "^5.8.2"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "node clean.js",
+    "bot": "rootsdk start devhost"
+  }
+}
