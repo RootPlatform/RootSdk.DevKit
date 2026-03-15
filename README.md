@@ -14,7 +14,6 @@ RootSdk.DevKit/
 ├── how-to/
 └── llms/
     ├── docs/
-    ├── skills/
     ├── templates/
     ├── gui/
     │   ├── tokens.md
@@ -33,7 +32,6 @@ RootSdk.DevKit/
 
 **`llms/`** — everything an AI agent needs to build on Root effectively.
 - **`docs/`** — LLM-friendly versions of the full Root developer documentation.
-- **`skills/`** — agent instruction files for scaffolding new apps and bots.
 - **`templates/`** — scaffolded starting points that skills utilize.
 - **`gui/`** — Root's theming system: CSS tokens, icons, and control recommendations for building app UIs.
 - **`schemas/`** — machine-readable reference files for the Root manifest format and API permission requirements.

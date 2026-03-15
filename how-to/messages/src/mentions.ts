@@ -54,7 +54,10 @@ export function initializeMentions(): void {
 // --- CONSTRUCTING MENTIONS ---------------------------------------------------
 
 // Build a user mention string. The displayName appears as the link text
-// in the rendered message. Use the member's nickname for a natural look.
+// in the rendered message.
+// IMPORTANT: Always fetch the member's current nickname via communityMembers.get()
+// before calling this. Don't use the userId or a hardcoded string as display text —
+// the rendered mention will show whatever you pass here.
 function userMention(displayName: string, userId: UserGuid): string {
   return `[@${displayName}](root://user/${userId})`;
 }

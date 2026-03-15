@@ -136,6 +136,8 @@ Derived from the `rootServer` type in `@rootsdk/server-bot`. 15 bots, ~28 source
 |-----|---------|-------------|--------|
 | `messages/` | channelMessages | `send.ts`, `reactions.ts`, `pins.ts`, `mentions.ts`, `flag.ts` | Done |
 | `app-logs/` | dataStore.logs.community | `app-logs.ts` | Done |
+| `key-value-store/` | dataStore.appData | `kv-store.ts` | Planned |
+| `jobs/` | jobScheduler | `scheduler.ts` | Planned |
 | `channels/` | channels, channelGroups | `crud.ts`, `groups.ts` | Planned |
 | `access-rules/` | accessRules | `access-rules.ts` | Planned |
 | `roles/` | communityRoles, communityMemberRoles | `roles.ts`, `member-roles.ts` | Planned |
@@ -143,13 +145,11 @@ Derived from the `rootServer` type in `@rootsdk/server-bot`. 15 bots, ~28 source
 | `kick-ban/` | communityMemberBans | `kick-ban.ts` | Planned |
 | `invites/` | communityMemberInvites | `invites.ts` | Planned |
 | `files/` | channelFiles, channelDirectories | `crud.ts`, `directories.ts` | Planned |
-| `key-value-store/` | dataStore.appData | `kv-store.ts` | Planned |
-| `jobs/` | jobScheduler | `scheduler.ts` | Planned |
-| `emojis/` | communityEmojis | `emojis.ts` | Planned |
 | `community/` | communities | `community.ts` | Planned |
-| `global-settings/` | globalSettings | `settings.ts` | Planned |
-| `voice/` | channelWebRtcs | `sessions.ts`, `tracks.ts` | Planned |
 | `member-groups/` | memberGroups | `member-groups.ts` | Planned |
+| `voice/` | channelWebRtcs | `sessions.ts`, `tracks.ts` | Planned |
+| `global-settings/` | globalSettings | `settings.ts` | Planned |
+| `emojis/` | communityEmojis | `emojis.ts` | Planned |
 
 ## Build Order
 
