@@ -28,7 +28,7 @@ RootSdk.DevKit/
 
 **`bots/`** — complete, runnable Root bot samples. Same intent as apps, server-side only.
 
-**`how-to/`** — focused samples covering specific API surfaces (messages, channels, roles). Server-side code is shared across apps and bots.
+**`how-to/`** — focused samples covering specific API surfaces (messages, channels, roles, files, etc.). Each directory is a standalone bot covering one SDK domain. Every method is covered. Files are self-contained: one file = one complete answer, with behavioral nuances inline as comments. Server-side code is shared across apps and bots.
 
 **`llms/`** — everything an AI agent needs to build on Root effectively.
 - **`docs/`** — LLM-friendly versions of the full Root developer documentation.

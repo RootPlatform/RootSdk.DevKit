@@ -1,0 +1,24 @@
+{
+  "name": "@rootsdk-howto/database",
+  "author": "Root Communications, Inc.",
+  "description": "How-To: SQLite Database — config access, open connection, basic CRUD",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@rootsdk/server-bot": "*",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "@rootsdk/dev-tools": "*",
+    "@types/sqlite3": "^3.1.11",
+    "typescript": "^5.8.2"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "node clean.js",
+    "bot": "rootsdk start devhost"
+  }
+}

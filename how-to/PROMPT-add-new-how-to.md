@@ -2,13 +2,17 @@
 
 Guide for building how-to bots in `RootSdk.DevKit/how-to/`. Established during the `messages/` proof of concept.
 
-## Philosophy
+## Principles
 
-Each how-to directory is a standalone, deployable bot that teaches one API domain. Multiple source files inside, each covering a specific set of operations — individually retrievable by RAG agents.
+1. **Cover every SDK method.** The cost of a missing method is that an agent hallucinates a signature. A few extra lines of code is always cheaper than a wrong answer.
 
-**Cover every API method.** The cost of an uncovered method is that an agent hallucinates — worse than a few extra tokens. Per-file retrieval means niche files only load when relevant.
+2. **One file, complete answer.** A developer or RAG agent gets everything they need from a single file — event subscription, API calls, behavioral nuances, error handling. No cross-referencing.
 
-**Show the common usage, mention advanced parameters in comments.** Don't pad files with rarely-used options.
+3. **Show the SDK, not the ecosystem.** We demonstrate Root's API surface. We don't teach SQLite, Knex, cron syntax, or markdown. If a concept is well-known outside Root, a one-line comment is enough.
+
+4. **Behavioral nuances live inline.** The gotchas that method signatures don't reveal ("bots can only remove their own reactions", "expired keys are cleaned up every 60s") go as comments directly on the relevant operation — where a developer would look.
+
+5. **Dual audience: humans scan, agents retrieve.** Structured metadata headers make files machine-discoverable. Clean exported functions make them copy-pasteable. Both get served by the same artifact.
 
 ## Audiences
 
@@ -130,34 +134,31 @@ Copy from `messages/` and change only:
 
 ## Bot Inventory
 
-Derived from the `rootServer` type in `@rootsdk/server-bot`. 15 bots, ~28 source files.
+Derived from the `rootServer` type in `@rootsdk/server-bot`. 19 bots, one bot per `rootServer` property.
 
-| Bot | Clients | Source files | Status |
-|-----|---------|-------------|--------|
+| Bot | Client | Source files | Status |
+|-----|--------|-------------|--------|
 | `messages/` | channelMessages | `send.ts`, `reactions.ts`, `pins.ts`, `mentions.ts`, `flag.ts` | Done |
 | `app-logs/` | dataStore.logs.community | `app-logs.ts` | Done |
-| `key-value-store/` | dataStore.appData | `kv-store.ts` | Planned |
-| `jobs/` | jobScheduler | `scheduler.ts` | Planned |
-| `channels/` | channels, channelGroups | `crud.ts`, `groups.ts` | Planned |
-| `access-rules/` | accessRules | `access-rules.ts` | Planned |
-| `roles/` | communityRoles, communityMemberRoles | `roles.ts`, `member-roles.ts` | Planned |
-| `members/` | communityMembers | `members.ts` | Planned |
-| `kick-ban/` | communityMemberBans | `kick-ban.ts` | Planned |
-| `invites/` | communityMemberInvites | `invites.ts` | Planned |
-| `files/` | channelFiles, channelDirectories | `crud.ts`, `directories.ts` | Planned |
-| `community/` | communities | `community.ts` | Planned |
-| `member-groups/` | memberGroups | `member-groups.ts` | Planned |
-| `voice/` | channelWebRtcs | `sessions.ts`, `tracks.ts` | Planned |
-| `global-settings/` | globalSettings | `settings.ts` | Planned |
-| `emojis/` | communityEmojis | `emojis.ts` | Planned |
-
-## Build Order
-
-1. `messages/`, `app-logs/` — complete
-2. `channels/`, `access-rules/`, `roles/` — channel structure and permissions
-3. `members/`, `kick-ban/`, `invites/` — member management
-4. `files/`, `key-value-store/`, `jobs/` — content and automation
-5. `emojis/`, `community/`, `global-settings/`, `voice/`, `member-groups/` — remaining domains
+| `key-value-store/` | dataStore.appData | `kv-store.ts` | Done |
+| `database/` | dataStore.config (SQLite) | `database.ts` | Done |
+| `jobs/` | jobScheduler | `scheduler.ts` | Done |
+| `channels/` | channels | `channels.ts` | Done |
+| `channel-groups/` | channelGroups | `channel-groups.ts` | Done |
+| `access-rules/` | accessRules | `access-rules.ts` | Done |
+| `roles/` | communityRoles | `roles.ts` | Done |
+| `member-roles/` | communityMemberRoles | `member-roles.ts` | Done |
+| `members/` | communityMembers | `members.ts` | Done |
+| `kick-ban/` | communityMemberBans | `kick-ban.ts` | Done |
+| `invites/` | communityMemberInvites | `invites.ts` | Done |
+| `files/` | channelFiles | `files.ts` | Done |
+| `directories/` | channelDirectories | `directories.ts` | Done |
+| `community/` | communities | `community.ts` | Done |
+| `member-groups/` | memberGroups | `member-groups.ts` | Done |
+| `voice/` | channelWebRtcs | `voice.ts` | Done |
+| `global-settings/` | globalSettings | `global-settings.ts` | Deferred - only user-role picker implemented |
+| `emojis/` | communityEmojis | `emojis.ts` | Deferred — client not yet in SDK |
+| `assets/` | assetClient | `assets.ts` | Deferred — app only for now, requires client side |
 
 ## Research
 

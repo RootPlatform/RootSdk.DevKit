@@ -1,0 +1,22 @@
+{
+  "name": "@rootsdk-howto/roles",
+  "author": "Root Communications, Inc.",
+  "description": "How-To: Roles \u2014 create, get, list, edit, move, delete community roles",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@rootsdk/server-bot": "*"
+  },
+  "devDependencies": {
+    "@rootsdk/dev-tools": "*",
+    "typescript": "^5.8.2"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "node clean.js",
+    "bot": "rootsdk start devhost"
+  }
+}

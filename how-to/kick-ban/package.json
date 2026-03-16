@@ -1,0 +1,22 @@
+{
+  "name": "@rootsdk-howto/kick-ban",
+  "author": "Root Communications, Inc.",
+  "description": "How-To: Kick & Ban \u2014 ban, unban, kick members; query bans; ban events",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@rootsdk/server-bot": "*"
+  },
+  "devDependencies": {
+    "@rootsdk/dev-tools": "*",
+    "typescript": "^5.8.2"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "node clean.js",
+    "bot": "rootsdk start devhost"
+  }
+}
