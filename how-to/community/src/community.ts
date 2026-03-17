@@ -99,9 +99,9 @@ async function onCommunityCommand(evt: ChannelMessageCreatedEvent): Promise<void
 
     const originalName = community.name;
 
-    // 2. Edit the community — rename (append " [edited]")
+    // 2. Edit the community — rename (append "Edited" — no spaces/brackets allowed)
     const edited = await editCommunity(
-      originalName + " [edited]",
+      originalName + "Edited",
       community.pictureHex,
       community.rejectUnverifiedEmail,
       community.defaultChannelId,

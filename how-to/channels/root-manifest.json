@@ -5,14 +5,17 @@
     "server": {
       "launch": "dist/main.js",
       "deploy": [
-          "dist"
+        "dist"
       ],
       "nodeModules": [
-          "node_modules"
+        "node_modules"
       ]
     }
   },
   "permissions": {
+    "community": {
+      "createChannelGroup": true
+    },
     "channel": {
       "fullControl": true,
       "createMessage": true

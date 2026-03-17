@@ -137,10 +137,10 @@ async function onChannelGroupsCommand(evt: ChannelMessageCreatedEvent): Promise<
     lines.push(`✓ listed ${existing.length} existing group(s)`);
 
     // 2. Create two groups
-    const groupA = await createChannelGroup("Test Group A");
+    const groupA = await createChannelGroup("TestAlpha");
     lines.push(`✓ created group: ${groupA.name} (${groupA.id})`);
 
-    const groupB = await createChannelGroup("Test Group B");
+    const groupB = await createChannelGroup("TestBeta");
     lines.push(`✓ created group: ${groupB.name} (${groupB.id})`);
 
     // 3. Get one by ID
@@ -148,7 +148,7 @@ async function onChannelGroupsCommand(evt: ChannelMessageCreatedEvent): Promise<
     lines.push(`✓ fetched group: name=${fetched.name}`);
 
     // 4. Edit the name
-    await editChannelGroup(groupA.id, "Renamed Group A");
+    await editChannelGroup(groupA.id, "RenamedAlpha");
     lines.push("✓ edited group name");
 
     // 5. Move group A before group B
@@ -161,9 +161,15 @@ async function onChannelGroupsCommand(evt: ChannelMessageCreatedEvent): Promise<
     lines.push("✓ deleted both groups");
 
     await messages.create({ channelId, content: lines.join("\n") });
-  } catch (err) {
+  } catch (err: any) {
+    const parts = [`Channel groups demo error: ${err}`];
+    if (err?.code) parts.push(`code: ${err.code}`);
+    if (err?.errorCode) parts.push(`errorCode: ${err.errorCode}`);
+    if (err?.meta) parts.push(`meta: ${JSON.stringify(err.meta)}`);
+    if (err?.payload) parts.push(`payload: ${JSON.stringify(err.payload)}`);
+    if (lines.length > 0) parts.push(`completed ${lines.length}/7 steps`);
     console.error("Channel groups demo error:", err);
-    await messages.create({ channelId, content: `Channel groups demo error: ${err}` });
+    await messages.create({ channelId, content: parts.join("\n") });
   }
 }
 

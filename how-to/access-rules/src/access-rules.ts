@@ -190,13 +190,20 @@ async function onAccessRulesCommand(evt: ChannelMessageCreatedEvent): Promise<vo
     const role = roles[0];
     lines.push(`\u2713 using role: ${role.name} (${role.id})`);
 
-    // 2. Get a channel group to target
+    // 2. Get the channel group containing the trigger channel
     const groups = await rootServer.community.channelGroups.list();
     if (groups.length === 0) {
       await messages.create({ channelId, content: "No channel groups found." });
       return;
     }
-    const group = groups[0];
+    let group = groups[0];
+    for (const g of groups) {
+      const channels = await rootServer.community.channels.list({ channelGroupId: g.id });
+      if (channels.some((ch) => ch.id === channelId)) {
+        group = g;
+        break;
+      }
+    }
     const groupId = group.id as unknown as ChannelOrChannelGroupGuid;
     const roleId = role.id as unknown as RoleOrMemberGuid;
     lines.push(`\u2713 using channel group: ${group.name} (${group.id})`);

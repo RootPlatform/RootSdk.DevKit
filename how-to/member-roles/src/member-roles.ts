@@ -29,6 +29,7 @@ import {
   ChannelMessageEvent,
   ChannelMessageCreatedEvent,
   MessageType,
+  WellKnownRootGuids,
 } from "@rootsdk/server-bot"; // For apps: import from "@rootsdk/server-app"
 
 // --- SUBSCRIBE ---------------------------------------------------------------
@@ -105,59 +106,69 @@ async function onMemberRolesCommand(evt: ChannelMessageCreatedEvent): Promise<vo
   const channelId = evt.channelId;
   const messages = rootServer.community.channelMessages;
   const lines: string[] = [];
+  let step = 0;
+  let debugRoles: any[] = [];
 
   try {
     // 1. Get roles and members to work with
-    const roles = await rootServer.community.communityRoles.list();
-    if (roles.length < 2) {
-      await messages.create({ channelId, content: "Need at least 2 roles. Create some first via /roles." });
-      return;
-    }
-    const members = await rootServer.community.communityMembers.listAll();
-    if (members.length === 0) {
-      await messages.create({ channelId, content: "No members found." });
+    // Filter out the Everyone role — it's implicit and can't be manually assigned/removed.
+    // Note: add() can only assign roles whose permissions are a subset of the bot's own.
+    const allRoles = await rootServer.community.communityRoles.list();
+    debugRoles = allRoles.map((r) => ({ id: r.id, name: r.name }));
+    const everyoneId = WellKnownRootGuids.CommunityRoles.EveryoneRole;
+    const roles = allRoles.filter((r) => r.id !== everyoneId);
+    if (roles.length < 1) {
+      await messages.create({ channelId, content: "Need at least 1 assignable role. Create one first via /roles." });
       return;
     }
 
-    const role1 = roles[0];
-    const role2 = roles[1];
-    const member = members[0];
-    const userId = member.userId;
-    lines.push(`\u2713 using roles: ${role1.name}, ${role2.name}`);
-    lines.push(`\u2713 using member: ${member.nickname ?? userId}`);
+    // Pick role from the end — built-in roles (like Admin) appear first and may have
+    // permissions that exceed the bot's own, making them unassignable (subset rule).
+    const role = roles[roles.length - 1];
+    // Use the message sender as the target member
+    const userId = evt.userId;
+    lines.push(`\u2713 using role: ${role.name} (${role.id})`);
+    lines.push(`\u2713 using member: ${userId}`);
 
     // 2. List current roles for the member
     const before = await listMemberRoles(userId);
     lines.push(`\u2713 member has ${before.communityRoleIds?.length ?? 0} role(s) before`);
 
-    // 3. Add two roles to the member
-    await addMemberRole(role1.id, [userId]);
-    await addMemberRole(role2.id, [userId]);
-    lines.push(`\u2713 added roles: ${role1.name}, ${role2.name}`);
+    // 3. Add the role to the member
+    step = 3;
+    await addMemberRole(role.id, [userId]);
+    lines.push(`\u2713 added role: ${role.name}`);
 
-    // 4. List roles — verify both are present
+    // 4. List roles — verify it's present
     const after = await listMemberRoles(userId);
     lines.push(`\u2713 member now has ${after.communityRoleIds?.length ?? 0} role(s)`);
 
-    // 5. Set the second role as primary — moves it to index [0]
-    await setMemberPrimaryRole(userId, role2.id);
+    // 5. Set the role as primary — moves it to index [0]
+    step = 5;
+    await setMemberPrimaryRole(userId, role.id);
     const withPrimary = await listMemberRoles(userId);
     const primaryId = withPrimary.communityRoleIds?.[0];
-    lines.push(`\u2713 set primary role: ${role2.name} (first in list: ${primaryId === role2.id})`);
+    lines.push(`\u2713 set primary role: ${role.name} (first in list: ${primaryId === role.id})`);
 
-    // 6. Remove both roles
-    await removeMemberRole(role1.id, [userId]);
-    await removeMemberRole(role2.id, [userId]);
-    lines.push("\u2713 removed both roles");
+    // 6. Remove the role
+    step = 6;
+    await removeMemberRole(role.id, [userId]);
+    lines.push("\u2713 removed role");
 
-    // 7. List roles — verify they're gone (EveryoneRole remains)
+    // 7. List roles — verify it's gone (EveryoneRole remains)
     const final = await listMemberRoles(userId);
     lines.push(`\u2713 member now has ${final.communityRoleIds?.length ?? 0} role(s) (EveryoneRole always present)`);
 
     await messages.create({ channelId, content: lines.join("\n") });
-  } catch (err) {
+  } catch (err: any) {
+    const parts = [`Member roles demo error: ${err}`];
+    if (err?.errorCode) parts.push(`errorCode: ${err.errorCode}`);
+    if (err?.payload) parts.push(`payload: ${JSON.stringify(err.payload)}`);
+    if (lines.length > 0) parts.push(`completed ${lines.length}/8 steps`);
+    parts.push(`step: ${step}`);
+    parts.push(`roles: ${JSON.stringify(debugRoles)}`);
     console.error("Member roles demo error:", err);
-    await messages.create({ channelId, content: `Member roles demo error: ${err}` });
+    await messages.create({ channelId, content: parts.join("\n") });
   }
 }
 

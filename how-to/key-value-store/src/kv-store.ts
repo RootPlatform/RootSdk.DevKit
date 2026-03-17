@@ -45,10 +45,10 @@ export async function getValue<T>(key: string): Promise<T | undefined> {
 
 // Set one or more key-value pairs (upsert).
 // If the key already exists, its value is overwritten.
-// Supports an optional expires_at date — after that time, get/select skip it.
-export async function setValue<T>(key: string, value: T, expires_at?: Date): Promise<void> {
+// Supports an optional expiresAt date — after that time, get/select skip it.
+export async function setValue<T>(key: string, value: T, expiresAt?: Date): Promise<void> {
   const entry: KeyValue<T> = { key, value };
-  if (expires_at) entry.expires_at = expires_at;
+  if (expiresAt) entry.expiresAt = expiresAt;
   await kv.set(entry);
 }
 
