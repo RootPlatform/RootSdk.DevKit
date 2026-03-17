@@ -12,5 +12,9 @@
       ]
     }
   },
-  "permissions": {}
+  "permissions": {
+    "channel": {
+      "createMessage": true
+    }
+  }
 }

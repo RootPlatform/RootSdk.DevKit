@@ -95,8 +95,9 @@ export async function setMemberPrimaryRole(
   return rootServer.community.communityMemberRoles.setPrimary(request);
 }
 
-// --- COMMAND HANDLER: /member-roles ------------------------------------------
+// --- COMMAND HANDLER: /member-roles [roleId] ---------------------------------
 // Exercises the full member role lifecycle: add, list, setPrimary, remove.
+// Pass a roleId to target a specific role, or omit to auto-select.
 
 async function onMemberRolesCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
   if (evt.messageType === MessageType.System) return;
@@ -107,14 +108,12 @@ async function onMemberRolesCommand(evt: ChannelMessageCreatedEvent): Promise<vo
   const messages = rootServer.community.channelMessages;
   const lines: string[] = [];
   let step = 0;
-  let debugRoles: any[] = [];
 
   try {
     // 1. Get roles and members to work with
     // Filter out the Everyone role — it's implicit and can't be manually assigned/removed.
     // Note: add() can only assign roles whose permissions are a subset of the bot's own.
     const allRoles = await rootServer.community.communityRoles.list();
-    debugRoles = allRoles.map((r) => ({ id: r.id, name: r.name }));
     const everyoneId = WellKnownRootGuids.CommunityRoles.EveryoneRole;
     const roles = allRoles.filter((r) => r.id !== everyoneId);
     if (roles.length < 1) {
@@ -122,9 +121,25 @@ async function onMemberRolesCommand(evt: ChannelMessageCreatedEvent): Promise<vo
       return;
     }
 
-    // Pick role from the end — built-in roles (like Admin) appear first and may have
-    // permissions that exceed the bot's own, making them unassignable (subset rule).
-    const role = roles[roles.length - 1];
+    // Accept an optional roleId argument: /member-roles <roleId>
+    // If provided, use that specific role. Otherwise fall back to the last
+    // non-Everyone role (built-in roles like Admin appear first and may have
+    // permissions that exceed the bot's own, making them unassignable).
+    const roleIdArg = content.replace("/member-roles", "").trim();
+    let role: typeof roles[0];
+    if (roleIdArg) {
+      const match = roles.find((r) => r.id === roleIdArg);
+      if (!match) {
+        await messages.create({
+          channelId,
+          content: `Role not found: ${roleIdArg}\nAvailable: ${roles.map(r => `${r.name} (${r.id})`).join(", ")}`,
+        });
+        return;
+      }
+      role = match;
+    } else {
+      role = roles[roles.length - 1];
+    }
     // Use the message sender as the target member
     const userId = evt.userId;
     lines.push(`\u2713 using role: ${role.name} (${role.id})`);
@@ -163,10 +178,7 @@ async function onMemberRolesCommand(evt: ChannelMessageCreatedEvent): Promise<vo
   } catch (err: any) {
     const parts = [`Member roles demo error: ${err}`];
     if (err?.errorCode) parts.push(`errorCode: ${err.errorCode}`);
-    if (err?.payload) parts.push(`payload: ${JSON.stringify(err.payload)}`);
     if (lines.length > 0) parts.push(`completed ${lines.length}/8 steps`);
-    parts.push(`step: ${step}`);
-    parts.push(`roles: ${JSON.stringify(debugRoles)}`);
     console.error("Member roles demo error:", err);
     await messages.create({ channelId, content: parts.join("\n") });
   }

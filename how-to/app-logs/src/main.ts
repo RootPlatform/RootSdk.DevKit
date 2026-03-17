@@ -1,7 +1,8 @@
 import { rootServer, RootBotStartState } from "@rootsdk/server-bot";
-import { logInfo } from "./app-logs";
+import { initializeAppLogs, logInfo } from "./app-logs";
 
 async function onStarting(state: RootBotStartState) {
+  initializeAppLogs();
   await logInfo("App started");
 }
 
