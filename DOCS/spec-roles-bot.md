@@ -13,7 +13,14 @@ Build a Root bot that lets community members self-assign roles by reacting to a 
 7. The bot handles errors gracefully — unknown roles, missing permissions, rate limits.
 8. Put the generated code in C:\Root\Code\Test\roles-bot.
 
-CRITICAL: only use C:\Root\Code\RootSdk.DevKit for context.
+Use ONLY C:\Root\Code\RootSdk.DevKit for context. Do NOT read files outside that directory. If the DevKit does not contain enough information to implement a requirement, do NOT guess or look elsewhere — instead, report it as a gap.
+
+After generating the code, write a **DevKit Gap Report** listing every point where the DevKit content was insufficient. For each gap, include:
+- What you needed to know.
+- What you looked for in the DevKit and where.
+- How you worked around it (assumption, omission, or placeholder).
+
+If there are no gaps, say so explicitly.
 
 ---
 
