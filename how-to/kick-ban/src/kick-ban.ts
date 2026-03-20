@@ -1,6 +1,6 @@
 // ============================================================================
 // How-To: Kick & Ban
-// SDK: communityMemberBans.create, .get, .list, .delete, .kick
+// SDK: communityMemberBans.create, .get, .list, .delete, .kick, .createBulk, .kickBulk
 // Permissions: community.createBan, community.manageBans, community.kick
 // Events: CommunityMemberBanEvent.CommunityMemberBanCreated,
 //         .CommunityMemberBanDeleted
@@ -17,8 +17,12 @@ import {
   rootServer,
   CommunityMemberBan,
   CommunityMemberBanCreateRequest,
+  CommunityMemberBanCreateBulkRequest,
+  CommunityMemberBanBulk,
   CommunityMemberBanDeleteRequest,
   CommunityMemberBanKickRequest,
+  CommunityMemberBanKickBulkRequest,
+  CommunityMemberBanKickBulkResponse,
   CommunityMemberBanGetRequest,
   CommunityMemberBanEvent,
   CommunityMemberBanCreatedEvent,
@@ -89,6 +93,30 @@ export async function getBan(userId: UserGuid): Promise<CommunityMemberBan> {
   return rootServer.community.communityMemberBans.get(request);
 }
 
+// Bans multiple users in a single call. Maximum 50 userIds per request.
+// Same rules as banMember — cannot ban the community owner or app users.
+// Returns the list of successfully banned userIds.
+// Requires createBan permission on the community.
+export async function banMembersBulk(
+  userIds: UserGuid[],
+  reason?: string,
+  expiresAt?: Date,
+): Promise<CommunityMemberBanBulk> {
+  const request: CommunityMemberBanCreateBulkRequest = { userIds, reason, expiresAt };
+  return rootServer.community.communityMemberBans.createBulk(request);
+}
+
+// Kicks multiple users in a single call. Maximum 50 userIds per request.
+// Same rules as kickMember — no ban record created, users can rejoin immediately.
+// Returns the list of successfully kicked userIds.
+// Requires kick permission on the community.
+export async function kickMembersBulk(
+  userIds: UserGuid[],
+): Promise<CommunityMemberBanKickBulkResponse> {
+  const request: CommunityMemberBanKickBulkRequest = { userIds };
+  return rootServer.community.communityMemberBans.kickBulk(request);
+}
+
 // --- COMMAND HANDLER: /kick-ban ----------------------------------------------
 // Shows how to query bans. Does not actually ban/kick anyone — that would
 // require a target member who can be safely removed and re-added.
@@ -122,6 +150,10 @@ async function onKickBanCommand(evt: ChannelMessageCreatedEvent): Promise<void> 
     lines.push("\u2713 operations: unbanMember(userId) \u2014 does NOT re-add the user");
     lines.push("\u2713 operations: kickMember(userId) \u2014 no ban record created");
     lines.push("\u2713 operations: getBan(userId), listBans()");
+
+    // 6–7. Show bulk operations
+    lines.push("\u2713 operations: banMembersBulk(userIds[], reason?, expiresAt?) \u2014 max 50");
+    lines.push("\u2713 operations: kickMembersBulk(userIds[]) \u2014 max 50");
 
     await messages.create({ channelId, content: lines.join("\n") });
   } catch (err) {

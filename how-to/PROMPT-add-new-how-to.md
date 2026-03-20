@@ -156,9 +156,9 @@ Derived from the `rootServer` type in `@rootsdk/server-bot`. 19 bots, one bot pe
 | `community/` | communities | `community.ts` | Done |
 | `member-groups/` | memberGroups | `member-groups.ts` | Done |
 | `voice/` | channelWebRtcs | `voice.ts` | Done |
+| `assets/` | assetClient | `assets.ts` | Planned |
+| `emojis/` | communityEmojis | `emojis.ts` | Done |
 | `global-settings/` | globalSettings | `global-settings.ts` | Deferred - only user-role picker implemented |
-| `emojis/` | communityEmojis | `emojis.ts` | Deferred — client not yet in SDK |
-| `assets/` | assetClient | `assets.ts` | Deferred — app only for now, requires client side |
 
 ## Research
 

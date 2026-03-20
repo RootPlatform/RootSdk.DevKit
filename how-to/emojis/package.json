@@ -1,0 +1,22 @@
+{
+  "name": "@rootsdk-howto/emojis",
+  "author": "Root Communications, Inc.",
+  "description": "How-To: Emojis — get, list, delete community emojis; emoji events",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@rootsdk/server-bot": "0.17.1-alpha.1"
+  },
+  "devDependencies": {
+    "@rootsdk/dev-tools": "*",
+    "typescript": "^5.8.2"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "node clean.js",
+    "bot": "rootsdk start devhost"
+  }
+}

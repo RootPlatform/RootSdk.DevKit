@@ -1,6 +1,6 @@
 // ============================================================================
 // How-To: Sending Messages
-// SDK: channelMessages.create, .get, .edit, .delete, .list, .setTypingIndicator
+// SDK: channelMessages.create, .get, .edit, .delete, .list, .setTypingIndicator, .setViewTime
 // Permissions: channel.createMessage
 // Events: ChannelMessageCreated, ChannelMessageEdited, ChannelMessageDeleted
 // Works in: Apps (@rootsdk/server-app) and Bots (@rootsdk/server-bot)
@@ -18,6 +18,7 @@ import {
   ChannelMessageEditedEvent,
   ChannelMessageDeletedEvent,
   ChannelGuid,
+  ChannelMessageSetViewTimeRequest,
   MessageGuid,
 } from "@rootsdk/server-bot"; // For apps: import from "@rootsdk/server-app"
 
@@ -151,14 +152,24 @@ async function listMessages(
   }
 }
 
+// Mark a channel as read (sets the read-receipt / view timestamp).
+// No permission required.
+async function markChannelRead(
+  channelId: ChannelGuid,
+): Promise<void> {
+  const request: ChannelMessageSetViewTimeRequest = { channelId };
+  await rootServer.community.channelMessages.setViewTime(request);
+}
+
 // --- COMMAND HANDLER: /echo <text> -------------------------------------------
 //
-// Demonstrates typing indicator → reply → edit → get lifecycle.
+// Demonstrates typing indicator → reply → edit → get → view-time lifecycle.
 // User sends "/echo hello" and we:
 //   1. Shows a typing indicator
 //   2. Replies to the user's message with the echoed text
 //   3. Edits the reply to add "(edited)" suffix
 //   4. Logs the message details via get
+//   5. Marks the channel as read via setViewTime
 
 async function onEchoCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
   if (evt.messageType === MessageType.System) return;
@@ -178,6 +189,9 @@ async function onEchoCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
 
     // 4. Read it back
     await getMessage(evt.channelId, messageId);
+
+    // 5. Mark the channel as read
+    await markChannelRead(evt.channelId);
 
   } catch (err: unknown) {
     if (err instanceof RootApiException) {
