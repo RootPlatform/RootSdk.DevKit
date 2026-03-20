@@ -1,7 +1,7 @@
 {
-  "name": "@rootsdk-howto/emojis",
+  "name": "@rootsdk-howto/lifecycle-bot",
   "author": "Root Communications, Inc.",
-  "description": "How-To: Emojis — get, list, delete community emojis; emoji events",
+  "description": "How-To: Lifecycle (Bot) — start, stop, start state, stopping callback",
   "version": "1.0.0",
   "private": true,
   "engines": {

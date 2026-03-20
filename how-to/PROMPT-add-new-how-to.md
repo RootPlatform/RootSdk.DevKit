@@ -134,7 +134,7 @@ Copy from `messages/` and change only:
 
 ## Bot Inventory
 
-Derived from the `rootServer` type in `@rootsdk/server-bot`. 19 bots, one bot per `rootServer` property.
+Derived from the `rootServer` type in `@rootsdk/server-bot`. 20 bots, one bot per `rootServer` property.
 
 | Bot | Client | Source files | Status |
 |-----|--------|-------------|--------|
@@ -158,6 +158,7 @@ Derived from the `rootServer` type in `@rootsdk/server-bot`. 19 bots, one bot pe
 | `voice/` | channelWebRtcs | `voice.ts` | Done |
 | `assets/` | assetClient | `assets.ts` | Planned |
 | `emojis/` | communityEmojis | `emojis.ts` | Done |
+| `lifecycle-bot/` | lifecycle (bot) | `lifecycle-bot.ts` | Done |
 | `global-settings/` | globalSettings | `global-settings.ts` | Deferred - only user-role picker implemented |
 
 ## Research
