@@ -26,7 +26,6 @@ import {
   ChannelMessageCreatedEvent,
   MessageType,
   UserGuid,
-  CommunityGuid,
 } from "@rootsdk/server-app";
 
 // --- SUBSCRIBE ---------------------------------------------------------------
@@ -51,27 +50,23 @@ export function initializeClients(state: RootAppStartState): void {
 // --- OPERATIONS --------------------------------------------------------------
 
 // Returns all currently connected users with their device arrays.
-// Pass communityId to filter by community (apps may serve multiple communities).
 // Each Client has: userId, communityId, deviceIds (all devices), deviceId
 // (current device, may be undefined).
-export function listConnectedClients(communityId?: CommunityGuid): Client[] {
-  return rootServer.clients.getClients(communityId);
+export function listConnectedClients(): Client[] {
+  return rootServer.clients.getClients();
 }
 
 // Returns a single connected user by userId, or undefined if the user has no
 // active connections. A user with multiple devices returns one Client object
 // containing all deviceIds.
-export function getConnectedClient(
-  userId: UserGuid,
-  communityId?: CommunityGuid,
-): Client | undefined {
-  return rootServer.clients.getClient(userId, communityId);
+export function getConnectedClient(userId: UserGuid): Client | undefined {
+  return rootServer.clients.getClient(userId);
 }
 
 // Returns raw device IDs for all connected devices. Use getClients() when you
 // need user-to-device mapping.
-export function listDeviceIds(communityId?: CommunityGuid): string[] {
-  return rootServer.clients.getDeviceIds(communityId);
+export function listDeviceIds(): string[] {
+  return rootServer.clients.getDeviceIds();
 }
 
 // --- EVENT HANDLERS ----------------------------------------------------------

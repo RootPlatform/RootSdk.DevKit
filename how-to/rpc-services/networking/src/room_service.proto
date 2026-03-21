@@ -1,0 +1,37 @@
+syntax = "proto3";
+package rpchowto;
+
+import "rootsdk/types.proto";
+
+// Each service defines its own error codes.
+// Values must be positive — negative codes are reserved for built-in
+// RootServerExceptionType (-1 through -8).
+enum RoomError {
+  ROOM_ERROR_UNSPECIFIED = 0;
+  ROOM_ERROR_NOT_FOUND = 1;
+  ROOM_ERROR_NOT_A_MEMBER = 2;
+  ROOM_ERROR_ROOM_FULL = 3;
+}
+
+message RoomJoinRequest { string room_id = 1; }
+message RoomJoinResponse { repeated string member_ids = 1; }
+
+message RoomLeaveRequest { string room_id = 1; }
+message RoomLeaveResponse {}
+
+message RoomSendRequest { string room_id = 1; string text = 2; }
+message RoomSendResponse {}
+
+message RoomJoinedEvent { string room_id = 1; string user_id = 2; }
+message RoomLeftEvent { string room_id = 1; string user_id = 2; }
+message RoomMessageEvent { string room_id = 1; string sender_id = 2; string text = 3; }
+
+service RoomService {
+  rpc Join(RoomJoinRequest) returns (RoomJoinResponse);
+  rpc Leave(RoomLeaveRequest) returns (RoomLeaveResponse);
+  rpc Send(RoomSendRequest) returns (RoomSendResponse);
+
+  rpc BroadcastJoined(RoomJoinedEvent) returns (rootsdk.Void);
+  rpc BroadcastLeft(RoomLeftEvent) returns (rootsdk.Void);
+  rpc BroadcastMessage(RoomMessageEvent) returns (rootsdk.Void);
+}

@@ -1,0 +1,44 @@
+syntax = "proto3";
+package rpchowto;
+
+import "rootsdk/types.proto";
+import "rootsdk/timestamp.proto";
+
+// Each service defines its own error codes.
+// Values must be positive — negative codes are reserved for built-in
+// RootServerExceptionType (-1 through -8).
+// Defined in proto so codegen exports them in gen-shared for both
+// server and client use.
+enum ItemError {
+  ITEM_ERROR_UNSPECIFIED = 0;
+  ITEM_ERROR_NOT_FOUND = 1;
+  ITEM_ERROR_DUPLICATE = 2;
+}
+
+message Item {
+  uint32 id = 1;
+  string name = 2;
+  string creator_id = 3;
+  rootsdk.Timestamp created_at = 4;
+}
+
+message ItemCreateRequest { string name = 1; }
+message ItemCreateResponse { Item item = 1; }
+
+message ItemListRequest {}
+message ItemListResponse { repeated Item items = 1; }
+
+message ItemDeleteRequest { uint32 id = 1; }
+message ItemDeleteResponse {}
+
+message ItemCreatedEvent { Item item = 1; }
+message ItemDeletedEvent { uint32 id = 1; }
+
+service ItemService {
+  rpc Create(ItemCreateRequest) returns (ItemCreateResponse);
+  rpc List(ItemListRequest) returns (ItemListResponse);
+  rpc Delete(ItemDeleteRequest) returns (ItemDeleteResponse);
+
+  rpc BroadcastCreated(ItemCreatedEvent) returns (rootsdk.Void);
+  rpc BroadcastDeleted(ItemDeletedEvent) returns (rootsdk.Void);
+}

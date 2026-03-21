@@ -10,9 +10,9 @@ Track connected users and devices in real time.
 
 ## SDK Methods
 
-- `clients.getClients(communityId?)` — list all connected users with their device arrays
-- `clients.getClient(userId, communityId?)` — look up a specific connected user
-- `clients.getDeviceIds(communityId?)` — list all connected device IDs
+- `clients.getClients()` — list all connected users with their device arrays
+- `clients.getClient(userId)` — look up a specific connected user
+- `clients.getDeviceIds()` — list all connected device IDs
 - `clients.on(event, listener)` / `clients.off(event, listener)` — subscribe to connection events
 
 ## Permissions
@@ -47,4 +47,3 @@ Track connected users and devices in real time.
 - **`user.detached` fires only when the last device disconnects** — if a user has 3 devices and one disconnects, only `user.device.detached` fires. `user.detached` fires when the third and final device disconnects.
 - **`Client.deviceIds`** is the full list of connected devices for that user. A `Client` object aggregates all devices.
 - **`ClientContext`** (from device events) has a single `deviceId` identifying the specific device. `Client` (from user events) has all `deviceIds`.
-- **Pass `communityId`** to filter queries to a specific community. When omitted, `getClient()` uses the app's default community.

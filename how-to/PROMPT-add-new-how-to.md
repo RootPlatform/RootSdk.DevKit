@@ -161,6 +161,7 @@ Derived from the `rootServer` type in `@rootsdk/server-bot` (20 bots) plus app-o
 | `lifecycle-bot/` | lifecycle (bot) | `lifecycle-bot.ts` | Done |
 | `lifecycle-app/` | lifecycle (app) | `lifecycle-app.ts` | Done |
 | `clients-app/` | clients (app) | `clients-app.ts` | Done |
+| `rpc-services/` | RPC services | `item_service.proto`, `room_service.proto`, `item-service.ts`, `room-service.ts`, `room-tracker.ts`, `ItemPanel.tsx`, `RoomPanel.tsx` | Done |
 | `global-settings/` | globalSettings | `global-settings.ts` | Deferred - only user-role picker implemented |
 
 ## Research
