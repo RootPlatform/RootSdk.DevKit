@@ -1,0 +1,23 @@
+{
+  "name": "@rootsdk-howto/clients-app",
+  "author": "Root Communications, Inc.",
+  "description": "How-To: Clients (App) — track connected users and devices in real time",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@rootsdk/server-app": "0.17.0",
+    "p-queue": "^8.0.1"
+  },
+  "devDependencies": {
+    "@rootsdk/dev-tools": "*",
+    "typescript": "^5.8.2"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "node clean.js",
+    "bot": "rootsdk start devhost"
+  }
+}

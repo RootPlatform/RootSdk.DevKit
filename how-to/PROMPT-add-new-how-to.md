@@ -134,7 +134,7 @@ Copy from `messages/` and change only:
 
 ## Bot Inventory
 
-Derived from the `rootServer` type in `@rootsdk/server-bot`. 20 bots, one bot per `rootServer` property.
+Derived from the `rootServer` type in `@rootsdk/server-bot` (20 bots) plus app-only properties from `@rootsdk/server-app` (2 app how-tos).
 
 | Bot | Client | Source files | Status |
 |-----|--------|-------------|--------|
@@ -156,9 +156,11 @@ Derived from the `rootServer` type in `@rootsdk/server-bot`. 20 bots, one bot pe
 | `community/` | communities | `community.ts` | Done |
 | `member-groups/` | memberGroups | `member-groups.ts` | Done |
 | `voice/` | channelWebRtcs | `voice.ts` | Done |
-| `assets/` | assetClient | `assets.ts` | Planned |
+| `assets/` | assetClient | `assets.ts` | Done (get() pending SDK export) |
 | `emojis/` | communityEmojis | `emojis.ts` | Done |
 | `lifecycle-bot/` | lifecycle (bot) | `lifecycle-bot.ts` | Done |
+| `lifecycle-app/` | lifecycle (app) | `lifecycle-app.ts` | Done |
+| `clients-app/` | clients (app) | `clients-app.ts` | Done |
 | `global-settings/` | globalSettings | `global-settings.ts` | Deferred - only user-role picker implemented |
 
 ## Research
@@ -180,3 +182,19 @@ Before writing a how-to bot, research the API surface using these locations:
 2. Permissions verified against `api-method-permissions.json`
 3. File names match common developer search queries
 4. Behavioral nuances discovered during implementation are captured inline
+
+## Comment Accuracy
+
+Every comment that describes SDK behavior must be verified before writing. Do not infer semantics from field names, implementation details (e.g., "WebSocket"), or related concepts. Follow this procedure:
+
+1. **Read the type definition** — the fields on an event or request type tell you what data is available and constrain what the event can mean.
+2. **Read the published docs** — `Docs.Developer/dist/` contains canonical descriptions for types, events, and methods. This is the primary source of truth for developer-facing semantics.
+3. **Check integration tests** — `Ops.Testing/test-server-multi/tests/test-cases/src/` shows real usage. What values are passed? What assertions are made?
+4. **Trace to the emitter** (if docs are unclear) — find the server-side code that fires the event or processes the request. The infrastructure code in `RootApp.Infrastructure/` is the ultimate source of truth.
+
+### Common pitfalls
+
+- **Upload tokens vs asset URIs** — Fields named `*TokenUri` (e.g., `uploadTokenUri`, `pictureTokenUri`, `iconTokenUri`) take raw upload tokens from `POST /asset/upload`, NOT asset URIs from `assets.create()`. The platform converts tokens to asset URIs internally.
+- **Attach/detach** — In the community member context, "attach" means a member opens the community on a device, "detach" means they close it. In the voice (WebRTC) context, "attach" means a user joins a voice call, "detach" means they leave. These are different concepts despite the shared terminology.
+- **Enum values** — Always verify the full set of values from the source enum definition. Do not assume gaps or omit values.
+- **Specific numbers** (timeouts, limits, sizes) — Verify against source code. If a number could change, use "approximately" and note where the value comes from.

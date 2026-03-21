@@ -10,7 +10,7 @@ Create, get, list, edit (rename), move, delete, search, and search across the co
 
 ## SDK Methods
 
-- `channelFiles.create(request)` — upload a file to a directory (requires uploadTokenUri from asset service)
+- `channelFiles.create(request)` — upload a file to a directory (requires uploadTokenUri from the platform upload endpoint)
 - `channelFiles.get(request)` — get a file by ID
 - `channelFiles.list(request)` — list files in a directory
 - `channelFiles.edit(request)` — rename a file (name is the only mutable field)
@@ -50,7 +50,7 @@ All code is identical between apps (`@rootsdk/server-app`) and bots (`@rootsdk/s
 
 ## Key Behaviors
 
-- **uploadTokenUri dependency** — `create()` requires an upload token from `rootServer.dataStore.assets.create()`, which is only available in `server-app` (not `server-bot`).
+- **uploadTokenUri dependency** — `create()` requires a raw upload token from the platform's asset upload endpoint. Upload tokens are temporary and should be used promptly, not stored.
 - **Every request requires channelId** — files are always scoped to a channel.
 - **Most requests require directoryId** — get, list, edit, delete all need it. Only search and searchCommunity skip it.
 - **edit() is rename-only** — the only mutable field is `name`. Use `move()` to change directories.

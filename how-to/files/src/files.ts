@@ -62,9 +62,10 @@ export function initializeFiles(): void {
 
 // --- OPERATIONS --------------------------------------------------------------
 
-// create() requires an uploadTokenUri obtained from the asset service:
-// rootServer.dataStore.assets.create({ tokens: [...] }) — available in server-app only.
-// The asset service maps upload tokens to asset URIs; pass that URI here.
+// create() requires an uploadTokenUri — a raw upload token from the platform's
+// asset upload endpoint. Upload tokens are temporary and should be used promptly,
+// not stored. In production, the client initiates the upload; in tests, use
+// community-builder's uploadFileContent() to generate tokens programmatically.
 // Requires channel.createFile permission.
 export async function createFile(
   channelId: ChannelGuid,

@@ -130,14 +130,16 @@ function onUserSetProfile(evt: UserSetProfileEvent): void {
   );
 }
 
-// Fires when a member's WebSocket connects to the community.
+// Fires when a member opens the community on a device.
+// If a member has multiple devices, this fires for each one.
 function onMemberAttach(evt: CommunityMemberAttachEvent): void {
   console.log(
     `Member attached: userId=${evt.userId} onlineStatus=${evt.onlineStatus}`,
   );
 }
 
-// Fires when a member's WebSocket disconnects from the community.
+// Fires when a member closes the community on a device.
+// Only broadcasts when the member's last device disconnects.
 function onMemberDetach(evt: CommunityMemberDetachEvent): void {
   console.log(`Member detached: userId=${evt.userId}`);
 }

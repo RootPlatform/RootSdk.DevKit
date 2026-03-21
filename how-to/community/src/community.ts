@@ -54,9 +54,9 @@ export async function getCommunity(): Promise<Community> {
 // Full replacement — every field is required. Omitting a field resets it to its
 // default, not "no change". To leave picture unchanged, set updatePicture: false.
 //
-// pictureTokenUri: requires an upload token from rootServer.dataStore.assets.create(),
-// which is only available in server-app (not server-bot). Set updatePicture: false
-// and omit pictureTokenUri to skip picture changes.
+// pictureTokenUri: a raw upload token from the platform's asset upload endpoint.
+// Upload tokens are temporary and should be used promptly, not stored.
+// Set updatePicture: false and omit pictureTokenUri to skip picture changes.
 //
 // Requires community.manageCommunity permission.
 export async function editCommunity(
@@ -145,8 +145,8 @@ function onCommunityJoined(evt: CommunityJoinedEvent): void {
   );
 }
 
-// CommunityLeaveReason: Unspecified = 0, User = 1 (voluntary), Kicked = 4 (removed).
-// Note the gap — there is no 2 or 3.
+// CommunityLeaveReason: Unspecified = 0, User = 1 (voluntary), Kicked = 4 (removed),
+// Banned = 7 (banned from the community). Note the gaps in numbering.
 function onCommunityLeave(evt: CommunityLeaveEvent): void {
   const reasonName = CommunityLeaveReason[evt.leaveReason] ?? "Unknown";
   console.log(
