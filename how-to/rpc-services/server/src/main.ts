@@ -15,6 +15,9 @@
 import {
   rootServer,
   RootAppStartState,
+  Client,
+  UserGuid,
+  CommunityGuid,
   ChannelMessageEvent,
   ChannelMessageCreatedEvent,
   MessageType,
@@ -22,7 +25,11 @@ import {
 import { itemService } from "./item-service";
 import { roomService } from "./room-service";
 
+let capturedCommunityId: CommunityGuid;
+
 async function onStarting(state: RootAppStartState) {
+  capturedCommunityId = state.communityId as CommunityGuid;
+
   // Register RPC services. Each addService() call registers all RPC methods
   // defined in the service's proto definition. Clients call these methods
   // via the generated client (gen-client).
@@ -59,18 +66,14 @@ async function onRpcServicesCommand(
   const lines: string[] = [];
 
   try {
-    // Self-test needs a Client object to exercise service methods.
+    // Self-test constructs a Client object to exercise service methods.
     // In production, clients call RPC methods via gen-client and the
     // Client is provided by the framework automatically.
-    const clients = rootServer.clients.getClients();
-    const testClient = clients.find((c) => c.userId === evt.userId);
-    if (!testClient) {
-      await messages.create({
-        channelId,
-        content: "\u2717 no connected client found for self-test",
-      });
-      return;
-    }
+    const testClient: Client = {
+      userId: evt.userId as UserGuid,
+      communityId: capturedCommunityId,
+      deviceIds: [],
+    };
 
     // --- ItemService tests ---
     const created = await itemService.create({ name: "Test Item" }, testClient);

@@ -15,6 +15,8 @@
 
 import {
   rootServer,
+  RootGuidUtils,
+  RootGuidType,
   CommunityEvent,
   CommunityEditedEvent,
   CommunityJoinedEvent,
@@ -129,7 +131,9 @@ async function onCommunityCommand(evt: ChannelMessageCreatedEvent): Promise<void
 }
 
 // --- EVENT HANDLERS ----------------------------------------------------------
-// These fire asynchronously for ALL community changes from any source.
+// Events fire only for changes that occur AFTER subscription. There is no
+// replay of historical events. The bot/app is already a community member when
+// onStarting runs, so its own join event is never received.
 
 function onCommunityEdited(evt: CommunityEditedEvent): void {
   console.log(
@@ -139,8 +143,15 @@ function onCommunityEdited(evt: CommunityEditedEvent): void {
 }
 
 function onCommunityJoined(evt: CommunityJoinedEvent): void {
+  // RootGuidUtils.toRootGuidType() extracts the type from any GUID.
+  // RootGuidType.App identifies bots and apps; RootGuidType.Person identifies humans.
+  // Use this to skip bot/app joins when you only want to act on human members.
+  const guidType = RootGuidUtils.toRootGuidType(evt.userId);
+  const isBot = guidType === RootGuidType.App;
+
   console.log(
     `Community joined: id=${evt.communityId} userId=${evt.userId} ` +
+    `type=${RootGuidType[guidType]} isBot=${isBot} ` +
     `roleIds=${evt.communityRoleIds?.join(", ") ?? "none"}`,
   );
 }

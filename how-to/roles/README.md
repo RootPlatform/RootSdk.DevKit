@@ -55,3 +55,4 @@ All code is identical between apps (`@rootsdk/server-app`) and bots (`@rootsdk/s
 - **list() is global** — returns all roles in the community with no parameters.
 - **beforeCommunityRoleId controls ordering** — on move, places the role before the specified role. Omit to move to the end.
 - **Roles define permissions; member-roles assign them** — see the `member-roles/` how-to for assigning roles to members.
+- **@everyone role** — `WellKnownRootGuids.CommunityRoles.EveryoneRole` is the GUID of the default role that every member has. Use it to identify or skip the @everyone role when iterating (see `onRolesCommand` in source).

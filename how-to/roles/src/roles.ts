@@ -30,6 +30,7 @@ import {
   CommunityRoleMovedEvent,
   CommunityPermission,
   ChannelPermission,
+  WellKnownRootGuids,
   ChannelMessageEvent,
   ChannelMessageCreatedEvent,
   MessageType,
@@ -143,6 +144,16 @@ async function onRolesCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
     // 1. List existing roles
     const existing = await listRoles();
     lines.push(`\u2713 listed ${existing.length} existing role(s)`);
+
+    // WellKnownRootGuids.CommunityRoles.EveryoneRole is the @everyone role GUID.
+    // Every community has this role and every member is assigned to it.
+    // Use it to identify or skip the default role when iterating roles.
+    const everyoneRole = existing.find(
+      (r) => r.id === WellKnownRootGuids.CommunityRoles.EveryoneRole,
+    );
+    lines.push(
+      `\u2713 @everyone role: ${everyoneRole ? everyoneRole.name : "not found"}`,
+    );
 
     // 2. Create a role
     const role = await createRole("test-role", true, "#AA00FF");
