@@ -104,6 +104,21 @@ export async function deleteChannel(id: ChannelGuid): Promise<void> {
   });
 }
 
+export async function findChannelsByName(name: string): Promise<Channel[]> {
+  // Channel names are not unique — multiple channels can share the same name.
+  // There is no listAll or search-by-name method for channels.
+  // Iterate every channel group and scan its channels.
+  const groups = await rootServer.community.channelGroups.list();
+  const matches: Channel[] = [];
+  for (const group of groups) {
+    const channels = await rootServer.community.channels.list({
+      channelGroupId: group.id,
+    });
+    matches.push(...channels.filter((ch) => ch.name === name));
+  }
+  return matches;
+}
+
 // --- COMMAND HANDLER: /channels ----------------------------------------------
 
 async function onChannelsCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
@@ -139,6 +154,11 @@ async function onChannelsCommand(evt: ChannelMessageCreatedEvent): Promise<void>
     step = 2;
     const channel = await createChannel(group.id, "test-channel", 1, true, "A test channel");
     lines.push(`✓ created channel: ${channel.name} (${channel.id})`);
+
+    // 2b. Find channels by name (cross-group search — names are not unique)
+    step = 10;
+    const found = await findChannelsByName("test-channel");
+    lines.push(`✓ found ${found.length} channel(s) named "test-channel"`);
 
     // 3. List channels
     step = 3;
@@ -177,7 +197,7 @@ async function onChannelsCommand(evt: ChannelMessageCreatedEvent): Promise<void>
     if (err?.meta) parts.push(`meta: ${JSON.stringify(err.meta)}`);
     if (err?.payload) parts.push(`payload: ${JSON.stringify(err.payload)}`);
     parts.push(`failed at step ${step}`);
-    if (lines.length > 0) parts.push(`completed ${lines.length}/7 steps`);
+    if (lines.length > 0) parts.push(`completed ${lines.length}/8 steps`);
     await messages.create({ channelId, content: parts.join("\n") });
   }
 }

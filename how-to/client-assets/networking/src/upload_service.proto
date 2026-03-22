@@ -1,0 +1,29 @@
+syntax = "proto3";
+package clientassets;
+
+// Error codes for UploadService.
+// Values must be positive — negative codes are reserved for built-in
+// RootServerExceptionType.
+enum UploadError {
+  UPLOAD_ERROR_UNSPECIFIED = 0;
+  UPLOAD_ERROR_INVALID_TOKEN = 1;
+  UPLOAD_ERROR_CONVERSION_FAILED = 2;
+}
+
+// Client sends the upload token received from rootClient.assets.fileUpload().
+message SubmitUploadRequest {
+  string token = 1;
+}
+
+// Server returns the permanent asset URI after converting and persisting it.
+message SubmitUploadResponse {
+  string asset_uri = 1;
+  string asset_type = 2;
+}
+
+service UploadService {
+  // Client uploads a file, gets a token, then submits it here.
+  // Server converts the token to a permanent asset URI, persists it,
+  // and returns it for client-side display.
+  rpc SubmitUpload(SubmitUploadRequest) returns (SubmitUploadResponse);
+}
