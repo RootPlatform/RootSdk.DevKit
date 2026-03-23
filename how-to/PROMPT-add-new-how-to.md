@@ -136,32 +136,36 @@ Copy from `messages/` and change only:
 
 Derived from the `rootServer` type in `@rootsdk/server-bot` (20 bots) plus app-only properties from `@rootsdk/server-app` (2 app how-tos).
 
-| Bot | Client | Source files | Status |
-|-----|--------|-------------|--------|
-| `messages/` | channelMessages | `send.ts`, `reactions.ts`, `pins.ts`, `mentions.ts`, `flag.ts` | Done |
-| `app-logs/` | dataStore.logs.community | `app-logs.ts` | Done |
-| `key-value-store/` | dataStore.appData | `kv-store.ts` | Done |
-| `database/` | dataStore.config (SQLite) | `database.ts` | Done |
-| `jobs/` | jobScheduler | `scheduler.ts` | Done |
-| `channels/` | channels | `channels.ts` | Done |
-| `channel-groups/` | channelGroups | `channel-groups.ts` | Done |
-| `access-rules/` | accessRules | `access-rules.ts` | Done |
-| `roles/` | communityRoles | `roles.ts` | Done |
-| `member-roles/` | communityMemberRoles | `member-roles.ts` | Done |
-| `members/` | communityMembers | `members.ts` | Done |
-| `kick-ban/` | communityMemberBans | `kick-ban.ts` | Done |
-| `invites/` | communityMemberInvites | `invites.ts` | Done |
-| `files/` | channelFiles | `files.ts` | Done |
-| `directories/` | channelDirectories | `directories.ts` | Done |
-| `community/` | communities | `community.ts` | Done |
-| `member-groups/` | memberGroups | `member-groups.ts` | Done |
-| `voice/` | channelWebRtcs | `voice.ts` | Done |
-| `assets/` | assetClient | `assets.ts` | Done (get() pending SDK export) |
-| `emojis/` | communityEmojis | `emojis.ts` | Done |
-| `lifecycle-bot/` | lifecycle (bot) | `lifecycle-bot.ts` | Done |
-| `lifecycle-app/` | lifecycle (app) | `lifecycle-app.ts` | Done |
-| `clients-app/` | clients (app) | `clients-app.ts` | Done |
-| `rpc-services/` | RPC services | `item_service.proto`, `room_service.proto`, `item-service.ts`, `room-service.ts`, `room-tracker.ts`, `ItemPanel.tsx`, `RoomPanel.tsx` | Done |
+| How-to | Client | Source files | Status |
+|--------|--------|-------------|--------|
+| `server-messages/` | channelMessages | `send.ts`, `reactions.ts`, `pins.ts`, `mentions.ts`, `flag.ts` | Done |
+| `server-community-logs/` | dataStore.logs.community | `app-logs.ts` | Done |
+| `server-key-value-store/` | dataStore.appData | `kv-store.ts` | Done |
+| `server-database/` | dataStore.config (SQLite) | `database.ts` | Done |
+| `server-jobs/` | jobScheduler | `scheduler.ts` | Done |
+| `server-channels/` | channels | `channels.ts` | Done |
+| `server-channel-groups/` | channelGroups | `channel-groups.ts` | Done |
+| `server-access-rules/` | accessRules | `access-rules.ts` | Done |
+| `server-roles/` | communityRoles | `roles.ts` | Done |
+| `server-member-roles/` | communityMemberRoles | `member-roles.ts` | Done |
+| `server-members/` | communityMembers | `members.ts` | Done |
+| `server-kick-ban/` | communityMemberBans | `kick-ban.ts` | Done |
+| `server-invites/` | communityMemberInvites | `invites.ts` | Done |
+| `server-files/` | channelFiles | `files.ts` | Done |
+| `server-directories/` | channelDirectories | `directories.ts` | Done |
+| `server-community/` | communities | `community.ts` | Done |
+| `server-member-groups/` | memberGroups | `member-groups.ts` | Done |
+| `server-voice/` | channelWebRtcs | `voice.ts` | Done |
+| `server-app-assets/` | assetClient | `assets.ts` | Done (get() pending SDK export) |
+| `server-emojis/` | communityEmojis | `emojis.ts` | Done |
+| `server-global-settings/` | globalSettings, update event, roleOrMember | `global-settings.ts` | Done |
+| `server-guid-utils/` | RootGuidUtils, RootGuidConverter | `guid-utils.ts` | Done |
+| `server-bot-lifecycle/` | lifecycle (bot) | `lifecycle-bot.ts` | Done |
+| `server-app-lifecycle/` | lifecycle (app) | `lifecycle-app.ts` | Done |
+| `server-app-connected-clients/` | clients (app) | `clients-app.ts` | Done |
+| `networking-app-services/` | RPC services | `item_service.proto`, `room_service.proto`, `item-service.ts`, `room-service.ts`, `room-tracker.ts`, `ItemPanel.tsx`, `RoomPanel.tsx` | Done |
+| `client-app-users/` | rootClient.users | `UserCard.tsx` | Done |
+| `client-app-assets/` | rootClient.assets | `AssetDemo.tsx` | Done |
 | `global-settings/` | globalSettings | `global-settings.ts` | Deferred - only user-role picker implemented |
 
 ## Research

@@ -1,0 +1,24 @@
+{
+  "id": "AC25K38wjgmf2nzkzpLJnA",
+  "version": "1.0.0",
+  "package": {
+    "server": {
+      "launch": "dist/main.js",
+      "deploy": [
+        "dist"
+      ],
+      "nodeModules": [
+        "node_modules"
+      ]
+    }
+  },
+  "permissions": {
+    "community": {
+      "createChannelGroup": true
+    },
+    "channel": {
+      "fullControl": true,
+      "createMessage": true
+    }
+  }
+}
