@@ -11,6 +11,10 @@
 // is exactly one per app/bot installation. get() takes zero parameters.
 // edit() is a full replacement — all fields are required, not a partial patch.
 //
+// IMPORTANT: A bot/app never receives its own CommunityJoined event because
+// it is already a member when onStarting runs. To detect other bots joining,
+// check RootGuidUtils.toRootGuidType(evt.userId) === RootGuidType.App.
+//
 // ============================================================================
 
 import {
