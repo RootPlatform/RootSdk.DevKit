@@ -8,11 +8,11 @@
     "node": ">=22"
   },
   "dependencies": {
-    "@rootsdk/server-bot": "0.17.1-alpha.1",
+    "@rootsdk/server-bot": "0.17.1-alpha.5",
     "p-queue": "^9.1.0"
   },
   "devDependencies": {
-    "@rootsdk/dev-tools": "*",
+    "@rootsdk/dev-tools": "0.17.1-alpha.5",
     "typescript": "^5.8.2"
   },
   "scripts": {
