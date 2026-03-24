@@ -1,0 +1,540 @@
+{
+  "AccessRuleClient.create": {
+    "manifestPermissions": [
+      { "permission": "fullControl", "category": "Channel" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "fullControl", "target": "on the target channel or channel group" }
+    ]
+  },
+  "AccessRuleClient.edit": {
+    "manifestPermissions": [
+      { "permission": "fullControl", "category": "Channel" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "fullControl", "target": "on the target channel or channel group" }
+    ]
+  },
+  "AccessRuleClient.update": {
+    "manifestPermissions": [
+      { "permission": "fullControl", "category": "Channel" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "fullControl", "target": "on the target channel or channel group" }
+    ]
+  },
+  "AccessRuleClient.listByChannelOrChannelGroup": {
+    "manifestPermissions": [],
+    "accessRuleTargets": []
+  },
+  "AccessRuleClient.listByRoleOrMember": {
+    "manifestPermissions": [],
+    "accessRuleTargets": []
+  },
+  "AccessRuleClient.get": {
+    "manifestPermissions": [],
+    "accessRuleTargets": []
+  },
+  "AccessRuleClient.delete": {
+    "manifestPermissions": [
+      { "permission": "fullControl", "category": "Channel" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "fullControl", "target": "on the target channel or channel group" }
+    ]
+  },
+
+  "ChannelClient.create": {
+    "manifestPermissions": [
+      { "permission": "fullControl", "category": "Channel" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "fullControl", "target": "on the containing channel group" }
+    ]
+  },
+  "ChannelClient.get": {
+    "manifestPermissions": [],
+    "accessRuleTargets": []
+  },
+  "ChannelClient.list": {
+    "manifestPermissions": [],
+    "accessRuleTargets": []
+  },
+  "ChannelClient.move": {
+    "manifestPermissions": [
+      { "permission": "fullControl", "category": "Channel" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "fullControl", "target": "on the source channel group" },
+      { "permission": "fullControl", "target": "on the destination channel group" }
+    ]
+  },
+  "ChannelClient.edit": {
+    "manifestPermissions": [
+      { "permission": "fullControl", "category": "Channel" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "fullControl", "target": "on the channel" }
+    ]
+  },
+  "ChannelClient.delete": {
+    "manifestPermissions": [
+      { "permission": "fullControl", "category": "Channel" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "fullControl", "target": "on the channel" }
+    ]
+  },
+
+  "ChannelDirectoryClient.create": {
+    "manifestPermissions": [
+      { "permission": "createFile", "category": "Channel" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "createFile", "target": "on the channel" }
+    ]
+  },
+  "ChannelDirectoryClient.edit": {
+    "manifestPermissions": [
+      { "permission": "manageFiles", "category": "Channel" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "manageFiles", "target": "on the channel" }
+    ]
+  },
+  "ChannelDirectoryClient.move": {
+    "manifestPermissions": [
+      { "permission": "manageFiles", "category": "Channel" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "manageFiles", "target": "on the channel" }
+    ]
+  },
+  "ChannelDirectoryClient.delete": {
+    "manifestPermissions": [
+      { "permission": "manageFiles", "category": "Channel" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "manageFiles", "target": "on the channel" }
+    ]
+  },
+  "ChannelDirectoryClient.get": {
+    "manifestPermissions": [
+      { "permission": "viewFile", "category": "Channel" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "viewFile", "target": "on the channel" }
+    ]
+  },
+  "ChannelDirectoryClient.list": {
+    "manifestPermissions": [
+      { "permission": "viewFile", "category": "Channel" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "viewFile", "target": "on the channel" }
+    ]
+  },
+
+  "ChannelFileClient.create": {
+    "manifestPermissions": [
+      { "permission": "createFile", "category": "Channel" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "createFile", "target": "on the channel" }
+    ]
+  },
+  "ChannelFileClient.edit": {
+    "manifestPermissions": [
+      { "permission": "manageFiles", "category": "Channel" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "manageFiles", "target": "on the channel" }
+    ]
+  },
+  "ChannelFileClient.move": {
+    "manifestPermissions": [
+      { "permission": "manageFiles", "category": "Channel" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "manageFiles", "target": "on the channel" }
+    ]
+  },
+  "ChannelFileClient.search": {
+    "manifestPermissions": [
+      { "permission": "viewFile", "category": "Channel" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "viewFile", "target": "on the channel" }
+    ]
+  },
+  "ChannelFileClient.searchCommunity": {
+    "manifestPermissions": [
+      { "permission": "viewFile", "category": "Channel" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "viewFile", "target": "on the channel" }
+    ]
+  },
+  "ChannelFileClient.delete": {
+    "manifestPermissions": [
+      { "permission": "manageFiles", "category": "Channel" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "manageFiles", "target": "on the channel" }
+    ]
+  },
+  "ChannelFileClient.list": {
+    "manifestPermissions": [
+      { "permission": "viewFile", "category": "Channel" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "viewFile", "target": "on the channel" }
+    ]
+  },
+  "ChannelFileClient.get": {
+    "manifestPermissions": [
+      { "permission": "viewFile", "category": "Channel" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "viewFile", "target": "on the channel" }
+    ]
+  },
+
+  "ChannelGroupClient.create": {
+    "manifestPermissions": [
+      { "permission": "createChannelGroup", "category": "Community" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "createChannelGroup", "target": "on the community" }
+    ]
+  },
+  "ChannelGroupClient.get": {
+    "manifestPermissions": [],
+    "accessRuleTargets": []
+  },
+  "ChannelGroupClient.list": {
+    "manifestPermissions": [],
+    "accessRuleTargets": []
+  },
+  "ChannelGroupClient.edit": {
+    "manifestPermissions": [
+      { "permission": "fullControl", "category": "Channel" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "fullControl", "target": "on the channel group" }
+    ]
+  },
+  "ChannelGroupClient.move": {
+    "manifestPermissions": [
+      { "permission": "fullControl", "category": "Channel" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "fullControl", "target": "on the channel group" }
+    ]
+  },
+  "ChannelGroupClient.delete": {
+    "manifestPermissions": [
+      { "permission": "fullControl", "category": "Channel" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "fullControl", "target": "on the channel group" },
+      { "permission": "fullControl", "target": "on all contained channels" }
+    ]
+  },
+
+  "ChannelMessageClient.create": {
+    "manifestPermissions": [
+      { "permission": "createMessage", "category": "Channel" },
+      { "permission": "createMessageAttachment", "category": "Channel", "when": "if message includes attachments" },
+      { "permission": "createMessageMention", "category": "Channel", "when": "if message mentions @All, @Here, or a non-mentionable role" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "createMessage", "target": "on the channel" },
+      { "permission": "createMessageAttachment", "target": "on the channel", "toAllow": "sending attachments" },
+      { "permission": "createMessageMention", "target": "on the channel", "toAllow": "mentioning @All, @Here, or non-mentionable roles" }
+    ]
+  },
+  "ChannelMessageClient.delete": {
+    "manifestPermissions": [
+      { "permission": "deleteMessageOther", "category": "Channel", "when": "if deleting messages created by others" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "deleteMessageOther", "target": "on the channel", "toAllow": "deleting messages created by others" }
+    ],
+    "note": "No permission required to delete your own messages"
+  },
+  "ChannelMessageClient.edit": {
+    "manifestPermissions": [],
+    "accessRuleTargets": [],
+    "note": "Can only edit messages created by your code; no permission required"
+  },
+  "ChannelMessageClient.get": {
+    "manifestPermissions": [],
+    "accessRuleTargets": []
+  },
+  "ChannelMessageClient.list": {
+    "manifestPermissions": [
+      { "permission": "viewMessageHistory", "category": "Channel", "when": "if listing messages sent before the code was added to the channel" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "viewMessageHistory", "target": "on the channel", "toAllow": "viewing messages sent before the code was added" }
+    ],
+    "note": "Without ViewMessageHistory, results are limited to messages sent after the code was added to the channel"
+  },
+  "ChannelMessageClient.flag": {
+    "manifestPermissions": [],
+    "accessRuleTargets": []
+  },
+  "ChannelMessageClient.pinCreate": {
+    "manifestPermissions": [
+      { "permission": "managePinnedMessages", "category": "Channel" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "managePinnedMessages", "target": "on the channel" }
+    ]
+  },
+  "ChannelMessageClient.pinDelete": {
+    "manifestPermissions": [
+      { "permission": "managePinnedMessages", "category": "Channel" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "managePinnedMessages", "target": "on the channel" }
+    ]
+  },
+  "ChannelMessageClient.pinList": {
+    "manifestPermissions": [],
+    "accessRuleTargets": []
+  },
+  "ChannelMessageClient.reactionCreate": {
+    "manifestPermissions": [
+      { "permission": "createMessageReaction", "category": "Channel" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "createMessageReaction", "target": "on the channel" }
+    ]
+  },
+  "ChannelMessageClient.reactionDelete": {
+    "manifestPermissions": [
+      { "permission": "createMessageReaction", "category": "Channel" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "createMessageReaction", "target": "on the channel" }
+    ],
+    "note": "Can only delete reactions created by your code"
+  },
+  "ChannelMessageClient.setTypingIndicator": {
+    "manifestPermissions": [],
+    "accessRuleTargets": []
+  },
+  "ChannelMessageClient.setViewTime": {
+    "manifestPermissions": [],
+    "accessRuleTargets": []
+  },
+
+  "ChannelWebRtcClient.setMuteAndDeafenOther": {
+    "manifestPermissions": [
+      { "permission": "voiceMuteOther", "category": "Channel", "when": "if setting isMuted" },
+      { "permission": "voiceDeafenOther", "category": "Channel", "when": "if setting isDeafened" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "voiceMuteOther", "target": "on the channel", "toAllow": "muting other users" },
+      { "permission": "voiceDeafenOther", "target": "on the channel", "toAllow": "deafening other users" }
+    ]
+  },
+  "ChannelWebRtcClient.kick": {
+    "manifestPermissions": [
+      { "permission": "voiceKick", "category": "Channel" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "voiceKick", "target": "on the channel" }
+    ]
+  },
+  "ChannelWebRtcClient.list": {
+    "manifestPermissions": [],
+    "accessRuleTargets": []
+  },
+
+  "CommunityClient.get": {
+    "manifestPermissions": [],
+    "accessRuleTargets": []
+  },
+  "CommunityClient.edit": {
+    "manifestPermissions": [
+      { "permission": "manageCommunity", "category": "Community" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "manageCommunity", "target": "on the community" }
+    ]
+  },
+
+  "CommunityMemberBanClient.create": {
+    "manifestPermissions": [
+      { "permission": "createBan", "category": "Community" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "createBan", "target": "on the community" }
+    ]
+  },
+  "CommunityMemberBanClient.delete": {
+    "manifestPermissions": [
+      { "permission": "manageBans", "category": "Community" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "manageBans", "target": "on the community" }
+    ]
+  },
+  "CommunityMemberBanClient.kick": {
+    "manifestPermissions": [
+      { "permission": "kick", "category": "Community" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "kick", "target": "on the community" }
+    ]
+  },
+  "CommunityMemberBanClient.list": {
+    "manifestPermissions": [
+      { "permission": "manageBans", "category": "Community" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "manageBans", "target": "on the community" }
+    ]
+  },
+  "CommunityMemberBanClient.get": {
+    "manifestPermissions": [
+      { "permission": "manageBans", "category": "Community" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "manageBans", "target": "on the community" }
+    ]
+  },
+
+  "CommunityMemberInviteClient.delete": {
+    "manifestPermissions": [
+      { "permission": "manageInvites", "category": "Community" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "manageInvites", "target": "on the community" }
+    ]
+  },
+  "CommunityMemberInviteClient.get": {
+    "manifestPermissions": [
+      { "permission": "manageInvites", "category": "Community" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "manageInvites", "target": "on the community" }
+    ]
+  },
+  "CommunityMemberInviteClient.list": {
+    "manifestPermissions": [
+      { "permission": "manageInvites", "category": "Community" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "manageInvites", "target": "on the community" }
+    ]
+  },
+
+  "CommunityRoleClient.create": {
+    "manifestPermissions": [
+      { "permission": "manageRoles", "category": "Community" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "manageRoles", "target": "on the community" }
+    ],
+    "note": "Your code can only grant permissions that it already has"
+  },
+  "CommunityRoleClient.edit": {
+    "manifestPermissions": [
+      { "permission": "manageRoles", "category": "Community" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "manageRoles", "target": "on the community" }
+    ],
+    "note": "Your code can only grant permissions that it already has"
+  },
+  "CommunityRoleClient.move": {
+    "manifestPermissions": [
+      { "permission": "manageRoles", "category": "Community" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "manageRoles", "target": "on the community" }
+    ]
+  },
+  "CommunityRoleClient.delete": {
+    "manifestPermissions": [
+      { "permission": "manageRoles", "category": "Community" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "manageRoles", "target": "on the community" }
+    ],
+    "note": "Your code can only delete roles whose permissions are a subset of its own."
+  },
+  "CommunityRoleClient.list": {
+    "manifestPermissions": [],
+    "accessRuleTargets": []
+  },
+  "CommunityRoleClient.get": {
+    "manifestPermissions": [],
+    "accessRuleTargets": []
+  },
+
+  "CommunityMemberClient.get": {
+    "manifestPermissions": [],
+    "accessRuleTargets": []
+  },
+  "CommunityMemberClient.list": {
+    "manifestPermissions": [],
+    "accessRuleTargets": []
+  },
+  "CommunityMemberClient.listAll": {
+    "manifestPermissions": [],
+    "accessRuleTargets": []
+  },
+
+  "CommunityMemberRoleClient.add": {
+    "manifestPermissions": [
+      { "permission": "manageRoles", "category": "Community" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "manageRoles", "target": "on the community" }
+    ],
+    "note": "Your code can only assign roles whose permissions are a subset of its own."
+  },
+  "CommunityMemberRoleClient.list": {
+    "manifestPermissions": [],
+    "accessRuleTargets": []
+  },
+  "CommunityMemberRoleClient.remove": {
+    "manifestPermissions": [
+      { "permission": "manageRoles", "category": "Community" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "manageRoles", "target": "on the community" }
+    ],
+    "note": "Your code can only remove roles whose permissions are a subset of its own."
+  },
+  "CommunityMemberRoleClient.setPrimary": {
+    "manifestPermissions": [
+      { "permission": "manageRoles", "category": "Community" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "manageRoles", "target": "on the community" }
+    ]
+  },
+
+  "CommunityEmojiClient.get": {
+    "manifestPermissions": [],
+    "accessRuleTargets": []
+  },
+  "CommunityEmojiClient.list": {
+    "manifestPermissions": [],
+    "accessRuleTargets": []
+  },
+  "CommunityEmojiClient.delete": {
+    "manifestPermissions": [
+      { "permission": "manageEmojis", "category": "Community" }
+    ],
+    "accessRuleTargets": [
+      { "permission": "manageEmojis", "target": "on the community" }
+    ]
+  }
+}

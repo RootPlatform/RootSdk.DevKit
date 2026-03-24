@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Version",
+  "type": "string",
+  "description": "Semantic version string (e.g., MAJOR.MINOR.PATCH). Your version number must be unique for each release; that is, you cannot republish a new package with a previously-used version number.",
+  "examples": [
+    {
+      "version": "1.0.0"
+    }
+  ]
+}

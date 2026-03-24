@@ -217,8 +217,9 @@ async function onEchoCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
 
 // --- EVENT HANDLERS ----------------------------------------------------------
 //
-// These fire for ALL messages in channels your app has access to — not just
-// messages you sent. Check evt.messageType to filter system messages.
+// These fire for messages by OTHER users, bots, and apps in channels you have
+// access to. You will NOT receive events for your own messages.
+// Check evt.messageType to filter system messages.
 
 async function onMessageCreated(evt: ChannelMessageCreatedEvent): Promise<void> {
   if (evt.messageType === MessageType.System) return;

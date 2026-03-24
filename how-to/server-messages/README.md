@@ -55,14 +55,14 @@ Required in `root-manifest.json`:
 
 | Event | Fires when |
 |-------|-----------|
-| `ChannelMessageCreated` | Any message is sent |
-| `ChannelMessageEdited` | Any message is edited |
-| `ChannelMessageDeleted` | Any message is deleted |
-| `ChannelMessageReactionCreated` | Any reaction is added |
-| `ChannelMessageReactionDeleted` | Any reaction is removed |
-| `ChannelMessagePinCreated` | Any message is pinned |
-| `ChannelMessagePinDeleted` | Any message is unpinned |
-| `ChannelMessageSetTypingIndicator` | Any user starts/stops typing |
+| `ChannelMessageCreated` | Another user sends a message (not your own) |
+| `ChannelMessageEdited` | Another user edits a message (not your own edits) |
+| `ChannelMessageDeleted` | Another user deletes a message (not your own deletes) |
+| `ChannelMessageReactionCreated` | Another user adds a reaction (not your own) |
+| `ChannelMessageReactionDeleted` | Another user removes a reaction (not your own) |
+| `ChannelMessagePinCreated` | Another user pins a message (not your own) |
+| `ChannelMessagePinDeleted` | Another user unpins a message (not your own) |
+| `ChannelMessageSetTypingIndicator` | Another user starts/stops typing (not your own) |
 
 ## Apps vs Bots
 
@@ -75,6 +75,7 @@ All SDK methods, event subscriptions, types, and error handling are identical.
 
 ## Key Behaviors
 
+- You do not receive events for your own actions — message, reaction, pin, and typing events only fire for other users
 - Edit only works on your own messages (no permission required)
 - Delete your own messages without permission; `deleteMessageOther` to delete others'
 - You can only remove your own reactions (not reactions by other users)

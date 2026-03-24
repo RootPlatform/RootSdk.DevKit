@@ -1,0 +1,318 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Settings",
+  "description": "Configurable global settings. They're declared in your manifest and set by community members with the `Manage Apps` permission during and after installation.",
+  "x-doc-note": "This feature is a work in progress.",
+  "type": "object",
+  "required": ["groups"],
+  "additionalProperties": false,
+  "properties": {
+    "groups": {
+      "type": "array",
+      "description": "Logical grouping of settings fields.",
+      "items": {
+        "type": "object",
+        "required": ["key", "title", "items"],
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Machine-friendly identifier for this group.",
+            "examples": ["general", "notifications"]
+          },
+          "title": {
+            "type": "string",
+            "description": "Human-readable title shown above this group.",
+            "examples": ["General Settings", "Notification Preferences"]
+          },
+          "items": {
+            "type": "array",
+            "description": "List of individual setting definitions in this group.",
+            "items": {
+              "type": "object",
+              "required": ["key", "title", "required", "confirmation"],
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "description": "Machine-friendly setting identifier.",
+                  "examples": ["maxRaidSize", "notifyOnJoin"]
+                },
+                "title": {
+                  "type": "string",
+                  "description": "Label shown to the user for this setting.",
+                  "examples": ["Maximum raid size", "Notify on new join"]
+                },
+                "description": {
+                  "type": ["string", "null"],
+                  "description": "Optional explanatory text for this setting.",
+                  "examples": ["Set the upper limit for raid participants.", null]
+                },
+                "required": {
+                  "type": "boolean",
+                  "description": "Whether the user must provide a value.",
+                  "examples": [true, false]
+                },
+                "confirmation": {
+                  "type": "string",
+                  "description": "Text for the button users click to save this setting.",
+                  "examples": ["Save", "Update"]
+                },
+                "text": {
+                  "type": ["object", "null"],
+                  "description": "Configuration for a free-form text input.",
+                  "properties": {
+                    "defaultValue": {
+                      "type": ["string", "null"],
+                      "description": "Default text pre-filled in the input.",
+                      "examples": ["Enter a title...", null]
+                    },
+                    "regex": {
+                      "type": ["string", "null"],
+                      "description": "Regular expression the input must match.",
+                      "examples": ["^[a-z0-9\\-]+$", null]
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "number": {
+                  "type": ["object", "null"],
+                  "description": "Configuration for a numeric input.",
+                  "properties": {
+                    "minValue": {
+                      "type": ["number", "null"],
+                      "description": "Minimum allowed value.",
+                      "examples": [1, null]
+                    },
+                    "maxValue": {
+                      "type": ["number", "null"],
+                      "description": "Maximum allowed value.",
+                      "examples": [100, null]
+                    },
+                    "step": {
+                      "type": ["number", "null"],
+                      "description": "Increment step.",
+                      "examples": [1, null]
+                    },
+                    "defaultValue": {
+                      "type": ["number", "null"],
+                      "description": "Default numeric value.",
+                      "examples": [10, null]
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "checkbox": {
+                  "type": ["object", "null"],
+                  "description": "Configuration for a boolean checkbox.",
+                  "properties": {
+                    "defaultValue": {
+                      "type": ["boolean", "null"],
+                      "description": "Initial state of the checkbox.",
+                      "examples": [true, false]
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "member": {
+                  "type": ["object", "null"],
+                  "description": "Select one or more community members.",
+                  "properties": {
+                    "multiSelect": {
+                      "type": "boolean",
+                      "description": "Allow multiple selections.",
+                      "examples": [false, true]
+                    },
+                    "userIds": {
+                      "type": "array",
+                      "description": "Pre-selected user IDs.",
+                      "items": { "type": "string" },
+                      "examples": [["user-123", "user-456"]]
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "role": {
+                  "type": ["object", "null"],
+                  "description": "Select one or more community roles.",
+                  "properties": {
+                    "multiSelect": {
+                      "type": "boolean",
+                      "description": "Allow multiple role selections.",
+                      "examples": [false, true]
+                    },
+                    "communityRoleIds": {
+                      "type": "array",
+                      "description": "Pre-selected role IDs.",
+                      "items": { "type": "string" },
+                      "examples": [["role-abc", "role-def"]]
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "roleAndMember": {
+                  "type": ["object", "null"],
+                  "description": "Combined selector for users and roles.",
+                  "properties": {
+                    "userIds": {
+                      "type": "array",
+                      "items": { "type": "string" },
+                      "examples": [["user-1"]]
+                    },
+                    "communityRoleIds": {
+                      "type": "array",
+                      "items": { "type": "string" },
+                      "examples": [["role-x"]]
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "channel": {
+                  "type": ["object", "null"],
+                  "description": "Select one or more channels.",
+                  "properties": {
+                    "multiSelect": {
+                      "type": "boolean",
+                      "description": "Allow multiple channels.",
+                      "examples": [true]
+                    },
+                    "channelIds": {
+                      "type": "array",
+                      "items": { "type": "string" },
+                      "examples": [["chan-1", "chan-2"]]
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "channelGroup": {
+                  "type": ["object", "null"],
+                  "description": "Select one or more channel groups.",
+                  "properties": {
+                    "multiSelect": {
+                      "type": "boolean",
+                      "description": "Allow multiple groups.",
+                      "examples": [false]
+                    },
+                    "channelGroupIds": {
+                      "type": "array",
+                      "items": { "type": "string" },
+                      "examples": [["grp-1"]]
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "select": {
+                  "type": ["object", "null"],
+                  "description": "Select from a custom list of options.",
+                  "properties": {
+                    "multiSelect": {
+                      "type": "boolean",
+                      "description": "Allow multiple options.",
+                      "examples": [false]
+                    },
+                    "options": {
+                      "type": "array",
+                      "description": "List of label/value pairs.",
+                      "items": {
+                        "type": "object",
+                        "required": ["label", "value"],
+                        "properties": {
+                          "label": {
+                            "type": "string",
+                            "description": "User-facing option text.",
+                            "examples": ["Low", "Medium", "High"]
+                          },
+                          "value": {
+                            "type": "string",
+                            "description": "Machine value for the option.",
+                            "examples": ["low", "medium", "high"]
+                          }
+                        },
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "timestamp": {
+                  "type": ["object", "null"],
+                  "description": "Raw timestamp object (ISO 8601).",
+                  "examples": [{"$date": "2025-08-05T00:00:00Z"}]
+                },
+                "time": {
+                  "type": ["object", "null"],
+                  "description": "Time-of-day field (HH:MM:SS).",
+                  "properties": {
+                    "defaultValue": {
+                      "type": ["string", "null"],
+                      "description": "Default time value.",
+                      "examples": ["09:30:00", null]
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "date": {
+                  "type": ["object", "null"],
+                  "description": "Date field object (YYYY-MM-DD).",
+                  "properties": {
+                    "date": {
+                      "type": ["object", "null"],
+                      "description": "Raw date object.",
+                      "examples": [{"$date": "2025-08-05"}]
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "color": {
+                  "type": ["object", "null"],
+                  "description": "Color picker field (hex code).",
+                  "properties": {
+                    "defaultValue": {
+                      "type": ["string", "null"],
+                      "description": "Default color value.",
+                      "examples": ["#ff0000", null]
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "button": {
+                  "type": ["object", "null"],
+                  "description": "Action button displayed in settings.",
+                  "properties": {
+                    "title": {
+                      "type": "string",
+                      "description": "Text shown on the button.",
+                      "examples": ["Reset settings"]
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "groups": [
+        {
+          "key": "general",
+          "title": "General",
+          "items": [
+            {
+              "key": "notifyOnJoin",
+              "title": "Notify on new join",
+              "description": "Send a message when someone joins the raid.",
+              "required": false,
+              "confirmation": "Update",
+              "checkbox": {
+                "defaultValue": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

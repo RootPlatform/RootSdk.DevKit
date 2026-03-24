@@ -19,6 +19,7 @@
 import {
   rootServer,
   RootServerException,
+  AssetGetResponse,
 } from "@rootsdk/server-app";
 
 import { UploadServiceBase } from "@clientassets/gen-server";
@@ -73,8 +74,7 @@ class UploadService extends UploadServiceBase {
     // Step 2: Resolve asset metadata to determine the type.
     let assetType = "unknown";
     try {
-      const assets = rootServer.dataStore.assets as any;
-      const metadata = await assets.get({ uris: [assetUri] });
+      const metadata: AssetGetResponse = await rootServer.dataStore.assets.get({ uris: [assetUri] });
       const info = metadata.assets[assetUri];
       if (info?.link?.oneofKind) {
         assetType = info.link.oneofKind;

@@ -29,6 +29,10 @@ import {
   MemberGroupServiceEvent,
   MemberGroup,
   MemberGroupShort,
+  MemberGroupMembersAddedEvent,
+  MemberGroupMembersRemovedEvent,
+  MemberGroupStateChangedEvent,
+  MemberGroupEmptiedEvent,
   ChannelMessageEvent,
   ChannelMessageCreatedEvent,
   MessageType,
@@ -40,8 +44,7 @@ export function initializeMemberGroups(): void {
   const memberGroups = rootServer.memberGroups;
   const messages = rootServer.community.channelMessages;
 
-  // Member group events — event payload types are not exported from the SDK,
-  // so we use TypeScript inference on the callback parameter.
+  // Member group events
   memberGroups.on(MemberGroupServiceEvent.MembersAdded, onMembersAdded);
   memberGroups.on(MemberGroupServiceEvent.MembersRemoved, onMembersRemoved);
   memberGroups.on(MemberGroupServiceEvent.StateChanged, onStateChanged);
@@ -270,24 +273,22 @@ async function onMemberGroupsCommand(evt: ChannelMessageCreatedEvent): Promise<v
 
 // --- EVENT HANDLERS ----------------------------------------------------------
 // Events fire on the service (rootServer.memberGroups), not on individual instances.
-// Payload types are not exported from the SDK — TypeScript infers them from
-// the MemberGroupServiceEvents map.
 
-function onMembersAdded(evt: { memberGroup: MemberGroup; userIds: string[] }): void {
+function onMembersAdded(evt: MemberGroupMembersAddedEvent): void {
   console.log(
     `Members added: group=${evt.memberGroup.id} name="${evt.memberGroup.name}" ` +
     `userIds=[${evt.userIds.join(", ")}]`,
   );
 }
 
-function onMembersRemoved(evt: { memberGroup: MemberGroup; userIds: string[] }): void {
+function onMembersRemoved(evt: MemberGroupMembersRemovedEvent): void {
   console.log(
     `Members removed: group=${evt.memberGroup.id} name="${evt.memberGroup.name}" ` +
     `userIds=[${evt.userIds.join(", ")}]`,
   );
 }
 
-function onStateChanged(evt: { memberGroup: MemberGroup }): void {
+function onStateChanged(evt: MemberGroupStateChangedEvent): void {
   console.log(
     `State changed: group=${evt.memberGroup.id} name="${evt.memberGroup.name}" ` +
     `userIds=[${evt.memberGroup.userIds.join(", ")}] ` +
@@ -295,7 +296,7 @@ function onStateChanged(evt: { memberGroup: MemberGroup }): void {
   );
 }
 
-function onGroupEmptied(evt: { memberGroup: MemberGroup }): void {
+function onGroupEmptied(evt: MemberGroupEmptiedEvent): void {
   console.log(
     `Group emptied: group=${evt.memberGroup.id} name="${evt.memberGroup.name}"`,
   );

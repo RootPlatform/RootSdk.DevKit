@@ -2,8 +2,8 @@
   "name": "@rootsdk-howto/root",
   "private": true,
   "scripts": {
-    "clean": "node scripts/foreach.js clean",
-    "install:all": "node scripts/foreach.js install",
-    "build": "node scripts/foreach.js build"
+    "clean":       "node build.js clean",
+    "install:all": "node build.js install",
+    "build":       "node build.js build"
   }
 }

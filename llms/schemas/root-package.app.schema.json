@@ -1,0 +1,67 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Package",
+  "description": "Deployment and startup configuration for your App's client and server code.",
+  "type": "object",
+  "required": ["client", "server"],
+  "properties": {
+    "client": {
+      "type": "object",
+      "description": "Client-side build output for deployment.",
+      "required": ["deploy"],
+      "properties": {
+        "deploy": {
+          "type": "string",
+          "description": "Path to the client deployment directory containing the entire single-page application (relative to project root).",
+          "examples": ["client/dist"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "server": {
+      "type": "object",
+      "description": "Configuration for launching and packaging your server.",
+      "required": ["launch", "deploy", "node_modules"],
+      "properties": {
+        "launch": {
+          "type": "string",
+          "description": "Entry point to launch the server process (must be a .js file).",
+          "examples": ["server/dist/myAppMain.js"]
+        },
+        "deploy": {
+          "type": "array",
+          "description": "List of server folders to include in deployment.",
+          "items": { "type": "string" },
+          "examples": [["server/dist", "networking/gen/server"]]
+        },
+        "node_modules": {
+          "type": "array",
+          "description": "List of server-side node_modules folders that must be deployed.",
+          "items": { "type": "string" },
+          "examples": [["server/node_modules"]]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "package": {
+        "client": {
+            "deploy": "client/dist"
+        },
+        "server": {
+            "launch": "server/dist/myAppMain.js",
+            "deploy": [
+                "server/dist",
+                "networking/gen/server"
+            ],
+            "node_modules": [
+                "server/node_modules"
+            ]
+        }
+      }
+    }
+  ]
+}

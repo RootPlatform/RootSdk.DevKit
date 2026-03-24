@@ -8,3 +8,4 @@ package-lock.json
 *.sqlite3
 *.sqlite
 *.pkg
+build.js

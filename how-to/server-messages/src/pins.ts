@@ -121,7 +121,8 @@ async function onPinCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
 
 // --- EVENT HANDLERS ----------------------------------------------------------
 //
-// Pin events fire when ANY user or app pins/unpins a message.
+// Pin events fire when OTHER users, bots, and apps pin/unpin a message — not
+// your own. You will NOT receive pin events for pins you create or remove.
 // The event payload includes channelId and messageId but NOT the userId
 // who performed the action (unlike reaction events).
 

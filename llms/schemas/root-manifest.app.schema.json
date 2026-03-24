@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Manifest reference",
+  "description": "Defines your App's metadata, deployment configuration, settings, and permissions.",
+  "type": "object",
+  "required": ["id", "version", "package"],
+  "additionalProperties": false,
+  "examples": [
+    {
+      "id": "ACj4U-eThgmjXUOBAjk_jw",
+      "version": "1.0.0",
+      "package": {
+        "client": { "deploy": "client/dist" },
+        "server": {
+          "launch": "server/dist/myServerMain.js",
+          "deploy": ["server/dist", "networking/gen/server"],
+          "node_modules": ["server/node_modules"]
+        }
+      }
+    }
+  ],
+
+  "properties": {
+    "id"         : { "$ref":"id.schema.json"          },
+    "version"    : { "$ref":"version.schema.json"     },
+    "package"    : { "$ref":"package.app.schema.json" },
+    "settings"   : { "$ref":"settings.schema.json"    },
+    "permissions": { "$ref":"permissions.schema.json" }
+  }
+}

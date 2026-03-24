@@ -117,7 +117,8 @@ async function onReactCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
 
 // --- EVENT HANDLERS ----------------------------------------------------------
 //
-// These fire when ANY user or app adds/removes a reaction — not just yours.
+// These fire when OTHER users, bots, and apps add/remove a reaction — not
+// your own. You will NOT receive reaction events for reactions you add or remove.
 // The event payload includes the shortcode, messageId, channelId, and userId
 // of whoever performed the action.
 

@@ -21,7 +21,6 @@ import {
   UserProfile,
   CommunityUserOnlineStatus,
   RootClientUserEvent,
-  TypedEventEmitter,
 } from "@rootsdk/client-app";
 
 // ImageUriResolution is a string literal type, not an enum.
@@ -123,15 +122,10 @@ export const UserCard: React.FC = () => {
       }
     }
 
-    // TODO: Remove cast after @rootsdk/client-app is rebuilt with the
-    // RootClientUser type fix (& TypedEventEmitter<RootClientUserEvents>).
-    const users = rootClient.users as unknown as TypedEventEmitter<{
-      [RootClientUserEvent.UserProfileUpdate]: (event: UserProfile) => void;
-    }>;
-    users.on(RootClientUserEvent.UserProfileUpdate, onProfileUpdate);
+    rootClient.users.on(RootClientUserEvent.UserProfileUpdate, onProfileUpdate);
 
     return () => {
-      users.off(RootClientUserEvent.UserProfileUpdate, onProfileUpdate);
+      rootClient.users.off(RootClientUserEvent.UserProfileUpdate, onProfileUpdate);
     };
   }, [currentUserId, addLog]);
 

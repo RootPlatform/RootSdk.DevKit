@@ -20,37 +20,14 @@ import {
   rootServer,
   AssetAppCreateRequest,
   AssetAppCreateResponse,
-  // AssetGetRequest and AssetGetResponse are defined in the SDK source but not
-  // yet exported from @rootsdk/server-app. Inline definitions below until the
-  // next release adds them to grpc_client/index.ts exports.
+  AssetGetRequest,
+  AssetGetResponse,
   ChannelMessageEvent,
   ChannelMessageCreatedEvent,
   MessageType,
   RootApiException,
   ErrorCodeType,
 } from "@rootsdk/server-app";
-
-// TODO: Remove these once AssetGetRequest/AssetGetResponse are exported from
-// @rootsdk/server-app (add to sdk/server-app/src/grpc_client/index.ts line 241)
-type AssetGetRequest = {
-  uris: string[];
-};
-type AssetGetResponse = {
-  assets: {
-    [key: string]: {
-      link:
-        | { oneofKind: "url"; url: string }
-        | { oneofKind: "image"; image: unknown }
-        | { oneofKind: "video"; video: unknown }
-        | { oneofKind: "file"; file: unknown }
-        | { oneofKind: "invalid"; invalid: unknown }
-        | { oneofKind: undefined };
-      linkExpiresAt?: Date;
-      assetId: string;
-      preview?: unknown;
-    };
-  };
-};
 
 // --- SUBSCRIBE ---------------------------------------------------------------
 
@@ -76,11 +53,9 @@ export async function createAssets(tokens: string[]): Promise<AssetAppCreateResp
 // determine the asset type: "image", "video", "file", "url", or "invalid".
 // Link URLs may have an expiry (linkExpiresAt) — do not cache them permanently.
 //
-// TODO: Once get() is exported, simplify to: rootServer.dataStore.assets.get(request)
 export async function getAssets(uris: string[]): Promise<AssetGetResponse> {
   const request: AssetGetRequest = { uris };
-  const assets = rootServer.dataStore.assets as any;
-  return assets.get(request);
+  return rootServer.dataStore.assets.get(request);
 }
 
 // --- COMMAND HANDLER: /server-app-assets ------------------------------------------------

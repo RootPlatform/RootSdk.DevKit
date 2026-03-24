@@ -28,15 +28,3 @@ Developer toolkit for building apps and bots on the Root Platform. This repo is 
 - All server-side SDK code is identical between apps and bots except the import path.
 - The `rootServer` object is the SDK entry point. Everything hangs off `rootServer.community.*`, `rootServer.dataStore.*`, `rootServer.lifecycle.*`, etc.
 
-## SDK Research Locations
-
-When you need to look up types, methods, or behaviors:
-
-| What | Where |
-|------|-------|
-| SDK client types, request/response types, enums, events | `RootApp.AppSdk/sdk/server-bot/` or `sdk/server-app/` |
-| Permissions per SDK method | `Docs.Developer/content/api-supplements/api-method-permissions.json` |
-| Developer-facing docs | `Docs.Developer/dist/` |
-| Integration tests (real usage) | `Ops.Testing/test-server-multi/tests/test-cases/src/` |
-
-**Note:** `server-multi` tests take a `communityId` on every call. In `server-app` and `server-bot`, the community ID is handled automatically. Use `server-bot`/`server-app` types as the reference — `server-multi` will have extra parameters.

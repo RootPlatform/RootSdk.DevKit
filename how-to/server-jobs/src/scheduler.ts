@@ -44,6 +44,9 @@ export function initializeScheduler(): void {
 
 // Dates are rounded to the nearest minute (1-minute time slices).
 // One-time jobs (JobInterval.OneTime) are auto-cleaned after they fire.
+// One-time jobs with a start time in the past will throw — the start must be
+// in the future (a 1-second grace period is allowed for clock drift).
+// Recurring jobs allow a past start time since start is the recurrence anchor.
 // Jobs with an end date older than 7 days are auto-deleted.
 export async function createJob(
   resourceId: string,
