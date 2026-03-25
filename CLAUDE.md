@@ -6,7 +6,7 @@ Developer toolkit for building apps and bots on the Root Platform. This repo is 
 
 | Directory | Purpose |
 |-----------|---------|
-| `how-to/` | Standalone bots, one per API domain. Every SDK method covered with working code. |
+| `how-to/` | Standalone apps and bots, one per API domain. Every SDK method covered with working code. |
 | `llms/templates/bot/` | Bot project template — the starting point for new bots. |
 | `llms/templates/app/` | App project template — client + server + networking starting point. |
 
@@ -27,4 +27,3 @@ Developer toolkit for building apps and bots on the Root Platform. This repo is 
 - **Apps** import from `@rootsdk/server-app`. **Bots** import from `@rootsdk/server-bot`.
 - All server-side SDK code is identical between apps and bots except the import path.
 - The `rootServer` object is the SDK entry point. Everything hangs off `rootServer.community.*`, `rootServer.dataStore.*`, `rootServer.lifecycle.*`, etc.
-
