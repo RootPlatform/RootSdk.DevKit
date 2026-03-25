@@ -142,13 +142,13 @@ async function onRolesCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
 
   try {
     // 1. List existing roles
-    const existing = await listRoles();
+    const existing: CommunityRole[] = await listRoles();
     lines.push(`\u2713 listed ${existing.length} existing role(s)`);
 
     // WellKnownRootGuids.CommunityRoles.EveryoneRole is the @everyone role GUID.
     // Every community has this role and every member is assigned to it.
     // Use it to identify or skip the default role when iterating roles.
-    const everyoneRole = existing.find(
+    const everyoneRole: CommunityRole | undefined = existing.find(
       (r) => r.id === WellKnownRootGuids.CommunityRoles.EveryoneRole,
     );
     lines.push(
@@ -156,15 +156,15 @@ async function onRolesCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
     );
 
     // 2. Create a role
-    const role = await createRole("test-role", true, "#AA00FF");
+    const role: CommunityRole = await createRole("test-role", true, "#AA00FF");
     lines.push(`\u2713 created role: ${role.name} (${role.id}) color=${role.colorHex}`);
 
     // 3. Get the role by ID
-    const fetched = await getRole(role.id);
+    const fetched: CommunityRole = await getRole(role.id);
     lines.push(`\u2713 fetched role: name=${fetched.name} mentionable=${fetched.isMentionable}`);
 
     // 4. Edit the role — must provide all fields
-    const edited = await editRole(
+    const edited: CommunityRole = await editRole(
       role.id,
       "renamed-role",
       "#FF0000",
@@ -175,7 +175,7 @@ async function onRolesCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
     lines.push(`\u2713 edited role: name=${edited.name} color=${edited.colorHex}`);
 
     // 5. Create a second role to test move ordering
-    const role2 = await createRole("test-role-two", false, "#00FF00");
+    const role2: CommunityRole = await createRole("test-role-two", false, "#00FF00");
     lines.push(`\u2713 created second role: ${role2.name} (${role2.id})`);
 
     // 6. Move the first role before the second
@@ -188,7 +188,7 @@ async function onRolesCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
     lines.push("\u2713 deleted both roles");
 
     await messages.create({ channelId, content: lines.join("\n") });
-  } catch (err) {
+  } catch (err: unknown) {
     console.error("Roles demo error:", err);
     await messages.create({ channelId, content: `Roles demo error: ${err}` });
   }

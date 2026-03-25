@@ -207,7 +207,7 @@ async function onMemberGroupsCommand(evt: ChannelMessageCreatedEvent): Promise<v
 
   try {
     // 1. Create a member group with empty initial membership
-    const group = await createMemberGroup(
+    const group: MemberGroup = await createMemberGroup(
       "demo", "demo-resource", "test-group", [], [],
     );
     lines.push(
@@ -226,8 +226,8 @@ async function onMemberGroupsCommand(evt: ChannelMessageCreatedEvent): Promise<v
     lines.push(`✓ isMember(${senderId}): ${isMember}`);
 
     // 4. List all groups (returns MemberGroupShort with snake_case fields)
-    const allGroups = await listMemberGroups();
-    const found = allGroups.find((g) => g.id === group.id);
+    const allGroups: MemberGroupShort[] = await listMemberGroups();
+    const found: MemberGroupShort | undefined = allGroups.find((g) => g.id === group.id);
     if (found) {
       lines.push(
         `✓ list: found group — resource_type=${found.resource_type} ` +
@@ -236,19 +236,19 @@ async function onMemberGroupsCommand(evt: ChannelMessageCreatedEvent): Promise<v
     }
 
     // 5. Get by name (resourceType + resourceId + name lookup)
-    const byName = await getMemberGroupByName("demo", "demo-resource", "test-group");
+    const byName: MemberGroup | undefined = await getMemberGroupByName("demo", "demo-resource", "test-group");
     lines.push(`✓ getByName: ${byName ? `found id=${byName.id}` : "not found"}`);
 
     // 6. List by resource ID
-    const byResource = await listMemberGroupsByResourceId("demo", "demo-resource");
+    const byResource: MemberGroup[] = await listMemberGroupsByResourceId("demo", "demo-resource");
     lines.push(`✓ listByResourceId: ${byResource.length} group(s) for demo/demo-resource`);
 
     // 7. List resource IDs for user
-    const resourceIds = await listResourceIdsForUserId("demo", "test-group", senderId);
+    const resourceIds: string[] = await listResourceIdsForUserId("demo", "test-group", senderId);
     lines.push(`✓ listResourceIdsForUserId: [${resourceIds.join(", ")}]`);
 
     // 8. Batch get by IDs
-    const byIds = await listMemberGroupsByIds([group.id]);
+    const byIds: MemberGroup[] = await listMemberGroupsByIds([group.id]);
     lines.push(`✓ listByIds: ${byIds.length} group(s)`);
 
     // 9. Update membership atomically (replaces all users and roles)
@@ -265,7 +265,7 @@ async function onMemberGroupsCommand(evt: ChannelMessageCreatedEvent): Promise<v
     lines.push("✓ deleted group");
 
     await messages.create({ channelId, content: lines.join("\n") });
-  } catch (err) {
+  } catch (err: unknown) {
     console.error("Member groups demo error:", err);
     await messages.create({ channelId, content: `Member groups demo error: ${err}` });
   }

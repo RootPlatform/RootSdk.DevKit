@@ -133,18 +133,18 @@ async function onChannelGroupsCommand(evt: ChannelMessageCreatedEvent): Promise<
 
   try {
     // 1. List existing groups
-    const existing = await listChannelGroups();
+    const existing: ChannelGroup[] = await listChannelGroups();
     lines.push(`✓ listed ${existing.length} existing group(s)`);
 
     // 2. Create two groups
-    const groupA = await createChannelGroup("TestAlpha");
+    const groupA: ChannelGroup = await createChannelGroup("TestAlpha");
     lines.push(`✓ created group: ${groupA.name} (${groupA.id})`);
 
-    const groupB = await createChannelGroup("TestBeta");
+    const groupB: ChannelGroup = await createChannelGroup("TestBeta");
     lines.push(`✓ created group: ${groupB.name} (${groupB.id})`);
 
     // 3. Get one by ID
-    const fetched = await getChannelGroup(groupA.id);
+    const fetched: ChannelGroup = await getChannelGroup(groupA.id);
     lines.push(`✓ fetched group: name=${fetched.name}`);
 
     // 4. Edit the name
@@ -161,12 +161,15 @@ async function onChannelGroupsCommand(evt: ChannelMessageCreatedEvent): Promise<
     lines.push("✓ deleted both groups");
 
     await messages.create({ channelId, content: lines.join("\n") });
-  } catch (err: any) {
+  } catch (err: unknown) {
     const parts = [`Channel groups demo error: ${err}`];
-    if (err?.code) parts.push(`code: ${err.code}`);
-    if (err?.errorCode) parts.push(`errorCode: ${err.errorCode}`);
-    if (err?.meta) parts.push(`meta: ${JSON.stringify(err.meta)}`);
-    if (err?.payload) parts.push(`payload: ${JSON.stringify(err.payload)}`);
+    if (err && typeof err === "object") {
+      const e = err as Record<string, unknown>;
+      if (e.code) parts.push(`code: ${e.code}`);
+      if (e.errorCode) parts.push(`errorCode: ${e.errorCode}`);
+      if (e.meta) parts.push(`meta: ${JSON.stringify(e.meta)}`);
+      if (e.payload) parts.push(`payload: ${JSON.stringify(e.payload)}`);
+    }
     if (lines.length > 0) parts.push(`completed ${lines.length}/7 steps`);
     console.error("Channel groups demo error:", err);
     await messages.create({ channelId, content: parts.join("\n") });

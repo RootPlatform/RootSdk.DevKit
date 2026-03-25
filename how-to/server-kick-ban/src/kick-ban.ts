@@ -132,12 +132,12 @@ async function onKickBanCommand(evt: ChannelMessageCreatedEvent): Promise<void> 
 
   try {
     // 1. List all active bans
-    const bans = await listBans();
+    const bans: CommunityMemberBan[] = await listBans();
     lines.push(`\u2713 listed ${bans.length} active ban(s)`);
 
     // 2. Show ban fields available
     if (bans.length > 0) {
-      const ban = bans[0];
+      const ban: CommunityMemberBan = bans[0];
       lines.push(
         `\u2713 ban details: id=${ban.id} userId=${ban.userId} ` +
         `agentUserId=${ban.agentUserId} reason=${ban.reason ?? "none"} ` +
@@ -156,7 +156,7 @@ async function onKickBanCommand(evt: ChannelMessageCreatedEvent): Promise<void> 
     lines.push("\u2713 operations: kickMembersBulk(userIds[]) \u2014 max 50");
 
     await messages.create({ channelId, content: lines.join("\n") });
-  } catch (err) {
+  } catch (err: unknown) {
     console.error("Kick/ban demo error:", err);
     await messages.create({ channelId, content: `Kick/ban demo error: ${err}` });
   }

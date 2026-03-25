@@ -115,7 +115,7 @@ async function onVoiceCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
 
   try {
     // List voice participants in this channel
-    const session = await listVoiceParticipants(channelId);
+    const session: ChannelWebRtcListResponse = await listVoiceParticipants(channelId);
 
     if (!session.members || session.members.length === 0) {
       lines.push("No active voice session in this channel.");
@@ -142,7 +142,7 @@ async function onVoiceCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
     // above but not executed here — they require real voice participants.
 
     await messages.create({ channelId, content: lines.join("\n") });
-  } catch (err) {
+  } catch (err: unknown) {
     console.error("Voice demo error:", err);
     await messages.create({ channelId, content: `Voice demo error: ${err}` });
   }

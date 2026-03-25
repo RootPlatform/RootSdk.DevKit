@@ -22,6 +22,7 @@ import {
   AssetAppCreateResponse,
   AssetGetRequest,
   AssetGetResponse,
+  AssetInformation,
   ChannelMessageEvent,
   ChannelMessageCreatedEvent,
   MessageType,
@@ -83,8 +84,8 @@ async function onAssetsCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
     }
 
     // 2. Convert upload token to permanent asset URI
-    const createResult = await createAssets([token]);
-    const assetUri = createResult.assets[token];
+    const createResult: AssetAppCreateResponse = await createAssets([token]);
+    const assetUri: string | undefined = createResult.assets[token];
 
     if (!assetUri) {
       lines.push("\u2717 create returned no URI for token");
@@ -95,8 +96,8 @@ async function onAssetsCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
     lines.push(`\u2713 asset created: ${assetUri}`);
 
     // 3. Resolve the asset URI to metadata
-    const getResult = await getAssets([assetUri]);
-    const info = getResult.assets[assetUri];
+    const getResult: AssetGetResponse = await getAssets([assetUri]);
+    const info: AssetInformation | undefined = getResult.assets[assetUri];
 
     if (!info) {
       lines.push("\u2717 get returned no metadata for URI");
@@ -106,7 +107,7 @@ async function onAssetsCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
 
     // 4. Report link type — AssetInformation.link is a discriminated union
     //    Possible oneofKind values: "image", "video", "file", "url", "invalid"
-    const linkType = info.link.oneofKind ?? "unknown";
+    const linkType: string = info.link.oneofKind ?? "unknown";
     lines.push(`\u2713 asset resolved: ${linkType}`);
 
     // 5. Report asset ID

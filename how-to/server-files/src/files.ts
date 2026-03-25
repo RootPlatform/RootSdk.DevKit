@@ -37,6 +37,7 @@ import {
   ChannelGuid,
   DirectoryGuid,
   FileGuid,
+  ChannelDirectory,
   ChannelDirectoryCreateRequest,
   ChannelDirectoryListRequest,
   ChannelMessageEvent,
@@ -182,7 +183,7 @@ async function onFilesCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
   try {
     // 1. List directories in this channel to get a directoryId
     const dirListReq: ChannelDirectoryListRequest = { channelId };
-    let dirList = await directories.list(dirListReq);
+    let dirList: ChannelDirectory[] = await directories.list(dirListReq);
 
     let dirId: DirectoryGuid;
     if (dirList.length > 0) {
@@ -191,34 +192,34 @@ async function onFilesCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
     } else {
       // Create a directory so we can demonstrate file operations
       const createDirReq: ChannelDirectoryCreateRequest = { channelId, name: "demo-files" };
-      const newDir = await directories.create(createDirReq);
+      const newDir: ChannelDirectory = await directories.create(createDirReq);
       dirId = newDir.id;
       lines.push(`✓ created directory: ${newDir.name} (${dirId})`);
     }
 
     // 2. List files in the directory
-    const files = await listFiles(channelId, dirId);
+    const files: ChannelFile[] = await listFiles(channelId, dirId);
     lines.push(`✓ listed ${files.length} file(s) in directory`);
 
     if (files.length > 0) {
-      const file = files[0];
+      const file: ChannelFile = files[0];
 
       // 3. Get a file by ID
-      const fetched = await getFile(channelId, file.id, dirId);
+      const fetched: ChannelFile = await getFile(channelId, file.id, dirId);
       lines.push(`✓ fetched file: name=${fetched.name}, length=${fetched.length}`);
 
       // 4. Search for the file by name within this channel
-      const searchResults = await searchFiles(channelId, file.name);
+      const searchResults: ChannelFile[] = await searchFiles(channelId, file.name);
       lines.push(`✓ search for "${file.name}": found ${searchResults.length} result(s)`);
 
       // 5. Edit (rename) the file
-      const editResult = await editFile(channelId, file.id, dirId, `renamed-${file.name}`);
+      const editResult: ChannelFileEditResponse = await editFile(channelId, file.id, dirId, `renamed-${file.name}`);
       lines.push(`✓ renamed file to: ${editResult.name}`);
 
       // 6. Move the file to a new directory (create one first)
       const moveDirReq: ChannelDirectoryCreateRequest = { channelId, name: "moved-files" };
-      const moveDir = await directories.create(moveDirReq);
-      const moveResult = await moveFile(channelId, file.id, dirId, moveDir.id);
+      const moveDir: ChannelDirectory = await directories.create(moveDirReq);
+      const moveResult: ChannelFileMoveResponse = await moveFile(channelId, file.id, dirId, moveDir.id);
       lines.push(`✓ moved file to directory: ${moveDir.name} (old=${moveResult.oldDirectoryId})`);
 
       // 7. Delete the file (from its new directory)
@@ -232,12 +233,12 @@ async function onFilesCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
     }
 
     // 8. Search across the community (this channel)
-    const communitySearch = await searchCommunityFiles([channelId], "test");
+    const communitySearch: ChannelFileSearchCommunityResponse = await searchCommunityFiles([channelId], "test");
     const resultCount = communitySearch.results?.length ?? 0;
     lines.push(`✓ searchCommunity for "test": ${resultCount} channel(s) with results`);
 
     await messages.create({ channelId, content: lines.join("\n") });
-  } catch (err) {
+  } catch (err: unknown) {
     console.error("Files demo error:", err);
     await messages.create({ channelId, content: `Files demo error: ${err}` });
   }

@@ -87,7 +87,7 @@ export const AssetDemo: React.FC = () => {
         await rootClient.assets.fileUpload(request);
       tokens = response.tokens;
       addLog(`fileUpload(${fileType}): ${tokens.length} token(s)`);
-    } catch (err) {
+    } catch (err: unknown) {
       addLog(`fileUpload error: ${err}`);
       return;
     }
@@ -133,7 +133,7 @@ export const AssetDemo: React.FC = () => {
       addLog(
         `toImageUrl: generated ${Object.keys(urls).length} resolution URLs`,
       );
-    } catch (err) {
+    } catch (err: unknown) {
       if (err instanceof RootServerException) {
         switch (err.code) {
           case UploadError.INVALID_TOKEN:

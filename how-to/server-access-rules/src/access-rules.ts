@@ -21,6 +21,9 @@
 import {
   rootServer,
   AccessRule,
+  Channel,
+  ChannelGroup,
+  CommunityRole,
   AccessRuleCreateRequest,
   AccessRuleEditRequest,
   AccessRuleUpdateRequest,
@@ -182,25 +185,25 @@ async function onAccessRulesCommand(evt: ChannelMessageCreatedEvent): Promise<vo
 
   try {
     // 1. Get a role to work with
-    const roles = await rootServer.community.communityRoles.list();
+    const roles: CommunityRole[] = await rootServer.community.communityRoles.list();
     if (roles.length === 0) {
       await messages.create({ channelId, content: "No roles found." });
       return;
     }
-    const role = roles[0];
+    const role: CommunityRole = roles[0];
     lines.push(`\u2713 using role: ${role.name} (${role.id})`);
 
     // 2. Get the channel group containing the trigger channel
-    const groups = await rootServer.community.channelGroups.list();
+    const groups: ChannelGroup[] = await rootServer.community.channelGroups.list();
     if (groups.length === 0) {
       await messages.create({ channelId, content: "No channel groups found." });
       return;
     }
-    let group = groups[0];
-    for (const g of groups) {
-      const channels = await rootServer.community.channels.list({ channelGroupId: g.id });
-      if (channels.some((ch) => ch.id === channelId)) {
-        group = g;
+    let group: ChannelGroup = groups[0];
+    for (const candidateGroup of groups) {
+      const groupChannels: Channel[] = await rootServer.community.channels.list({ channelGroupId: candidateGroup.id });
+      if (groupChannels.some((channel) => channel.id === channelId)) {
+        group = candidateGroup;
         break;
       }
     }
@@ -213,18 +216,18 @@ async function onAccessRulesCommand(evt: ChannelMessageCreatedEvent): Promise<vo
     lines.push("\u2713 created access rule (channelCreateMessage: true)");
 
     // 4. Get the access rule
-    const fetched = await getAccessRule(groupId, roleId);
-    const overlayKeys = Object.entries(fetched.overlay)
+    const fetched: AccessRule = await getAccessRule(groupId, roleId);
+    const overlayKeys: string[] = Object.entries(fetched.overlay)
       .filter(([_, v]) => v === true)
       .map(([k]) => k);
     lines.push(`\u2713 fetched access rule: overlay has ${overlayKeys.length} permission(s) set`);
 
     // 5. List rules by channel/group
-    const byGroup = await listAccessRulesByChannelOrChannelGroup(groupId);
+    const byGroup: AccessRule[] = await listAccessRulesByChannelOrChannelGroup(groupId);
     lines.push(`\u2713 listed ${byGroup.length} rule(s) for channel group`);
 
     // 6. List rules by role
-    const byRole = await listAccessRulesByRoleOrMember(roleId);
+    const byRole: AccessRule[] = await listAccessRulesByRoleOrMember(roleId);
     lines.push(`\u2713 listed ${byRole.length} rule(s) for role`);
 
     // 7. Edit the rule — replaces the entire overlay
@@ -239,7 +242,7 @@ async function onAccessRulesCommand(evt: ChannelMessageCreatedEvent): Promise<vo
     lines.push("\u2713 deleted access rule");
 
     await messages.create({ channelId, content: lines.join("\n") });
-  } catch (err) {
+  } catch (err: unknown) {
     console.error("Access rules demo error:", err);
     await messages.create({ channelId, content: `Access rules demo error: ${err}` });
   }

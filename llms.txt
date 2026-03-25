@@ -1,0 +1,37 @@
+# RootSdk.DevKit
+
+> Developer toolkit for building apps and bots on the Root Platform. Designed for AI-agent-driven development.
+
+## Navigation
+
+- [Agent Guide](AGENTS.md): Full navigation — quick start, sample catalog, how-to index, doc pointers, schema reference
+
+## Templates
+
+- [Bot Template](templates/bot/): Starting point for new bots (server-only)
+- [App Template](templates/app/): Starting point for new apps (client + server + networking)
+
+## Documentation
+
+- [Documentation Index](docs/llms.txt): Full index of all developer documentation with descriptions
+- [Bot Guides](docs/llms-bot-guides.txt): Concepts, tutorials, and how-tos (~61K tokens)
+- [Bot API Reference](docs/llms-bot-api.txt): All endpoints, parameters, types, and errors (~141K tokens)
+- [App Guides](docs/llms-app-guides.txt): Concepts, tutorials, and how-tos (~106K tokens)
+- [App API Reference](docs/llms-app-api.txt): All endpoints, parameters, types, and errors (~163K tokens)
+- [All Bot Docs](docs/llms-bot.txt): Combined bot guides + API reference (~202K tokens)
+- [All App Docs](docs/llms-app.txt): Combined app guides + API reference (~270K tokens)
+- [Everything](docs/llms-full.txt): All documentation (~470K tokens)
+
+## Samples
+
+- [Sample Apps](apps/): 6 complete, runnable app examples (hello-world, data-storage, protobuf-service, suggestion-box, themes, tic-tac-toe)
+- [Sample Bots](bots/): 6 complete, runnable bot examples (hello-world, all-channel-broadcast, new-member-welcome, reset-channel-description, role-assignment, role-list)
+
+## How-Tos
+
+- [How-To Examples](how-to/): 30 standalone bots, one per SDK domain. Every method covered with working code.
+
+## Schemas
+
+- [Permissions Map](schemas/permissions-map.json): Maps every SDK method to its required manifest permission
+- [Manifest Schemas](schemas/): JSON schemas for validating root-manifest.json

@@ -84,7 +84,7 @@ async function onMembersCommand(evt: ChannelMessageCreatedEvent): Promise<void> 
 
   try {
     // 1. List all members in the community
-    const all = await listAllMembers();
+    const all: CommunityMember[] = await listAllMembers();
     lines.push(`\u2713 listAll: ${all.length} member(s) in community`);
 
     if (all.length === 0) {
@@ -93,16 +93,16 @@ async function onMembersCommand(evt: ChannelMessageCreatedEvent): Promise<void> 
     }
 
     // 2. Get a single member by ID
-    const first = all[0];
-    const member = await getMember(first.userId);
+    const first: CommunityMember = all[0];
+    const member: CommunityMember = await getMember(first.userId);
     lines.push(
       `\u2713 get: nickname=${member.nickname} roles=${member.communityRoleIds?.length ?? 0} ` +
       `primary=${member.primaryCommunityRoleName ?? "none"}`,
     );
 
     // 3. List specific members by userIds
-    const userIds = all.slice(0, Math.min(3, all.length)).map((m) => m.userId);
-    const subset = await listMembers(userIds);
+    const userIds: UserGuid[] = all.slice(0, Math.min(3, all.length)).map((m) => m.userId);
+    const subset: CommunityMember[] = await listMembers(userIds);
     lines.push(`\u2713 list: requested ${userIds.length}, got ${subset.length} member(s)`);
 
     // 4. Show member fields available
@@ -112,7 +112,7 @@ async function onMembersCommand(evt: ChannelMessageCreatedEvent): Promise<void> 
     );
 
     await messages.create({ channelId, content: lines.join("\n") });
-  } catch (err) {
+  } catch (err: unknown) {
     console.error("Members demo error:", err);
     await messages.create({ channelId, content: `Members demo error: ${err}` });
   }

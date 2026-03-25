@@ -70,12 +70,12 @@ async function onDbCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
 
   try {
     // 1. Read the config
-    const config = getDatabaseConfig();
+    const config: RootDatabaseConfig = getDatabaseConfig();
     lines.push(`✓ databaseType: ${config.databaseType}`);
     lines.push(`✓ filename: ${getDatabasePath()}`);
 
     // 2. Open the database
-    const db = openDatabase();
+    const db: sqlite3.Database = openDatabase();
 
     // 3. Minimal CRUD cycle — create table, insert, query, clean up
     await run(db, `CREATE TABLE IF NOT EXISTS howto_demo (id INTEGER PRIMARY KEY, message TEXT)`);
@@ -84,7 +84,7 @@ async function onDbCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
     await run(db, `INSERT INTO howto_demo (message) VALUES (?)`, ["Hello from the database how-to!"]);
     lines.push("✓ inserted a row");
 
-    const rows = await all<{ id: number; message: string }>(db, `SELECT * FROM howto_demo`);
+    const rows: { id: number; message: string }[] = await all<{ id: number; message: string }>(db, `SELECT * FROM howto_demo`);
     lines.push(`✓ queried ${rows.length} row(s): ${rows.map((r) => r.message).join(", ")}`);
 
     await run(db, `DROP TABLE howto_demo`);
@@ -94,7 +94,7 @@ async function onDbCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
     lines.push("✓ cleanup complete");
 
     await messages.create({ channelId, content: lines.join("\n") });
-  } catch (err) {
+  } catch (err: unknown) {
     console.error("DB demo error:", err);
     await messages.create({ channelId, content: `DB demo error: ${err}` });
   }

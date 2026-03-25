@@ -80,19 +80,19 @@ async function onInvitesCommand(evt: ChannelMessageCreatedEvent): Promise<void> 
 
   try {
     // 1. List all pending invites
-    const invites = await listInvites();
+    const invites: CommunityMemberInvite[] = await listInvites();
     lines.push(`\u2713 listed ${invites.length} pending invite(s)`);
 
     // 2. Show invite details if any exist
     if (invites.length > 0) {
-      const invite = invites[0];
+      const invite: CommunityMemberInvite = invites[0];
       lines.push(
         `\u2713 invite details: id=${invite.id} invitedUser=${invite.invitedUsername} ` +
         `sender=${invite.senderUserId} roles=${invite.communityRoleIds?.length ?? 0}`,
       );
 
       // 3. Get the same invite by composite key
-      const fetched = await getInvite(invite.invitedUserId, invite.senderUserId);
+      const fetched: CommunityMemberInvite = await getInvite(invite.invitedUserId, invite.senderUserId);
       lines.push(`\u2713 fetched invite by key: ${fetched.invitedUsername}`);
     }
 
@@ -103,7 +103,7 @@ async function onInvitesCommand(evt: ChannelMessageCreatedEvent): Promise<void> 
     lines.push("\u2713 note: no create method \u2014 invites are created via the Root platform");
 
     await messages.create({ channelId, content: lines.join("\n") });
-  } catch (err) {
+  } catch (err: unknown) {
     console.error("Invites demo error:", err);
     await messages.create({ channelId, content: `Invites demo error: ${err}` });
   }

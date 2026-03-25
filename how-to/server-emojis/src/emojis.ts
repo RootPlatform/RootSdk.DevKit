@@ -83,7 +83,7 @@ async function onEmojisCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
 
   try {
     // 1. List all emojis
-    const emojis = await listEmojis();
+    const emojis: CommunityEmoji[] = await listEmojis();
     lines.push(`\u2713 listed ${emojis.length} custom emoji(s)`);
 
     for (const emoji of emojis) {
@@ -105,7 +105,7 @@ async function onEmojisCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
     }
 
     if (target) {
-      const fetched = await getEmoji(target.id);
+      const fetched: CommunityEmoji = await getEmoji(target.id);
       lines.push(
         `\u2713 get: id=${fetched.id} shortcode=${fetched.shortcode} ` +
         `assetUri=${fetched.assetUri}`,

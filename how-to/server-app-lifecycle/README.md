@@ -35,7 +35,7 @@ No SDK events for lifecycle.
 
 **Apps receive `RootAppStartState`** which includes `channelId` — the Root channel where the app is embedded. **Bots receive `RootBotStartState`** which does not include `channelId`. See `lifecycle-bot/` for the bot variant.
 
-For `addService()` and custom RPC services (protobuf-defined client-server methods), see `llms/templates/app/`.
+For `addService()` and custom RPC services (protobuf-defined client-server methods), see `templates/app/`.
 
 ## Key Behaviors
 

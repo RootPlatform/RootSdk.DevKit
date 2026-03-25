@@ -64,9 +64,9 @@ export async function updateValue<T>(
   key: string,
   updateFunc: (current: T) => T,
   defaultValue: T,
-  expires_at?: Date,
+  expiresAt?: Date,
 ): Promise<T> {
-  return await kv.update<T>(key, updateFunc, defaultValue, expires_at);
+  return await kv.update<T>(key, updateFunc, defaultValue, expiresAt);
 }
 
 // Delete a single key.
@@ -112,7 +112,7 @@ async function onKvCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
     lines.push("✓ set: stored howto:demo:greeting");
 
     // 2. get — retrieve it
-    const greeting = await getValue<{ text: string; ts: number }>("howto:demo:greeting");
+    const greeting: { text: string; ts: number } | undefined = await getValue<{ text: string; ts: number }>("howto:demo:greeting");
     lines.push(`✓ get: ${greeting?.text}`);
 
     // 3. set with expiration — value auto-expires after the given date
@@ -137,24 +137,24 @@ async function onKvCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
     lines.push(`✓ update: howto:demo:counter:a incremented to ${newVal}`);
 
     // 6. select — pattern query returning key + value + metadata
-    const entries = await selectEntries<number>("howto:demo:counter:%");
+    const entries: KeyValue<number>[] = await selectEntries<number>("howto:demo:counter:%");
     lines.push(`✓ select: found ${entries.length} entries matching howto:demo:counter:%`);
     for (const entry of entries) {
       lines.push(`    ${entry.key} = ${entry.value}`);
     }
 
     // 7. selectValue — pattern query returning just values
-    const values = await selectValues<number>("howto:demo:counter:%");
+    const values: number[] = await selectValues<number>("howto:demo:counter:%");
     lines.push(`✓ selectValue: [${values.join(", ")}]`);
 
     // 8. delete — remove a single key
     await deleteValue("howto:demo:greeting");
-    const afterDelete = await getValue("howto:demo:greeting");
+    const afterDelete: unknown = await getValue("howto:demo:greeting");
     lines.push(`✓ delete: howto:demo:greeting → ${afterDelete === undefined ? "undefined (gone)" : "still exists"}`);
 
     // 9. deleteLike — remove keys by pattern
     await deleteByPattern("howto:demo:counter:%");
-    const afterBulk = await selectValues("howto:demo:counter:%");
+    const afterBulk: unknown[] = await selectValues("howto:demo:counter:%");
     lines.push(`✓ deleteLike: howto:demo:counter:% → ${afterBulk.length} remaining`);
 
     // Clean up the temp key too
@@ -162,7 +162,7 @@ async function onKvCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
     lines.push("✓ cleanup complete");
 
     await messages.create({ channelId, content: lines.join("\n") });
-  } catch (err) {
+  } catch (err: unknown) {
     console.error("KV demo error:", err);
     await messages.create({ channelId, content: `KV demo error: ${err}` });
   }

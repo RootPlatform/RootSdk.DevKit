@@ -15,6 +15,7 @@
 
 import {
   rootServer,
+  CommunityRole,
   CommunityRoleGuid,
   UserGuid,
   CommunityMemberRoleAddRequest,
@@ -113,9 +114,9 @@ async function onMemberRolesCommand(evt: ChannelMessageCreatedEvent): Promise<vo
     // 1. Get roles and members to work with
     // Filter out the Everyone role — it's implicit and can't be manually assigned/removed.
     // Note: add() can only assign roles whose permissions are a subset of the bot's own.
-    const allRoles = await rootServer.community.communityRoles.list();
+    const allRoles: CommunityRole[] = await rootServer.community.communityRoles.list();
     const everyoneId = WellKnownRootGuids.CommunityRoles.EveryoneRole;
-    const roles = allRoles.filter((r) => r.id !== everyoneId);
+    const roles: CommunityRole[] = allRoles.filter((r) => r.id !== everyoneId);
     if (roles.length < 1) {
       await messages.create({ channelId, content: "Need at least 1 assignable role. Create one first via /server-roles." });
       return;
@@ -126,9 +127,9 @@ async function onMemberRolesCommand(evt: ChannelMessageCreatedEvent): Promise<vo
     // non-Everyone role (built-in roles like Admin appear first and may have
     // permissions that exceed the bot's own, making them unassignable).
     const roleIdArg = content.replace("/server-member-roles", "").trim();
-    let role: typeof roles[0];
+    let role: CommunityRole;
     if (roleIdArg) {
-      const match = roles.find((r) => r.id === roleIdArg);
+      const match: CommunityRole | undefined = roles.find((r) => r.id === roleIdArg);
       if (!match) {
         await messages.create({
           channelId,
@@ -146,7 +147,7 @@ async function onMemberRolesCommand(evt: ChannelMessageCreatedEvent): Promise<vo
     lines.push(`\u2713 using member: ${userId}`);
 
     // 2. List current roles for the member
-    const before = await listMemberRoles(userId);
+    const before: CommunityMemberRoleListResponse = await listMemberRoles(userId);
     lines.push(`\u2713 member has ${before.communityRoleIds?.length ?? 0} role(s) before`);
 
     // 3. Add the role to the member
@@ -155,14 +156,14 @@ async function onMemberRolesCommand(evt: ChannelMessageCreatedEvent): Promise<vo
     lines.push(`\u2713 added role: ${role.name}`);
 
     // 4. List roles — verify it's present
-    const after = await listMemberRoles(userId);
+    const after: CommunityMemberRoleListResponse = await listMemberRoles(userId);
     lines.push(`\u2713 member now has ${after.communityRoleIds?.length ?? 0} role(s)`);
 
     // 5. Set the role as primary — moves it to index [0]
     step = 5;
     await setMemberPrimaryRole(userId, role.id);
-    const withPrimary = await listMemberRoles(userId);
-    const primaryId = withPrimary.communityRoleIds?.[0];
+    const withPrimary: CommunityMemberRoleListResponse = await listMemberRoles(userId);
+    const primaryId: CommunityRoleGuid | undefined = withPrimary.communityRoleIds?.[0];
     lines.push(`\u2713 set primary role: ${role.name} (first in list: ${primaryId === role.id})`);
 
     // 6. Remove the role
@@ -171,13 +172,15 @@ async function onMemberRolesCommand(evt: ChannelMessageCreatedEvent): Promise<vo
     lines.push("\u2713 removed role");
 
     // 7. List roles — verify it's gone (EveryoneRole remains)
-    const final = await listMemberRoles(userId);
+    const final: CommunityMemberRoleListResponse = await listMemberRoles(userId);
     lines.push(`\u2713 member now has ${final.communityRoleIds?.length ?? 0} role(s) (EveryoneRole always present)`);
 
     await messages.create({ channelId, content: lines.join("\n") });
-  } catch (err: any) {
+  } catch (err: unknown) {
     const parts = [`Member roles demo error: ${err}`];
-    if (err?.errorCode) parts.push(`errorCode: ${err.errorCode}`);
+    if (err && typeof err === "object" && "errorCode" in err) {
+      parts.push(`errorCode: ${(err as Record<string, unknown>).errorCode}`);
+    }
     if (lines.length > 0) parts.push(`completed ${lines.length}/8 steps`);
     console.error("Member roles demo error:", err);
     await messages.create({ channelId, content: parts.join("\n") });

@@ -73,7 +73,7 @@ export const UserCard: React.FC = () => {
       const userId = rootClient.users.getCurrentUserId();
       setCurrentUserId(userId);
       addLog(`getCurrentUserId() -> ${userId}`);
-    } catch (err) {
+    } catch (err: unknown) {
       setError(`getCurrentUserId failed: ${err}`);
     }
   }, [addLog]);
@@ -97,7 +97,7 @@ export const UserCard: React.FC = () => {
         // Useful when rendering a member list or participant roster.
         const profiles = await rootClient.users.getUserProfiles([currentUserId]);
         addLog(`getUserProfiles([1 id]) -> ${profiles.length} profile(s)`);
-      } catch (err) {
+      } catch (err: unknown) {
         setError(`Profile fetch failed: ${err}`);
       }
     }

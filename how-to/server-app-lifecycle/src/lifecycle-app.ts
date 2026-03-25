@@ -6,7 +6,7 @@
 // Works in: Apps only (@rootsdk/server-app)
 //           Bots use RootBotLifecycle and RootBotStartState (no channelId).
 //           See lifecycle-bot/ for the bot variant.
-//           For addService() and custom RPC services, see llms/templates/app/.
+//           For addService() and custom RPC services, see templates/app/.
 // ============================================================================
 //
 // App-specific lifecycle: start state with channelId, starting/stopping

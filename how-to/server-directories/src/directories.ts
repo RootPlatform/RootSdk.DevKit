@@ -138,33 +138,33 @@ async function onDirectoriesCommand(evt: ChannelMessageCreatedEvent): Promise<vo
 
   try {
     // 1. List existing directories
-    const existing = await listDirectories(channelId);
+    const existing: ChannelDirectory[] = await listDirectories(channelId);
     lines.push(`✓ listed ${existing.length} existing directory(ies)`);
 
     // 2. Create a root-level directory (no parentDirectoryId)
-    const rootDir = await createDirectory(channelId, "demo-root");
+    const rootDir: ChannelDirectory = await createDirectory(channelId, "demo-root");
     lines.push(`✓ created root directory: ${rootDir.name} (${rootDir.id})`);
 
     // 3. Create a subdirectory inside it (showing parentDirectoryId nesting)
-    const subDir = await createDirectory(channelId, "demo-child", rootDir.id);
+    const subDir: ChannelDirectory = await createDirectory(channelId, "demo-child", rootDir.id);
     lines.push(
       `✓ created subdirectory: ${subDir.name} (${subDir.id}) ` +
       `parent=${subDir.parentDirectoryId}`,
     );
 
     // 4. Get the subdirectory by ID
-    const fetched = await getDirectory(channelId, subDir.id);
+    const fetched: ChannelDirectory = await getDirectory(channelId, subDir.id);
     lines.push(`✓ fetched directory: name=${fetched.name}, parent=${fetched.parentDirectoryId}`);
 
     // 5. Edit (rename) the subdirectory
-    const editResult = await editDirectory(subDir.id, channelId, "renamed-child");
+    const editResult: ChannelDirectoryEditResponse = await editDirectory(subDir.id, channelId, "renamed-child");
     lines.push(`✓ renamed directory to: ${editResult.name}`);
 
     // 6. Create a second root directory and move the subdirectory into it
-    const rootDir2 = await createDirectory(channelId, "demo-root-2");
+    const rootDir2: ChannelDirectory = await createDirectory(channelId, "demo-root-2");
     lines.push(`✓ created second root directory: ${rootDir2.name} (${rootDir2.id})`);
 
-    const moveResult = await moveDirectory(subDir.id, channelId, rootDir.id, rootDir2.id);
+    const moveResult: ChannelDirectoryMoveResponse = await moveDirectory(subDir.id, channelId, rootDir.id, rootDir2.id);
     lines.push(
       `✓ moved subdirectory: new parent=${moveResult.parentDirectoryId} ` +
       `old parent=${moveResult.oldParentDirectoryId}`,
@@ -181,7 +181,7 @@ async function onDirectoriesCommand(evt: ChannelMessageCreatedEvent): Promise<vo
     lines.push("✓ deleted second root directory");
 
     await messages.create({ channelId, content: lines.join("\n") });
-  } catch (err) {
+  } catch (err: unknown) {
     console.error("Directories demo error:", err);
     await messages.create({ channelId, content: `Directories demo error: ${err}` });
   }

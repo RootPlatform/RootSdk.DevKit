@@ -17,6 +17,7 @@ import {
   ChannelMovedEvent,
   Channel,
   ChannelGuid,
+  ChannelGroup,
   ChannelGroupGuid,
   ChannelCreateRequest,
   ChannelGetRequest,
@@ -30,7 +31,7 @@ import {
   ChannelMessageEvent,
   ChannelMessageCreatedEvent,
   MessageType,
-} from "@rootsdk/server-bot";
+} from "@rootsdk/server-bot"; // For apps: import from "@rootsdk/server-app"
 
 // --- SUBSCRIBE ---------------------------------------------------------------
 
@@ -108,10 +109,10 @@ export async function findChannelsByName(name: string): Promise<Channel[]> {
   // Channel names are not unique — multiple channels can share the same name.
   // There is no listAll or search-by-name method for channels.
   // Iterate every channel group and scan its channels.
-  const groups = await rootServer.community.channelGroups.list();
+  const groups: ChannelGroup[] = await rootServer.community.channelGroups.list();
   const matches: Channel[] = [];
   for (const group of groups) {
-    const channels = await rootServer.community.channels.list({
+    const channels: Channel[] = await rootServer.community.channels.list({
       channelGroupId: group.id,
     });
     matches.push(...channels.filter((ch) => ch.name === name));
@@ -134,17 +135,17 @@ async function onChannelsCommand(evt: ChannelMessageCreatedEvent): Promise<void>
   try {
     // 1. List channel groups and find the one containing this channel
     step = 1;
-    const groups = await rootServer.community.channelGroups.list();
+    const groups: ChannelGroup[] = await rootServer.community.channelGroups.list();
     if (groups.length === 0) {
       await messages.create({ channelId, content: "No channel groups found." });
       return;
     }
     // Find the group containing the trigger channel
     let group = groups[0];
-    for (const g of groups) {
-      const channels = await listChannels(g.id);
-      if (channels.some((ch) => ch.id === channelId)) {
-        group = g;
+    for (const candidateGroup of groups) {
+      const groupChannels: Channel[] = await listChannels(candidateGroup.id);
+      if (groupChannels.some((channel) => channel.id === channelId)) {
+        group = candidateGroup;
         break;
       }
     }
@@ -152,52 +153,57 @@ async function onChannelsCommand(evt: ChannelMessageCreatedEvent): Promise<void>
 
     // 2. Create a channel
     step = 2;
-    const channel = await createChannel(group.id, "test-channel", 1, true, "A test channel");
+    const channel: Channel = await createChannel(
+      group.id, "test-channel", 1 /* text channel */, true /* useChannelGroupPermission */, "A test channel",
+    );
     lines.push(`✓ created channel: ${channel.name} (${channel.id})`);
 
-    // 2b. Find channels by name (cross-group search — names are not unique)
-    step = 10;
-    const found = await findChannelsByName("test-channel");
+    // 3. Find channels by name (cross-group search — names are not unique)
+    step = 3;
+    const found: Channel[] = await findChannelsByName("test-channel");
     lines.push(`✓ found ${found.length} channel(s) named "test-channel"`);
 
-    // 3. List channels
-    step = 3;
-    const channelList = await listChannels(group.id);
+    // 4. List channels
+    step = 4;
+    const channelList: Channel[] = await listChannels(group.id);
     lines.push(`✓ listed ${channelList.length} channel(s) in group`);
 
-    // 4. Get channel
-    step = 4;
-    const fetched = await getChannel(channel.id);
+    // 5. Get channel
+    step = 5;
+    const fetched: Channel = await getChannel(channel.id);
     lines.push(`✓ fetched channel: name=${fetched.name}, type=${fetched.channelType}`);
 
-    // 5. Edit channel
-    step = 5;
+    // 6. Edit channel
+    step = 6;
     await editChannel(channel.id, "renamed-channel", true, "Updated description");
     lines.push("✓ edited channel name and description");
 
-    // 6. Create target group + move channel
-    step = 6;
-    const moveTarget = await rootServer.community.channelGroups.create({ name: "Move Target" });
+    // 7. Create target group + move channel
     step = 7;
-    await moveChannel(channel.id, group.id, moveTarget.id);
-    lines.push("✓ moved channel from " + group.name + " to " + moveTarget.name);
-
-    // 7. Delete channel + cleanup
+    const moveTarget: ChannelGroup = await rootServer.community.channelGroups.create({ name: "Move Target" });
     step = 8;
-    await deleteChannel(channel.id);
+    await moveChannel(channel.id, group.id, moveTarget.id);
+    lines.push(`✓ moved channel from ${group.name} to ${moveTarget.name}`);
+
+    // 9. Delete channel + cleanup
     step = 9;
+    await deleteChannel(channel.id);
+    step = 10;
     await rootServer.community.channelGroups.delete({ id: moveTarget.id });
     lines.push("✓ deleted channel and move-target group");
 
     await messages.create({ channelId, content: lines.join("\n") });
-  } catch (err: any) {
+  } catch (err: unknown) {
     const parts = [`Channels demo error: ${err}`];
-    if (err?.code) parts.push(`code: ${err.code}`);
-    if (err?.errorCode) parts.push(`errorCode: ${err.errorCode}`);
-    if (err?.meta) parts.push(`meta: ${JSON.stringify(err.meta)}`);
-    if (err?.payload) parts.push(`payload: ${JSON.stringify(err.payload)}`);
+    if (err && typeof err === "object") {
+      const e = err as Record<string, unknown>;
+      if (e.code) parts.push(`code: ${e.code}`);
+      if (e.errorCode) parts.push(`errorCode: ${e.errorCode}`);
+      if (e.meta) parts.push(`meta: ${JSON.stringify(e.meta)}`);
+      if (e.payload) parts.push(`payload: ${JSON.stringify(e.payload)}`);
+    }
     parts.push(`failed at step ${step}`);
-    if (lines.length > 0) parts.push(`completed ${lines.length}/8 steps`);
+    if (lines.length > 0) parts.push(`completed ${lines.length}/10 steps`);
     await messages.create({ channelId, content: parts.join("\n") });
   }
 }

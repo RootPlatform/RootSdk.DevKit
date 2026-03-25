@@ -19,7 +19,9 @@
 import {
   rootServer,
   RootServerException,
+  AssetAppCreateResponse,
   AssetGetResponse,
+  AssetInformation,
 } from "@rootsdk/server-app";
 
 import { UploadServiceBase } from "@clientassets/gen-server";
@@ -52,10 +54,10 @@ class UploadService extends UploadServiceBase {
     // of token → asset URI. Tokens are temporary — convert them promptly.
     let assetUri: string;
     try {
-      const result = await rootServer.dataStore.assets.create({
+      const result: AssetAppCreateResponse = await rootServer.dataStore.assets.create({
         tokens: [request.token],
       });
-      const uri = result.assets[request.token];
+      const uri: string | undefined = result.assets[request.token];
       if (!uri) {
         throw new RootServerException(
           UploadError.CONVERSION_FAILED,
@@ -63,7 +65,7 @@ class UploadService extends UploadServiceBase {
         );
       }
       assetUri = uri;
-    } catch (err) {
+    } catch (err: unknown) {
       if (err instanceof RootServerException) throw err;
       throw new RootServerException(
         UploadError.CONVERSION_FAILED,
@@ -75,7 +77,7 @@ class UploadService extends UploadServiceBase {
     let assetType = "unknown";
     try {
       const metadata: AssetGetResponse = await rootServer.dataStore.assets.get({ uris: [assetUri] });
-      const info = metadata.assets[assetUri];
+      const info: AssetInformation | undefined = metadata.assets[assetUri];
       if (info?.link?.oneofKind) {
         assetType = info.link.oneofKind;
       }

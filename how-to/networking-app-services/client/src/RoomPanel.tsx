@@ -96,7 +96,7 @@ export const RoomPanel: React.FC<{ onLog: (msg: string) => void }> = ({
     try {
       await sendToRoom(roomId, "Hello from client!");
       onLog(`sent message to room "${roomId}"`);
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof RootServerException) {
         switch (error.code) {
           case RoomError.NOT_A_MEMBER:

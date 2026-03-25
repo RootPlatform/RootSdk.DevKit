@@ -185,7 +185,7 @@ async function onGlobalSettingsCommand(
     lines.push("✓ update event: subscribed");
 
     await messages.create({ channelId, content: lines.join("\n") });
-  } catch (err) {
+  } catch (err: unknown) {
     console.error("Global settings demo error:", err);
     await messages.create({
       channelId,

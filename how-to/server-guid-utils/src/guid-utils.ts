@@ -183,7 +183,7 @@ async function onGuidUtilsCommand(
     }
 
     await messages.create({ channelId, content: lines.join("\n") });
-  } catch (err) {
+  } catch (err: unknown) {
     console.error("GUID utils demo error:", err);
     await messages.create({
       channelId,

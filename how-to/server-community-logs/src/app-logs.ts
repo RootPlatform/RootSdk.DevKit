@@ -95,8 +95,8 @@ async function onAppLogsCommand(evt: ChannelMessageCreatedEvent): Promise<void> 
 
     await logFatal("Test fatal log from /app-logs command");
     lines.push("✓ logged Fatal level");
-  } catch (err: any) {
-    lines.push(`demo error: ${err.message ?? err}`);
+  } catch (err: unknown) {
+    lines.push(`demo error: ${err instanceof Error ? err.message : err}`);
   }
 
   await messages.create({ channelId, content: lines.join("\n") });

@@ -96,7 +96,7 @@ async function onCommunityCommand(evt: ChannelMessageCreatedEvent): Promise<void
 
   try {
     // 1. Get the community
-    const community = await getCommunity();
+    const community: Community = await getCommunity();
     lines.push(
       `✓ get: name="${community.name}" pictureHex=${community.pictureHex} ` +
       `owner=${community.ownerUserId} defaultChannel=${community.defaultChannelId} ` +
@@ -106,7 +106,7 @@ async function onCommunityCommand(evt: ChannelMessageCreatedEvent): Promise<void
     const originalName = community.name;
 
     // 2. Edit the community — rename (append "Edited" — no spaces/brackets allowed)
-    const edited = await editCommunity(
+    const edited: Community = await editCommunity(
       originalName + "Edited",
       community.pictureHex,
       community.rejectUnverifiedEmail,
@@ -115,11 +115,11 @@ async function onCommunityCommand(evt: ChannelMessageCreatedEvent): Promise<void
     lines.push(`✓ edit: renamed to "${edited.name}"`);
 
     // 3. Get again to confirm the edit took effect
-    const confirmed = await getCommunity();
+    const confirmed: Community = await getCommunity();
     lines.push(`✓ get (confirm): name="${confirmed.name}"`);
 
     // 4. Restore original name
-    const restored = await editCommunity(
+    const restored: Community = await editCommunity(
       originalName,
       community.pictureHex,
       community.rejectUnverifiedEmail,
@@ -128,7 +128,7 @@ async function onCommunityCommand(evt: ChannelMessageCreatedEvent): Promise<void
     lines.push(`✓ edit (restore): name="${restored.name}"`);
 
     await messages.create({ channelId, content: lines.join("\n") });
-  } catch (err) {
+  } catch (err: unknown) {
     console.error("Community demo error:", err);
     await messages.create({ channelId, content: `Community demo error: ${err}` });
   }

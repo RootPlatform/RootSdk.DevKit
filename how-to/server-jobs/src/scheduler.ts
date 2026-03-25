@@ -115,23 +115,23 @@ async function onJobsCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
   try {
     // 1. Create a one-time job (1 minute from now)
     const oneMinute = new Date(Date.now() + 60_000);
-    const oneTime = await createJob("demo-resource", "one-time-demo", oneMinute, JobInterval.OneTime);
+    const oneTime: JobRecord = await createJob("demo-resource", "one-time-demo", oneMinute, JobInterval.OneTime);
     lines.push(`✓ created one-time job: ${oneTime.jobScheduleId}`);
 
     // 2. Create a daily recurring job
-    const daily = await createJob("demo-resource", "daily-demo", new Date(), JobInterval.Daily);
+    const daily: JobRecord = await createJob("demo-resource", "daily-demo", new Date(), JobInterval.Daily);
     lines.push(`✓ created daily job: ${daily.jobScheduleId}`);
 
     // 3. List all jobs
-    const allJobs = await listAllJobs();
+    const allJobs: JobRecord[] = await listAllJobs();
     lines.push(`✓ listed ${allJobs.length} job(s)`);
 
     // 4. Get one by ID
-    const fetched = await getJob(daily.jobScheduleId);
+    const fetched: JobRecord | undefined = await getJob(daily.jobScheduleId);
     lines.push(`✓ fetched job: interval=${fetched?.jobInterval}, tag=${fetched?.tag}`);
 
     // 5. List by resource ID
-    const byResource = await listJobsByResourceId("demo-resource");
+    const byResource: JobRecord[] = await listJobsByResourceId("demo-resource");
     lines.push(`✓ listed ${byResource.length} job(s) by resourceId`);
 
     // 6. Edit the daily job's tag
@@ -139,7 +139,7 @@ async function onJobsCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
     lines.push("✓ edited daily job tag");
 
     // 7. List by tag
-    const byTag = await listJobsByTag("updated-tag");
+    const byTag: JobRecord[] = await listJobsByTag("updated-tag");
     lines.push(`✓ listed ${byTag.length} job(s) by tag "updated-tag"`);
 
     // 8. Delete by tag
@@ -151,11 +151,11 @@ async function onJobsCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
     lines.push("✓ deleted jobs by resourceId");
 
     // 10. Confirm empty
-    const remaining = await listAllJobs();
+    const remaining: JobRecord[] = await listAllJobs();
     lines.push(`✓ ${remaining.length} job(s) remaining`);
 
     await messages.create({ channelId, content: lines.join("\n") });
-  } catch (err) {
+  } catch (err: unknown) {
     console.error("Jobs demo error:", err);
     await messages.create({ channelId, content: `Jobs demo error: ${err}` });
   }

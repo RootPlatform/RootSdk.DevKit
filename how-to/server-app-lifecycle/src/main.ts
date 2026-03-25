@@ -3,7 +3,7 @@ import { initializeLifecycleApp, shutdownLifecycleApp } from "./lifecycle-app";
 
 async function onStarting(state: RootAppStartState) {
   // For apps with custom RPC services, call rootServer.lifecycle.addService()
-  // here before start() resolves. See llms/templates/app/ for the full pattern
+  // here before start() resolves. See templates/app/ for the full pattern
   // including .proto definitions and generated service base classes.
   initializeLifecycleApp(state);
 }

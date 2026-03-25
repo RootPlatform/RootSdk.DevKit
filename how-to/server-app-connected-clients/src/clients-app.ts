@@ -123,17 +123,17 @@ async function onClientsCommand(evt: ChannelMessageCreatedEvent): Promise<void> 
   const lines: string[] = [];
 
   // 1. List all connected clients
-  const allClients = listConnectedClients();
+  const allClients: Client[] = listConnectedClients();
   lines.push(`\u2713 connected clients: ${allClients.length}`);
 
   // 2. List all device IDs
-  const deviceIds = listDeviceIds();
+  const deviceIds: string[] = listDeviceIds();
   lines.push(`\u2713 device ids: ${deviceIds.length}`);
 
   // 3. Look up a specific client (use the first connected user if any)
   if (allClients.length > 0) {
-    const firstClient = allClients[0];
-    const looked = getConnectedClient(firstClient.userId);
+    const firstClient: Client = allClients[0];
+    const looked: Client | undefined = getConnectedClient(firstClient.userId);
     lines.push(`\u2713 client lookup: ${looked ? "found" : "none"}`);
   } else {
     lines.push(`\u2713 client lookup: none`);

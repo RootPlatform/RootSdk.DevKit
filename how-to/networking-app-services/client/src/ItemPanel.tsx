@@ -115,7 +115,7 @@ export const ItemPanel: React.FC<{ onLog: (msg: string) => void }> = ({
       await deleteItem(id);
       onLog(`deleted item: id=${id}`);
       setItems((prev) => prev.filter((i) => i.id !== id));
-    } catch (error) {
+    } catch (error: unknown) {
       // RootServerException carries the error code and message from the server.
       // The code matches the ItemError proto enum values.
       if (error instanceof RootServerException) {

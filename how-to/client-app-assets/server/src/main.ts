@@ -69,7 +69,7 @@ async function onClientAssetsCommand(
     await rootServer.dataStore.appData.delete(testKey);
 
     await messages.create({ channelId, content: lines.join("\n") });
-  } catch (err: any) {
+  } catch (err: unknown) {
     lines.push(`✗ error: ${err}`);
     await messages.create({ channelId, content: lines.join("\n") });
   }
