@@ -10,6 +10,7 @@
 import {
   rootServer,
   RootApiException,
+  RootGuidUtils,
   ErrorCodeType,
   MessageType,
   MessageDirectionTake,
@@ -133,22 +134,102 @@ async function deleteMessage(
   });
 }
 
-// List messages in a channel. Returns messages around a given date.
-// Use messageDirectionTake to control whether to fetch newer, older, or both.
-async function listMessages(
+// List older messages before a given date.
+// limit controls batch size: server accepts 10–50 (default 50).
+// result.oldCount indicates how many older messages remain beyond this batch.
+async function listOlderMessages(
   channelId: ChannelGuid,
+  beforeDate: Date,
+  limit: number = 50,
 ): Promise<void> {
   const result = await rootServer.community.channelMessages.list({
     channelId,
-    dateAt: new Date(),
+    dateAt: beforeDate,
     messageDirectionTake: MessageDirectionTake.Older,
+    limit,
   });
 
-  // result.messages — array of ChannelMessage
-  // result.oldCount — number of older messages available
-  // result.newCount — number of newer messages available
+  // result.messages     — array of ChannelMessage, oldest first
+  // result.oldCount     — count of still-older messages beyond this batch
+  // result.newCount     — count of newer messages after dateAt
+  // result.referenceMaps — bulk-resolved mentions (users, roles, channels, assets)
   for (const msg of result.messages) {
     console.log(`[${msg.userId}] ${msg.messageContent}`);
+  }
+}
+
+// List newer messages after a given date.
+// Useful for loading messages that arrived while the user was away.
+async function listNewerMessages(
+  channelId: ChannelGuid,
+  afterDate: Date,
+  limit: number = 50,
+): Promise<void> {
+  const result = await rootServer.community.channelMessages.list({
+    channelId,
+    dateAt: afterDate,
+    messageDirectionTake: MessageDirectionTake.Newer,
+    limit,
+  });
+
+  // result.newCount — count of still-newer messages beyond this batch
+  for (const msg of result.messages) {
+    console.log(`[${msg.userId}] ${msg.messageContent}`);
+  }
+}
+
+// List messages in both directions around a date.
+// Ideal for initial channel load or jumping to a specific point in history.
+async function listMessagesAround(
+  channelId: ChannelGuid,
+  aroundDate: Date,
+  limit: number = 50,
+): Promise<void> {
+  const result = await rootServer.community.channelMessages.list({
+    channelId,
+    dateAt: aroundDate,
+    messageDirectionTake: MessageDirectionTake.Both,
+    limit,
+  });
+
+  // Both oldCount and newCount are populated — tells the caller if there
+  // are more messages available in either direction.
+  console.log(
+    `${result.messages.length} messages around date, ` +
+    `${result.oldCount} older, ${result.newCount} newer`,
+  );
+}
+
+// Paginate through all messages in a channel by walking backward in time.
+// Uses oldCount to know when to stop and each batch's oldest message
+// timestamp as the dateAt for the next request.
+async function paginateMessages(
+  channelId: ChannelGuid,
+): Promise<void> {
+  let dateAt = new Date();
+  let hasMore = true;
+
+  while (hasMore) {
+    const result = await rootServer.community.channelMessages.list({
+      channelId,
+      dateAt,
+      messageDirectionTake: MessageDirectionTake.Older,
+      limit: 50,
+    });
+
+    for (const msg of result.messages) {
+      console.log(`[${msg.userId}] ${msg.messageContent}`);
+    }
+
+    // When oldCount is 0 there are no more older messages to fetch.
+    hasMore = result.oldCount > 0 && result.messages.length > 0;
+
+    if (hasMore) {
+      // Message IDs are time-ordered GUIDs. Extract the timestamp from the
+      // oldest message's ID to position the next fetch.
+      const oldestMsg = result.messages[result.messages.length - 1];
+      dateAt = new Date(RootGuidUtils.toMilliseconds(oldestMsg.id));
+    }
   }
 }
 
@@ -163,13 +244,14 @@ async function markChannelRead(
 
 // --- COMMAND HANDLER: /server-messages <text> -------------------------------------------
 //
-// Demonstrates typing indicator → reply → edit → get → view-time lifecycle.
+// Demonstrates typing indicator → reply → edit → get → list → view-time lifecycle.
 // User sends "/server-messages hello" and we:
 //   1. Shows a typing indicator
 //   2. Replies to the user's message with the echoed text
 //   3. Edits the reply to add "(edited)" suffix
 //   4. Logs the message details via get
-//   5. Marks the channel as read via setViewTime
+//   5. Lists recent messages in the channel
+//   6. Marks the channel as read via setViewTime
 
 async function onEchoCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
   if (evt.messageType === MessageType.System) return;
@@ -190,7 +272,10 @@ async function onEchoCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
     // 4. Read it back
     await getMessage(evt.channelId, messageId);
 
-    // 5. Mark the channel as read
+    // 5. List recent messages (fetch the 10 most recent)
+    await listOlderMessages(evt.channelId, new Date(), 10);
+
+    // 6. Mark the channel as read
     await markChannelRead(evt.channelId);
 
   } catch (err: unknown) {

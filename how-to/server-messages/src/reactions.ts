@@ -1,8 +1,9 @@
 // ============================================================================
 // How-To: Message Reactions
-// SDK: channelMessages.reactionCreate, channelMessages.reactionDelete
+// SDK: channelMessages.reactionCreate, .reactionDelete, .reactionDeleteFull
 // Permissions: channel.createMessageReaction
-// Events: ChannelMessageReactionCreated, ChannelMessageReactionDeleted
+// Events: ChannelMessageReactionCreated, ChannelMessageReactionDeleted,
+//         ChannelMessageReactionDeletedFull
 // Works in: Apps (@rootsdk/server-app) and Bots (@rootsdk/server-bot)
 //           All code except the import below is identical for both.
 // ============================================================================
@@ -16,6 +17,7 @@ import {
   ChannelMessageCreatedEvent,
   ChannelMessageReactionCreatedEvent,
   ChannelMessageReactionDeletedEvent,
+  ChannelMessageReactionDeletedFullEvent,
   ChannelGuid,
   MessageGuid,
 } from "@rootsdk/server-bot"; // For apps: import from "@rootsdk/server-app"
@@ -31,12 +33,14 @@ export function initializeReactions(): void {
   // Respond to reaction changes made by anyone
   messages.on(ChannelMessageEvent.ChannelMessageReactionCreated, onReactionCreated);
   messages.on(ChannelMessageEvent.ChannelMessageReactionDeleted, onReactionDeleted);
+  messages.on(ChannelMessageEvent.ChannelMessageReactionDeletedFull, onReactionDeletedFull);
 }
 
 // --- OPERATIONS --------------------------------------------------------------
 
 // Add an emoji reaction to an existing message.
 // The shortcode must include colons, e.g. ":thumbsup:", ":heart:".
+// Emoji shortcodes use standard :shortcode: names — for lookups see https://github.com/iamcal/emoji-data
 async function addReaction(
   channelId: ChannelGuid,
   messageId: MessageGuid,
@@ -64,11 +68,27 @@ async function removeReaction(
   });
 }
 
+// Remove ALL reactions of a given emoji from a message — every user's reaction,
+// not just yours. This is a moderation operation.
+// Requires the createMessageReaction permission (same as reactionCreate/reactionDelete).
+async function removeAllReactions(
+  channelId: ChannelGuid,
+  messageId: MessageGuid,
+  shortcode: string,
+): Promise<void> {
+  await rootServer.community.channelMessages.reactionDeleteFull({
+    channelId,
+    messageId,
+    shortcode,
+  });
+}
+
 // --- COMMAND HANDLER: /react <emoji> -----------------------------------------
 //
 // Example usage in chat:
-//   /react thumbsup     → reacts with :thumbsup: to the command message
-//   /unreact heart      → removes the :heart: reaction from the command message
+//   /react thumbsup      → reacts with :thumbsup: to the command message
+//   /unreact heart       → removes the :heart: reaction from the command message
+//   /unreact-all thumbsup → removes ALL :thumbsup: reactions from the command message
 //
 // Note: ChannelMessageCreatedEvent uses evt.id for the message ID (not evt.messageId).
 // The evt.messageId field does not exist on this event type.
@@ -82,6 +102,12 @@ async function onReactCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
       const shortcode = ":" + emoji + ":";
 
       await addReaction(evt.channelId, evt.id, shortcode);
+
+    } else if (evt.messageContent?.startsWith("/unreact-all ")) {
+      const emoji = evt.messageContent.substring("/unreact-all ".length).trim();
+      const shortcode = ":" + emoji + ":";
+
+      await removeAllReactions(evt.channelId, evt.id, shortcode);
 
     } else if (evt.messageContent?.startsWith("/unreact ")) {
       const emoji = evt.messageContent.substring("/unreact ".length).trim();
@@ -133,5 +159,15 @@ async function onReactionDeleted(evt: ChannelMessageReactionDeletedEvent): Promi
   console.log(
     `Reaction ${evt.shortcode} removed from message ${evt.messageId} ` +
     `in channel ${evt.channelId} by user ${evt.userId}`
+  );
+}
+
+// Fires when ALL reactions of a given emoji are removed from a message via
+// reactionDeleteFull. Unlike reactionDeleted, there is no userId — this
+// affects every user's reaction for the shortcode.
+async function onReactionDeletedFull(evt: ChannelMessageReactionDeletedFullEvent): Promise<void> {
+  console.log(
+    `All ${evt.shortcode} reactions removed from message ${evt.messageId} ` +
+    `in channel ${evt.channelId}`
   );
 }
