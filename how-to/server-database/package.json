@@ -9,7 +9,6 @@
   },
   "dependencies": {
     "@rootsdk/server-bot": "0.17.1-alpha.6",
-    "p-queue": "^8.0.1",
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {

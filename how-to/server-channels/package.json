@@ -8,8 +8,7 @@
     "node": ">=22"
   },
   "dependencies": {
-    "@rootsdk/server-bot": "0.17.1-alpha.6",
-    "p-queue": "^9.1.0"
+    "@rootsdk/server-bot": "0.17.1-alpha.6"
   },
   "devDependencies": {
     "@rootsdk/dev-tools": "0.17.1-alpha.6",

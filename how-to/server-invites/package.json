@@ -1,15 +1,14 @@
 {
   "name": "@rootsdk-howto/server-invites",
   "author": "Root Communications, Inc.",
-  "description": "How-To: Invites \u2014 get, list, delete community member invites",
+  "description": "How-To: Invites — get, list, delete community member invites",
   "version": "1.0.0",
   "private": true,
   "engines": {
     "node": ">=22"
   },
   "dependencies": {
-    "@rootsdk/server-bot": "0.17.1-alpha.6",
-    "p-queue": "^8.0.1"
+    "@rootsdk/server-bot": "0.17.1-alpha.6"
   },
   "devDependencies": {
     "@rootsdk/dev-tools": "0.17.1-alpha.6",

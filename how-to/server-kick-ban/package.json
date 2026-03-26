@@ -1,15 +1,14 @@
 {
   "name": "@rootsdk-howto/server-kick-ban",
   "author": "Root Communications, Inc.",
-  "description": "How-To: Kick & Ban \u2014 ban, unban, kick members; query bans; ban events",
+  "description": "How-To: Kick & Ban — ban, unban, kick members; query bans; ban events",
   "version": "1.0.0",
   "private": true,
   "engines": {
     "node": ">=22"
   },
   "dependencies": {
-    "@rootsdk/server-bot": "0.17.1-alpha.6",
-    "p-queue": "^8.0.1"
+    "@rootsdk/server-bot": "0.17.1-alpha.6"
   },
   "devDependencies": {
     "@rootsdk/dev-tools": "0.17.1-alpha.6",
