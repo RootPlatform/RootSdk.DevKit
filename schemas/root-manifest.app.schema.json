@@ -3,28 +3,859 @@
   "title": "Manifest reference",
   "description": "Defines your App's metadata, deployment configuration, settings, and permissions.",
   "type": "object",
-  "required": ["id", "version", "package"],
+  "required": [
+    "id",
+    "version",
+    "package"
+  ],
   "additionalProperties": false,
   "examples": [
     {
       "id": "ACj4U-eThgmjXUOBAjk_jw",
       "version": "1.0.0",
       "package": {
-        "client": { "deploy": "client/dist" },
+        "client": {
+          "deploy": "client/dist"
+        },
         "server": {
           "launch": "server/dist/myServerMain.js",
-          "deploy": ["server/dist", "networking/gen/server"],
-          "node_modules": ["server/node_modules"]
+          "deploy": [
+            "server/dist",
+            "networking/gen/server"
+          ],
+          "node_modules": [
+            "server/node_modules"
+          ]
         }
       }
     }
   ],
-
   "properties": {
-    "id"         : { "$ref":"id.schema.json"          },
-    "version"    : { "$ref":"version.schema.json"     },
-    "package"    : { "$ref":"package.app.schema.json" },
-    "settings"   : { "$ref":"settings.schema.json"    },
-    "permissions": { "$ref":"permissions.schema.json" }
+    "id": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Id",
+      "type": "string",
+      "description": "Unique identifier for your project, assigned by the Root Developer Portal (https://dev.rootapp.com). Create a project in the portal to obtain this value. If you scaffolded your project with create-root, the manifest contains a placeholder that must be replaced with your real ID. The format is validated by the CLI during verify and push.",
+      "examples": [
+        {
+          "id": "ACj4U-eThgmjXUOBAjk_jw"
+        }
+      ]
+    },
+    "version": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Version",
+      "type": "string",
+      "description": "Semantic version string (MAJOR.MINOR.PATCH). Pre-release and build metadata are supported (e.g., 1.0.0-beta.1+build.42). Each push must use a version strictly greater than the last published version — you cannot reuse or go backwards. Validated locally by the CLI and server-side during push.",
+      "examples": [
+        {
+          "version": "1.0.0"
+        }
+      ]
+    },
+    "package": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Package",
+      "description": "Deployment and startup configuration for your App's client and server code.",
+      "x-doc-details": "When you push, the CLI reads these paths and creates a .pkg archive containing root-manifest.json, server.tar.gz (from deploy and node_modules), and client.tar.gz (from client.deploy).",
+      "type": "object",
+      "required": [
+        "client",
+        "server"
+      ],
+      "properties": {
+        "client": {
+          "type": "object",
+          "description": "Client-side build output. Root serves these files to users who open your app in their browser.",
+          "required": [
+            "deploy"
+          ],
+          "properties": {
+            "deploy": {
+              "type": "string",
+              "description": "Path to the client build output directory containing your single-page application, relative to the project root. This is typically the output of your frontend build tool (e.g., Vite, webpack).",
+              "examples": [
+                "client/dist"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "server": {
+          "type": "object",
+          "description": "Configuration for launching and packaging your server.",
+          "required": [
+            "launch",
+            "deploy",
+            "node_modules"
+          ],
+          "properties": {
+            "launch": {
+              "type": "string",
+              "description": "Path to the JavaScript entry point that Root executes to start your server. Must be a .js file (not .ts). This is typically the compiled output of your main server file.",
+              "examples": [
+                "server/dist/myAppMain.js"
+              ]
+            },
+            "deploy": {
+              "type": "array",
+              "description": "Directories to include in the server package, relative to the project root. Typically your compiled output. Multiple directories are supported if your build output spans more than one folder.",
+              "items": {
+                "type": "string"
+              },
+              "examples": [
+                [
+                  "server/dist",
+                  "networking/gen/server"
+                ]
+              ]
+            },
+            "node_modules": {
+              "type": "array",
+              "description": "node_modules directories to bundle with your server (production dependencies). The CLI automatically excludes sqlite3 and @rootsdk/dev-tools from the bundle.",
+              "items": {
+                "type": "string"
+              },
+              "examples": [
+                [
+                  "server/node_modules"
+                ]
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false,
+      "examples": [
+        {
+          "package": {
+            "client": {
+              "deploy": "client/dist"
+            },
+            "server": {
+              "launch": "server/dist/myAppMain.js",
+              "deploy": [
+                "server/dist",
+                "networking/gen/server"
+              ],
+              "node_modules": [
+                "server/node_modules"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "settings": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Settings",
+      "description": "Configurable global settings. They're declared in your manifest and set by community members with the `Manage Apps` permission during and after installation.",
+      "x-doc-note": "This feature is a work in progress.",
+      "x-doc-details": "Settings are accessed at runtime via rootServer.globalSettings[groupKey][itemKey]. Each setting type determines the UI the admin sees and the SDK type your server receives. Only member, role, and roleAndMember types are currently functional on the platform.",
+      "type": "object",
+      "required": [
+        "groups"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "groups": {
+          "type": "array",
+          "description": "Logical grouping of settings fields. Each group appears as a section in the admin UI.",
+          "items": {
+            "type": "object",
+            "required": [
+              "key",
+              "title",
+              "items"
+            ],
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "Machine-friendly identifier for this group. Used at runtime: rootServer.globalSettings[groupKey].",
+                "examples": [
+                  "general",
+                  "notifications"
+                ]
+              },
+              "title": {
+                "type": "string",
+                "description": "Human-readable title shown above this group in the admin UI.",
+                "examples": [
+                  "General Settings",
+                  "Notification Preferences"
+                ]
+              },
+              "items": {
+                "type": "array",
+                "description": "List of individual setting definitions in this group.",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "key",
+                    "title",
+                    "required",
+                    "confirmation"
+                  ],
+                  "properties": {
+                    "key": {
+                      "type": "string",
+                      "description": "Machine-friendly setting identifier. Used at runtime: rootServer.globalSettings[groupKey][itemKey].",
+                      "examples": [
+                        "maxRaidSize",
+                        "notifyOnJoin"
+                      ]
+                    },
+                    "title": {
+                      "type": "string",
+                      "description": "Label shown to the user for this setting.",
+                      "examples": [
+                        "Maximum raid size",
+                        "Notify on new join"
+                      ]
+                    },
+                    "description": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Optional explanatory text for this setting.",
+                      "examples": [
+                        "Set the upper limit for raid participants.",
+                        null
+                      ]
+                    },
+                    "required": {
+                      "type": "boolean",
+                      "description": "Whether the user must provide a value.",
+                      "examples": [
+                        true,
+                        false
+                      ]
+                    },
+                    "confirmation": {
+                      "type": "string",
+                      "description": "Text for the button users click to save this setting. Required even though it may seem optional.",
+                      "examples": [
+                        "Save",
+                        "Update"
+                      ]
+                    },
+                    "text": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Free-form text input.",
+                      "x-doc-note": "Not yet available on the platform.",
+                      "x-doc-runtime-type": "string | undefined",
+                      "properties": {
+                        "defaultValue": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "description": "Default text pre-filled in the input.",
+                          "examples": [
+                            "Enter a title...",
+                            null
+                          ]
+                        },
+                        "regex": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "description": "Regular expression the input must match.",
+                          "examples": [
+                            "^[a-z0-9\\-]+$",
+                            null
+                          ]
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "number": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Numeric input.",
+                      "x-doc-note": "Not yet available on the platform.",
+                      "x-doc-runtime-type": "number | undefined",
+                      "properties": {
+                        "minValue": {
+                          "type": [
+                            "number",
+                            "null"
+                          ],
+                          "description": "Minimum allowed value.",
+                          "examples": [
+                            1,
+                            null
+                          ]
+                        },
+                        "maxValue": {
+                          "type": [
+                            "number",
+                            "null"
+                          ],
+                          "description": "Maximum allowed value.",
+                          "examples": [
+                            100,
+                            null
+                          ]
+                        },
+                        "step": {
+                          "type": [
+                            "number",
+                            "null"
+                          ],
+                          "description": "Increment step.",
+                          "examples": [
+                            1,
+                            null
+                          ]
+                        },
+                        "defaultValue": {
+                          "type": [
+                            "number",
+                            "null"
+                          ],
+                          "description": "Default numeric value.",
+                          "examples": [
+                            10,
+                            null
+                          ]
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "checkbox": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Boolean checkbox toggle.",
+                      "x-doc-note": "Not yet available on the platform.",
+                      "x-doc-runtime-type": "boolean",
+                      "properties": {
+                        "defaultValue": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ],
+                          "description": "Initial state of the checkbox.",
+                          "examples": [
+                            true,
+                            false
+                          ]
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "member": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Select one or more community members. The admin sees a member picker.",
+                      "x-doc-runtime-type": "ReadOnlyMemberGroup",
+                      "x-doc-details": "All three member/role types (member, role, roleAndMember) produce a ReadOnlyMemberGroup on the server. Choose based on the UI you want the admin to see. The member group is automatically kept in sync — deleted users and roles are removed, and memberUserIds is recalculated when role membership changes.",
+                      "properties": {
+                        "multiSelect": {
+                          "type": "boolean",
+                          "description": "Allow multiple selections.",
+                          "examples": [
+                            false,
+                            true
+                          ]
+                        },
+                        "userIds": {
+                          "type": "array",
+                          "description": "Default user IDs shown in the picker during installation. Typically left as an empty array.",
+                          "items": {
+                            "type": "string"
+                          },
+                          "examples": [
+                            []
+                          ]
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "role": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Select one or more community roles. The admin sees a role picker.",
+                      "x-doc-runtime-type": "ReadOnlyMemberGroup",
+                      "properties": {
+                        "multiSelect": {
+                          "type": "boolean",
+                          "description": "Allow multiple role selections.",
+                          "examples": [
+                            false,
+                            true
+                          ]
+                        },
+                        "communityRoleIds": {
+                          "type": "array",
+                          "description": "Default role IDs shown in the picker during installation. Typically left as an empty array.",
+                          "items": {
+                            "type": "string"
+                          },
+                          "examples": [
+                            []
+                          ]
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "roleAndMember": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Combined selector for users and roles. The admin sees a picker for both members and roles.",
+                      "x-doc-runtime-type": "ReadOnlyMemberGroup",
+                      "properties": {
+                        "userIds": {
+                          "type": "array",
+                          "description": "Default user IDs shown in the picker during installation. Typically left as an empty array.",
+                          "items": {
+                            "type": "string"
+                          },
+                          "examples": [
+                            []
+                          ]
+                        },
+                        "communityRoleIds": {
+                          "type": "array",
+                          "description": "Default role IDs shown in the picker during installation. Typically left as an empty array.",
+                          "items": {
+                            "type": "string"
+                          },
+                          "examples": [
+                            []
+                          ]
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "channel": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Select one or more channels. The admin sees a channel picker.",
+                      "x-doc-note": "Not yet available on the platform.",
+                      "x-doc-runtime-type": "ChannelGuid[]",
+                      "properties": {
+                        "multiSelect": {
+                          "type": "boolean",
+                          "description": "Allow multiple channels.",
+                          "examples": [
+                            true
+                          ]
+                        },
+                        "channelIds": {
+                          "type": "array",
+                          "description": "Default channel IDs shown in the picker during installation. Typically left as an empty array.",
+                          "items": {
+                            "type": "string"
+                          },
+                          "examples": [
+                            []
+                          ]
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "channelGroup": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Select one or more channel groups. The admin sees a channel group picker.",
+                      "x-doc-note": "Not yet available on the platform.",
+                      "x-doc-runtime-type": "ChannelGroupGuid[]",
+                      "properties": {
+                        "multiSelect": {
+                          "type": "boolean",
+                          "description": "Allow multiple groups.",
+                          "examples": [
+                            false
+                          ]
+                        },
+                        "channelGroupIds": {
+                          "type": "array",
+                          "description": "Default channel group IDs shown in the picker during installation. Typically left as an empty array.",
+                          "items": {
+                            "type": "string"
+                          },
+                          "examples": [
+                            []
+                          ]
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "select": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Dropdown with custom label/value options.",
+                      "x-doc-note": "Not yet available on the platform.",
+                      "x-doc-runtime-type": "string[]",
+                      "properties": {
+                        "multiSelect": {
+                          "type": "boolean",
+                          "description": "Allow multiple options.",
+                          "examples": [
+                            false
+                          ]
+                        },
+                        "options": {
+                          "type": "array",
+                          "description": "List of label/value pairs for the dropdown.",
+                          "items": {
+                            "type": "object",
+                            "required": [
+                              "label",
+                              "value"
+                            ],
+                            "properties": {
+                              "label": {
+                                "type": "string",
+                                "description": "User-facing option text.",
+                                "examples": [
+                                  "Low",
+                                  "Medium",
+                                  "High"
+                                ]
+                              },
+                              "value": {
+                                "type": "string",
+                                "description": "Machine value for the option.",
+                                "examples": [
+                                  "low",
+                                  "medium",
+                                  "high"
+                                ]
+                              }
+                            },
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "timestamp": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "ISO 8601 timestamp picker.",
+                      "x-doc-note": "Not yet available on the platform.",
+                      "x-doc-runtime-type": "Date | undefined",
+                      "examples": [
+                        {
+                          "$date": "2025-08-05T00:00:00Z"
+                        }
+                      ]
+                    },
+                    "time": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Time-of-day picker (HH:MM:SS).",
+                      "x-doc-note": "Not yet available on the platform.",
+                      "x-doc-runtime-type": "{ hours: number, minutes: number, seconds: number }",
+                      "properties": {
+                        "defaultValue": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "description": "Default time value in HH:MM:SS format.",
+                          "examples": [
+                            "09:30:00",
+                            null
+                          ]
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "date": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Date picker (YYYY-MM-DD).",
+                      "x-doc-note": "Not yet available on the platform.",
+                      "x-doc-runtime-type": "{ year: number, month: number, day: number }",
+                      "properties": {
+                        "date": {
+                          "type": [
+                            "object",
+                            "null"
+                          ],
+                          "description": "Raw date object.",
+                          "examples": [
+                            {
+                              "$date": "2025-08-05"
+                            }
+                          ]
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "color": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Color picker (hex code).",
+                      "x-doc-note": "Not yet available on the platform.",
+                      "x-doc-runtime-type": "string | undefined",
+                      "properties": {
+                        "defaultValue": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "description": "Default color value as hex code.",
+                          "examples": [
+                            "#ff0000",
+                            null
+                          ]
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "button": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Action button displayed in settings. No value is sent to the server. Fires a 'button' event on GlobalSettings instead.",
+                      "x-doc-note": "Not yet available on the platform.",
+                      "x-doc-runtime-type": "none (fires GlobalSettingButtonEvent)",
+                      "properties": {
+                        "title": {
+                          "type": "string",
+                          "description": "Text shown on the button.",
+                          "examples": [
+                            "Reset settings"
+                          ]
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        }
+      },
+      "examples": [
+        {
+          "groups": [
+            {
+              "key": "general",
+              "title": "General",
+              "items": [
+                {
+                  "key": "moderators",
+                  "title": "Moderators",
+                  "description": "Select the roles and members who can moderate.",
+                  "required": true,
+                  "confirmation": "Save",
+                  "roleAndMember": {
+                    "userIds": [],
+                    "communityRoleIds": []
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "permissions": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Permissions",
+      "description": "Permissions control which parts of the Root Community API your code is able to use.",
+      "x-doc-details": "Declare your permissions in the `permissions` section of your manifest. All permissions default to `false`; set the ones you need to `true`. Follow the principle of least privilege — only request what you need.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "community": {
+          "type": "object",
+          "description": "Permissions scoped to the community level.",
+          "x-doc-note": "Community permissions are granted when the community approves installation and cannot be modified or revoked by the community after installation.",
+          "additionalProperties": false,
+          "properties": {
+            "manageCommunity": {
+              "type": "boolean",
+              "description": "Edit community level settings like name and branding.",
+              "default": false
+            },
+            "manageRoles": {
+              "type": "boolean",
+              "description": "Create, edit, delete, and assign community roles and their permissions.",
+              "default": false
+            },
+            "manageEmojis": {
+              "type": "boolean",
+              "description": "Add, remove, or update custom emojis available across the community.",
+              "default": false
+            },
+            "createInvite": {
+              "type": "boolean",
+              "description": "Create a new invite link for the community.",
+              "default": false
+            },
+            "manageInvites": {
+              "type": "boolean",
+              "description": "View, disable, expire, or edit community invite links. Includes createInvite.",
+              "default": false
+            },
+            "createBan": {
+              "type": "boolean",
+              "description": "Ban a member from the community.",
+              "default": false
+            },
+            "manageBans": {
+              "type": "boolean",
+              "description": "Review bans and unban or change ban settings. Includes createBan.",
+              "default": false
+            },
+            "kick": {
+              "type": "boolean",
+              "description": "Remove a member from the community without banning.",
+              "default": false
+            },
+            "changeOtherNickname": {
+              "type": "boolean",
+              "description": "Change another member's display name in the community.",
+              "default": false
+            },
+            "createChannelGroup": {
+              "type": "boolean",
+              "description": "Create a channel group or category at the community level.",
+              "default": false
+            }
+          }
+        },
+        "channel": {
+          "type": "object",
+          "description": "Permissions scoped to individual channels and channel groups.",
+          "x-doc-note": "Channel permissions can be modified by the community after installation using access rule overlays. Your code should handle permission failures for channel operations. Channel permissions only apply to channels your code can see — visibility requires an access rule granting your code access.",
+          "additionalProperties": false,
+          "properties": {
+            "fullControl": {
+              "type": "boolean",
+              "description": "Admin level control for the channel. Includes all other channel permissions.",
+              "default": false
+            },
+            "useExternalEmoji": {
+              "type": "boolean",
+              "description": "Use emojis not native to this community in the channel.",
+              "default": false
+            },
+            "createMessage": {
+              "type": "boolean",
+              "description": "Post messages in the channel.",
+              "default": false
+            },
+            "deleteMessageOther": {
+              "type": "boolean",
+              "description": "Delete messages posted by other members.",
+              "default": false
+            },
+            "managePinnedMessages": {
+              "type": "boolean",
+              "description": "Pin and unpin messages in the channel.",
+              "default": false
+            },
+            "viewMessageHistory": {
+              "type": "boolean",
+              "description": "Read messages posted prior to joining the channel.",
+              "default": false
+            },
+            "createMessageAttachment": {
+              "type": "boolean",
+              "description": "Attach files or media to a message.",
+              "default": false
+            },
+            "createMessageMention": {
+              "type": "boolean",
+              "description": "Mention users or roles in a message.",
+              "default": false
+            },
+            "createMessageReaction": {
+              "type": "boolean",
+              "description": "React to messages with emoji.",
+              "default": false
+            },
+            "moveUserOther": {
+              "type": "boolean",
+              "description": "Move another user between voice rooms or channel instances.",
+              "default": false
+            },
+            "voiceMuteOther": {
+              "type": "boolean",
+              "description": "Mute another user in voice.",
+              "default": false
+            },
+            "voiceDeafenOther": {
+              "type": "boolean",
+              "description": "Deafen another user in voice.",
+              "default": false
+            },
+            "voiceKick": {
+              "type": "boolean",
+              "description": "Remove another user from an active voice session.",
+              "default": false
+            },
+            "manageFiles": {
+              "type": "boolean",
+              "description": "Create, view, and delete channel files. Includes createFile and viewFile.",
+              "default": false
+            },
+            "createFile": {
+              "type": "boolean",
+              "description": "Upload a new file into the channel.",
+              "default": false
+            },
+            "viewFile": {
+              "type": "boolean",
+              "description": "View or download files in the channel.",
+              "default": false
+            }
+          }
+        }
+      },
+      "examples": [
+        {
+          "permissions": {
+            "community": {
+              "kick": true
+            },
+            "channel": {
+              "createMessage": true,
+              "deleteMessageOther": true
+            }
+          }
+        }
+      ]
+    }
   }
 }
