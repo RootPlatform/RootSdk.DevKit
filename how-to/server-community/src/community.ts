@@ -156,7 +156,7 @@ function onCommunityJoined(evt: CommunityJoinedEvent): void {
   console.log(
     `Community joined: id=${evt.communityId} userId=${evt.userId} ` +
     `type=${RootGuidType[guidType]} isBot=${isBot} ` +
-    `roleIds=${evt.communityRoleIds?.join(", ") ?? "none"}`,
+    `roleIds=${evt.communityRoleIds.join(", ")}`,
   );
 }
 
