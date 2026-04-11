@@ -1,0 +1,252 @@
+# Root Developer Documentation
+
+> Root is a platform for building real-time, multi-user community applications. Developers build Apps (with a React/TypeScript client UI hosted in a Chromium container, plus a server) or Bots (server-only automation). Server code runs in the Root cloud with built-in SQLite persistence and a community API for messaging, moderation, and events. Apps define custom client-server networking using Protobuf. SDKs: `@rootsdk/server-app`, `@rootsdk/server-bot`, `@rootsdk/client`.
+
+## Instructions
+
+- Apps use `@rootsdk/server-app` (server) and `@rootsdk/client` (client). Bots use `@rootsdk/server-bot`.
+- TypeScript-first. All examples use TypeScript.
+- Server code runs in the Root cloud. Client code runs in a Chromium container.
+- For real-time data, use event subscriptions, not polling.
+- All async methods return Promises. Use async/await.
+- Bots are server-only — same community API as apps, but no client UI.
+
+## Building an App
+
+Load these files as context in your AI coding tool:
+
+- [App Guides](llms-app-guides.txt): Concepts, tutorials, and how-tos (~112K tokens)
+- [App API Reference](llms-app-api.txt): All endpoints, parameters, types, and errors (~178K tokens)
+
+## Building a Bot
+
+Load these files as context in your AI coding tool:
+
+- [Bot Guides](llms-bot-guides.txt): Concepts, tutorials, and how-tos (~65K tokens)
+- [Bot API Reference](llms-bot-api.txt): All endpoints, parameters, types, and errors (~152K tokens)
+
+## Quick Links
+
+- [Choose App or Bot](llms/overview/choose-app-or-bot.md): Not sure which to build? Start here.
+- [App Quickstart](llms/app-docs/get-started/index.md): Get your first app running
+- [Bot Quickstart](llms/bot-docs/get-started/index.md): Get your first bot running
+
+## Complete Files (large — most AI tools cannot load these fully)
+
+- [All App Docs](llms-app.txt): Combined app guides + API reference (~290K tokens)
+- [All Bot Docs](llms-bot.txt): Combined bot guides + API reference (~217K tokens)
+- [Everything](llms-full.txt): All documentation (~505K tokens)
+
+## Overview
+
+Platform overview and getting started.
+
+- [Choose between a Root App and a Root Bot](llms/overview/choose-app-or-bot.md): There are two ways to add custom functionality to Root communities: Root Apps and Root Bots.
+
+## App Development
+
+Guides for building Root Apps with client UI and server logic.
+
+- [Root App developer home](llms/app-docs/app-home.md): Welcome to the Root App developer guide. This guide shows you how to build full-featured Apps that run in communities, complete with a user...
+- [Configure](llms/app-docs/configure/index.md): Configure your code to run on the Root platform.
+- [Debug](llms/app-docs/debug/index.md): Tools and features for diagnosing issues in your app or bot.
+- [Design](llms/app-docs/design/index.md): The Root platform enables developers to create powerful automation and integration tools that enhance community collaboration.
+- [Root App client development](llms/app-docs/develop/client/index.md): This section shows you how to build the client. You'll create the UI, connect to your server, and respond to user actions like clicks and file...
+- [Develop](llms/app-docs/develop/index.md): This guide shows you how to build a Root App. You'll write code for the server, build a client UI, and connect them using custom networking.
+- [Root App networking development](llms/app-docs/develop/networking/index.md): This section covers how to create your App's custom client-server networking using the Root SDK tooling and Protobuf.
+- [Community access](llms/app-docs/develop/server/community-api/index.md): This section explains how to interact with the community using the Root API.
+- [Mentions](llms/app-docs/develop/server/community-api/mentions/index.md): Reference users, roles, and channels in messages.
+- [Mentions overview](llms/app-docs/develop/server/community-api/mentions/overview.md): Notify users, reference roles, and link to channels directly within message content.
+- [Messaging](llms/app-docs/develop/server/community-api/messaging/index.md): This section explains how to work with messages in channels using the Root API.
+- [Channel messages](llms/app-docs/develop/server/community-api/messaging/overview.md): Send messages to channels, respond to user activity, and manage message features like reactions and pins.
+- [Community access overview](llms/app-docs/develop/server/community-api/overview.md): The community access API lets your server code read and modify the community where it's installed.
+- [Root App server development](llms/app-docs/develop/server/index.md): This section shows you how to build your App's server. You'll write code to handle client requests, store data, and manage users.
+- [Persistence](llms/app-docs/develop/server/persistence/index.md): This section lists the persistence options and shows how to use each.
+- [Root Apps FAQ](llms/app-docs/faq/index.md)
+- [Get started](llms/app-docs/get-started/index.md): These pages will help you get started building a Root App. By the end of this section, you'll be able to:
+- [Publish](llms/app-docs/publish/index.md): This section guides you through how to package and publish your App.
+- [App tutorials](llms/app-docs/tutorials/index.md)
+- [Showdown App tutorial steps](llms/app-docs/tutorials/showdown-app/index.md): Step-by-step guide for the Showdown App tutorial.
+- [Tutorial: Showdown App](llms/app-docs/tutorials/showdown-app/overview.md): **Showdown** is a simple, real-time voting App where members choose between two competing options — like _Cats vs.
+- [Tasks App tutorial steps](llms/app-docs/tutorials/tasks-app/index.md): Step-by-step guide for the Tasks App tutorial.
+- [Tutorial: Tasks App](llms/app-docs/tutorials/tasks-app/overview.md): **Tasks** is a simple Root App with a React UI and backend service for managing a list of shared tasks.
+
+## App API Reference
+
+API reference for Root App development (server and client).
+
+- [Client API Reference](llms/app-api-reference/client/Index.md)
+- [Server API Reference](llms/app-api-reference/server/Index.md)
+
+## Bot Development
+
+Guides for building Root Bots (server-side automation).
+
+- [Root Bot developer home](llms/bot-docs/bot-home.md): Welcome to the Root Bot developer guide. This guide shows you how to build Bots that run server-side in a community, without a user interface.
+- [Configure](llms/bot-docs/configure/index.md): Configure your code to run on the Root platform.
+- [Debug](llms/bot-docs/debug/index.md): Tools and features for diagnosing issues in your app or bot.
+- [Design](llms/bot-docs/design/index.md): The Root platform enables developers to create powerful automation and integration tools that automate community workflows.
+- [Community access](llms/bot-docs/develop/community-api/index.md): This section explains how to interact with the community using the Root API.
+- [Mentions](llms/bot-docs/develop/community-api/mentions/index.md): Reference users, roles, and channels in messages.
+- [Mentions overview](llms/bot-docs/develop/community-api/mentions/overview.md): Notify users, reference roles, and link to channels directly within message content.
+- [Messaging](llms/bot-docs/develop/community-api/messaging/index.md): This section explains how to work with messages in channels using the Root API.
+- [Channel messages](llms/bot-docs/develop/community-api/messaging/overview.md): Send messages to channels, respond to user activity, and manage message features like reactions and pins.
+- [Community access overview](llms/bot-docs/develop/community-api/overview.md): The community access API lets your server code read and modify the community where it's installed.
+- [Develop](llms/bot-docs/develop/index.md): This section guides you through the core parts of the code you'll need for your Bot.
+- [Persistence](llms/bot-docs/develop/persistence/index.md): This section lists the persistence options and shows how to use each.
+- [Root Bots FAQ](llms/bot-docs/faq/index.md)
+- [Get started](llms/bot-docs/get-started/index.md): These pages will help you get started building a Root Bot. By the end of this section, you'll be able to:
+- [Publish](llms/bot-docs/publish/index.md): This section guides you through how to package and publish your Bot.
+- [Announce Bot tutorial steps](llms/bot-docs/tutorials/announce-bot/index.md): Step-by-step guide for the Announce Bot tutorial.
+- [Tutorial: Announce Bot](llms/bot-docs/tutorials/announce-bot/overview.md): In this tutorial, you'll build a Bot that listens for a specific command in a Root community and responds by broadcasting the message to all text...
+- [Bot tutorials](llms/bot-docs/tutorials/index.md)
+- [Welcome Bot tutorial steps](llms/bot-docs/tutorials/welcome-bot/index.md): Step-by-step guide for the Welcome Bot tutorial.
+- [Tutorial: Welcome Bot](llms/bot-docs/tutorials/welcome-bot/overview.md): In this tutorial, you'll build a Bot that counts the number of messages each user posts and assigns a special role after they post their 5th message.
+
+## Bot API Reference
+
+API reference for Root Bot development.
+
+- [Bot API Reference](llms/bot-api-reference/Index.md)
+
+## Support
+
+Troubleshooting and support resources.
+
+- [Root developer support](llms/support/support-home.md): Join the [Root Developers](https://rootapp.gg/developer) community to ask questions and interact with other developers.
+
+## Optional
+
+Individual articles covering configuration, design, development, and tutorials. Can be skipped for shorter context.
+
+- [Manifest `settings`](llms/app-docs/configure/manifest-global-settings.md): Configurable global settings. They're declared in your manifest and set by community members with the `Manage Apps` permission during and after...
+- [Manifest `id`](llms/app-docs/configure/manifest-id.md): Unique identifier for your project, assigned by the [Root Developer Portal](https://dev.rootapp.com). Required.
+- [Manifest overview](llms/app-docs/configure/manifest-overview.md): Your **manifest file** defines how your code integrates with the Root platform.
+- [Manifest `package`](llms/app-docs/configure/manifest-package.md): Deployment and startup configuration for your app's client and server code. Required.
+- [Manifest `permissions`](llms/app-docs/configure/manifest-permissions.md): Permissions control which parts of the Root Community API your code can use.
+- [Manifest `version`](llms/app-docs/configure/manifest-version.md): Semantic version string for your release. Required.
+- [Developer mode](llms/app-docs/debug/developer-mode.md): Copy entity IDs from the Root client for use in API calls and debugging.
+- [Developer log](llms/app-docs/debug/logging-developer.md): Debug your deployed server code by viewing console output in the Developer Portal.
+- [Choose your UI framework](llms/app-docs/design/choose-ui-framework.md): The client side of a Root App is a regular web app. It runs inside a Chromium-based container and starts by loading your `index.html` file.
+- [Plan your App's client-server networking API](llms/app-docs/design/client-server-networking.md): Root Apps follow a **client-server model** with a **thin client**. Your server does most of the work and is the source of truth for all data.
+- [Define your App's features](llms/app-docs/design/define-your-features.md): Before you write code, take some time to plan. This article walks through standard planning steps, tailored for Root.
+- [Choose your Global Settings](llms/app-docs/design/global-settings.md): _Global Settings_ let community members with the `Manage Apps` permission configure how your code behaves, either during installation or later.
+- [Handle failures in a real-time environment](llms/app-docs/design/handle-real-time-failures.md): Real-time software, by its nature, involves rapid data changes and constant synchronization. Networking failures and disconnects will happen.
+- [Integrate with the Root platform](llms/app-docs/design/integrate-with-platform.md): Your App runs inside Root—it should feel like part of Root. That means using the same tools and patterns the platform uses to interact with community...
+- [Is your App right for Root?](llms/app-docs/design/is-your-app-right-for-root.md): **Root Apps** are multi-user applications with real-time updates that are installed into a community.
+- [Make your App feel collaborative](llms/app-docs/design/make-collaborative.md): Collaborative Apps share updates in real time. When one member does something, everyone else sees it right away.
+- [Choose your permissions](llms/app-docs/design/permissions.md): Permissions control which parts of the Root Community API your code can use.
+- [Save data early and often](llms/app-docs/design/save-data-early-and-often.md): All persistent data in your App should be stored on your server.
+- [Should your App look like Root?](llms/app-docs/design/should-it-look-like-root.md): Does your App have its own brand colors? Or do you want to match Root’s colors? Either way works. It's your choice.
+- [Client lifecycle](llms/app-docs/develop/client/client-lifecycle.md): Root controls when your App's client starts, when it stops, and when it gets reloaded.
+- [Client project overview](llms/app-docs/develop/client/client-project-overview.md): This section shows how the client side of a Root App is set up.
+- [CSS colors](llms/app-docs/develop/client/css-colors.md): Style your App to match the Root theme using CSS color variables provided by the Root SDK.
+- [Root responsive design](llms/app-docs/develop/client/responsive-ui.md): Root apps are built using modern web technologies like React and TypeScript.
+- [Theme mode](llms/app-docs/develop/client/theme-mode.md): Detect and respond to the user's theme preference in your App client.
+- [UI component library](llms/app-docs/develop/client/ui-components.md): Root provides a library of pre-built UI components designed to integrate seamlessly with the Root platform.
+- [Define a service](llms/app-docs/develop/networking/define-service.md): This article covers how to define your App's networking services.
+- [Generate a service](llms/app-docs/develop/networking/generate-service.md): This article covers how to use the Root tooling to generate your App's networking code from your protobuf definition.
+- [Exception handling](llms/app-docs/develop/networking/handle-exceptions.md): `RootServerException` is a special exception type that's thrown on the server and caught on the client.
+- [Implement the server side of a service](llms/app-docs/develop/networking/implement-service.md): This article covers how to implement the server side of your App's networking services.
+- [Plan your services](llms/app-docs/develop/networking/plan-services.md): This article covers the concepts you'll use when planning your App's networking services.
+- [Use a service from the client side](llms/app-docs/develop/networking/use-service.md): This article covers how to use a service in the client side of your App.
+- [Assets](llms/app-docs/develop/server/assets.md): Convert temporary upload tokens into permanent file references that your app can store and use later.
+- [Client attachment](llms/app-docs/develop/server/client-attachment.md): Track when community members are actively viewing your app.
+- [Access rules](llms/app-docs/develop/server/community-api/access-rules.md): Override channel and channel group permissions for specific roles or members.
+- [API structure](llms/app-docs/develop/server/community-api/api-structure.md): This reference describes how the community access API is organized.
+- [Channels and channel groups](llms/app-docs/develop/server/community-api/channels.md): Organize community content into channels and group related channels together.
+- [Community emojis](llms/app-docs/develop/server/community-api/community-emojis.md): Manage custom emojis that members use in community messages.
+- [Error handling](llms/app-docs/develop/server/community-api/error-handling.md): This reference describes how to handle errors from the community access API.
+- [Channel files](llms/app-docs/develop/server/community-api/files.md): Organize and manage files within channels using directories and file metadata.
+- [Get started with community access](llms/app-docs/develop/server/community-api/get-started.md): This guide walks you through the core patterns for using the community access API: subscribing to events and calling methods.
+- [Create mentions](llms/app-docs/develop/server/community-api/mentions/create-mentions.md): Include mentions in your messages so they appear as highlighted, clickable text in Root clients.
+- [Read mentions](llms/app-docs/develop/server/community-api/mentions/read-mentions.md): Extract mention data from messages your code receives to identify referenced users, roles, and channels.
+- [Message attachments](llms/app-docs/develop/server/community-api/messaging/attachments.md): Send and receive messages with file attachments.
+- [Message replies](llms/app-docs/develop/server/community-api/messaging/replies.md): Send messages that reference other messages, creating conversational context for your responses.
+- [Moderation](llms/app-docs/develop/server/community-api/moderation.md): Build automated moderation tools that manage members, moderate content, and control voice channels.
+- [Permission update events](llms/app-docs/develop/server/community-api/permission-update-events.md): Some API operations trigger side effects that modify other resources. This article explains why this happens and how to handle it.
+- [Voice channels](llms/app-docs/develop/server/community-api/voice-channels.md): Monitor and moderate voice channel participants.
+- [Community log](llms/app-docs/develop/server/community-log.md): Send diagnostic messages from your app server to the administrators of a Root community.
+- [GUIDs](llms/app-docs/develop/server/guids.md): Identify entities in the Root SDK using typed, base64-encoded string identifiers.
+- [Root Job scheduler](llms/app-docs/develop/server/job-scheduler.md): The Root `JobScheduler` is an API for scheduling tasks that need to execute at future date(s).
+- [Member groups](llms/app-docs/develop/server/member-groups.md): A member group combines users and community roles into a named audience you can use for targeting broadcasts and organizing custom access control.
+- [Choose your approach: persistence](llms/app-docs/develop/server/persistence/persistence-choose-approach.md): Root supports two ways to store persistent data in your server: a **key-value store** and a **SQLite database**.
+- [Key-value store persistence](llms/app-docs/develop/server/persistence/persistence-key-value-store.md): The [KeyValueStore](llms/app-api-reference/server/type-aliases/KeyValueStore.md) type stores your data as key-value pairs.
+- [SQLite persistence](llms/app-docs/develop/server/persistence/persistence-sqlite.md): Use a **SQLite** database to store your structured data persistently.
+- [Server lifecycle](llms/app-docs/develop/server/server-lifecycle.md): Your server runs in the Root cloud, and Root manages when it starts, stops, and restarts.
+- [Server project overview](llms/app-docs/develop/server/server-project-overview.md): This section covers how to set up and work with the server side of a Root App.
+- [Root App overview](llms/app-docs/get-started/app-overview.md): A **Root App** (App) is a full-featured software application that brings new functionality to a Root community.
+- [Build your Root App](llms/app-docs/get-started/build-your-app.md): Building an App with Root requires a few key steps to set up your App's test environment and compile your project.
+- [Generate App starter code](llms/app-docs/get-started/generate-app-starter-code.md): Root supplies a command-line utility named `create-root` that generates starter code.
+- [Set up Root and your dev machine](llms/app-docs/get-started/setup-root-and-dev-machine.md): You can develop for the Root Platform on Windows or macOS. You'll need to do a few Root setup tasks before starting to write code.
+- [Test your Root App](llms/app-docs/get-started/test-your-app.md): Root supports testing your App locally. Both your App's client and server are hosted on your local machine.
+- [What's next?](llms/app-docs/get-started/whats-next.md): You're ready to start building. Your dev setup is done, your Root account is active, and you've seen how Root code is organized.
+- [Package your code](llms/app-docs/publish/package.md): The `rootsdk build package` command packages your compiled code for distribution. It creates a `.pkg` file based on your `root-manifest.json`.
+- [Register your App](llms/app-docs/publish/register.md): To register your App with Root, create a project for it in the Root Developer Portal.
+- [Upload your code](llms/app-docs/publish/upload.md): The `rootsdk upload` command deploys your code to the Root cloud. You must provide the package file path and a valid authentication token.
+- [Generate and test App starter code](llms/app-docs/shared/generate-build-test-app.md): Root supplies a command-line utility named `create-root` that generates starter code.
+- [Add voting support](llms/app-docs/tutorials/showdown-app/add-vote.md): In this section, you'll add voting support. The UI will have two buttons.
+- [Broadcast new votes](llms/app-docs/tutorials/showdown-app/broadcast-votes.md): In this section, you'll notify all other clients whenever one client adds a vote.
+- [Generate and test App starter code](llms/app-docs/tutorials/showdown-app/generate-build-test-app.md): Root supplies a command-line utility named `create-root` that generates starter code.
+- [Initial state](llms/app-docs/tutorials/showdown-app/initial-state.md): You'll store the number of votes for each option on your server. The number of votes for each will start at zero and go up as clients vote.
+- [Set up Root and your dev machine](llms/app-docs/tutorials/showdown-app/setup-root-and-dev-machine.md): You can develop for the Root Platform on Windows or macOS. You'll need to do a few Root setup tasks before starting to write code.
+- [Generate and test App starter code](llms/app-docs/tutorials/tasks-app/generate-build-test-app.md): Root supplies a command-line utility named `create-root` that generates starter code.
+- [In-memory storage](llms/app-docs/tutorials/tasks-app/in-memory.md): In this section, you'll build the _Tasks_ App with in-memory storage in your server.
+- [SQLite storage with Knex](llms/app-docs/tutorials/tasks-app/knex.md): In this section, you'll store the tasks in SQLite. Recall that SQLite is built-in to Root and is always available on your server side.
+- [SQLite storage with Prisma](llms/app-docs/tutorials/tasks-app/prisma.md): In this section, you'll use Prisma to store tasks in SQLite. **Prisma** is a TypeScript ORM for Node.js that simplifies database access by providing...
+- [Set up Root and your dev machine](llms/app-docs/tutorials/tasks-app/setup-root-and-dev-machine.md): You can develop for the Root Platform on Windows or macOS. You'll need to do a few Root setup tasks before starting to write code.
+- [Manifest `settings`](llms/bot-docs/configure/manifest-global-settings.md): Configurable global settings. They're declared in your manifest and set by community members with the `Manage Apps` permission during and after...
+- [Manifest `id`](llms/bot-docs/configure/manifest-id.md): Unique identifier for your project, assigned by the [Root Developer Portal](https://dev.rootapp.com). Required.
+- [Manifest overview](llms/bot-docs/configure/manifest-overview.md): Your **manifest file** defines how your code integrates with the Root platform.
+- [Manifest `package`](llms/bot-docs/configure/manifest-package.md): Deployment and startup configuration for your bot. Required.
+- [Manifest `permissions`](llms/bot-docs/configure/manifest-permissions.md): Permissions control which parts of the Root Community API your code can use.
+- [Manifest `version`](llms/bot-docs/configure/manifest-version.md): Semantic version string for your release. Required.
+- [Developer mode](llms/bot-docs/debug/developer-mode.md): Copy entity IDs from the Root client for use in API calls and debugging.
+- [Developer log](llms/bot-docs/debug/logging-developer.md): Debug your deployed server code by viewing console output in the Developer Portal.
+- [Define your Bot's features](llms/bot-docs/design/define-your-features.md): Before you write code, take time to plan. This article covers key planning steps tailored for Root Bots.
+- [Choose your Global Settings](llms/bot-docs/design/global-settings.md): _Global Settings_ let community members with the `Manage Apps` permission configure how your code behaves, either during installation or later.
+- [Is Your Bot Right for Root?](llms/bot-docs/design/is-your-bot-right-for-root.md): Root Bots let you add community features without building a GUI. Bots rely entirely on Root's built-in UI and API for user interaction.
+- [Choose your permissions](llms/bot-docs/design/permissions.md): Permissions control which parts of the Root Community API your code can use.
+- [Plan your Bot’s communication with the community](llms/bot-docs/design/plan-community-communication.md): Even without a user interface, your Bot needs a clear communication plan. That includes deciding what to say, who to say it to, and how to send it.
+- [Save data early and often](llms/bot-docs/design/save-data-early-and-often.md): Your Bot automatically gets a SQLite database. Use it to store anything important.
+- [Bot project overview](llms/bot-docs/develop/bot-project-overview.md): This section covers how to set up and work with a Root Bot. You'll see how the project is structured, what tools it uses, and how to run it locally...
+- [Access rules](llms/bot-docs/develop/community-api/access-rules.md): Override channel and channel group permissions for specific roles or members.
+- [API structure](llms/bot-docs/develop/community-api/api-structure.md): This reference describes how the community access API is organized.
+- [Channels and channel groups](llms/bot-docs/develop/community-api/channels.md): Organize community content into channels and group related channels together.
+- [Community emojis](llms/bot-docs/develop/community-api/community-emojis.md): Manage custom emojis that members use in community messages.
+- [Error handling](llms/bot-docs/develop/community-api/error-handling.md): This reference describes how to handle errors from the community access API.
+- [Channel files](llms/bot-docs/develop/community-api/files.md): Read and manage files within channels using directories and file metadata.
+- [Get started with community access](llms/bot-docs/develop/community-api/get-started.md): This guide walks you through the core patterns for using the community access API: subscribing to events and calling methods.
+- [Create mentions](llms/bot-docs/develop/community-api/mentions/create-mentions.md): Include mentions in your messages so they appear as highlighted, clickable text in Root clients.
+- [Read mentions](llms/bot-docs/develop/community-api/mentions/read-mentions.md): Extract mention data from messages your code receives to identify referenced users, roles, and channels.
+- [Message attachments](llms/bot-docs/develop/community-api/messaging/attachments.md): Send and receive messages with file attachments.
+- [Message replies](llms/bot-docs/develop/community-api/messaging/replies.md): Send messages that reference other messages, creating conversational context for your responses.
+- [Moderation](llms/bot-docs/develop/community-api/moderation.md): Build automated moderation tools that manage members, moderate content, and control voice channels.
+- [Permission update events](llms/bot-docs/develop/community-api/permission-update-events.md): Some API operations trigger side effects that modify other resources. This article explains why this happens and how to handle it.
+- [Voice channels](llms/bot-docs/develop/community-api/voice-channels.md): Monitor and moderate voice channel participants.
+- [GUIDs](llms/bot-docs/develop/guids.md): Identify entities in the Root SDK using typed, base64-encoded string identifiers.
+- [Root Job scheduler](llms/bot-docs/develop/job-scheduler.md): The Root `JobScheduler` is an API for scheduling tasks that need to execute at future date(s).
+- [Member groups](llms/bot-docs/develop/member-groups.md): A member group combines users and community roles into a named audience you can use for targeting broadcasts and organizing custom access control.
+- [Choose your approach: persistence](llms/bot-docs/develop/persistence/persistence-choose-approach.md): Root supports two ways to store persistent data in your server: a **key-value store** and a **SQLite database**.
+- [Key-value store persistence](llms/bot-docs/develop/persistence/persistence-key-value-store.md): The [KeyValueStore](llms/bot-api-reference/type-aliases/KeyValueStore.md) type stores your data as key-value pairs.
+- [SQLite persistence](llms/bot-docs/develop/persistence/persistence-sqlite.md): Use a **SQLite** database to store your structured data persistently.
+- [Server lifecycle](llms/bot-docs/develop/server-lifecycle.md): Your server runs in the Root cloud, and Root manages when it starts, stops, and restarts.
+- [Root Bot overview](llms/bot-docs/get-started/bot-overview.md): A **Root Bot** is a software application that extends the functionality of Root communities.
+- [Build your Root Bot](llms/bot-docs/get-started/build-your-bot.md): Building a Bot with Root requires a few key steps to set up your Bot's test environment and compile your project.
+- [Generate Bot starter code](llms/bot-docs/get-started/generate-bot-starter-code.md): Root supplies a command-line utility named `create-root` that generates starter code.
+- [Set up Root and your dev machine](llms/bot-docs/get-started/setup-root-and-dev-machine.md): You can develop for the Root Platform on Windows or macOS. You'll need to do a few Root setup tasks before starting to write code.
+- [Test your Root Bot](llms/bot-docs/get-started/test-your-bot.md): Root supports testing your Bot locally. Your Bot still needs a valid `DEV_TOKEN` because execution isn't fully local.
+- [What's next?](llms/bot-docs/get-started/whats-next.md): You're ready to start building. Your dev setup is done, your Root account is active, and you've seen how Root code is organized.
+- [Package your code](llms/bot-docs/publish/package.md): The `rootsdk build package` command packages your compiled code for distribution. It creates a `.pkg` file based on your `root-manifest.json`.
+- [Register your Bot](llms/bot-docs/publish/register.md): To register your Bot with Root, create a project for it in the Root Developer Portal.
+- [Upload your code](llms/bot-docs/publish/upload.md): The `rootsdk upload` command deploys your code to the Root cloud. You must provide the package file path and a valid authentication token.
+- [Generate and test Bot starter code](llms/bot-docs/shared/generate-build-test-bot.md): Root supplies a command-line utility named `create-root` that generates starter code.
+- [Add member nickname](llms/bot-docs/tutorials/announce-bot/add-member-nickname.md): In this section, the main goal is to include the member's nickname in your Bot's response. But first, you'll change the command your Bot looks for.
+- [Generate and test Bot starter code](llms/bot-docs/tutorials/announce-bot/generate-build-test-bot.md): Root supplies a command-line utility named `create-root` that generates starter code.
+- [Send to all text channels](llms/bot-docs/tutorials/announce-bot/send-to-all-channels.md): Currently, your Bot sends its response only to the same channel as the incoming message.
+- [Set up Root and your dev machine](llms/bot-docs/tutorials/announce-bot/setup-root-and-dev-machine.md): You can develop for the Root Platform on Windows or macOS. You'll need to do a few Root setup tasks before starting to write code.
+- [Programmatically assign the role](llms/bot-docs/tutorials/welcome-bot/assign-role.md): The _Participant_ role appears inside the community as a text string.
+- [Create a new role in your community](llms/bot-docs/tutorials/welcome-bot/create-community-role.md): Recall that this Bot is a simplified version of typical community management software.
+- [Generate and test Bot starter code](llms/bot-docs/tutorials/welcome-bot/generate-build-test-bot.md): Root supplies a command-line utility named `create-root` that generates starter code.
+- [Set up Root and your dev machine](llms/bot-docs/tutorials/welcome-bot/setup-root-and-dev-machine.md): You can develop for the Root Platform on Windows or macOS. You'll need to do a few Root setup tasks before starting to write code.
+- [Store the message count for each member](llms/bot-docs/tutorials/welcome-bot/store-message-count.md): You need to store the number of messages each member posts. To make sure your code works even if your Bot restarts, you should use the Root API's...

@@ -96,6 +96,12 @@ Focused samples in `how-to/`, one per SDK domain. Each is a standalone bot with 
 | `server-global-settings` | Global settings | read manifest-declared settings |
 | `server-guid-utils` | GUID utilities | parse, create, validate Root GUIDs |
 
+### Developer Tools
+
+| Folder | Domain | Key Methods |
+|--------|--------|-------------|
+| `cli` | CLI commands | create-root, start devhost, build proto, build package, upload package |
+
 ### Client (Apps only)
 
 | Folder | Domain | Key Methods |

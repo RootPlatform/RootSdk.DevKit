@@ -675,6 +675,11 @@
           "x-doc-note": "Community permissions are granted when the community approves installation and cannot be modified or revoked by the community after installation.",
           "additionalProperties": false,
           "properties": {
+            "fullControl": {
+              "type": "boolean",
+              "description": "Grants every community permission and bypasses all channel-specific permissions.",
+              "default": false
+            },
             "manageCommunity": {
               "type": "boolean",
               "description": "Edit community level settings like name and branding.",

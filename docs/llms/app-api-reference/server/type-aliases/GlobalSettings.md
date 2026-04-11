@@ -1,0 +1,20 @@
+---
+path: app-api-reference/server/type-aliases/GlobalSettings.md
+audience: app
+category: reference
+summary: Community-scoped global settings container. Provides keyed access to setting values by group and item, and emits events when settings change.
+---
+
+> **GlobalSettings** = `object` & [`TypedEventEmitter`](TypedEventEmitter.md)<[`GlobalSettingsEvents`](GlobalSettingsEvents.md)>
+
+Community-scoped global settings container. Provides keyed access to setting values by group and item, and emits events when settings change.
+
+Access this object via `rootServer.globalSettings`.
+
+Settings are accessed by group key and then item key, matching the structure declared in your manifest:
+
+```
+rootServer.globalSettings[groupKey][itemKey]
+```
+
+For event name constants, see `GlobalSettingsEvents`.
