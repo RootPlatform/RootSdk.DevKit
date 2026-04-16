@@ -26,6 +26,18 @@ Developer toolkit for building apps and bots on the Root Platform. This guide he
 - The `rootServer` object is the SDK entry point. Everything hangs off `rootServer.community.*`, `rootServer.dataStore.*`, `rootServer.lifecycle.*`, etc.
 - **Set permissions** in `root-manifest.json` — each how-to README lists the permissions its APIs require. `schemas/permissions-map.json` maps every SDK method to its required permission.
 
+## Common Needs
+
+When your task requires one of these, go to the linked module — don't invent a solution from outside the DevKit.
+
+| Need | Where to look | Notes |
+|------|--------------|-------|
+| Make something configurable by community admins | `how-to/server-global-settings` + `docs/llms/bot-docs/configure/manifest-global-settings.md` | Settings are declared in `root-manifest.json` and edited by admins through the Root UI. Some setting types are not yet available — check the docs for platform status before using one. |
+| Persist data between restarts | `how-to/server-database` (SQLite) or `how-to/server-key-value-store` | Don't use the filesystem or in-memory state for data that must survive restarts. |
+| Run code on a schedule or delay | `how-to/server-jobs` | Don't use `setTimeout`/`setInterval` — jobs survive restarts, timers don't. |
+| Identify what type of entity a GUID represents | `how-to/server-guid-utils` | Distinguishes users from bots/apps, extracts timestamps — no API call needed. |
+| Set permissions for SDK calls | `schemas/permissions-map.json` | Maps every SDK method to its required `root-manifest.json` permission. |
+
 ## Sample Apps
 
 Complete, runnable app examples in `apps/`. Use these as end-to-end references for architecture and patterns.

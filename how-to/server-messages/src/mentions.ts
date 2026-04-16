@@ -37,6 +37,8 @@ import {
   ChannelGuid,
   UserGuid,
   CommunityRoleGuid,
+  CommunityMemberGetRequest,
+  ChannelMessageCreateRequest,
 } from "@rootsdk/server-bot"; // For apps: import from "@rootsdk/server-app"
 
 // --- SUBSCRIBE ---------------------------------------------------------------
@@ -103,9 +105,8 @@ async function onMentionCommand(evt: ChannelMessageCreatedEvent): Promise<void> 
   if (evt.messageContent !== "/mention") return;
 
   try {
-    const member = await rootServer.community.communityMembers.get({
-      userId: evt.userId,
-    });
+    const memberRequest: CommunityMemberGetRequest = { userId: evt.userId };
+    const member = await rootServer.community.communityMembers.get(memberRequest);
 
     const content = [
       `User: ${userMention(member.nickname, evt.userId)}`,
@@ -113,10 +114,8 @@ async function onMentionCommand(evt: ChannelMessageCreatedEvent): Promise<void> 
       `Here: ${mentionHere()}`,
     ].join("\n");
 
-    await rootServer.community.channelMessages.create({
-      channelId: evt.channelId,
-      content,
-    });
+    const createRequest: ChannelMessageCreateRequest = { channelId: evt.channelId, content };
+    await rootServer.community.channelMessages.create(createRequest);
   } catch (err: unknown) {
     if (err instanceof RootApiException) {
       switch (err.errorCode) {
@@ -162,7 +161,7 @@ async function logReferenceMaps(evt: ChannelMessageCreatedEvent): Promise<void> 
 
   if (evt.referenceMaps?.assets) {
     for (const [assetId, asset] of Object.entries(evt.referenceMaps.assets)) {
-      console.log(`Referenced asset: ${assetId}`);
+      console.log(`Referenced asset: ${assetId} (type=${asset.link.oneofKind})`);
     }
   }
 }

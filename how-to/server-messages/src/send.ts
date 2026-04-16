@@ -19,6 +19,12 @@ import {
   ChannelMessageEditedEvent,
   ChannelMessageDeletedEvent,
   ChannelGuid,
+  ChannelMessageCreateRequest,
+  ChannelMessageGetRequest,
+  ChannelMessageEditRequest,
+  ChannelMessageDeleteRequest,
+  ChannelMessageListRequest,
+  ChannelMessageSetTypingIndicatorRequest,
   ChannelMessageSetViewTimeRequest,
   MessageGuid,
 } from "@rootsdk/server-bot"; // For apps: import from "@rootsdk/server-app"
@@ -47,10 +53,8 @@ async function sendMessage(
   channelId: ChannelGuid,
   content: string,
 ): Promise<MessageGuid> {
-  const message = await rootServer.community.channelMessages.create({
-    channelId,
-    content,
-  });
+  const request: ChannelMessageCreateRequest = { channelId, content };
+  const message = await rootServer.community.channelMessages.create(request);
 
   return message.id;
 }
@@ -64,12 +68,13 @@ async function replyToMessage(
   parentMessageId: MessageGuid,
   content: string,
 ): Promise<MessageGuid> {
-  const message = await rootServer.community.channelMessages.create({
+  const request: ChannelMessageCreateRequest = {
     channelId,
     content,
     parentMessageIds: [parentMessageId],
     needsParentMessageNotification: true,
-  });
+  };
+  const message = await rootServer.community.channelMessages.create(request);
 
   return message.id;
 }
@@ -81,10 +86,8 @@ async function showTypingIndicator(
   channelId: ChannelGuid,
   isTyping: boolean,
 ): Promise<void> {
-  await rootServer.community.channelMessages.setTypingIndicator({
-    channelId,
-    isTyping,
-  });
+  const request: ChannelMessageSetTypingIndicatorRequest = { channelId, isTyping };
+  await rootServer.community.channelMessages.setTypingIndicator(request);
 }
 
 // Retrieve a single message by ID.
@@ -93,10 +96,8 @@ async function getMessage(
   channelId: ChannelGuid,
   messageId: MessageGuid,
 ): Promise<void> {
-  const message = await rootServer.community.channelMessages.get({
-    channelId,
-    id: messageId,
-  });
+  const request: ChannelMessageGetRequest = { channelId, id: messageId };
+  const message = await rootServer.community.channelMessages.get(request);
 
   // message.messageContent  — the markdown content
   // message.userId          — who sent it
@@ -115,11 +116,8 @@ async function editMessage(
   messageId: MessageGuid,
   newContent: string,
 ): Promise<void> {
-  await rootServer.community.channelMessages.edit({
-    channelId,
-    id: messageId,
-    content: newContent,
-  });
+  const request: ChannelMessageEditRequest = { channelId, id: messageId, content: newContent };
+  await rootServer.community.channelMessages.edit(request);
 }
 
 // Delete a message. No permission required for your own messages.
@@ -128,10 +126,8 @@ async function deleteMessage(
   channelId: ChannelGuid,
   messageId: MessageGuid,
 ): Promise<void> {
-  await rootServer.community.channelMessages.delete({
-    channelId,
-    id: messageId,
-  });
+  const request: ChannelMessageDeleteRequest = { channelId, id: messageId };
+  await rootServer.community.channelMessages.delete(request);
 }
 
 // List older messages before a given date.
@@ -142,12 +138,13 @@ async function listOlderMessages(
   beforeDate: Date,
   limit: number = 50,
 ): Promise<void> {
-  const result = await rootServer.community.channelMessages.list({
+  const request: ChannelMessageListRequest = {
     channelId,
     dateAt: beforeDate,
     messageDirectionTake: MessageDirectionTake.Older,
     limit,
-  });
+  };
+  const result = await rootServer.community.channelMessages.list(request);
 
   // result.messages     — array of ChannelMessage, oldest first
   // result.oldCount     — count of still-older messages beyond this batch
@@ -165,12 +162,13 @@ async function listNewerMessages(
   afterDate: Date,
   limit: number = 50,
 ): Promise<void> {
-  const result = await rootServer.community.channelMessages.list({
+  const request: ChannelMessageListRequest = {
     channelId,
     dateAt: afterDate,
     messageDirectionTake: MessageDirectionTake.Newer,
     limit,
-  });
+  };
+  const result = await rootServer.community.channelMessages.list(request);
 
   // result.newCount — count of still-newer messages beyond this batch
   for (const msg of result.messages) {
@@ -185,12 +183,13 @@ async function listMessagesAround(
   aroundDate: Date,
   limit: number = 50,
 ): Promise<void> {
-  const result = await rootServer.community.channelMessages.list({
+  const request: ChannelMessageListRequest = {
     channelId,
     dateAt: aroundDate,
     messageDirectionTake: MessageDirectionTake.Both,
     limit,
-  });
+  };
+  const result = await rootServer.community.channelMessages.list(request);
 
   // Both oldCount and newCount are populated — tells the caller if there
   // are more messages available in either direction.
@@ -210,12 +209,13 @@ async function paginateMessages(
   let hasMore = true;
 
   while (hasMore) {
-    const result = await rootServer.community.channelMessages.list({
+    const request: ChannelMessageListRequest = {
       channelId,
       dateAt,
       messageDirectionTake: MessageDirectionTake.Older,
       limit: 50,
-    });
+    };
+    const result = await rootServer.community.channelMessages.list(request);
 
     for (const msg of result.messages) {
       console.log(`[${msg.userId}] ${msg.messageContent}`);

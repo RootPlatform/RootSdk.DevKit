@@ -26,6 +26,7 @@ import {
   ChannelMessageCreatedEvent,
   MessageType,
   UserGuid,
+  ChannelGuid,
 } from "@rootsdk/server-app";
 
 // --- SUBSCRIBE ---------------------------------------------------------------
@@ -118,7 +119,7 @@ async function onClientsCommand(evt: ChannelMessageCreatedEvent): Promise<void> 
   const content = evt.messageContent?.trim() ?? "";
   if (!content.startsWith("/server-app-connected-clients")) return;
 
-  const channelId = evt.channelId;
+  const channelId: ChannelGuid = evt.channelId;
   const messages = rootServer.community.channelMessages;
   const lines: string[] = [];
 

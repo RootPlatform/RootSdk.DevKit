@@ -44,6 +44,7 @@ import {
   ChannelMessageEvent,
   ChannelMessageCreatedEvent,
   MessageType,
+  ChannelGuid,
 } from "@rootsdk/server-bot"; // For apps: import from "@rootsdk/server-app"
 
 // --- SUBSCRIBE ---------------------------------------------------------------
@@ -179,7 +180,7 @@ async function onAccessRulesCommand(evt: ChannelMessageCreatedEvent): Promise<vo
   const content = evt.messageContent?.trim() ?? "";
   if (!content.startsWith("/server-access-rules")) return;
 
-  const channelId = evt.channelId;
+  const channelId: ChannelGuid = evt.channelId;
   const messages = rootServer.community.channelMessages;
   const lines: string[] = [];
 
@@ -207,8 +208,8 @@ async function onAccessRulesCommand(evt: ChannelMessageCreatedEvent): Promise<vo
         break;
       }
     }
-    const groupId = group.id as unknown as ChannelOrChannelGroupGuid;
-    const roleId = role.id as unknown as RoleOrMemberGuid;
+    const groupId: ChannelOrChannelGroupGuid = group.id;
+    const roleId: RoleOrMemberGuid = role.id;
     lines.push(`\u2713 using channel group: ${group.name} (${group.id})`);
 
     // 3. Create an access rule on the channel group for the role

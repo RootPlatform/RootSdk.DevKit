@@ -31,6 +31,8 @@ import {
   ChannelMessageEvent,
   ChannelMessageCreatedEvent,
   MessageType,
+  ChannelType,
+  RootApiException,
 } from "@rootsdk/server-bot"; // For apps: import from "@rootsdk/server-app"
 
 // --- SUBSCRIBE ---------------------------------------------------------------
@@ -52,7 +54,7 @@ export function initializeChannels(): void {
 export async function createChannel(
   channelGroupId: ChannelGroupGuid,
   name: string,
-  channelType: number,
+  channelType: ChannelType,
   useChannelGroupPermission: boolean,
   description?: string,
   accessRuleCreates?: AccessRuleCreateRoleOrMemberRequest[],
@@ -64,11 +66,13 @@ export async function createChannel(
 }
 
 export async function getChannel(id: ChannelGuid): Promise<Channel> {
-  return rootServer.community.channels.get({ id });
+  const request: ChannelGetRequest = { id };
+  return rootServer.community.channels.get(request);
 }
 
 export async function listChannels(channelGroupId: ChannelGroupGuid): Promise<Channel[]> {
-  return rootServer.community.channels.list({ channelGroupId });
+  const request: ChannelListRequest = { channelGroupId };
+  return rootServer.community.channels.list(request);
 }
 
 export async function moveChannel(
@@ -77,7 +81,8 @@ export async function moveChannel(
   newChannelGroupId: ChannelGroupGuid,
   beforeChannelId?: ChannelGuid,
 ): Promise<void> {
-  return rootServer.community.channels.move({ id, oldChannelGroupId, newChannelGroupId, beforeChannelId });
+  const request: ChannelMoveRequest = { id, oldChannelGroupId, newChannelGroupId, beforeChannelId };
+  return rootServer.community.channels.move(request);
 }
 
 export async function editChannel(
@@ -89,13 +94,15 @@ export async function editChannel(
   iconTokenUri?: string,
   accessRuleUpdate?: AccessRuleUpdateRequest,
 ): Promise<void> {
-  return rootServer.community.channels.edit({
+  const request: ChannelEditRequest = {
     id, name, description, updateIcon, iconTokenUri, useChannelGroupPermission, accessRuleUpdate,
-  });
+  };
+  return rootServer.community.channels.edit(request);
 }
 
 export async function deleteChannel(id: ChannelGuid): Promise<void> {
-  return rootServer.community.channels.delete({ id }, {
+  const request: ChannelDeleteRequest = { id };
+  return rootServer.community.channels.delete(request, {
     "channel.deleted": (evt: ChannelDeletedEvent) => {
       console.log(`Side effect: channel ${evt.id} no longer visible`);
     },
@@ -112,9 +119,7 @@ export async function findChannelsByName(name: string): Promise<Channel[]> {
   const groups: ChannelGroup[] = await rootServer.community.channelGroups.list();
   const matches: Channel[] = [];
   for (const group of groups) {
-    const channels: Channel[] = await rootServer.community.channels.list({
-      channelGroupId: group.id,
-    });
+    const channels: Channel[] = await listChannels(group.id);
     matches.push(...channels.filter((ch) => ch.name === name));
   }
   return matches;
@@ -127,7 +132,7 @@ async function onChannelsCommand(evt: ChannelMessageCreatedEvent): Promise<void>
   const content = evt.messageContent?.trim() ?? "";
   if (!content.startsWith("/server-channels")) return;
 
-  const channelId = evt.channelId;
+  const channelId: ChannelGuid = evt.channelId;
   const messages = rootServer.community.channelMessages;
   const lines: string[] = [];
 
@@ -154,7 +159,7 @@ async function onChannelsCommand(evt: ChannelMessageCreatedEvent): Promise<void>
     // 2. Create a channel
     step = 2;
     const channel: Channel = await createChannel(
-      group.id, "test-channel", 1 /* text channel */, true /* useChannelGroupPermission */, "A test channel",
+      group.id, "test-channel", ChannelType.Text, true /* useChannelGroupPermission */, "A test channel",
     );
     lines.push(`✓ created channel: ${channel.name} (${channel.id})`);
 
@@ -195,12 +200,9 @@ async function onChannelsCommand(evt: ChannelMessageCreatedEvent): Promise<void>
     await messages.create({ channelId, content: lines.join("\n") });
   } catch (err: unknown) {
     const parts = [`Channels demo error: ${err}`];
-    if (err && typeof err === "object") {
-      const e = err as Record<string, unknown>;
-      if (e.code) parts.push(`code: ${e.code}`);
-      if (e.errorCode) parts.push(`errorCode: ${e.errorCode}`);
-      if (e.meta) parts.push(`meta: ${JSON.stringify(e.meta)}`);
-      if (e.payload) parts.push(`payload: ${JSON.stringify(e.payload)}`);
+    if (err instanceof RootApiException) {
+      parts.push(`errorCode: ${err.errorCode}`);
+      if (err.payload) parts.push(`payload: ${JSON.stringify(err.payload)}`);
     }
     parts.push(`failed at step ${step}`);
     if (lines.length > 0) parts.push(`completed ${lines.length}/10 steps`);

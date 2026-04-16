@@ -132,7 +132,7 @@ async function onDirectoriesCommand(evt: ChannelMessageCreatedEvent): Promise<vo
   const content = evt.messageContent?.trim() ?? "";
   if (!content.startsWith("/server-directories")) return;
 
-  const channelId = evt.channelId;
+  const channelId: ChannelGuid = evt.channelId;
   const messages = rootServer.community.channelMessages;
   const lines: string[] = [];
 

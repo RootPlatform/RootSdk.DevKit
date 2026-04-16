@@ -28,6 +28,7 @@ import {
   MessageType,
   RootApiException,
   ErrorCodeType,
+  ChannelGuid,
 } from "@rootsdk/server-app";
 
 // --- SUBSCRIBE ---------------------------------------------------------------
@@ -70,7 +71,7 @@ async function onAssetsCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
   const content = evt.messageContent?.trim() ?? "";
   if (!content.startsWith("/server-app-assets")) return;
 
-  const channelId = evt.channelId;
+  const channelId: ChannelGuid = evt.channelId;
   const messages = rootServer.community.channelMessages;
   const lines: string[] = [];
 

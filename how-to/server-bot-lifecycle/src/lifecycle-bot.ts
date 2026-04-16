@@ -19,9 +19,7 @@
 import {
   rootServer,
   RootBotStartState,
-  CommunityGuid,
-  CommunityRoleGuid,
-  UserGuid,
+  ChannelGuid,
   ChannelMessageEvent,
   ChannelMessageCreatedEvent,
   MessageType,
@@ -94,7 +92,7 @@ async function onLifecycleCommand(evt: ChannelMessageCreatedEvent): Promise<void
   const content = evt.messageContent?.trim() ?? "";
   if (!content.startsWith("/server-bot-lifecycle")) return;
 
-  const channelId = evt.channelId;
+  const channelId: ChannelGuid = evt.channelId;
   const messages = rootServer.community.channelMessages;
   const lines: string[] = [];
 

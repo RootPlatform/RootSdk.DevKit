@@ -27,6 +27,7 @@ import {
   ChannelMessageCreatedEvent,
   ChannelGuid,
   MessageGuid,
+  ChannelMessageFlagRequest,
 } from "@rootsdk/server-bot"; // For apps: import from "@rootsdk/server-app"
 
 // --- SUBSCRIBE ---------------------------------------------------------------
@@ -47,11 +48,8 @@ async function flagMessage(
   messageId: MessageGuid,
   reason: ContentFlagReason,
 ): Promise<void> {
-  await rootServer.community.channelMessages.flag({
-    channelId,
-    id: messageId,
-    reason,
-  });
+  const request: ChannelMessageFlagRequest = { channelId, id: messageId, reason };
+  await rootServer.community.channelMessages.flag(request);
 }
 
 // --- COMMAND HANDLER: /flag --------------------------------------------------

@@ -21,6 +21,7 @@ import {
   ChannelMessageEvent,
   ChannelMessageCreatedEvent,
   MessageType,
+  ChannelGuid,
 } from "@rootsdk/server-app";
 
 import { uploadService } from "./upload-service";
@@ -49,7 +50,7 @@ async function onClientAssetsCommand(
   const content = evt.messageContent?.trim() ?? "";
   if (!content.startsWith("/client-app-assets")) return;
 
-  const channelId = evt.channelId;
+  const channelId: ChannelGuid = evt.channelId;
   const messages = rootServer.community.channelMessages;
   const lines: string[] = [];
 

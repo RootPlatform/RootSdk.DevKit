@@ -31,6 +31,8 @@ import {
   ChannelMessageCreatedEvent,
   MessageType,
   WellKnownRootGuids,
+  ChannelGuid,
+  RootApiException,
 } from "@rootsdk/server-bot"; // For apps: import from "@rootsdk/server-app"
 
 // --- SUBSCRIBE ---------------------------------------------------------------
@@ -105,7 +107,7 @@ async function onMemberRolesCommand(evt: ChannelMessageCreatedEvent): Promise<vo
   const content = evt.messageContent?.trim() ?? "";
   if (!content.startsWith("/server-member-roles")) return;
 
-  const channelId = evt.channelId;
+  const channelId: ChannelGuid = evt.channelId;
   const messages = rootServer.community.channelMessages;
   const lines: string[] = [];
   let step = 0;
@@ -178,8 +180,8 @@ async function onMemberRolesCommand(evt: ChannelMessageCreatedEvent): Promise<vo
     await messages.create({ channelId, content: lines.join("\n") });
   } catch (err: unknown) {
     const parts = [`Member roles demo error: ${err}`];
-    if (err && typeof err === "object" && "errorCode" in err) {
-      parts.push(`errorCode: ${(err as Record<string, unknown>).errorCode}`);
+    if (err instanceof RootApiException) {
+      parts.push(`errorCode: ${err.errorCode}`);
     }
     if (lines.length > 0) parts.push(`completed ${lines.length}/8 steps`);
     console.error("Member roles demo error:", err);

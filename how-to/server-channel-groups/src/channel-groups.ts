@@ -32,6 +32,8 @@ import {
   ChannelMessageEvent,
   ChannelMessageCreatedEvent,
   MessageType,
+  ChannelGuid,
+  RootApiException,
 } from "@rootsdk/server-bot"; // For apps: import from "@rootsdk/server-app"
 
 // --- SUBSCRIBE ---------------------------------------------------------------
@@ -127,7 +129,7 @@ async function onChannelGroupsCommand(evt: ChannelMessageCreatedEvent): Promise<
   const content = evt.messageContent?.trim() ?? "";
   if (!content.startsWith("/server-channel-groups")) return;
 
-  const channelId = evt.channelId;
+  const channelId: ChannelGuid = evt.channelId;
   const messages = rootServer.community.channelMessages;
   const lines: string[] = [];
 
@@ -163,12 +165,9 @@ async function onChannelGroupsCommand(evt: ChannelMessageCreatedEvent): Promise<
     await messages.create({ channelId, content: lines.join("\n") });
   } catch (err: unknown) {
     const parts = [`Channel groups demo error: ${err}`];
-    if (err && typeof err === "object") {
-      const e = err as Record<string, unknown>;
-      if (e.code) parts.push(`code: ${e.code}`);
-      if (e.errorCode) parts.push(`errorCode: ${e.errorCode}`);
-      if (e.meta) parts.push(`meta: ${JSON.stringify(e.meta)}`);
-      if (e.payload) parts.push(`payload: ${JSON.stringify(e.payload)}`);
+    if (err instanceof RootApiException) {
+      parts.push(`errorCode: ${err.errorCode}`);
+      if (err.payload) parts.push(`payload: ${JSON.stringify(err.payload)}`);
     }
     if (lines.length > 0) parts.push(`completed ${lines.length}/7 steps`);
     console.error("Channel groups demo error:", err);

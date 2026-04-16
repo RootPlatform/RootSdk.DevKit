@@ -34,6 +34,7 @@ import {
   ChannelMessageEvent,
   ChannelMessageCreatedEvent,
   MessageType,
+  ChannelGuid,
 } from "@rootsdk/server-bot"; // For apps: import from "@rootsdk/server-app"
 
 // --- SUBSCRIBE ---------------------------------------------------------------
@@ -136,7 +137,7 @@ async function onRolesCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
   const content = evt.messageContent?.trim() ?? "";
   if (!content.startsWith("/server-roles")) return;
 
-  const channelId = evt.channelId;
+  const channelId: ChannelGuid = evt.channelId;
   const messages = rootServer.community.channelMessages;
   const lines: string[] = [];
 

@@ -175,7 +175,7 @@ async function onFilesCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
   const content = evt.messageContent?.trim() ?? "";
   if (!content.startsWith("/server-files")) return;
 
-  const channelId = evt.channelId;
+  const channelId: ChannelGuid = evt.channelId;
   const messages = rootServer.community.channelMessages;
   const directories = rootServer.community.channelDirectories;
   const lines: string[] = [];

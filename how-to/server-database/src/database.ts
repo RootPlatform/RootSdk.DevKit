@@ -64,7 +64,7 @@ async function onDbCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
   const content = evt.messageContent?.trim() ?? "";
   if (!content.startsWith("/server-database")) return;
 
-  const channelId = evt.channelId;
+  const channelId: ChannelGuid = evt.channelId;
   const messages = rootServer.community.channelMessages;
   const lines: string[] = [];
 

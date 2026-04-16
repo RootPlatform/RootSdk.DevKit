@@ -20,6 +20,9 @@ import {
   ChannelMessageReactionDeletedFullEvent,
   ChannelGuid,
   MessageGuid,
+  ChannelMessageReactionCreateRequest,
+  ChannelMessageReactionDeleteRequest,
+  ChannelMessageReactionDeleteFullRequest,
 } from "@rootsdk/server-bot"; // For apps: import from "@rootsdk/server-app"
 
 // --- SUBSCRIBE ---------------------------------------------------------------
@@ -46,11 +49,8 @@ async function addReaction(
   messageId: MessageGuid,
   shortcode: string,
 ): Promise<void> {
-  await rootServer.community.channelMessages.reactionCreate({
-    channelId,
-    messageId,
-    shortcode,
-  });
+  const request: ChannelMessageReactionCreateRequest = { channelId, messageId, shortcode };
+  await rootServer.community.channelMessages.reactionCreate(request);
 }
 
 // Remove a reaction that YOUR CODE previously added.
@@ -61,11 +61,8 @@ async function removeReaction(
   messageId: MessageGuid,
   shortcode: string,
 ): Promise<void> {
-  await rootServer.community.channelMessages.reactionDelete({
-    channelId,
-    messageId,
-    shortcode,
-  });
+  const request: ChannelMessageReactionDeleteRequest = { channelId, messageId, shortcode };
+  await rootServer.community.channelMessages.reactionDelete(request);
 }
 
 // Remove ALL reactions of a given emoji from a message — every user's reaction,
@@ -76,11 +73,8 @@ async function removeAllReactions(
   messageId: MessageGuid,
   shortcode: string,
 ): Promise<void> {
-  await rootServer.community.channelMessages.reactionDeleteFull({
-    channelId,
-    messageId,
-    shortcode,
-  });
+  const request: ChannelMessageReactionDeleteFullRequest = { channelId, messageId, shortcode };
+  await rootServer.community.channelMessages.reactionDeleteFull(request);
 }
 
 // --- COMMAND HANDLER: /react <emoji> -----------------------------------------

@@ -42,11 +42,12 @@ import {
   ChannelMessageEvent,
   ChannelMessageCreatedEvent,
   MessageType,
+  UserGuid,
 } from "@rootsdk/server-bot"; // For apps: import from "@rootsdk/server-app"
 
 // Capture startup state for use in the command handler
 let startupSettings: GlobalSettings | undefined;
-let firstMemberId: string | undefined;
+let firstMemberId: UserGuid | undefined;
 
 // ── SUBSCRIBE ────────────────────────────────────────────────────────────────
 
@@ -103,7 +104,7 @@ async function onGlobalSettingsCommand(
   const content = evt.messageContent?.trim() ?? "";
   if (!content.startsWith("/server-global-settings")) return;
 
-  const channelId = evt.channelId;
+  const channelId: ChannelGuid = evt.channelId;
   const messages = rootServer.community.channelMessages;
   const lines: string[] = [];
 

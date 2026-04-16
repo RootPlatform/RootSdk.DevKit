@@ -18,6 +18,9 @@ import {
   ChannelMessagePinDeletedEvent,
   ChannelGuid,
   MessageGuid,
+  ChannelMessagePinCreateRequest,
+  ChannelMessagePinDeleteRequest,
+  ChannelMessagePinListRequest,
 } from "@rootsdk/server-bot"; // For apps: import from "@rootsdk/server-app"
 
 // --- SUBSCRIBE ---------------------------------------------------------------
@@ -41,10 +44,8 @@ async function pinMessage(
   channelId: ChannelGuid,
   messageId: MessageGuid,
 ): Promise<void> {
-  await rootServer.community.channelMessages.pinCreate({
-    channelId,
-    messageId,
-  });
+  const request: ChannelMessagePinCreateRequest = { channelId, messageId };
+  await rootServer.community.channelMessages.pinCreate(request);
 }
 
 // Unpin a previously pinned message.
@@ -53,10 +54,8 @@ async function unpinMessage(
   channelId: ChannelGuid,
   messageId: MessageGuid,
 ): Promise<void> {
-  await rootServer.community.channelMessages.pinDelete({
-    channelId,
-    messageId,
-  });
+  const request: ChannelMessagePinDeleteRequest = { channelId, messageId };
+  await rootServer.community.channelMessages.pinDelete(request);
 }
 
 // List all pinned messages in a channel.
@@ -64,9 +63,8 @@ async function unpinMessage(
 async function listPins(
   channelId: ChannelGuid,
 ): Promise<void> {
-  const result = await rootServer.community.channelMessages.pinList({
-    channelId,
-  });
+  const request: ChannelMessagePinListRequest = { channelId };
+  const result = await rootServer.community.channelMessages.pinList(request);
 
   // result.messages — array of pinned ChannelMessage objects
   // result.oldCount — number of older pinned messages

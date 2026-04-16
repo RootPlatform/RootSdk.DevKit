@@ -36,6 +36,10 @@ import {
   ChannelMessageEvent,
   ChannelMessageCreatedEvent,
   MessageType,
+  UserGuid,
+  CommunityRoleGuid,
+  ChannelGuid,
+  CustomMemberGroupGuid,
 } from "@rootsdk/server-bot"; // For apps: import from "@rootsdk/server-app"
 
 // --- SUBSCRIBE ---------------------------------------------------------------
@@ -64,8 +68,8 @@ export async function createMemberGroup(
   resourceType: string,
   resourceId: string,
   name: string,
-  userIds: string[],
-  communityRoleIds: string[],
+  userIds: UserGuid[],
+  communityRoleIds: CommunityRoleGuid[],
 ): Promise<MemberGroup> {
   return rootServer.memberGroups.create({
     resourceType,
@@ -79,7 +83,7 @@ export async function createMemberGroup(
 // Throws if not found. Returns a cached instance (WeakRef) — if you hold a
 // reference, subsequent get() calls return the SAME in-memory object, not a
 // fresh DB read. Mutations on one reference are visible on all references.
-export async function getMemberGroup(id: string): Promise<MemberGroup> {
+export async function getMemberGroup(id: CustomMemberGroupGuid): Promise<MemberGroup> {
   return rootServer.memberGroups.get(id);
 }
 
@@ -93,7 +97,7 @@ export async function getMemberGroupByName(
   return rootServer.memberGroups.getByName({ resourceType, resourceId, name });
 }
 
-export async function deleteMemberGroup(id: string): Promise<void> {
+export async function deleteMemberGroup(id: CustomMemberGroupGuid): Promise<void> {
   return rootServer.memberGroups.delete(id);
 }
 
@@ -105,7 +109,7 @@ export async function listMemberGroups(): Promise<MemberGroupShort[]> {
 }
 
 // Batch get by IDs. Returns full MemberGroup instances.
-export async function listMemberGroupsByIds(ids: string[]): Promise<MemberGroup[]> {
+export async function listMemberGroupsByIds(ids: CustomMemberGroupGuid[]): Promise<MemberGroup[]> {
   return rootServer.memberGroups.listByIds(ids);
 }
 
@@ -123,7 +127,7 @@ export async function listMemberGroupsByResourceId(
 export async function listResourceIdsForUserId(
   resourceType: string,
   name: string,
-  userId: string,
+  userId: UserGuid,
 ): Promise<string[]> {
   return rootServer.memberGroups.listResourceIdsForUserId(
     { resourceType, name },
@@ -136,43 +140,43 @@ export async function listResourceIdsForUserId(
 // This is unique among all SDK services — other services use request objects.
 
 // Add a single user to the group's direct membership.
-export async function addUserToGroup(group: MemberGroup, userId: string): Promise<void> {
+export async function addUserToGroup(group: MemberGroup, userId: UserGuid): Promise<void> {
   return group.addUser(userId);
 }
 
 // Add multiple users at once.
-export async function addUsersToGroup(group: MemberGroup, userIds: string[]): Promise<void> {
+export async function addUsersToGroup(group: MemberGroup, userIds: UserGuid[]): Promise<void> {
   return group.addUsers(userIds);
 }
 
 // Remove a single user from direct membership.
-export async function removeUserFromGroup(group: MemberGroup, userId: string): Promise<void> {
+export async function removeUserFromGroup(group: MemberGroup, userId: UserGuid): Promise<void> {
   return group.removeUser(userId);
 }
 
 // Remove multiple users at once.
-export async function removeUsersFromGroup(group: MemberGroup, userIds: string[]): Promise<void> {
+export async function removeUsersFromGroup(group: MemberGroup, userIds: UserGuid[]): Promise<void> {
   return group.removeUsers(userIds);
 }
 
 // Add a community role — all users holding that role become effective members.
-export async function addRoleToGroup(group: MemberGroup, communityRoleId: string): Promise<void> {
+export async function addRoleToGroup(group: MemberGroup, communityRoleId: CommunityRoleGuid): Promise<void> {
   return group.addCommunityRole(communityRoleId);
 }
 
 // Add multiple community roles at once.
-export async function addRolesToGroup(group: MemberGroup, communityRoleIds: string[]): Promise<void> {
+export async function addRolesToGroup(group: MemberGroup, communityRoleIds: CommunityRoleGuid[]): Promise<void> {
   return group.addCommunityRoles(communityRoleIds);
 }
 
 // Remove a community role — its users are no longer effective members
 // (unless they're also direct members or hold another referenced role).
-export async function removeRoleFromGroup(group: MemberGroup, communityRoleId: string): Promise<void> {
+export async function removeRoleFromGroup(group: MemberGroup, communityRoleId: CommunityRoleGuid): Promise<void> {
   return group.removeCommunityRole(communityRoleId);
 }
 
 // Remove multiple community roles at once.
-export async function removeRolesFromGroup(group: MemberGroup, communityRoleIds: string[]): Promise<void> {
+export async function removeRolesFromGroup(group: MemberGroup, communityRoleIds: CommunityRoleGuid[]): Promise<void> {
   return group.removeCommunityRoles(communityRoleIds);
 }
 
@@ -180,15 +184,15 @@ export async function removeRolesFromGroup(group: MemberGroup, communityRoleIds:
 // This is NOT additive. Pass the complete desired state.
 export async function updateGroupMembership(
   group: MemberGroup,
-  userIds: string[],
-  communityRoleIds: string[],
+  userIds: UserGuid[],
+  communityRoleIds: CommunityRoleGuid[],
 ): Promise<void> {
   return group.update({ userIds, communityRoleIds });
 }
 
 // Check if a user is an effective member — either directly added or via a
 // referenced community role.
-export async function checkMembership(group: MemberGroup, userId: string): Promise<boolean> {
+export async function checkMembership(group: MemberGroup, userId: UserGuid): Promise<boolean> {
   return group.isMember({ userId });
 }
 
@@ -200,7 +204,7 @@ async function onMemberGroupsCommand(evt: ChannelMessageCreatedEvent): Promise<v
   const content = evt.messageContent?.trim() ?? "";
   if (!content.startsWith("/server-member-groups")) return;
 
-  const channelId = evt.channelId;
+  const channelId: ChannelGuid = evt.channelId;
   const messages = rootServer.community.channelMessages;
   const lines: string[] = [];
   const senderId = evt.userId;

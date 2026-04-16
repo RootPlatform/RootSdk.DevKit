@@ -16,11 +16,11 @@ import {
   rootServer,
   RootAppStartState,
   Client,
-  UserGuid,
-  CommunityGuid,
   ChannelMessageEvent,
   ChannelMessageCreatedEvent,
   MessageType,
+  ChannelGuid,
+  RootServerException,
 } from "@rootsdk/server-app";
 import { itemService } from "./item-service";
 import { roomService } from "./room-service";
@@ -28,7 +28,7 @@ import { roomService } from "./room-service";
 let capturedCommunityId: CommunityGuid;
 
 async function onStarting(state: RootAppStartState) {
-  capturedCommunityId = state.communityId as CommunityGuid;
+  capturedCommunityId = state.communityId;
 
   // Register RPC services. Each addService() call registers all RPC methods
   // defined in the service's proto definition. Clients call these methods
@@ -61,7 +61,7 @@ async function onRpcServicesCommand(
   const content = evt.messageContent?.trim() ?? "";
   if (!content.startsWith("/networking-app-services")) return;
 
-  const channelId = evt.channelId;
+  const channelId: ChannelGuid = evt.channelId;
   const messages = rootServer.community.channelMessages;
   const lines: string[] = [];
 
@@ -70,7 +70,7 @@ async function onRpcServicesCommand(
     // In production, clients call RPC methods via gen-client and the
     // Client is provided by the framework automatically.
     const testClient: Client = {
-      userId: evt.userId as UserGuid,
+      userId: evt.userId,
       communityId: capturedCommunityId,
       deviceIds: [],
     };
@@ -92,8 +92,9 @@ async function onRpcServicesCommand(
       await itemService.delete({ id: 99999 }, testClient);
       lines.push("\u2717 item.delete: expected error but none thrown");
     } catch (err: unknown) {
-      const e = err as { code?: number; message?: string };
-      lines.push(`\u2713 item.delete error: code=${e.code}`);
+      if (err instanceof RootServerException) {
+        lines.push(`\u2713 item.delete error: code=${err.code}`);
+      } else { throw err; }
     }
 
     // --- RoomService tests ---
@@ -120,14 +121,15 @@ async function onRpcServicesCommand(
       );
       lines.push("\u2717 room.send: expected error but none thrown");
     } catch (err: unknown) {
-      const e = err as { code?: number; message?: string };
-      lines.push(`\u2713 room.send error: code=${e.code}`);
+      if (err instanceof RootServerException) {
+        lines.push(`\u2713 room.send error: code=${err.code}`);
+      } else { throw err; }
     }
 
     await messages.create({ channelId, content: lines.join("\n") });
   } catch (err: unknown) {
-    const e = err as { code?: number; message?: string };
-    const parts = [`\u2717 self-test error: ${e.message ?? err}`];
+    const msg = err instanceof RootServerException ? err.message : String(err);
+    const parts = [`\u2717 self-test error: ${msg}`];
     if (lines.length > 0) parts.push(lines.join("\n"));
     await messages.create({ channelId, content: parts.join("\n") });
   }

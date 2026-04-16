@@ -28,6 +28,7 @@ import {
   CommunityMemberBanCreatedEvent,
   CommunityMemberBanDeletedEvent,
   UserGuid,
+  ChannelGuid,
   ChannelMessageEvent,
   ChannelMessageCreatedEvent,
   MessageType,
@@ -126,7 +127,7 @@ async function onKickBanCommand(evt: ChannelMessageCreatedEvent): Promise<void> 
   const content = evt.messageContent?.trim() ?? "";
   if (!content.startsWith("/server-kick-ban")) return;
 
-  const channelId = evt.channelId;
+  const channelId: ChannelGuid = evt.channelId;
   const messages = rootServer.community.channelMessages;
   const lines: string[] = [];
 

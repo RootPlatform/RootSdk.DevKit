@@ -31,6 +31,7 @@ import {
   WellKnownRootGuids,
   UserGuid,
   CommunityRoleGuid,
+  ChannelGuid,
   ChannelMessageEvent,
   ChannelMessageCreatedEvent,
   MessageType,
@@ -93,6 +94,9 @@ export function toUuidString(guid: string): string {
   return RootGuidUtils.toUuidString(guid);
 }
 
+// SDK bug: parse() returns a base64 GUID string at runtime, but the .d.ts
+// declares the return type as RootGuidType (numeric enum). Cast required until
+// the SDK fixes the return type to RootGuid.
 export function fromUuidString(uuid: string): string {
   return RootGuidConverter.parse(uuid) as unknown as string;
 }
@@ -120,7 +124,7 @@ async function onGuidUtilsCommand(
   const content = evt.messageContent?.trim() ?? "";
   if (!content.startsWith("/server-guid-utils")) return;
 
-  const channelId = evt.channelId;
+  const channelId: ChannelGuid = evt.channelId;
   const messages = rootServer.community.channelMessages;
   const lines: string[] = [];
 

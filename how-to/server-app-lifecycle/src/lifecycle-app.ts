@@ -21,10 +21,7 @@ import {
   ChannelMessageEvent,
   ChannelMessageCreatedEvent,
   MessageType,
-  CommunityGuid,
   ChannelGuid,
-  CommunityRoleGuid,
-  UserGuid,
 } from "@rootsdk/server-app"; // For bots: import from "@rootsdk/server-bot"
 
 // Module-level reference to the start state captured during onStarting.
@@ -101,7 +98,7 @@ async function onLifecycleAppCommand(evt: ChannelMessageCreatedEvent): Promise<v
   const content = evt.messageContent?.trim() ?? "";
   if (!content.startsWith("/server-app-lifecycle")) return;
 
-  const channelId = evt.channelId;
+  const channelId: ChannelGuid = evt.channelId;
   const messages = rootServer.community.channelMessages;
   const lines: string[] = [];
 

@@ -50,9 +50,12 @@ function statusLabel(status: CommunityUserOnlineStatus): string {
 // Convert an asset URI to a displayable image URL.
 // Uses rootClient.assets.toImageUrl() with "small" resolution for avatars.
 // ImageUriResolution values: "original" | "large" | "medium" | "small"
-function profilePictureUrl(uri: string | undefined): string | undefined {
+function profilePictureUrl(
+  uri: string | undefined,
+  resolution: ImageUriResolution = "small",
+): string | undefined {
   if (!uri) return undefined;
-  return rootClient.assets.toImageUrl(uri, "small");
+  return rootClient.assets.toImageUrl(uri, resolution);
 }
 
 // --- COMPONENT ---------------------------------------------------------------
