@@ -73,11 +73,11 @@ export const UserCard: React.FC = () => {
   // 1. Get current user ID (synchronous)
   useEffect(() => {
     try {
-      const userId = rootClient.users.getCurrentUserId();
+      const userId: string = rootClient.users.getCurrentUserId();
       setCurrentUserId(userId);
       addLog(`getCurrentUserId() -> ${userId}`);
     } catch (err: unknown) {
-      setError(`getCurrentUserId failed: ${err}`);
+      setError(`getCurrentUserId failed: ${err instanceof Error ? err.message : String(err)}`);
     }
   }, [addLog]);
 
@@ -89,7 +89,7 @@ export const UserCard: React.FC = () => {
       try {
         // getUserProfile — fetch a single user's profile by ID.
         // Returns UserProfile: { id, nickname, profilePictureUri?, onlineStatus }
-        const userProfile = await rootClient.users.getUserProfile(currentUserId);
+        const userProfile: UserProfile = await rootClient.users.getUserProfile(currentUserId);
         setProfile(userProfile);
         addLog(
           `getUserProfile() -> nickname=${userProfile.nickname} ` +
@@ -98,10 +98,10 @@ export const UserCard: React.FC = () => {
 
         // getUserProfiles — batch fetch multiple profiles in one call.
         // Useful when rendering a member list or participant roster.
-        const profiles = await rootClient.users.getUserProfiles([currentUserId]);
+        const profiles: UserProfile[] = await rootClient.users.getUserProfiles([currentUserId]);
         addLog(`getUserProfiles([1 id]) -> ${profiles.length} profile(s)`);
       } catch (err: unknown) {
-        setError(`Profile fetch failed: ${err}`);
+        setError(`Profile fetch failed: ${err instanceof Error ? err.message : String(err)}`);
       }
     }
 

@@ -43,6 +43,8 @@ import {
   ChannelMessageCreatedEvent,
   MessageType,
   UserGuid,
+  ChannelGuid,
+  RootApiException,
 } from "@rootsdk/server-bot"; // For apps: import from "@rootsdk/server-app"
 
 // Capture startup state for use in the command handler
@@ -81,12 +83,16 @@ function onSettingsUpdate(event: GlobalSettingsUpdateEvent): void {
   );
 
   // Example: detect when vipMembers changed
-  const prev = event.previous?.["general"]?.["vipMembers"] as
-    | ReadOnlyMemberGroup
-    | undefined;
-  const curr = event.current?.["general"]?.["vipMembers"] as
-    | ReadOnlyMemberGroup
-    | undefined;
+  const prevRaw: unknown = event.previous?.["general"]?.["vipMembers"];
+  const prev: ReadOnlyMemberGroup | undefined =
+    prevRaw && typeof prevRaw === "object" && "memberUserIds" in prevRaw
+      ? (prevRaw as ReadOnlyMemberGroup)
+      : undefined;
+  const currRaw: unknown = event.current?.["general"]?.["vipMembers"];
+  const curr: ReadOnlyMemberGroup | undefined =
+    currRaw && typeof currRaw === "object" && "memberUserIds" in currRaw
+      ? (currRaw as ReadOnlyMemberGroup)
+      : undefined;
 
   if (prev && curr) {
     console.log(
@@ -125,7 +131,7 @@ async function onGlobalSettingsCommand(
 
     // 2. Read settings at runtime
     //    rootServer.globalSettings returns the current settings object.
-    const runtimeSettings = rootServer.globalSettings;
+    const runtimeSettings: GlobalSettings | undefined = rootServer.globalSettings;
     if (!runtimeSettings) {
       await messages.create({
         channelId,
@@ -148,9 +154,11 @@ async function onGlobalSettingsCommand(
     //      "role"                  — single role
     //      "roles"                 — multiple roles
     //      "roleMultiAndUserMulti" — multiple roles and users (most common)
-    const vipGroup = runtimeSettings["general"]?.["vipMembers"] as
-      | ReadOnlyMemberGroup
-      | undefined;
+    const vipRaw: unknown = runtimeSettings["general"]?.["vipMembers"];
+    const vipGroup: ReadOnlyMemberGroup | undefined =
+      vipRaw && typeof vipRaw === "object" && "memberUserIds" in vipRaw
+        ? (vipRaw as ReadOnlyMemberGroup)
+        : undefined;
 
     if (!vipGroup) {
       await messages.create({
@@ -187,10 +195,13 @@ async function onGlobalSettingsCommand(
 
     await messages.create({ channelId, content: lines.join("\n") });
   } catch (err: unknown) {
-    console.error("Global settings demo error:", err);
-    await messages.create({
-      channelId,
-      content: `Global settings demo error: ${err}`,
-    });
+    const parts: string[] = [];
+    if (err instanceof RootApiException) {
+      parts.push(`Global settings demo error: ${err.errorCode}`);
+      if (err.payload) parts.push(`payload: ${JSON.stringify(err.payload)}`);
+    } else if (err instanceof Error) {
+      parts.push(`Global settings demo error: ${err.message}`);
+    }
+    await messages.create({ channelId, content: parts.join("\n") });
   }
 }

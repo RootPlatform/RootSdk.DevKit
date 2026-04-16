@@ -164,13 +164,14 @@ async function onChannelGroupsCommand(evt: ChannelMessageCreatedEvent): Promise<
 
     await messages.create({ channelId, content: lines.join("\n") });
   } catch (err: unknown) {
-    const parts = [`Channel groups demo error: ${err}`];
+    const parts: string[] = [];
     if (err instanceof RootApiException) {
-      parts.push(`errorCode: ${err.errorCode}`);
+      parts.push(`Channel groups demo error: ${err.errorCode}`);
       if (err.payload) parts.push(`payload: ${JSON.stringify(err.payload)}`);
+    } else if (err instanceof Error) {
+      parts.push(`Channel groups demo error: ${err.message}`);
     }
     if (lines.length > 0) parts.push(`completed ${lines.length}/7 steps`);
-    console.error("Channel groups demo error:", err);
     await messages.create({ channelId, content: parts.join("\n") });
   }
 }

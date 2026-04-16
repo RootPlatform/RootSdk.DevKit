@@ -27,6 +27,7 @@ import {
   MessageType,
   UserGuid,
   ChannelGuid,
+  RootApiException,
 } from "@rootsdk/server-app";
 
 // --- SUBSCRIBE ---------------------------------------------------------------
@@ -143,5 +144,13 @@ async function onClientsCommand(evt: ChannelMessageCreatedEvent): Promise<void> 
   // 4. Confirm event listeners are registered
   lines.push(`\u2713 event listeners: 4 registered`);
 
-  await messages.create({ channelId, content: lines.join("\n") });
+  try {
+    await messages.create({ channelId, content: lines.join("\n") });
+  } catch (err: unknown) {
+    if (err instanceof RootApiException) {
+      console.error("Clients command error:", err.errorCode);
+    } else if (err instanceof Error) {
+      console.error("Clients command error:", err.message);
+    }
+  }
 }

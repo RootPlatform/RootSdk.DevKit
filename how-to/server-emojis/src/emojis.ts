@@ -19,6 +19,7 @@ import {
   CommunityEmoji,
   CommunityEmojiGetRequest,
   CommunityEmojiDeleteRequest,
+  EmojiGuid,
   CommunityEmojiEvent,
   CommunityEmojiCreatedEvent,
   CommunityEmojiDeletedEvent,
@@ -48,7 +49,7 @@ export function initializeEmojis(): void {
 
 // Retrieves a single emoji by ID. Returns the emoji's shortcode and assetUri.
 // No special permissions required.
-export async function getEmoji(id: CommunityEmoji["id"]): Promise<CommunityEmoji> {
+export async function getEmoji(id: EmojiGuid): Promise<CommunityEmoji> {
   const request: CommunityEmojiGetRequest = { id };
   return rootServer.community.communityEmojis.get(request);
 }
@@ -62,7 +63,7 @@ export async function listEmojis(): Promise<CommunityEmoji[]> {
 // Deletes an emoji by ID. Idempotent — deleting an already-deleted emoji
 // succeeds without error.
 // Requires community.manageEmojis permission.
-export async function deleteEmoji(id: CommunityEmoji["id"]): Promise<void> {
+export async function deleteEmoji(id: EmojiGuid): Promise<void> {
   const request: CommunityEmojiDeleteRequest = { id };
   return rootServer.community.communityEmojis.delete(request);
 }
@@ -118,23 +119,14 @@ async function onEmojisCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
 
     await messages.create({ channelId, content: lines.join("\n") });
   } catch (err: unknown) {
+    const parts: string[] = [];
     if (err instanceof RootApiException) {
-      switch (err.errorCode) {
-        case ErrorCodeType.NotFound:
-          console.error("Emoji not found — it may have been deleted");
-          break;
-        case ErrorCodeType.NoPermissionToDelete:
-          console.error("Missing manageEmojis permission in root-manifest.json");
-          break;
-        case ErrorCodeType.TooManyRequests:
-          console.error("Rate limited — queries max ~20 req/s, commands ~5 req/s");
-          break;
-        default:
-          console.error("RootApiException:", err.errorCode);
-      }
+      parts.push(`Emojis demo error: ${err.errorCode}`);
+      if (err.payload) parts.push(`payload: ${JSON.stringify(err.payload)}`);
     } else if (err instanceof Error) {
-      console.error("Unexpected error:", err.message);
+      parts.push(`Emojis demo error: ${err.message}`);
     }
+    await messages.create({ channelId, content: parts.join("\n") });
   }
 }
 

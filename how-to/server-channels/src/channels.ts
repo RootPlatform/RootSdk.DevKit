@@ -26,6 +26,8 @@ import {
   ChannelEditRequest,
   ChannelDeleteRequest,
   ChannelGroupDeletedEvent,
+  ChannelGroupCreateRequest,
+  ChannelGroupDeleteRequest,
   AccessRuleCreateRoleOrMemberRequest,
   AccessRuleUpdateRequest,
   ChannelMessageEvent,
@@ -185,7 +187,8 @@ async function onChannelsCommand(evt: ChannelMessageCreatedEvent): Promise<void>
 
     // 7. Create target group + move channel
     step = 7;
-    const moveTarget: ChannelGroup = await rootServer.community.channelGroups.create({ name: "Move Target" });
+    const createGroupRequest: ChannelGroupCreateRequest = { name: "Move Target" };
+    const moveTarget: ChannelGroup = await rootServer.community.channelGroups.create(createGroupRequest);
     step = 8;
     await moveChannel(channel.id, group.id, moveTarget.id);
     lines.push(`✓ moved channel from ${group.name} to ${moveTarget.name}`);
@@ -194,15 +197,18 @@ async function onChannelsCommand(evt: ChannelMessageCreatedEvent): Promise<void>
     step = 9;
     await deleteChannel(channel.id);
     step = 10;
-    await rootServer.community.channelGroups.delete({ id: moveTarget.id });
+    const deleteGroupRequest: ChannelGroupDeleteRequest = { id: moveTarget.id };
+    await rootServer.community.channelGroups.delete(deleteGroupRequest);
     lines.push("✓ deleted channel and move-target group");
 
     await messages.create({ channelId, content: lines.join("\n") });
   } catch (err: unknown) {
-    const parts = [`Channels demo error: ${err}`];
+    const parts: string[] = [];
     if (err instanceof RootApiException) {
-      parts.push(`errorCode: ${err.errorCode}`);
+      parts.push(`Channels demo error: ${err.errorCode}`);
       if (err.payload) parts.push(`payload: ${JSON.stringify(err.payload)}`);
+    } else if (err instanceof Error) {
+      parts.push(`Channels demo error: ${err.message}`);
     }
     parts.push(`failed at step ${step}`);
     if (lines.length > 0) parts.push(`completed ${lines.length}/10 steps`);

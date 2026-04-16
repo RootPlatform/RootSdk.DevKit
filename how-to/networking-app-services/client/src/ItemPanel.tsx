@@ -29,6 +29,8 @@ import {
 import {
   Item,
   ItemCreateRequest,
+  ItemListRequest,
+  ItemDeleteRequest,
   ItemCreatedEvent,
   ItemDeletedEvent,
   ItemError,
@@ -42,7 +44,8 @@ import {
 // vanilla JS). The React component below calls these functions.
 
 async function listItems(): Promise<Item[]> {
-  const response = await itemServiceClient.list({});
+  const request: ItemListRequest = {};
+  const response = await itemServiceClient.list(request);
   return response.items;
 }
 
@@ -51,13 +54,16 @@ async function createItem(name: string): Promise<Item> {
   const response = await itemServiceClient.create(request);
   // The caller gets the created item via the return value.
   // Other connected clients receive it via BroadcastCreated instead.
-  return response.item!;
+  const item = response.item;
+  if (!item) throw new Error("Server returned no item in create response");
+  return item;
 }
 
 async function deleteItem(id: number): Promise<void> {
   // If the item doesn't exist, the server throws RootServerException
   // with code ItemError.NOT_FOUND. Catch it at the call site.
-  await itemServiceClient.delete({ id });
+  const request: ItemDeleteRequest = { id };
+  await itemServiceClient.delete(request);
 }
 
 // --- REACT COMPONENT ---------------------------------------------------------
@@ -77,8 +83,10 @@ export const ItemPanel: React.FC<{ onLog: (msg: string) => void }> = ({
   // The caller receives the result via the RPC return value instead.
   useEffect(() => {
     const onCreated = (event: ItemCreatedEvent) => {
-      onLog(`[broadcast] item created: ${event.item!.name}`);
-      setItems((prev) => [...prev, event.item!]);
+      const item = event.item;
+      if (!item) return;
+      onLog(`[broadcast] item created: ${item.name}`);
+      setItems((prev) => [...prev, item]);
     };
     const onDeleted = (event: ItemDeletedEvent) => {
       onLog(`[broadcast] item deleted: id=${event.id}`);
@@ -99,15 +107,31 @@ export const ItemPanel: React.FC<{ onLog: (msg: string) => void }> = ({
   // --- Event handlers --------------------------------------------------------
 
   const handleCreate = async () => {
-    const item = await createItem(`Item ${Date.now()}`);
-    onLog(`created item: id=${item.id}, name=${item.name}`);
-    setItems((prev) => [...prev, item]);
+    try {
+      const item = await createItem(`Item ${Date.now()}`);
+      onLog(`created item: id=${item.id}, name=${item.name}`);
+      setItems((prev) => [...prev, item]);
+    } catch (error: unknown) {
+      if (error instanceof RootServerException) {
+        onLog(`create error: code=${error.code} ${error.message}`);
+      } else if (error instanceof Error) {
+        onLog(`create error: ${error.message}`);
+      }
+    }
   };
 
   const handleList = async () => {
-    const result = await listItems();
-    onLog(`listed ${result.length} item(s)`);
-    setItems(result);
+    try {
+      const result = await listItems();
+      onLog(`listed ${result.length} item(s)`);
+      setItems(result);
+    } catch (error: unknown) {
+      if (error instanceof RootServerException) {
+        onLog(`list error: code=${error.code} ${error.message}`);
+      } else if (error instanceof Error) {
+        onLog(`list error: ${error.message}`);
+      }
+    }
   };
 
   const handleDelete = async (id: number) => {
@@ -127,8 +151,8 @@ export const ItemPanel: React.FC<{ onLog: (msg: string) => void }> = ({
           default:
             onLog(`server error: code=${error.code} ${error.message}`);
         }
-      } else {
-        onLog(`unexpected error: ${error}`);
+      } else if (error instanceof Error) {
+        onLog(`unexpected error: ${error.message}`);
       }
     }
   };

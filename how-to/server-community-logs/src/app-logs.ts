@@ -24,10 +24,12 @@
 import {
   rootServer,
   CommunityAppLogType,
+  CommunityAppLogCreateRequest,
   ChannelMessageEvent,
   ChannelMessageCreatedEvent,
   MessageType,
   ChannelGuid,
+  RootApiException,
 } from "@rootsdk/server-bot"; // For apps: import from "@rootsdk/server-app"
 
 // --- SUBSCRIBE ---------------------------------------------------------------
@@ -42,34 +44,38 @@ export function initializeAppLogs(): void {
 // Write an Info-level log entry.
 // Message cannot be empty or whitespace-only.
 export async function logInfo(message: string): Promise<void> {
-  await rootServer.dataStore.logs.community.create({
+  const request: CommunityAppLogCreateRequest = {
     communityAppLogType: CommunityAppLogType.Info,
     message,
-  });
+  };
+  await rootServer.dataStore.logs.community.create(request);
 }
 
 // Write a Warn-level log entry.
 export async function logWarn(message: string): Promise<void> {
-  await rootServer.dataStore.logs.community.create({
+  const request: CommunityAppLogCreateRequest = {
     communityAppLogType: CommunityAppLogType.Warn,
     message,
-  });
+  };
+  await rootServer.dataStore.logs.community.create(request);
 }
 
 // Write an Error-level log entry.
 export async function logError(message: string): Promise<void> {
-  await rootServer.dataStore.logs.community.create({
+  const request: CommunityAppLogCreateRequest = {
     communityAppLogType: CommunityAppLogType.Error,
     message,
-  });
+  };
+  await rootServer.dataStore.logs.community.create(request);
 }
 
 // Write a Fatal-level log entry.
 export async function logFatal(message: string): Promise<void> {
-  await rootServer.dataStore.logs.community.create({
+  const request: CommunityAppLogCreateRequest = {
     communityAppLogType: CommunityAppLogType.Fatal,
     message,
-  });
+  };
+  await rootServer.dataStore.logs.community.create(request);
 }
 
 // --- COMMAND HANDLER: /server-community-logs ----------------------------------------------
@@ -96,9 +102,16 @@ async function onAppLogsCommand(evt: ChannelMessageCreatedEvent): Promise<void> 
 
     await logFatal("Test fatal log from /app-logs command");
     lines.push("✓ logged Fatal level");
-  } catch (err: unknown) {
-    lines.push(`demo error: ${err instanceof Error ? err.message : err}`);
-  }
 
-  await messages.create({ channelId, content: lines.join("\n") });
+    await messages.create({ channelId, content: lines.join("\n") });
+  } catch (err: unknown) {
+    const parts: string[] = [];
+    if (err instanceof RootApiException) {
+      parts.push(`App logs demo error: ${err.errorCode}`);
+    } else if (err instanceof Error) {
+      parts.push(`App logs demo error: ${err.message}`);
+    }
+    if (lines.length > 0) parts.push(`completed ${lines.length}/4 steps`);
+    await messages.create({ channelId, content: parts.join("\n") });
+  }
 }

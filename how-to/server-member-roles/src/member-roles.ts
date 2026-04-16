@@ -179,12 +179,14 @@ async function onMemberRolesCommand(evt: ChannelMessageCreatedEvent): Promise<vo
 
     await messages.create({ channelId, content: lines.join("\n") });
   } catch (err: unknown) {
-    const parts = [`Member roles demo error: ${err}`];
+    const parts: string[] = [];
     if (err instanceof RootApiException) {
-      parts.push(`errorCode: ${err.errorCode}`);
+      parts.push(`Member roles demo error: ${err.errorCode}`);
+      if (err.payload) parts.push(`payload: ${JSON.stringify(err.payload)}`);
+    } else if (err instanceof Error) {
+      parts.push(`Member roles demo error: ${err.message}`);
     }
     if (lines.length > 0) parts.push(`completed ${lines.length}/8 steps`);
-    console.error("Member roles demo error:", err);
     await messages.create({ channelId, content: parts.join("\n") });
   }
 }

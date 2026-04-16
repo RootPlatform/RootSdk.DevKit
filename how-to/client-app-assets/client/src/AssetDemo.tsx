@@ -41,7 +41,11 @@ import type {
 import { uploadServiceClient } from "@clientassets/gen-client";
 
 // Shared types from proto — used by both server and client.
-import { UploadError } from "@clientassets/gen-shared";
+import {
+  SubmitUploadRequest,
+  SubmitUploadResponse,
+  UploadError,
+} from "@clientassets/gen-shared";
 
 // --- HELPERS -----------------------------------------------------------------
 
@@ -88,7 +92,7 @@ export const AssetDemo: React.FC = () => {
       tokens = response.tokens;
       addLog(`fileUpload(${fileType}): ${tokens.length} token(s)`);
     } catch (err: unknown) {
-      addLog(`fileUpload error: ${err}`);
+      addLog(`fileUpload error: ${err instanceof Error ? err.message : String(err)}`);
       return;
     }
 
@@ -100,7 +104,7 @@ export const AssetDemo: React.FC = () => {
     // Step 2: Preview the upload (images only).
     // toUploadImagePreview returns a temporary URL for just-uploaded images.
     // Returns undefined for non-image uploads.
-    const preview = rootClient.assets.toUploadImagePreview(tokens[0]);
+    const preview: string | undefined = rootClient.assets.toUploadImagePreview(tokens[0]);
     setPreviewUrl(preview);
     addLog(
       `toUploadImagePreview: ${preview ? "preview available" : "no preview (non-image)"}`,
@@ -110,9 +114,8 @@ export const AssetDemo: React.FC = () => {
     // The server converts the temporary token to a permanent asset URI
     // using dataStore.assets.create() and persists it in the key-value store.
     try {
-      const result = await uploadServiceClient.submitUpload({
-        token: tokens[0],
-      });
+      const submitRequest: SubmitUploadRequest = { token: tokens[0] };
+      const result: SubmitUploadResponse = await uploadServiceClient.submitUpload(submitRequest);
       setAssetUri(result.assetUri);
       addLog(
         `submitUpload: uri=${result.assetUri} type=${result.assetType}`,
@@ -145,8 +148,8 @@ export const AssetDemo: React.FC = () => {
           default:
             addLog(`Server error: code=${err.code} ${err.message}`);
         }
-      } else {
-        addLog(`submitUpload error: ${err}`);
+      } else if (err instanceof Error) {
+        addLog(`submitUpload error: ${err.message}`);
       }
     }
   }
@@ -160,11 +163,11 @@ export const AssetDemo: React.FC = () => {
     }
     // toUrl converts an asset URI (root:// scheme) to a displayable HTTP URL.
     // Handles null/undefined gracefully (returns empty string).
-    const url = rootClient.assets.toUrl(assetUri);
+    const url: string = rootClient.assets.toUrl(assetUri);
     addLog(`toUrl -> "${url}"`);
 
     // Null safety — toUrl returns "" for null/undefined
-    const nullResult = rootClient.assets.toUrl(null);
+    const nullResult: string = rootClient.assets.toUrl(null);
     addLog(`toUrl(null) -> "${nullResult}"`);
   }
 

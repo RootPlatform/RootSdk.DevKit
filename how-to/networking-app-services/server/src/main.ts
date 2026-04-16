@@ -20,6 +20,7 @@ import {
   ChannelMessageCreatedEvent,
   MessageType,
   ChannelGuid,
+  CommunityGuid,
   RootServerException,
 } from "@rootsdk/server-app";
 import { itemService } from "./item-service";

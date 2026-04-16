@@ -26,7 +26,7 @@
 import React from "react";
 import { rootClient } from "@rootsdk/client-app";
 
-export function RestartPanel() {
+export const RestartPanel: React.FC = () => {
   // --- Restart: full page reload ---
   // Reloads all JS bundles, clears all in-memory state, and reinitializes
   // React from scratch. Any unsaved state will be lost.
@@ -53,4 +53,4 @@ export function RestartPanel() {
       </button>
     </div>
   );
-}
+};

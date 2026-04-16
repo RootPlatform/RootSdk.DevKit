@@ -43,6 +43,7 @@ import {
   ChannelMessageEvent,
   ChannelMessageCreatedEvent,
   MessageType,
+  RootApiException,
 } from "@rootsdk/server-bot"; // For apps: import from "@rootsdk/server-app"
 
 // --- SUBSCRIBE ---------------------------------------------------------------
@@ -234,13 +235,19 @@ async function onFilesCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
 
     // 8. Search across the community (this channel)
     const communitySearch: ChannelFileSearchCommunityResponse = await searchCommunityFiles([channelId], "test");
-    const resultCount = communitySearch.results?.length ?? 0;
+    const resultCount: number = communitySearch.results?.length ?? 0;
     lines.push(`✓ searchCommunity for "test": ${resultCount} channel(s) with results`);
 
     await messages.create({ channelId, content: lines.join("\n") });
   } catch (err: unknown) {
-    console.error("Files demo error:", err);
-    await messages.create({ channelId, content: `Files demo error: ${err}` });
+    const parts: string[] = [];
+    if (err instanceof RootApiException) {
+      parts.push(`Files demo error: ${err.errorCode}`);
+      if (err.payload) parts.push(`payload: ${JSON.stringify(err.payload)}`);
+    } else if (err instanceof Error) {
+      parts.push(`Files demo error: ${err.message}`);
+    }
+    await messages.create({ channelId, content: parts.join("\n") });
   }
 }
 

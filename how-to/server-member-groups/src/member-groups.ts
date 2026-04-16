@@ -40,6 +40,7 @@ import {
   CommunityRoleGuid,
   ChannelGuid,
   CustomMemberGroupGuid,
+  RootApiException,
 } from "@rootsdk/server-bot"; // For apps: import from "@rootsdk/server-app"
 
 // --- SUBSCRIBE ---------------------------------------------------------------
@@ -270,8 +271,14 @@ async function onMemberGroupsCommand(evt: ChannelMessageCreatedEvent): Promise<v
 
     await messages.create({ channelId, content: lines.join("\n") });
   } catch (err: unknown) {
-    console.error("Member groups demo error:", err);
-    await messages.create({ channelId, content: `Member groups demo error: ${err}` });
+    const parts: string[] = [];
+    if (err instanceof RootApiException) {
+      parts.push(`Member groups demo error: ${err.errorCode}`);
+      if (err.payload) parts.push(`payload: ${JSON.stringify(err.payload)}`);
+    } else if (err instanceof Error) {
+      parts.push(`Member groups demo error: ${err.message}`);
+    }
+    await messages.create({ channelId, content: parts.join("\n") });
   }
 }
 

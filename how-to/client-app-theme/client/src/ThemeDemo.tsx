@@ -30,7 +30,7 @@ import {
   RootClientThemeEvent,
 } from "@rootsdk/client-app";
 
-export function ThemeDemo() {
+export const ThemeDemo: React.FC = () => {
   // --- Read current theme on mount ---
   // getTheme() returns "light" or "dark" synchronously.
   const [theme, setTheme] = useState<RootThemeMode>(
@@ -71,4 +71,4 @@ export function ThemeDemo() {
       </p>
     </div>
   );
-}
+};

@@ -32,6 +32,7 @@ import {
   ChannelMessageEvent,
   ChannelMessageCreatedEvent,
   MessageType,
+  RootApiException,
 } from "@rootsdk/server-bot"; // For apps: import from "@rootsdk/server-app"
 
 // --- SUBSCRIBE ---------------------------------------------------------------
@@ -158,8 +159,14 @@ async function onKickBanCommand(evt: ChannelMessageCreatedEvent): Promise<void> 
 
     await messages.create({ channelId, content: lines.join("\n") });
   } catch (err: unknown) {
-    console.error("Kick/ban demo error:", err);
-    await messages.create({ channelId, content: `Kick/ban demo error: ${err}` });
+    const parts: string[] = [];
+    if (err instanceof RootApiException) {
+      parts.push(`Kick/ban demo error: ${err.errorCode}`);
+      if (err.payload) parts.push(`payload: ${JSON.stringify(err.payload)}`);
+    } else if (err instanceof Error) {
+      parts.push(`Kick/ban demo error: ${err.message}`);
+    }
+    await messages.create({ channelId, content: parts.join("\n") });
   }
 }
 

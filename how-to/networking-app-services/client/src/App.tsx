@@ -20,10 +20,10 @@ import { rootClient } from "@rootsdk/client-app";
 import { ItemPanel } from "./ItemPanel";
 import { RoomPanel } from "./RoomPanel";
 
-const App: React.FC = () => {
+export const App: React.FC = () => {
   // rootClient.users.getCurrentUserId() returns the authenticated user's ID.
   // No login flow needed — the platform handles authentication.
-  const userId = rootClient.users.getCurrentUserId();
+  const userId: string = rootClient.users.getCurrentUserId();
 
   // Shared log — both panels write here to show SDK interactions.
   const [log, setLog] = useState<string[]>([]);
@@ -46,4 +46,3 @@ const App: React.FC = () => {
   );
 };
 
-export default App;

@@ -21,6 +21,10 @@ import {
 } from "@rpchowto/gen-client";
 
 import {
+  RoomJoinRequest,
+  RoomJoinResponse,
+  RoomLeaveRequest,
+  RoomSendRequest,
   RoomJoinedEvent,
   RoomLeftEvent,
   RoomMessageEvent,
@@ -30,18 +34,21 @@ import {
 // --- RPC CALLS: RoomService --------------------------------------------------
 
 async function joinRoom(roomId: string): Promise<string[]> {
-  const response = await roomServiceClient.join({ roomId });
+  const request: RoomJoinRequest = { roomId };
+  const response: RoomJoinResponse = await roomServiceClient.join(request);
   return response.memberIds;
 }
 
 async function leaveRoom(roomId: string): Promise<void> {
-  await roomServiceClient.leave({ roomId });
+  const request: RoomLeaveRequest = { roomId };
+  await roomServiceClient.leave(request);
 }
 
 async function sendToRoom(roomId: string, text: string): Promise<void> {
   // Throws RootServerException with RoomError.NOT_A_MEMBER
   // if the caller hasn't joined the room.
-  await roomServiceClient.send({ roomId, text });
+  const request: RoomSendRequest = { roomId, text };
+  await roomServiceClient.send(request);
 }
 
 // --- REACT COMPONENT ---------------------------------------------------------
@@ -83,13 +90,29 @@ export const RoomPanel: React.FC<{ onLog: (msg: string) => void }> = ({
   // --- Event handlers --------------------------------------------------------
 
   const handleJoin = async () => {
-    const members = await joinRoom(roomId);
-    onLog(`joined room "${roomId}": ${members.length} member(s)`);
+    try {
+      const members = await joinRoom(roomId);
+      onLog(`joined room "${roomId}": ${members.length} member(s)`);
+    } catch (error: unknown) {
+      if (error instanceof RootServerException) {
+        onLog(`join error: code=${error.code} ${error.message}`);
+      } else if (error instanceof Error) {
+        onLog(`join error: ${error.message}`);
+      }
+    }
   };
 
   const handleLeave = async () => {
-    await leaveRoom(roomId);
-    onLog(`left room "${roomId}"`);
+    try {
+      await leaveRoom(roomId);
+      onLog(`left room "${roomId}"`);
+    } catch (error: unknown) {
+      if (error instanceof RootServerException) {
+        onLog(`leave error: code=${error.code} ${error.message}`);
+      } else if (error instanceof Error) {
+        onLog(`leave error: ${error.message}`);
+      }
+    }
   };
 
   const handleSend = async () => {
@@ -105,8 +128,8 @@ export const RoomPanel: React.FC<{ onLog: (msg: string) => void }> = ({
           default:
             onLog(`server error: code=${error.code} ${error.message}`);
         }
-      } else {
-        onLog(`unexpected error: ${error}`);
+      } else if (error instanceof Error) {
+        onLog(`unexpected error: ${error.message}`);
       }
     }
   };

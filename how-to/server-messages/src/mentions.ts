@@ -37,6 +37,7 @@ import {
   ChannelGuid,
   UserGuid,
   CommunityRoleGuid,
+  CommunityMember,
   CommunityMemberGetRequest,
   ChannelMessageCreateRequest,
 } from "@rootsdk/server-bot"; // For apps: import from "@rootsdk/server-app"
@@ -106,7 +107,7 @@ async function onMentionCommand(evt: ChannelMessageCreatedEvent): Promise<void> 
 
   try {
     const memberRequest: CommunityMemberGetRequest = { userId: evt.userId };
-    const member = await rootServer.community.communityMembers.get(memberRequest);
+    const member: CommunityMember = await rootServer.community.communityMembers.get(memberRequest);
 
     const content = [
       `User: ${userMention(member.nickname, evt.userId)}`,

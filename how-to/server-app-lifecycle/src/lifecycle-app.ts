@@ -22,6 +22,7 @@ import {
   ChannelMessageCreatedEvent,
   MessageType,
   ChannelGuid,
+  RootApiException,
 } from "@rootsdk/server-app"; // For bots: import from "@rootsdk/server-bot"
 
 // Module-level reference to the start state captured during onStarting.
@@ -108,7 +109,7 @@ async function onLifecycleAppCommand(evt: ChannelMessageCreatedEvent): Promise<v
     return;
   }
 
-  const state = capturedState;
+  const state: RootAppStartState = capturedState;
 
   // 1. Channel ID — the app-only field
   lines.push(`\u2713 channelId: ${state.channelId}`);
@@ -117,7 +118,7 @@ async function onLifecycleAppCommand(evt: ChannelMessageCreatedEvent): Promise<v
   lines.push(`\u2713 communityId: ${state.communityId}`);
 
   // 3. Roles
-  const roleNames = [...state.communityRoles.values()].map((r) => r.name);
+  const roleNames: string[] = [...state.communityRoles.values()].map((r) => r.name);
   lines.push(
     `\u2713 communityRoles: ${state.communityRoles.size} role(s)` +
     (roleNames.length > 0 ? ` \u2014 ${roleNames.join(", ")}` : ""),
@@ -131,5 +132,13 @@ async function onLifecycleAppCommand(evt: ChannelMessageCreatedEvent): Promise<v
     `\u2713 globalSettings: ${state.globalSettings ? "available" : "not configured"}`,
   );
 
-  await messages.create({ channelId, content: lines.join("\n") });
+  try {
+    await messages.create({ channelId, content: lines.join("\n") });
+  } catch (err: unknown) {
+    if (err instanceof RootApiException) {
+      console.error("Lifecycle app command error:", err.errorCode);
+    } else if (err instanceof Error) {
+      console.error("Lifecycle app command error:", err.message);
+    }
+  }
 }

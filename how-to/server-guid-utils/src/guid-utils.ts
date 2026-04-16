@@ -30,11 +30,13 @@ import {
   RootGuidType,
   WellKnownRootGuids,
   UserGuid,
+  CommunityRole,
   CommunityRoleGuid,
   ChannelGuid,
   ChannelMessageEvent,
   ChannelMessageCreatedEvent,
   MessageType,
+  RootApiException,
 } from "@rootsdk/server-bot"; // For apps: import from "@rootsdk/server-app"
 
 // --- SUBSCRIBE ---------------------------------------------------------------
@@ -95,10 +97,12 @@ export function toUuidString(guid: string): string {
 }
 
 // SDK bug: parse() returns a base64 GUID string at runtime, but the .d.ts
-// declares the return type as RootGuidType (numeric enum). Cast required until
-// the SDK fixes the return type to RootGuid.
+// declares the return type as RootGuidType (numeric enum). Runtime guard
+// required until the SDK fixes the return type to RootGuid.
 export function fromUuidString(uuid: string): string {
-  return RootGuidConverter.parse(uuid) as unknown as string;
+  const result: unknown = RootGuidConverter.parse(uuid);
+  if (typeof result !== "string") throw new Error("Unexpected parse() return type");
+  return result;
 }
 
 // --- WELL-KNOWN GUIDS --------------------------------------------------------
@@ -167,12 +171,12 @@ async function onGuidUtilsCommand(
     lines.push(`\u2713 toUuidString: ${uuidStr}`);
 
     const roundTripped = fromUuidString(uuidStr);
-    const matches = roundTripped === (evt.userId as string);
+    const matches = (roundTripped as UserGuid) === evt.userId;
     lines.push(`\u2713 parse (round-trip): matches=${matches}`);
 
     // --- WellKnownRootGuids: identify the @everyone role ---
-    const roles = await rootServer.community.communityRoles.list();
-    const everyoneRole = roles.find((r) => isEveryoneRole(r.id));
+    const roles: CommunityRole[] = await rootServer.community.communityRoles.list();
+    const everyoneRole: CommunityRole | undefined = roles.find((r) => isEveryoneRole(r.id));
     lines.push(
       `\u2713 @everyone role: ${everyoneRole ? everyoneRole.name : "not found"} ` +
       `(${WellKnownRootGuids.CommunityRoles.EveryoneRole})`,
@@ -188,10 +192,13 @@ async function onGuidUtilsCommand(
 
     await messages.create({ channelId, content: lines.join("\n") });
   } catch (err: unknown) {
-    console.error("GUID utils demo error:", err);
-    await messages.create({
-      channelId,
-      content: `GUID utils demo error: ${err}`,
-    });
+    const parts: string[] = [];
+    if (err instanceof RootApiException) {
+      parts.push(`GUID utils demo error: ${err.errorCode}`);
+      if (err.payload) parts.push(`payload: ${JSON.stringify(err.payload)}`);
+    } else if (err instanceof Error) {
+      parts.push(`GUID utils demo error: ${err.message}`);
+    }
+    await messages.create({ channelId, content: parts.join("\n") });
   }
 }

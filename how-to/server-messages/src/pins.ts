@@ -21,6 +21,7 @@ import {
   ChannelMessagePinCreateRequest,
   ChannelMessagePinDeleteRequest,
   ChannelMessagePinListRequest,
+  ChannelMessagePinListResponse,
 } from "@rootsdk/server-bot"; // For apps: import from "@rootsdk/server-app"
 
 // --- SUBSCRIBE ---------------------------------------------------------------
@@ -64,7 +65,7 @@ async function listPins(
   channelId: ChannelGuid,
 ): Promise<void> {
   const request: ChannelMessagePinListRequest = { channelId };
-  const result = await rootServer.community.channelMessages.pinList(request);
+  const result: ChannelMessagePinListResponse = await rootServer.community.channelMessages.pinList(request);
 
   // result.messages — array of pinned ChannelMessage objects
   // result.oldCount — number of older pinned messages

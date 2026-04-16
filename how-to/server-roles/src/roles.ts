@@ -35,6 +35,7 @@ import {
   ChannelMessageCreatedEvent,
   MessageType,
   ChannelGuid,
+  RootApiException,
 } from "@rootsdk/server-bot"; // For apps: import from "@rootsdk/server-app"
 
 // --- SUBSCRIBE ---------------------------------------------------------------
@@ -190,8 +191,14 @@ async function onRolesCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
 
     await messages.create({ channelId, content: lines.join("\n") });
   } catch (err: unknown) {
-    console.error("Roles demo error:", err);
-    await messages.create({ channelId, content: `Roles demo error: ${err}` });
+    const parts: string[] = [];
+    if (err instanceof RootApiException) {
+      parts.push(`Roles demo error: ${err.errorCode}`);
+      if (err.payload) parts.push(`payload: ${JSON.stringify(err.payload)}`);
+    } else if (err instanceof Error) {
+      parts.push(`Roles demo error: ${err.message}`);
+    }
+    await messages.create({ channelId, content: parts.join("\n") });
   }
 }
 

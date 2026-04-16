@@ -22,6 +22,7 @@ import {
   ChannelMessageCreatedEvent,
   ChannelGuid,
   MessageType,
+  RootApiException,
 } from "@rootsdk/server-bot"; // For apps: import from "@rootsdk/server-app"
 
 import sqlite3 from "sqlite3";
@@ -46,7 +47,9 @@ export function getDatabaseConfig(): RootDatabaseConfig {
 // The platform backs up and restores this file. Use this path — if you create
 // a separate database file, it won't be included in backups.
 export function getDatabasePath(): string {
-  return rootServer.dataStore.config.sqlite3!.filename;
+  const sqlite3Config = rootServer.dataStore.config.sqlite3;
+  if (!sqlite3Config) throw new Error("SQLite config not available — check databaseType");
+  return sqlite3Config.filename;
 }
 
 // Open a SQLite connection using the platform-provided path.
@@ -95,8 +98,14 @@ async function onDbCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
 
     await messages.create({ channelId, content: lines.join("\n") });
   } catch (err: unknown) {
-    console.error("DB demo error:", err);
-    await messages.create({ channelId, content: `DB demo error: ${err}` });
+    const parts: string[] = [];
+    if (err instanceof RootApiException) {
+      parts.push(`DB demo error: ${err.errorCode}`);
+      if (err.payload) parts.push(`payload: ${JSON.stringify(err.payload)}`);
+    } else if (err instanceof Error) {
+      parts.push(`DB demo error: ${err.message}`);
+    }
+    await messages.create({ channelId, content: parts.join("\n") });
   }
 }
 

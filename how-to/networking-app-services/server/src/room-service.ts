@@ -47,7 +47,7 @@ export class RoomService extends RoomServiceBase {
     request: RoomJoinRequest,
     client: Client,
   ): Promise<RoomJoinResponse> {
-    const members = roomTracker.join(request.roomId, client);
+    const members: Client[] = roomTracker.join(request.roomId, client);
 
     // Client[] audience: sends the event ONLY to the listed clients.
     // This is the key difference from "all" — only room members receive
@@ -67,7 +67,7 @@ export class RoomService extends RoomServiceBase {
     request: RoomLeaveRequest,
     client: Client,
   ): Promise<RoomLeaveResponse> {
-    const remaining = roomTracker.leave(request.roomId, client);
+    const remaining: Client[] = roomTracker.leave(request.roomId, client);
 
     // No `except` parameter needed here — the leaving client was already
     // removed from the members array by roomTracker.leave(). Passing
@@ -95,7 +95,7 @@ export class RoomService extends RoomServiceBase {
       );
     }
 
-    const members = roomTracker.getMembers(request.roomId);
+    const members: Client[] = roomTracker.getMembers(request.roomId);
 
     // Broadcast to all room members except the sender.
     const event: RoomMessageEvent = {

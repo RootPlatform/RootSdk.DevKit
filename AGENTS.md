@@ -36,6 +36,7 @@ When your task requires one of these, go to the linked module — don't invent a
 | Persist data between restarts | `how-to/server-database` (SQLite) or `how-to/server-key-value-store` | Don't use the filesystem or in-memory state for data that must survive restarts. |
 | Run code on a schedule or delay | `how-to/server-jobs` | Don't use `setTimeout`/`setInterval` — jobs survive restarts, timers don't. |
 | Identify what type of entity a GUID represents | `how-to/server-guid-utils` | Distinguishes users from bots/apps, extracts timestamps — no API call needed. |
+| Retry after rate limits or transient errors | `how-to/server-resilience` | Wrap any SDK call in `withRetry()`. Retries TooManyRequests, ServerError, Timeout with exponential backoff + jitter. |
 | Set permissions for SDK calls | `schemas/permissions-map.json` | Maps every SDK method to its required `root-manifest.json` permission. |
 
 ## Sample Apps
@@ -107,6 +108,7 @@ Focused samples in `how-to/`, one per SDK domain. Each is a standalone bot with 
 | `server-app-assets` | Server assets | convert upload tokens to permanent file refs |
 | `server-global-settings` | Global settings | read manifest-declared settings |
 | `server-guid-utils` | GUID utilities | parse, create, validate Root GUIDs |
+| `server-resilience` | Retry & backoff | withRetry() wrapper, retryable error classification, batch pacing |
 
 ### Developer Tools
 

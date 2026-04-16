@@ -14,7 +14,7 @@
 //
 // ============================================================================
 
-import { Client } from "@rootsdk/server-app";
+import { Client, UserGuid } from "@rootsdk/server-app";
 
 export class RoomTracker {
   // roomId → array of Client objects currently in that room.
@@ -69,7 +69,7 @@ export class RoomTracker {
 
   // Membership check — used by RoomService.send() to verify the caller is
   // in the room before broadcasting.
-  isInRoom(roomId: string, userId: string): boolean {
+  isInRoom(roomId: string, userId: UserGuid): boolean {
     const members = this.rooms.get(roomId);
     return members ? members.some((m) => m.userId === userId) : false;
   }

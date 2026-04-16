@@ -45,6 +45,8 @@ import {
   ChannelMessageCreatedEvent,
   MessageType,
   ChannelGuid,
+  ChannelListRequest,
+  RootApiException,
 } from "@rootsdk/server-bot"; // For apps: import from "@rootsdk/server-app"
 
 // --- SUBSCRIBE ---------------------------------------------------------------
@@ -202,7 +204,8 @@ async function onAccessRulesCommand(evt: ChannelMessageCreatedEvent): Promise<vo
     }
     let group: ChannelGroup = groups[0];
     for (const candidateGroup of groups) {
-      const groupChannels: Channel[] = await rootServer.community.channels.list({ channelGroupId: candidateGroup.id });
+      const listRequest: ChannelListRequest = { channelGroupId: candidateGroup.id };
+      const groupChannels: Channel[] = await rootServer.community.channels.list(listRequest);
       if (groupChannels.some((channel) => channel.id === channelId)) {
         group = candidateGroup;
         break;
@@ -244,7 +247,13 @@ async function onAccessRulesCommand(evt: ChannelMessageCreatedEvent): Promise<vo
 
     await messages.create({ channelId, content: lines.join("\n") });
   } catch (err: unknown) {
-    console.error("Access rules demo error:", err);
-    await messages.create({ channelId, content: `Access rules demo error: ${err}` });
+    const parts: string[] = [];
+    if (err instanceof RootApiException) {
+      parts.push(`Access rules demo error: ${err.errorCode}`);
+      if (err.payload) parts.push(`payload: ${JSON.stringify(err.payload)}`);
+    } else if (err instanceof Error) {
+      parts.push(`Access rules demo error: ${err.message}`);
+    }
+    await messages.create({ channelId, content: parts.join("\n") });
   }
 }

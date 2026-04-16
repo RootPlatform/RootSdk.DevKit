@@ -23,6 +23,7 @@ import {
   ChannelMessageEvent,
   ChannelMessageCreatedEvent,
   MessageType,
+  RootApiException,
 } from "@rootsdk/server-bot"; // For apps: import from "@rootsdk/server-app"
 
 // Module-level reference to the start state captured during onStarting.
@@ -102,13 +103,13 @@ async function onLifecycleCommand(evt: ChannelMessageCreatedEvent): Promise<void
     return;
   }
 
-  const state = capturedState;
+  const state: RootBotStartState = capturedState;
 
   // 1. Community ID
   lines.push(`\u2713 communityId: ${state.communityId}`);
 
   // 2. Roles
-  const roleNames = [...state.communityRoles.values()].map((r) => r.name);
+  const roleNames: string[] = [...state.communityRoles.values()].map((r) => r.name);
   lines.push(
     `\u2713 communityRoles: ${state.communityRoles.size} role(s)` +
     (roleNames.length > 0 ? ` — ${roleNames.join(", ")}` : ""),
@@ -125,5 +126,13 @@ async function onLifecycleCommand(evt: ChannelMessageCreatedEvent): Promise<void
   // 5. Stopping callback
   lines.push("\u2713 stoppingCallback: registered");
 
-  await messages.create({ channelId, content: lines.join("\n") });
+  try {
+    await messages.create({ channelId, content: lines.join("\n") });
+  } catch (err: unknown) {
+    if (err instanceof RootApiException) {
+      console.error("Lifecycle command error:", err.errorCode);
+    } else if (err instanceof Error) {
+      console.error("Lifecycle command error:", err.message);
+    }
+  }
 }
