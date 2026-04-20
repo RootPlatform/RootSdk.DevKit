@@ -43,7 +43,6 @@ import {
   ChannelFileCreateRequest,
   ChannelGuid,
   DirectoryGuid,
-  FileGuid,
   rootServer,
 } from "@rootsdk/server-bot";
 
@@ -98,7 +97,6 @@ A promise that resolves when the deletion completes.
 
 ```ts
 import {
-  ChannelFile,
   ChannelFileDeleteRequest,
   ChannelGuid,
   DirectoryGuid,
@@ -154,7 +152,6 @@ A promise that resolves to a `ChannelFileEditResponse` containing the updated fi
 
 ```ts
 import {
-  ChannelFile,
   ChannelFileEditRequest,
   ChannelFileEditResponse,
   ChannelGuid,
@@ -331,7 +328,6 @@ A promise that resolves to a `ChannelFileMoveResponse` containing the move resul
 
 ```ts
 import {
-  ChannelFile,
   ChannelFileMoveRequest,
   ChannelFileMoveResponse,
   ChannelGuid,
@@ -396,7 +392,6 @@ import {
   ChannelFile,
   ChannelFileSearchRequest,
   ChannelGuid,
-  DirectoryGuid,
   rootServer,
 } from "@rootsdk/server-bot";
 
@@ -450,11 +445,9 @@ A promise that resolves to a `ChannelFileSearchCommunityResponse` containing res
 
 ```ts
 import {
-  ChannelFile,
   ChannelFileSearchCommunityRequest,
   ChannelFileSearchCommunityResponse,
   ChannelGuid,
-  DirectoryGuid,
   rootServer,
 } from "@rootsdk/server-bot";
 

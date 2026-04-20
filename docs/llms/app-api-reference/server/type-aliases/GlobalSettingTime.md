@@ -9,7 +9,6 @@ summary: The value of a `time` setting: `{ hours: number, minutes: number, secon
 
 The value of a `time` setting: `{ hours: number, minutes: number, seconds: number }`. Returns the time-of-day selected by the community admin.
 
-> **Note:** This setting type is not yet available on the platform.
 ## Properties
 
 ### hours

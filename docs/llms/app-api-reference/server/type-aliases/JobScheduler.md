@@ -89,9 +89,6 @@ A promise that resolves when the job is deleted. It's not considered an error if
 
 ```ts
 import {
-  JobCreateRequest,
-  JobInterval,
-  JobRecord,
   rootServer,
 } from "@rootsdk/server-app";
 
@@ -200,8 +197,6 @@ A promise that resolves when the job is updated. It's not considered an error if
 
 ```ts
 import {
-  JobCreateRequest,
-  JobInterval,
   JobRecord,
   rootServer,
 } from "@rootsdk/server-app";
@@ -239,8 +234,6 @@ A promise that resolves with the job record if found, otherwise `undefined`.
 
 ```ts
 import {
-  JobCreateRequest,
-  JobInterval,
   JobRecord,
   rootServer,
 } from "@rootsdk/server-app";

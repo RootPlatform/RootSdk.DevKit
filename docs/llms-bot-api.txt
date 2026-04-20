@@ -1,7 +1,7 @@
 # Root Bot Developer Documentation — API Reference
 
 > TypeScript API reference for the Root Bot SDK. For conceptual guides, see llms-bot-guides.txt.
-> Generated: 2026-04-10 | Content-Hash: 3bf687a4ac55
+> Generated: 2026-04-20 | Content-Hash: cc495d347f9d
 
 ## Instructions
 
@@ -12,7 +12,7 @@
 - All async methods return Promises. Use async/await.
 - Bots are server-only — same community API as apps, but no client UI.
 
-> **Size:** ~152K tokens
+> **Size:** ~151K tokens
 
 ## Table of Contents
 
@@ -331,7 +331,7 @@
 
 - [MemberGroupEvent](#file-bot-api-reference-enumerations-membergroupevent) - Enumeration (Member Groups).
 - [MemberGroup](#file-bot-api-reference-type-aliases-membergroup) - A named collection of individual users and community roles combined into a single audience.
-- [MemberGroupClient](#file-bot-api-reference-type-aliases-membergroupclient) - Service with methods: create, delete, get, getByName, ... (Member Groups).
+- [MemberGroupClient](#file-bot-api-reference-type-aliases-membergroupclient) - Type alias for `MemberGroupClientBase` (Member Groups).
 - [MemberGroupEmptiedEvent](#file-bot-api-reference-type-aliases-membergroupemptiedevent) - Payload for the `MemberGroupServiceEvent.UserGroupEmptied` event, emitted when a member group's resolved membership becomes empty.
 - [MemberGroupEvents](#file-bot-api-reference-type-aliases-membergroupevents) - Object type with properties: members, members, state, userGroup (Member Groups).
 - [MemberGroupMembersAddedEvent](#file-bot-api-reference-type-aliases-membergroupmembersaddedevent) - Payload for the `MemberGroupServiceEvent.MembersAdded` event, emitted when users are added to a member group.
@@ -492,9 +492,9 @@ Parses a GUID string and returns its `RootGuidType`.
 
 #### Type Parameters
 
-| Type Parameter |
-| ------ |
-| `T` *extends* [`RootGuidType`](#file-bot-api-reference-enumerations-rootguidtype) |
+| Type Parameter | Default type |
+| ------ | ------ |
+| `T` *extends* [`RootGuid`](#file-bot-api-reference-type-aliases-rootguid) | [`RootGuid`](#file-bot-api-reference-type-aliases-rootguid) |
 
 #### Parameters
 
@@ -3486,10 +3486,6 @@ import {
   ChannelOrChannelGroupGuid,
   RoleOrMemberGuid,
   AccessRuleBulkCreateEditDeleteRequest,
-  AccessRuleCreateRequest,
-  AccessRuleEditRequest,
-  AccessRuleDeleteRequest,
-  ChannelOverlayPermission,
   rootServer,
 } from "@rootsdk/server-bot";
 
@@ -3580,7 +3576,6 @@ import {
   ChannelOrChannelGroupGuid,
   RoleOrMemberGuid,
   AccessRuleCreateRequest,
-  ChannelOverlayPermission,
   rootServer,
 } from "@rootsdk/server-bot";
 
@@ -3725,7 +3720,6 @@ import {
   ChannelOrChannelGroupGuid,
   RoleOrMemberGuid,
   AccessRuleEditRequest,
-  ChannelOverlayPermission,
   rootServer,
 } from "@rootsdk/server-bot";
 
@@ -4769,11 +4763,9 @@ A promise that resolves when the delete operation completes.
 
 ```ts
 import {
-  Channel,
   ChannelDeleteRequest,
   ChannelGuid,
   ChannelGroupGuid,
-  ChannelType,
   rootServer,
 } from "@rootsdk/server-bot";
 
@@ -4829,7 +4821,6 @@ import {
   Channel,
   ChannelEditRequest,
   ChannelGuid,
-  ChannelGroupGuid,
   rootServer,
 } from "@rootsdk/server-bot";
 
@@ -4883,7 +4874,6 @@ import {
   Channel,
   ChannelGetRequest,
   ChannelGuid,
-  ChannelGroupGuid,
   rootServer,
 } from "@rootsdk/server-bot";
 
@@ -4933,7 +4923,6 @@ A promise that resolves to an array of `Channel` objects, sorted by their positi
 import {
   Channel,
   ChannelGroupGuid,
-  ChannelGuid,
   ChannelListRequest,
   rootServer,
 } from "@rootsdk/server-bot";
@@ -4988,7 +4977,6 @@ A promise that resolves when the move operation completes.
 
 ```ts
 import {
-  Channel,
   ChannelMoveRequest,
   ChannelGuid,
   ChannelGroupGuid,
@@ -5356,7 +5344,6 @@ A promise that resolves when the deletion completes.
 
 ```ts
 import {
-  ChannelDirectory,
   ChannelDirectoryDeleteRequest,
   ChannelGuid,
   DirectoryGuid,
@@ -6399,7 +6386,6 @@ import {
   ChannelFileCreateRequest,
   ChannelGuid,
   DirectoryGuid,
-  FileGuid,
   rootServer,
 } from "@rootsdk/server-bot";
 
@@ -6454,7 +6440,6 @@ A promise that resolves when the deletion completes.
 
 ```ts
 import {
-  ChannelFile,
   ChannelFileDeleteRequest,
   ChannelGuid,
   DirectoryGuid,
@@ -6510,7 +6495,6 @@ A promise that resolves to a `ChannelFileEditResponse` containing the updated fi
 
 ```ts
 import {
-  ChannelFile,
   ChannelFileEditRequest,
   ChannelFileEditResponse,
   ChannelGuid,
@@ -6687,7 +6671,6 @@ A promise that resolves to a `ChannelFileMoveResponse` containing the move resul
 
 ```ts
 import {
-  ChannelFile,
   ChannelFileMoveRequest,
   ChannelFileMoveResponse,
   ChannelGuid,
@@ -6752,7 +6735,6 @@ import {
   ChannelFile,
   ChannelFileSearchRequest,
   ChannelGuid,
-  DirectoryGuid,
   rootServer,
 } from "@rootsdk/server-bot";
 
@@ -6806,11 +6788,9 @@ A promise that resolves to a `ChannelFileSearchCommunityResponse` containing res
 
 ```ts
 import {
-  ChannelFile,
   ChannelFileSearchCommunityRequest,
   ChannelFileSearchCommunityResponse,
   ChannelGuid,
-  DirectoryGuid,
   rootServer,
 } from "@rootsdk/server-bot";
 
@@ -7646,7 +7626,6 @@ A promise that resolves when the edit completes.
 
 ```ts
 import {
-  ChannelGroup,
   ChannelGroupEditRequest,
   ChannelGroupGuid,
   rootServer,
@@ -7745,7 +7724,6 @@ A promise that resolves to an array of `ChannelGroup` objects.
 
 ```ts
 import {
-  ChannelListRequest,
   ChannelGroup,
   rootServer,
 } from "@rootsdk/server-bot";
@@ -7790,7 +7768,6 @@ A promise that resolves when the move completes.
 
 ```ts
 import {
-  ChannelGroup,
   ChannelGroupMoveRequest,
   ChannelGroupGuid,
   rootServer,
@@ -8441,7 +8418,6 @@ A promise that resolves when the delete operation completes.
 ```ts
 import {
   ChannelGuid,
-  ChannelMessage,
   ChannelMessageDeleteRequest,
   MessageGuid,
   rootServer,
@@ -8666,7 +8642,6 @@ import {
   ChannelGuid,
   ChannelMessageListRequest,
   MessageDirectionTake,
-  MessageGuid,
   rootServer,
 } from "@rootsdk/server-bot";
 
@@ -8826,7 +8801,6 @@ import {
   ChannelGuid,
   ChannelMessagePinListRequest,
   ChannelMessagePinListResponse,
-  MessageGuid,
   rootServer,
 } from "@rootsdk/server-bot";
 
@@ -8936,7 +8910,6 @@ A promise that resolves when the reaction is removed.
 import {
   ChannelGuid,
   ChannelMessageReactionDeleteRequest,
-  ChannelMessageReaction,
   MessageGuid,
   rootServer,
 } from "@rootsdk/server-bot";
@@ -9068,7 +9041,6 @@ A promise that resolves when the view time is updated.
 import {
   ChannelGuid,
   ChannelMessageSetViewTimeRequest,
-  MessageGuid,
   rootServer,
 } from "@rootsdk/server-bot";
 
@@ -10699,24 +10671,21 @@ A promise that resolves when the kick completes.
 
 ```ts
 import {
-  ChannelWebRtcMuteAndDeafenRequest,
+  ChannelWebRtcKickRequest,
   ChannelGuid,
   UserGuid,
-  DeviceGuid,
   rootServer,
 } from "@rootsdk/server-bot";
 
 export async function kickExample(
   channelId: ChannelGuid,
-  userId: UserGuid,
-  deviceId?: DeviceGuid,
+  userId?: UserGuid,
 ): Promise<void> {
   try {
     // Set up the request
     const request: ChannelWebRtcKickRequest = {
       channelId: channelId,
       userId: userId,
-      deviceId: deviceId,
     };
 
     // Call the API
@@ -11523,7 +11492,6 @@ import {
   CommunityAppLogType,
   CommunityAppLogCreateRequest,
   CommunityAppLogCreateResponse,
-  UnknownGuid,
   rootServer,
 } from "@rootsdk/server-bot";
 
@@ -12500,7 +12468,6 @@ A promise that resolves when the ban is deleted.
 
 ```ts
 import {
-  CommunityMemberBan,
   CommunityMemberBanDeleteRequest,
   UserGuid,
   rootServer,
@@ -12601,7 +12568,6 @@ A promise that resolves when the member is kicked.
 
 ```ts
 import {
-  CommunityMemberBan,
   CommunityMemberBanKickRequest,
   UserGuid,
   rootServer,
@@ -13315,7 +13281,6 @@ A promise that resolves when the invitation has been deleted.
 
 ```ts
 import {
-  CommunityMemberInvite,
   CommunityMemberInviteDeleteRequest,
   UserGuid,
   rootServer,
@@ -13619,7 +13584,6 @@ A promise that resolves to a `CommunityMemberRoleListResponse` containing the me
 
 ```ts
 import {
-  CommunityMember,
   CommunityMemberRoleListRequest,
   CommunityMemberRoleListResponse,
   UserGuid,
@@ -13724,7 +13688,6 @@ A promise that resolves when the primary role has been set.
 
 ```ts
 import {
-  CommunityMember,
   CommunityMemberRoleSetPrimaryRequest,
   CommunityRoleGuid,
   UserGuid,
@@ -14246,9 +14209,6 @@ A promise that resolves to the created `CommunityRole` object.
 import {
   CommunityRole,
   CommunityRoleCreateRequest,
-  CommunityRoleGuid,
-  CommunityPermission,
-  ChannelPermission,
   rootServer,
 } from "@rootsdk/server-bot";
 
@@ -14338,7 +14298,6 @@ A promise that resolves when the delete operation completes.
 
 ```ts
 import {
-  CommunityRole,
   CommunityRoleDeleteRequest,
   CommunityRoleGuid,
   rootServer,
@@ -14391,8 +14350,6 @@ import {
   CommunityRole,
   CommunityRoleEditRequest,
   CommunityRoleGuid,
-  CommunityPermission,
-  ChannelPermission,
   rootServer,
 } from "@rootsdk/server-bot";
 
@@ -14535,7 +14492,6 @@ To identify the `@everyone` role, compare against `WellKnownRootGuids.CommunityR
 ```ts
 import {
   CommunityRole,
-  CommunityRoleGuid,
   rootServer,
 } from "@rootsdk/server-bot";
 
@@ -15143,8 +15099,6 @@ The full key identifying which button was pressed, in the format `groupKey.itemK
 
 The value of a `channel` setting: `ChannelGuid[]`. Returns an array of channel IDs selected by the community admin.
 
-> **Note:** This setting type is not yet available on the platform.
-
 ---
 
 ## File: bot-api-reference/type-aliases/GlobalSettingChannelGroup.md
@@ -15152,8 +15106,6 @@ The value of a `channel` setting: `ChannelGuid[]`. Returns an array of channel I
 > **GlobalSettingChannelGroup** = [`ChannelGroupGuid`](#file-bot-api-reference-type-aliases-channelgroupguid)[]
 
 The value of a `channelGroup` setting: `ChannelGroupGuid[]`. Returns an array of channel group IDs selected by the community admin.
-
-> **Note:** This setting type is not yet available on the platform.
 
 ---
 
@@ -15163,8 +15115,6 @@ The value of a `channelGroup` setting: `ChannelGroupGuid[]`. Returns an array of
 
 The value of a `checkbox` setting: `boolean`. Returns `true` or `false` based on the community admin's selection.
 
-> **Note:** This setting type is not yet available on the platform.
-
 ---
 
 ## File: bot-api-reference/type-aliases/GlobalSettingColor.md
@@ -15172,8 +15122,6 @@ The value of a `checkbox` setting: `boolean`. Returns `true` or `false` based on
 > **GlobalSettingColor** = `string` | `undefined`
 
 The value of a `color` setting: `string | undefined`. Returns the hex color code selected by the community admin (e.g., `#ff0000`), or `undefined` if no value has been set.
-
-> **Note:** This setting type is not yet available on the platform.
 
 ---
 
@@ -15183,7 +15131,6 @@ The value of a `color` setting: `string | undefined`. Returns the hex color code
 
 The value of a `date` setting: `{ year: number, month: number, day: number }`. Returns the date selected by the community admin.
 
-> **Note:** This setting type is not yet available on the platform.
 ## Properties
 
 ### day
@@ -15205,8 +15152,6 @@ The value of a `date` setting: `{ year: number, month: number, day: number }`. R
 > **GlobalSettingNumber** = `number` | `undefined`
 
 The value of a `number` setting: `number | undefined`. Returns the numeric value entered by the community admin, or `undefined` if no value has been set.
-
-> **Note:** This setting type is not yet available on the platform.
 
 ---
 
@@ -15243,8 +15188,6 @@ For event name constants, see `GlobalSettingsEvents`.
 > **GlobalSettingSelect** = `string`[]
 
 The value of a `select` setting: `string[]`. Returns an array of selected option values from the dropdown defined in the manifest.
-
-> **Note:** This setting type is not yet available on the platform.
 
 ---
 
@@ -15324,8 +15267,6 @@ The `GlobalSettings` state before the change. Use this to compare old and new va
 
 The value of a `text` setting: `string | undefined`. Returns the text entered by the community admin, or `undefined` if no value has been set.
 
-> **Note:** This setting type is not yet available on the platform.
-
 ---
 
 ## File: bot-api-reference/type-aliases/GlobalSettingTime.md
@@ -15334,7 +15275,6 @@ The value of a `text` setting: `string | undefined`. Returns the text entered by
 
 The value of a `time` setting: `{ hours: number, minutes: number, seconds: number }`. Returns the time-of-day selected by the community admin.
 
-> **Note:** This setting type is not yet available on the platform.
 ## Properties
 
 ### hours
@@ -15356,8 +15296,6 @@ The value of a `time` setting: `{ hours: number, minutes: number, seconds: numbe
 > **GlobalSettingTimestamp** = `Date` | `undefined`
 
 The value of a `timestamp` setting: `Date | undefined`. Returns a JavaScript `Date` object representing the timestamp selected by the community admin, or `undefined` if no value has been set.
-
-> **Note:** This setting type is not yet available on the platform.
 
 ---
 
@@ -15605,9 +15543,6 @@ A promise that resolves when the job is deleted. It's not considered an error if
 
 ```ts
 import {
-  JobCreateRequest,
-  JobInterval,
-  JobRecord,
   rootServer,
 } from "@rootsdk/server-bot";
 
@@ -15716,8 +15651,6 @@ A promise that resolves when the job is updated. It's not considered an error if
 
 ```ts
 import {
-  JobCreateRequest,
-  JobInterval,
   JobRecord,
   rootServer,
 } from "@rootsdk/server-bot";
@@ -15755,8 +15688,6 @@ A promise that resolves with the job record if found, otherwise `undefined`.
 
 ```ts
 import {
-  JobCreateRequest,
-  JobInterval,
   JobRecord,
   rootServer,
 } from "@rootsdk/server-bot";
@@ -16189,7 +16120,7 @@ This read-write type extends `ReadOnlyMemberGroup` with methods for modifying th
 
 ### addCommunityRole()
 
-> **addCommunityRole**(`communityRoleId`: `string`): `Promise`<`void`>
+> **addCommunityRole**(`communityRoleId`: [`CommunityRoleGuid`](#file-bot-api-reference-type-aliases-communityroleguid)): `Promise`<`void`>
 
 Adds a community role to this group. Users with this role will be included in the resolved membership.
 
@@ -16197,7 +16128,7 @@ Adds a community role to this group. Users with this role will be included in th
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `communityRoleId` | `string` | The ID of the community role to add. |
+| `communityRoleId` | [`CommunityRoleGuid`](#file-bot-api-reference-type-aliases-communityroleguid) | The ID of the community role to add. |
 
 #### Returns
 
@@ -16209,7 +16140,7 @@ Adds a community role to this group. Users with this role will be included in th
 
 ### addCommunityRoles()
 
-> **addCommunityRoles**(`communityRoleIds`: `string`[]): `Promise`<`void`>
+> **addCommunityRoles**(`communityRoleIds`: [`CommunityRoleGuid`](#file-bot-api-reference-type-aliases-communityroleguid)[]): `Promise`<`void`>
 
 Adds multiple community roles to this group.
 
@@ -16217,7 +16148,7 @@ Adds multiple community roles to this group.
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `communityRoleIds` | `string`[] | An array of community role IDs to add. |
+| `communityRoleIds` | [`CommunityRoleGuid`](#file-bot-api-reference-type-aliases-communityroleguid)[] | An array of community role IDs to add. |
 
 #### Returns
 
@@ -16229,7 +16160,7 @@ Adds multiple community roles to this group.
 
 ### addUser()
 
-> **addUser**(`userId`: `string`): `Promise`<`void`>
+> **addUser**(`userId`: [`UserGuid`](#file-bot-api-reference-type-aliases-userguid)): `Promise`<`void`>
 
 Adds a single user directly to this group.
 
@@ -16237,7 +16168,7 @@ Adds a single user directly to this group.
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `userId` | `string` | The ID of the user to add. |
+| `userId` | [`UserGuid`](#file-bot-api-reference-type-aliases-userguid) | The ID of the user to add. |
 
 #### Returns
 
@@ -16249,7 +16180,7 @@ Adds a single user directly to this group.
 
 ### addUsers()
 
-> **addUsers**(`userIds`: `string`[]): `Promise`<`void`>
+> **addUsers**(`userIds`: [`UserGuid`](#file-bot-api-reference-type-aliases-userguid)[]): `Promise`<`void`>
 
 Adds multiple users directly to this group.
 
@@ -16257,7 +16188,7 @@ Adds multiple users directly to this group.
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `userIds` | `string`[] | An array of user IDs to add. |
+| `userIds` | [`UserGuid`](#file-bot-api-reference-type-aliases-userguid)[] | An array of user IDs to add. |
 
 #### Returns
 
@@ -16269,7 +16200,7 @@ Adds multiple users directly to this group.
 
 ### removeCommunityRole()
 
-> **removeCommunityRole**(`communityRoleId`: `string`): `Promise`<`void`>
+> **removeCommunityRole**(`communityRoleId`: [`CommunityRoleGuid`](#file-bot-api-reference-type-aliases-communityroleguid)): `Promise`<`void`>
 
 Removes a community role from this group. Users who only belonged through this role will no longer be resolved members. No effect if the role is not in this group.
 
@@ -16277,7 +16208,7 @@ Removes a community role from this group. Users who only belonged through this r
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `communityRoleId` | `string` | The ID of the community role to remove. |
+| `communityRoleId` | [`CommunityRoleGuid`](#file-bot-api-reference-type-aliases-communityroleguid) | The ID of the community role to remove. |
 
 #### Returns
 
@@ -16285,7 +16216,7 @@ Removes a community role from this group. Users who only belonged through this r
 
 ### removeCommunityRoles()
 
-> **removeCommunityRoles**(`communityRoleIds`: `string`[]): `Promise`<`void`>
+> **removeCommunityRoles**(`communityRoleIds`: [`CommunityRoleGuid`](#file-bot-api-reference-type-aliases-communityroleguid)[]): `Promise`<`void`>
 
 Removes multiple community roles from this group. Roles not in this group are silently ignored.
 
@@ -16293,7 +16224,7 @@ Removes multiple community roles from this group. Roles not in this group are si
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `communityRoleIds` | `string`[] | An array of community role IDs to remove. |
+| `communityRoleIds` | [`CommunityRoleGuid`](#file-bot-api-reference-type-aliases-communityroleguid)[] | An array of community role IDs to remove. |
 
 #### Returns
 
@@ -16301,7 +16232,7 @@ Removes multiple community roles from this group. Roles not in this group are si
 
 ### removeUser()
 
-> **removeUser**(`userId`: `string`): `Promise`<`void`>
+> **removeUser**(`userId`: [`UserGuid`](#file-bot-api-reference-type-aliases-userguid)): `Promise`<`void`>
 
 Removes a single user from this group's direct membership. No effect if the user is not a direct member.
 
@@ -16309,7 +16240,7 @@ Removes a single user from this group's direct membership. No effect if the user
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `userId` | `string` | The ID of the user to remove. |
+| `userId` | [`UserGuid`](#file-bot-api-reference-type-aliases-userguid) | The ID of the user to remove. |
 
 #### Returns
 
@@ -16317,7 +16248,7 @@ Removes a single user from this group's direct membership. No effect if the user
 
 ### removeUsers()
 
-> **removeUsers**(`userIds`: `string`[]): `Promise`<`void`>
+> **removeUsers**(`userIds`: [`UserGuid`](#file-bot-api-reference-type-aliases-userguid)[]): `Promise`<`void`>
 
 Removes multiple users from this group's direct membership. Users not in the group are silently ignored.
 
@@ -16325,7 +16256,7 @@ Removes multiple users from this group's direct membership. Users not in the gro
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `userIds` | `string`[] | An array of user IDs to remove. |
+| `userIds` | [`UserGuid`](#file-bot-api-reference-type-aliases-userguid)[] | An array of user IDs to remove. |
 
 #### Returns
 
@@ -16341,9 +16272,9 @@ Replaces the group's direct user list and community role list entirely.
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `data` | \{ `communityRoleIds`: `string`[]; `userIds`: `string`[]; \} | An object containing the new membership. |
-| `data.communityRoleIds` | `string`[] | The new array of community role IDs. |
-| `data.userIds` | `string`[] | The new array of direct user IDs. |
+| `data` | \{ `communityRoleIds`: [`CommunityRoleGuid`](#file-bot-api-reference-type-aliases-communityroleguid)[]; `userIds`: [`UserGuid`](#file-bot-api-reference-type-aliases-userguid)[]; \} | An object containing the new membership. |
+| `data.communityRoleIds` | [`CommunityRoleGuid`](#file-bot-api-reference-type-aliases-communityroleguid)[] | The new array of community role IDs. |
+| `data.userIds` | [`UserGuid`](#file-bot-api-reference-type-aliases-userguid)[] | The new array of direct user IDs. |
 
 #### Returns
 
@@ -16353,7 +16284,7 @@ Replaces the group's direct user list and community role list entirely.
 
 ## File: bot-api-reference/type-aliases/MemberGroupClient.md
 
-> **MemberGroupClient** = [`TypedEventEmitter`](#file-bot-api-reference-type-aliases-typedeventemitter)<[`MemberGroupEvents`](#file-bot-api-reference-type-aliases-membergroupevents)> & `object`
+> **MemberGroupClient** = `MemberGroupClientBase` & `object`
 
 ## Type Declaration
 
@@ -16365,41 +16296,12 @@ Replaces the group's direct user list and community role list entirely.
 
 | Parameter | Type |
 | ------ | ------ |
-| `data` | \{ `communityId?`: `string`; `communityRoleIds`: `string`[]; `name`: `string`; `resourceId`: `string`; `resourceType`: `string`; `userIds`: `string`[]; \} |
-| `data.communityId?` | `string` |
-| `data.communityRoleIds` | `string`[] |
+| `data` | \{ `communityRoleIds`: [`CommunityRoleGuid`](#file-bot-api-reference-type-aliases-communityroleguid)[]; `name`: `string`; `resourceId`: `string`; `resourceType`: `string`; `userIds`: [`UserGuid`](#file-bot-api-reference-type-aliases-userguid)[]; \} |
+| `data.communityRoleIds` | [`CommunityRoleGuid`](#file-bot-api-reference-type-aliases-communityroleguid)[] |
 | `data.name` | `string` |
 | `data.resourceId` | `string` |
 | `data.resourceType` | `string` |
-| `data.userIds` | `string`[] |
-
-#### Returns
-
-`Promise`<[`MemberGroup`](#file-bot-api-reference-type-aliases-membergroup)>
-
-### delete()
-
-> **delete**(`id`: `string`): `Promise`<`void`>
-
-#### Parameters
-
-| Parameter | Type |
-| ------ | ------ |
-| `id` | `string` |
-
-#### Returns
-
-`Promise`<`void`>
-
-### get()
-
-> **get**(`id`: `string`): `Promise`<[`MemberGroup`](#file-bot-api-reference-type-aliases-membergroup)>
-
-#### Parameters
-
-| Parameter | Type |
-| ------ | ------ |
-| `id` | `string` |
+| `data.userIds` | [`UserGuid`](#file-bot-api-reference-type-aliases-userguid)[] |
 
 #### Returns
 
@@ -16407,16 +16309,16 @@ Replaces the group's direct user list and community role list entirely.
 
 ### getByName()
 
-> **getByName**(`data`: `object`): `Promise`<[`MemberGroup`](#file-bot-api-reference-type-aliases-membergroup) | `undefined`>
+> **getByName**(`query`: `object`): `Promise`<[`MemberGroup`](#file-bot-api-reference-type-aliases-membergroup) | `undefined`>
 
 #### Parameters
 
 | Parameter | Type |
 | ------ | ------ |
-| `data` | \{ `name`: `string`; `resourceId`: `string`; `resourceType`: `string`; \} |
-| `data.name` | `string` |
-| `data.resourceId` | `string` |
-| `data.resourceType` | `string` |
+| `query` | \{ `name`: `string`; `resourceId`: `string`; `resourceType`: `string`; \} |
+| `query.name` | `string` |
+| `query.resourceId` | `string` |
+| `query.resourceType` | `string` |
 
 #### Returns
 
@@ -16430,23 +16332,9 @@ Replaces the group's direct user list and community role list entirely.
 
 `Promise`<[`MemberGroupShort`](#file-bot-api-reference-type-aliases-membergroupshort)[]>
 
-### listByIds()
-
-> **listByIds**(`ids`: `string`[]): `Promise`<[`MemberGroup`](#file-bot-api-reference-type-aliases-membergroup)[]>
-
-#### Parameters
-
-| Parameter | Type |
-| ------ | ------ |
-| `ids` | `string`[] |
-
-#### Returns
-
-`Promise`<[`MemberGroup`](#file-bot-api-reference-type-aliases-membergroup)[]>
-
 ### listByResourceId()
 
-> **listByResourceId**(`query`: `object`, `communityId?`: `string`): `Promise`<[`MemberGroup`](#file-bot-api-reference-type-aliases-membergroup)[]>
+> **listByResourceId**(`query`: `object`): `Promise`<[`MemberGroup`](#file-bot-api-reference-type-aliases-membergroup)[]>
 
 #### Parameters
 
@@ -16454,8 +16342,7 @@ Replaces the group's direct user list and community role list entirely.
 | ------ | ------ |
 | `query` | \{ `resourceId`: `string`; `resourceType`: `string`; \} |
 | `query.resourceId` | `string` |
-| `query.resourceType?` | `string` |
-| `communityId?` | `string` |
+| `query.resourceType` | `string` |
 
 #### Returns
 
@@ -16472,9 +16359,8 @@ Replaces the group's direct user list and community role list entirely.
 | `query` | \{ `name`: `string`; `resourceType`: `string`; \} |
 | `query.name` | `string` |
 | `query.resourceType` | `string` |
-| `user` | \{ `communityId?`: `string`; `userId`: `string`; \} |
-| `user.communityId?` | `string` |
-| `user.userId` | `string` |
+| `user` | \{ `userId`: [`UserGuid`](#file-bot-api-reference-type-aliases-userguid); \} |
+| `user.userId` | [`UserGuid`](#file-bot-api-reference-type-aliases-userguid) |
 
 #### Returns
 
@@ -16956,8 +16842,8 @@ See `MemberGroup` for property descriptions.
 
 | Parameter | Type |
 | ------ | ------ |
-| `user` | \{ `userId`: `string`; \} |
-| `user.userId` | `string` |
+| `user` | \{ `userId`: [`UserGuid`](#file-bot-api-reference-type-aliases-userguid); \} |
+| `user.userId` | [`UserGuid`](#file-bot-api-reference-type-aliases-userguid) |
 
 #### Returns
 

@@ -151,8 +151,7 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Settings",
       "description": "Configurable global settings. They're declared in your manifest and set by community members with the `Manage Apps` permission during and after installation.",
-      "x-doc-note": "This feature is a work in progress.",
-      "x-doc-details": "Settings are accessed at runtime via rootServer.globalSettings[groupKey][itemKey]. Each setting type determines the UI the admin sees and the SDK type your server receives. Only member, role, and roleAndMember types are currently functional on the platform.",
+      "x-doc-details": "Settings are accessed at runtime via rootServer.globalSettings[groupKey][itemKey]. Each setting type determines the UI the admin sees and the SDK type your server receives. The SDK supports every setting type listed below, but the Root desktop and mobile clients have not yet shipped admin UI for every type. Today, only member, role, and roleAndMember types have admin-facing UI.",
       "type": "object",
       "required": [
         "groups"
@@ -247,7 +246,7 @@
                         "null"
                       ],
                       "description": "Free-form text input.",
-                      "x-doc-note": "Not yet available on the platform.",
+                      "x-doc-note": "The Root clients don't yet show a UI for this type; admins can't configure it until client support ships.",
                       "x-doc-runtime-type": "string | undefined",
                       "properties": {
                         "defaultValue": {
@@ -281,7 +280,7 @@
                         "null"
                       ],
                       "description": "Numeric input.",
-                      "x-doc-note": "Not yet available on the platform.",
+                      "x-doc-note": "The Root clients don't yet show a UI for this type; admins can't configure it until client support ships.",
                       "x-doc-runtime-type": "number | undefined",
                       "properties": {
                         "minValue": {
@@ -337,7 +336,7 @@
                         "null"
                       ],
                       "description": "Boolean checkbox toggle.",
-                      "x-doc-note": "Not yet available on the platform.",
+                      "x-doc-note": "The Root clients don't yet show a UI for this type; admins can't configure it until client support ships.",
                       "x-doc-runtime-type": "boolean",
                       "properties": {
                         "defaultValue": {
@@ -450,7 +449,7 @@
                         "null"
                       ],
                       "description": "Select one or more channels. The admin sees a channel picker.",
-                      "x-doc-note": "Not yet available on the platform.",
+                      "x-doc-note": "The Root clients don't yet show a UI for this type; admins can't configure it until client support ships.",
                       "x-doc-runtime-type": "ChannelGuid[]",
                       "properties": {
                         "multiSelect": {
@@ -479,7 +478,7 @@
                         "null"
                       ],
                       "description": "Select one or more channel groups. The admin sees a channel group picker.",
-                      "x-doc-note": "Not yet available on the platform.",
+                      "x-doc-note": "The Root clients don't yet show a UI for this type; admins can't configure it until client support ships.",
                       "x-doc-runtime-type": "ChannelGroupGuid[]",
                       "properties": {
                         "multiSelect": {
@@ -508,7 +507,7 @@
                         "null"
                       ],
                       "description": "Dropdown with custom label/value options.",
-                      "x-doc-note": "Not yet available on the platform.",
+                      "x-doc-note": "The Root clients don't yet show a UI for this type; admins can't configure it until client support ships.",
                       "x-doc-runtime-type": "string[]",
                       "properties": {
                         "multiSelect": {
@@ -559,7 +558,7 @@
                         "null"
                       ],
                       "description": "ISO 8601 timestamp picker.",
-                      "x-doc-note": "Not yet available on the platform.",
+                      "x-doc-note": "The Root clients don't yet show a UI for this type; admins can't configure it until client support ships.",
                       "x-doc-runtime-type": "Date | undefined",
                       "examples": [
                         {
@@ -573,7 +572,7 @@
                         "null"
                       ],
                       "description": "Time-of-day picker (HH:MM:SS).",
-                      "x-doc-note": "Not yet available on the platform.",
+                      "x-doc-note": "The Root clients don't yet show a UI for this type; admins can't configure it until client support ships.",
                       "x-doc-runtime-type": "{ hours: number, minutes: number, seconds: number }",
                       "properties": {
                         "defaultValue": {
@@ -596,7 +595,7 @@
                         "null"
                       ],
                       "description": "Date picker (YYYY-MM-DD).",
-                      "x-doc-note": "Not yet available on the platform.",
+                      "x-doc-note": "The Root clients don't yet show a UI for this type; admins can't configure it until client support ships.",
                       "x-doc-runtime-type": "{ year: number, month: number, day: number }",
                       "properties": {
                         "date": {
@@ -620,7 +619,7 @@
                         "null"
                       ],
                       "description": "Color picker (hex code).",
-                      "x-doc-note": "Not yet available on the platform.",
+                      "x-doc-note": "The Root clients don't yet show a UI for this type; admins can't configure it until client support ships.",
                       "x-doc-runtime-type": "string | undefined",
                       "properties": {
                         "defaultValue": {
@@ -643,7 +642,7 @@
                         "null"
                       ],
                       "description": "Action button displayed in settings. No value is sent to the server. Fires a 'button' event on GlobalSettings instead.",
-                      "x-doc-note": "Not yet available on the platform.",
+                      "x-doc-note": "The Root clients don't yet show a UI for this type; admins can't configure it until client support ships.",
                       "x-doc-runtime-type": "none (fires GlobalSettingButtonEvent)",
                       "properties": {
                         "title": {

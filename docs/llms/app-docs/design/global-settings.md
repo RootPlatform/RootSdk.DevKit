@@ -9,7 +9,6 @@ summary: _Global Settings_ let community members with the `Manage Apps` permissi
 
 _Global Settings_ let community members with the `Manage Apps` permission configure how your code behaves, either during installation or later. The settings apply to everyone in the community.
 
-> **Note:** This feature is a work in progress.
 By the end of this article, you'll be able to:
 
 * **Identify** which settings your code needs.
@@ -56,6 +55,10 @@ You handle some parts. Root handles the rest.
 ## What data types can I use?
 
 Global Settings support both standard types (text, number, checkbox) and Root-specific types (channels, roles, members). Each type determines what UI the admin sees and what value your server receives.
+
+:::note Client UI rollout
+The SDK supports every type, but the Root clients are still adding admin UI for some of them. Today, only the `member`, `role`, and `roleAndMember` types have admin-facing UI. Other types can be declared in your manifest, but admins won't be able to set values until client support ships. See [Manifest settings](../configure/manifest-global-settings.md) for per-type status.
+:::
 
 For the full list of types and how to declare them, see [Manifest settings](../configure/manifest-global-settings.md).
 

@@ -27,9 +27,9 @@ Parses a GUID string and returns its `RootGuidType`.
 
 #### Type Parameters
 
-| Type Parameter |
-| ------ |
-| `T` *extends* [`RootGuidType`](../enumerations/RootGuidType.md) |
+| Type Parameter | Default type |
+| ------ | ------ |
+| `T` *extends* [`RootGuid`](../type-aliases/RootGuid.md) | [`RootGuid`](../type-aliases/RootGuid.md) |
 
 #### Parameters
 

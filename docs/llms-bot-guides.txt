@@ -1,7 +1,7 @@
 # Root Bot Developer Documentation — Guides
 
 > Conceptual guides, tutorials, and how-tos for building Bots on the Root platform. For endpoint details and parameter specs, see llms-bot-api.txt.
-> Generated: 2026-04-10 | Content-Hash: ea906f56f565
+> Generated: 2026-04-20 | Content-Hash: 6cd4fca32ff0
 
 ## Instructions
 
@@ -12,7 +12,7 @@
 - All async methods return Promises. Use async/await.
 - Bots are server-only — same community API as apps, but no client UI.
 
-> **Size:** ~65K tokens
+> **Size:** ~66K tokens
 
 ## Table of Contents
 
@@ -186,7 +186,6 @@ Configure your code to run on the Root platform.
 
 Configurable global settings. They're declared in your manifest and set by community members with the `Manage Apps` permission during and after installation. The `settings` field is optional -- not every project needs it.
 
-> **Note:** This feature is a work in progress.
 ## Example
 
 Suppose your code needed to know which community members and roles should have moderation privileges. You'd declare a `roleAndMember` setting that gives the admin a picker to select them.
@@ -363,7 +362,7 @@ Select one or more community roles. Your server receives a `ReadOnlyMemberGroup`
 > **Note:** `member`, `role`, and `roleAndMember` all produce a `ReadOnlyMemberGroup` on the server. Choose based on the UI you want the admin to see.
 ### `text`
 
-> **Note:** This setting type is not yet available on the platform.
+> **Note:** The Root clients don't yet show a UI for this type. Admins can't configure it until client support ships.
 Free-form text input. Your server receives `string | undefined`.
 
 | Property | Type | Description |
@@ -373,7 +372,7 @@ Free-form text input. Your server receives `string | undefined`.
 
 ### `number`
 
-> **Note:** This setting type is not yet available on the platform.
+> **Note:** The Root clients don't yet show a UI for this type. Admins can't configure it until client support ships.
 Numeric input. Your server receives `number | undefined`.
 
 | Property | Type | Description |
@@ -385,7 +384,7 @@ Numeric input. Your server receives `number | undefined`.
 
 ### `checkbox`
 
-> **Note:** This setting type is not yet available on the platform.
+> **Note:** The Root clients don't yet show a UI for this type. Admins can't configure it until client support ships.
 Boolean toggle. Your server receives `boolean`.
 
 | Property | Type | Description |
@@ -394,7 +393,7 @@ Boolean toggle. Your server receives `boolean`.
 
 ### `channel`
 
-> **Note:** This setting type is not yet available on the platform.
+> **Note:** The Root clients don't yet show a UI for this type. Admins can't configure it until client support ships.
 Select one or more channels. Your server receives `ChannelGuid[]`.
 
 | Property | Type | Description |
@@ -404,7 +403,7 @@ Select one or more channels. Your server receives `ChannelGuid[]`.
 
 ### `channelGroup`
 
-> **Note:** This setting type is not yet available on the platform.
+> **Note:** The Root clients don't yet show a UI for this type. Admins can't configure it until client support ships.
 Select one or more channel groups. Your server receives `ChannelGroupGuid[]`.
 
 | Property | Type | Description |
@@ -414,7 +413,7 @@ Select one or more channel groups. Your server receives `ChannelGroupGuid[]`.
 
 ### `select`
 
-> **Note:** This setting type is not yet available on the platform.
+> **Note:** The Root clients don't yet show a UI for this type. Admins can't configure it until client support ships.
 Dropdown with custom options. Your server receives `string[]`.
 
 | Property | Type | Description |
@@ -424,12 +423,12 @@ Dropdown with custom options. Your server receives `string[]`.
 
 ### `timestamp`
 
-> **Note:** This setting type is not yet available on the platform.
+> **Note:** The Root clients don't yet show a UI for this type. Admins can't configure it until client support ships.
 ISO 8601 timestamp picker. Your server receives `Date | undefined`.
 
 ### `time`
 
-> **Note:** This setting type is not yet available on the platform.
+> **Note:** The Root clients don't yet show a UI for this type. Admins can't configure it until client support ships.
 Time-of-day picker. Your server receives `{ hours: number, minutes: number, seconds: number }`.
 
 | Property | Type | Description |
@@ -438,12 +437,12 @@ Time-of-day picker. Your server receives `{ hours: number, minutes: number, seco
 
 ### `date`
 
-> **Note:** This setting type is not yet available on the platform.
+> **Note:** The Root clients don't yet show a UI for this type. Admins can't configure it until client support ships.
 Date picker. Your server receives `{ year: number, month: number, day: number }`.
 
 ### `color`
 
-> **Note:** This setting type is not yet available on the platform.
+> **Note:** The Root clients don't yet show a UI for this type. Admins can't configure it until client support ships.
 Color picker. Your server receives `string | undefined` (hex code).
 
 | Property | Type | Description |
@@ -452,7 +451,7 @@ Color picker. Your server receives `string | undefined` (hex code).
 
 ### `button`
 
-> **Note:** This setting type is not yet available on the platform.
+> **Note:** The Root clients don't yet show a UI for this type. Admins can't configure it until client support ships.
 Action button displayed in settings. No value is sent to your server. Instead, a `button` event fires.
 
 | Property | Type | Description |
@@ -1028,7 +1027,6 @@ With a clear purpose and focused feature list, you’re ready to build a Root Bo
 
 _Global Settings_ let community members with the `Manage Apps` permission configure how your code behaves, either during installation or later. The settings apply to everyone in the community.
 
-> **Note:** This feature is a work in progress.
 By the end of this article, you'll be able to:
 
 * **Identify** which settings your code needs.
@@ -1075,6 +1073,10 @@ You handle some parts. Root handles the rest.
 ## What data types can I use?
 
 Global Settings support both standard types (text, number, checkbox) and Root-specific types (channels, roles, members). Each type determines what UI the admin sees and what value your server receives.
+
+:::note Client UI rollout
+The SDK supports every type, but the Root clients are still adding admin UI for some of them. Today, only the `member`, `role`, and `roleAndMember` types have admin-facing UI. Other types can be declared in your manifest, but admins won't be able to set values until client support ships. See [Manifest settings](#file-bot-docs-configure-manifest-global-settings) for per-type status.
+:::
 
 For the full list of types and how to declare them, see [Manifest settings](#file-bot-docs-configure-manifest-global-settings).
 
@@ -4740,40 +4742,41 @@ Include the tool in your project by adding the following to your `package.json`:
 ## Usage
 
 ```bash
-rootsdk build package [options]
+npx rootsdk build package [options]
 ```
 
 ## Options
 
-| Option | Default | Description |
-| ------ | ------- | ----------- |
-| `--output-file (-o)  <output-file>` | `./rootapp-<manifest.version>.pkg` (dots in version replaced by hyphens) | Output file for the generated package. Example: if `manifest.version` is `1.2.3`, the output is `./rootapp-1-2-3.pkg`. You can override this by specifying a custom file or directory path. |
-| `--project-folder (-p) <folder>` | `./` (current directory) | Path to the directory containing `root-manifest.json`. |
+| Option | Required | Default | Description |
+| ------ | -------- | ------- | ----------- |
+| `-o, --output-file <output-file>` | **No** | `./rootapp-<manifest.version>.pkg` (dots in version replaced by hyphens) | Output file for the generated package. Example: if `manifest.version` is `1.2.3`, the output is `./rootapp-1-2-3.pkg`. You can override this by specifying a custom file or directory path. |
+| `-p, --project-folder <folder>`   | **No** | `./` (current directory) | Path to the directory containing `root-manifest.json`. |
+| `--verbose`                       | **No** | (off) | Print step-by-step progress during packaging. Useful when diagnosing a slow build or unexpected package size. |
 
 ## Examples
 
 Package the current project into a file named `rootapp-<version>.pkg` in the project root:
 
 ```bash
-rootsdk build package
+npx rootsdk build package
 ```
 
 Package into a custom output file:
 
 ```bash
-rootsdk build package --output-file ./dist
+npx rootsdk build package --output-file ./dist
 ```
 
 Package into a custom file name in a custom output file:
 
 ```bash
-rootsdk build package --output-file ./dist/custom-name.pkg
+npx rootsdk build package --output-file ./dist/custom-name.pkg
 ```
 
 Package a project where the source is in a different directory:
 
 ```bash
-rootsdk build package --project-folder ../my-project --output-file ./dist/pkg
+npx rootsdk build package --project-folder ../my-project --output-file ./dist/pkg
 ```
 
 ---
@@ -4820,7 +4823,7 @@ TBD
 
 # Upload your code
 
-The `rootsdk upload` command deploys your code to the Root cloud. You must provide the package file path and a valid authentication token. You get your authentication token from [Root Developer Portal](https://dev.rootapp.com).
+The `rootsdk upload` command deploys your code to the Root cloud. You must provide the package file path and a valid authentication token. You get your authentication token from the [Root Developer Portal](https://dev.rootapp.com).
 
 ## Installation
 
@@ -4837,24 +4840,45 @@ Include the tool in your project by adding the following to your `package.json`:
 ## Usage
 
 ```bash
-rootsdk upload package [options]
+npx rootsdk upload package [options]
 ```
 
 ## Options
 
-| Flag                          | Description                          | Required | Default |
-| ----------------------------- | -------------------------------------| -------- | ------- |
-| `-f, --file <file>`           | Path to the package file to upload.  | **Yes**  | —       |
-| `-a, --authToken <token>`     | Authentication token for the upload. | **Yes**  | —       |
+You must supply the authentication token through exactly one of the three auth options below (`--auth-token-file`, `ROOT_AUTH_TOKEN`, or `--authToken`). The file form is preferred in CI and shared environments because the token never appears on a command line or in shell history.
 
-## Example
+| Option                      | Required | Default | Description |
+| --------------------------- | -------- | ------- | ----------- |
+| `-f, --file <file>`         | **Yes**  | —       | Path to the package file to upload. |
+| `--auth-token-file <path>`  | One of * | —       | Read the authentication token from a file. Preferred for CI and shared environments. |
+| `ROOT_AUTH_TOKEN` env var   | One of * | —       | Authentication token read from the environment. Not visible to other processes via `ps`. |
+| `-a, --auth-token <token>`  | One of * | —       | Authentication token passed inline. Visible in the process list and shell history, so it is not recommended for production use. |
+| `--verbose`                 | **No**   | (off)   | Print step-by-step progress during upload (manifest extraction, per-chunk streaming, server response). |
 
-Upload a package file to the Root cloud:
+&ast; Exactly one of the three auth options is required. The older camelCase form `--authToken` is still accepted but deprecated, and will be removed in a future release.
+
+## Examples
+
+Upload using a token file (recommended for CI):
 
 ```bash
-rootsdk upload package \
+npx rootsdk upload package \
   --file ./dist/rootapp-1-2-3.pkg \
-  --authToken $TOKEN
+  --auth-token-file ./secrets/root-token
+```
+
+Upload using the environment variable:
+
+```bash
+ROOT_AUTH_TOKEN=$TOKEN npx rootsdk upload package --file ./dist/rootapp-1-2-3.pkg
+```
+
+Upload using an explicit command-line flag (fine for a quick local upload, not recommended in CI):
+
+```bash
+npx rootsdk upload package \
+  --file ./dist/rootapp-1-2-3.pkg \
+  --auth-token $TOKEN
 ```
 
 ---

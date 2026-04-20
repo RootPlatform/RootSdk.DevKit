@@ -15,7 +15,7 @@ This read-write type extends `ReadOnlyMemberGroup` with methods for modifying th
 
 ### addCommunityRole()
 
-> **addCommunityRole**(`communityRoleId`: `string`): `Promise`<`void`>
+> **addCommunityRole**(`communityRoleId`: [`CommunityRoleGuid`](CommunityRoleGuid.md)): `Promise`<`void`>
 
 Adds a community role to this group. Users with this role will be included in the resolved membership.
 
@@ -23,7 +23,7 @@ Adds a community role to this group. Users with this role will be included in th
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `communityRoleId` | `string` | The ID of the community role to add. |
+| `communityRoleId` | [`CommunityRoleGuid`](CommunityRoleGuid.md) | The ID of the community role to add. |
 
 #### Returns
 
@@ -35,7 +35,7 @@ Adds a community role to this group. Users with this role will be included in th
 
 ### addCommunityRoles()
 
-> **addCommunityRoles**(`communityRoleIds`: `string`[]): `Promise`<`void`>
+> **addCommunityRoles**(`communityRoleIds`: [`CommunityRoleGuid`](CommunityRoleGuid.md)[]): `Promise`<`void`>
 
 Adds multiple community roles to this group.
 
@@ -43,7 +43,7 @@ Adds multiple community roles to this group.
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `communityRoleIds` | `string`[] | An array of community role IDs to add. |
+| `communityRoleIds` | [`CommunityRoleGuid`](CommunityRoleGuid.md)[] | An array of community role IDs to add. |
 
 #### Returns
 
@@ -55,7 +55,7 @@ Adds multiple community roles to this group.
 
 ### addUser()
 
-> **addUser**(`userId`: `string`): `Promise`<`void`>
+> **addUser**(`userId`: [`UserGuid`](UserGuid.md)): `Promise`<`void`>
 
 Adds a single user directly to this group.
 
@@ -63,7 +63,7 @@ Adds a single user directly to this group.
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `userId` | `string` | The ID of the user to add. |
+| `userId` | [`UserGuid`](UserGuid.md) | The ID of the user to add. |
 
 #### Returns
 
@@ -75,7 +75,7 @@ Adds a single user directly to this group.
 
 ### addUsers()
 
-> **addUsers**(`userIds`: `string`[]): `Promise`<`void`>
+> **addUsers**(`userIds`: [`UserGuid`](UserGuid.md)[]): `Promise`<`void`>
 
 Adds multiple users directly to this group.
 
@@ -83,7 +83,7 @@ Adds multiple users directly to this group.
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `userIds` | `string`[] | An array of user IDs to add. |
+| `userIds` | [`UserGuid`](UserGuid.md)[] | An array of user IDs to add. |
 
 #### Returns
 
@@ -95,7 +95,7 @@ Adds multiple users directly to this group.
 
 ### removeCommunityRole()
 
-> **removeCommunityRole**(`communityRoleId`: `string`): `Promise`<`void`>
+> **removeCommunityRole**(`communityRoleId`: [`CommunityRoleGuid`](CommunityRoleGuid.md)): `Promise`<`void`>
 
 Removes a community role from this group. Users who only belonged through this role will no longer be resolved members. No effect if the role is not in this group.
 
@@ -103,7 +103,7 @@ Removes a community role from this group. Users who only belonged through this r
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `communityRoleId` | `string` | The ID of the community role to remove. |
+| `communityRoleId` | [`CommunityRoleGuid`](CommunityRoleGuid.md) | The ID of the community role to remove. |
 
 #### Returns
 
@@ -111,7 +111,7 @@ Removes a community role from this group. Users who only belonged through this r
 
 ### removeCommunityRoles()
 
-> **removeCommunityRoles**(`communityRoleIds`: `string`[]): `Promise`<`void`>
+> **removeCommunityRoles**(`communityRoleIds`: [`CommunityRoleGuid`](CommunityRoleGuid.md)[]): `Promise`<`void`>
 
 Removes multiple community roles from this group. Roles not in this group are silently ignored.
 
@@ -119,7 +119,7 @@ Removes multiple community roles from this group. Roles not in this group are si
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `communityRoleIds` | `string`[] | An array of community role IDs to remove. |
+| `communityRoleIds` | [`CommunityRoleGuid`](CommunityRoleGuid.md)[] | An array of community role IDs to remove. |
 
 #### Returns
 
@@ -127,7 +127,7 @@ Removes multiple community roles from this group. Roles not in this group are si
 
 ### removeUser()
 
-> **removeUser**(`userId`: `string`): `Promise`<`void`>
+> **removeUser**(`userId`: [`UserGuid`](UserGuid.md)): `Promise`<`void`>
 
 Removes a single user from this group's direct membership. No effect if the user is not a direct member.
 
@@ -135,7 +135,7 @@ Removes a single user from this group's direct membership. No effect if the user
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `userId` | `string` | The ID of the user to remove. |
+| `userId` | [`UserGuid`](UserGuid.md) | The ID of the user to remove. |
 
 #### Returns
 
@@ -143,7 +143,7 @@ Removes a single user from this group's direct membership. No effect if the user
 
 ### removeUsers()
 
-> **removeUsers**(`userIds`: `string`[]): `Promise`<`void`>
+> **removeUsers**(`userIds`: [`UserGuid`](UserGuid.md)[]): `Promise`<`void`>
 
 Removes multiple users from this group's direct membership. Users not in the group are silently ignored.
 
@@ -151,7 +151,7 @@ Removes multiple users from this group's direct membership. Users not in the gro
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `userIds` | `string`[] | An array of user IDs to remove. |
+| `userIds` | [`UserGuid`](UserGuid.md)[] | An array of user IDs to remove. |
 
 #### Returns
 
@@ -167,9 +167,9 @@ Replaces the group's direct user list and community role list entirely.
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `data` | \{ `communityRoleIds`: `string`[]; `userIds`: `string`[]; \} | An object containing the new membership. |
-| `data.communityRoleIds` | `string`[] | The new array of community role IDs. |
-| `data.userIds` | `string`[] | The new array of direct user IDs. |
+| `data` | \{ `communityRoleIds`: [`CommunityRoleGuid`](CommunityRoleGuid.md)[]; `userIds`: [`UserGuid`](UserGuid.md)[]; \} | An object containing the new membership. |
+| `data.communityRoleIds` | [`CommunityRoleGuid`](CommunityRoleGuid.md)[] | The new array of community role IDs. |
+| `data.userIds` | [`UserGuid`](UserGuid.md)[] | The new array of direct user IDs. |
 
 #### Returns
 

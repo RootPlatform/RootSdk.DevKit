@@ -110,7 +110,6 @@ A promise that resolves when the deletion completes.
 
 ```ts
 import {
-  ChannelDirectory,
   ChannelDirectoryDeleteRequest,
   ChannelGuid,
   DirectoryGuid,

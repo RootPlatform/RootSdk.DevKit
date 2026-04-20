@@ -40,7 +40,6 @@ import {
   CommunityAppLogType,
   CommunityAppLogCreateRequest,
   CommunityAppLogCreateResponse,
-  UnknownGuid,
   rootServer,
 } from "@rootsdk/server-app";
 

@@ -11,11 +11,23 @@ Developer toolkit for building apps and bots on the Root Platform. This guide he
 4. For complete SDK usage per domain, always check the matching `how-to/` module — each one demonstrates every method. Sample bots only show targeted use cases.
 
 **Building an app** (client UI + server):
-1. Copy `templates/app/` to your target location
-2. Load `docs/llms-app-guides.txt` (~106K tokens) and `docs/llms-app-api.txt` (~163K tokens)
-3. Read the template files — `server/src/main.ts`, `server/src/exampleService.ts`, `client/src/Example.tsx`, `networking/src/example.proto`
-4. Reference `how-to/` bots for server-side SDK patterns (server code is identical between apps and bots)
-5. For complete SDK usage per domain, always check the matching `how-to/` module — each one demonstrates every method. Sample bots only show targeted use cases.
+
+1. Load `docs/llms-app-guides.txt` (~106K tokens) and `docs/llms-app-api.txt` (~163K tokens).
+2. Walk the concern checklist below. For each concern that applies to your app, load the matching how-to **before writing code for that concern** — don't defer until you hit a wall.
+
+   | Concern | How-to | Triggers for |
+   |---|---|---|
+   | UI theming / dark mode | `how-to/client-app-theme` | any client UI |
+   | User profiles / identity | `how-to/client-app-users` | any UI showing user-scoped data |
+   | Client-server RPC | `how-to/networking-app-services` | any call back to the server |
+   | Persistence | `how-to/server-database` or `how-to/server-key-value-store` | any stored state |
+   | Role/member permissions | `how-to/server-global-settings`, `how-to/server-access-rules` | any role-gated behavior |
+   | Scheduling | `how-to/server-jobs` | timers, retries, delayed work |
+   | Retry / resilience | `how-to/server-resilience` | any external call |
+
+3. Copy `templates/app/` for scaffolding. Read the template files — `server/src/main.ts`, `server/src/exampleService.ts`, `client/src/Example.tsx`, `networking/src/example.proto` — to understand the build layout.
+4. Consult `apps/*` for end-to-end shape. **Samples illustrate one possible shape — they do not cover every concern your app needs. Check each sample's `README.md` for its coverage scope before using it as a reference.**
+5. `how-to/` bots double as server-side references for apps (server code is identical between apps and bots). For complete SDK usage per domain, always check the matching how-to module — each demonstrates every method; samples only show targeted use cases.
 
 **Not sure which to build?** Read `docs/llms/overview/choose-app-or-bot.md`.
 
@@ -38,6 +50,9 @@ When your task requires one of these, go to the linked module — don't invent a
 | Identify what type of entity a GUID represents | `how-to/server-guid-utils` | Distinguishes users from bots/apps, extracts timestamps — no API call needed. |
 | Retry after rate limits or transient errors | `how-to/server-resilience` | Wrap any SDK call in `withRetry()`. Retries TooManyRequests, ServerError, Timeout with exponential backoff + jitter. |
 | Set permissions for SDK calls | `schemas/permissions-map.json` | Maps every SDK method to its required `root-manifest.json` permission. |
+| Style a client UI to match Root (light/dark) | `how-to/client-app-theme` + `apps/themes` | Use `var(--rootsdk-*)` CSS tokens; don't hardcode colors. Tokens switch automatically with the user's theme. |
+| Show a user's profile, nickname, or avatar | `how-to/client-app-users` | Don't invent a user model — use `rootClient.users.*` and its profile-update events. |
+| Call the server from the client | `how-to/networking-app-services` | Define protobuf services and use the generated client/server bases; don't hand-roll JSON fetch. |
 
 ## Sample Apps
 

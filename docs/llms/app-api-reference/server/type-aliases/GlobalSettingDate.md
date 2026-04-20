@@ -9,7 +9,6 @@ summary: The value of a `date` setting: `{ year: number, month: number, day: num
 
 The value of a `date` setting: `{ year: number, month: number, day: number }`. Returns the date selected by the community admin.
 
-> **Note:** This setting type is not yet available on the platform.
 ## Properties
 
 ### day

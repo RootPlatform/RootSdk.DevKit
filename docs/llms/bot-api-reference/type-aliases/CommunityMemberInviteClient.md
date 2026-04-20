@@ -39,7 +39,6 @@ A promise that resolves when the invitation has been deleted.
 
 ```ts
 import {
-  CommunityMemberInvite,
   CommunityMemberInviteDeleteRequest,
   UserGuid,
   rootServer,

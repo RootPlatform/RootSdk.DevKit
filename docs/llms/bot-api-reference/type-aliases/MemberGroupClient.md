@@ -2,10 +2,10 @@
 path: bot-api-reference/type-aliases/MemberGroupClient.md
 audience: bot
 category: reference
-summary: Service with methods: create, delete, get, getByName, ... (Member Groups).
+summary: Type alias for `MemberGroupClientBase` (Member Groups).
 ---
 
-> **MemberGroupClient** = [`TypedEventEmitter`](TypedEventEmitter.md)<[`MemberGroupEvents`](MemberGroupEvents.md)> & `object`
+> **MemberGroupClient** = `MemberGroupClientBase` & `object`
 
 ## Type Declaration
 
@@ -17,41 +17,12 @@ summary: Service with methods: create, delete, get, getByName, ... (Member Group
 
 | Parameter | Type |
 | ------ | ------ |
-| `data` | \{ `communityId?`: `string`; `communityRoleIds`: `string`[]; `name`: `string`; `resourceId`: `string`; `resourceType`: `string`; `userIds`: `string`[]; \} |
-| `data.communityId?` | `string` |
-| `data.communityRoleIds` | `string`[] |
+| `data` | \{ `communityRoleIds`: [`CommunityRoleGuid`](CommunityRoleGuid.md)[]; `name`: `string`; `resourceId`: `string`; `resourceType`: `string`; `userIds`: [`UserGuid`](UserGuid.md)[]; \} |
+| `data.communityRoleIds` | [`CommunityRoleGuid`](CommunityRoleGuid.md)[] |
 | `data.name` | `string` |
 | `data.resourceId` | `string` |
 | `data.resourceType` | `string` |
-| `data.userIds` | `string`[] |
-
-#### Returns
-
-`Promise`<[`MemberGroup`](MemberGroup.md)>
-
-### delete()
-
-> **delete**(`id`: `string`): `Promise`<`void`>
-
-#### Parameters
-
-| Parameter | Type |
-| ------ | ------ |
-| `id` | `string` |
-
-#### Returns
-
-`Promise`<`void`>
-
-### get()
-
-> **get**(`id`: `string`): `Promise`<[`MemberGroup`](MemberGroup.md)>
-
-#### Parameters
-
-| Parameter | Type |
-| ------ | ------ |
-| `id` | `string` |
+| `data.userIds` | [`UserGuid`](UserGuid.md)[] |
 
 #### Returns
 
@@ -59,16 +30,16 @@ summary: Service with methods: create, delete, get, getByName, ... (Member Group
 
 ### getByName()
 
-> **getByName**(`data`: `object`): `Promise`<[`MemberGroup`](MemberGroup.md) | `undefined`>
+> **getByName**(`query`: `object`): `Promise`<[`MemberGroup`](MemberGroup.md) | `undefined`>
 
 #### Parameters
 
 | Parameter | Type |
 | ------ | ------ |
-| `data` | \{ `name`: `string`; `resourceId`: `string`; `resourceType`: `string`; \} |
-| `data.name` | `string` |
-| `data.resourceId` | `string` |
-| `data.resourceType` | `string` |
+| `query` | \{ `name`: `string`; `resourceId`: `string`; `resourceType`: `string`; \} |
+| `query.name` | `string` |
+| `query.resourceId` | `string` |
+| `query.resourceType` | `string` |
 
 #### Returns
 
@@ -82,23 +53,9 @@ summary: Service with methods: create, delete, get, getByName, ... (Member Group
 
 `Promise`<[`MemberGroupShort`](MemberGroupShort.md)[]>
 
-### listByIds()
-
-> **listByIds**(`ids`: `string`[]): `Promise`<[`MemberGroup`](MemberGroup.md)[]>
-
-#### Parameters
-
-| Parameter | Type |
-| ------ | ------ |
-| `ids` | `string`[] |
-
-#### Returns
-
-`Promise`<[`MemberGroup`](MemberGroup.md)[]>
-
 ### listByResourceId()
 
-> **listByResourceId**(`query`: `object`, `communityId?`: `string`): `Promise`<[`MemberGroup`](MemberGroup.md)[]>
+> **listByResourceId**(`query`: `object`): `Promise`<[`MemberGroup`](MemberGroup.md)[]>
 
 #### Parameters
 
@@ -106,8 +63,7 @@ summary: Service with methods: create, delete, get, getByName, ... (Member Group
 | ------ | ------ |
 | `query` | \{ `resourceId`: `string`; `resourceType`: `string`; \} |
 | `query.resourceId` | `string` |
-| `query.resourceType?` | `string` |
-| `communityId?` | `string` |
+| `query.resourceType` | `string` |
 
 #### Returns
 
@@ -124,9 +80,8 @@ summary: Service with methods: create, delete, get, getByName, ... (Member Group
 | `query` | \{ `name`: `string`; `resourceType`: `string`; \} |
 | `query.name` | `string` |
 | `query.resourceType` | `string` |
-| `user` | \{ `communityId?`: `string`; `userId`: `string`; \} |
-| `user.communityId?` | `string` |
-| `user.userId` | `string` |
+| `user` | \{ `userId`: [`UserGuid`](UserGuid.md); \} |
+| `user.userId` | [`UserGuid`](UserGuid.md) |
 
 #### Returns
 

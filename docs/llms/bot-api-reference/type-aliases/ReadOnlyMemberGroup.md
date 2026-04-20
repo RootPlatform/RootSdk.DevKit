@@ -59,8 +59,8 @@ See `MemberGroup` for property descriptions.
 
 | Parameter | Type |
 | ------ | ------ |
-| `user` | \{ `userId`: `string`; \} |
-| `user.userId` | `string` |
+| `user` | \{ `userId`: [`UserGuid`](UserGuid.md); \} |
+| `user.userId` | [`UserGuid`](UserGuid.md) |
 
 #### Returns
 

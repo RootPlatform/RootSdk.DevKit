@@ -93,7 +93,6 @@ A promise that resolves to a `CommunityMemberRoleListResponse` containing the me
 
 ```ts
 import {
-  CommunityMember,
   CommunityMemberRoleListRequest,
   CommunityMemberRoleListResponse,
   UserGuid,
@@ -198,7 +197,6 @@ A promise that resolves when the primary role has been set.
 
 ```ts
 import {
-  CommunityMember,
   CommunityMemberRoleSetPrimaryRequest,
   CommunityRoleGuid,
   UserGuid,

@@ -15,15 +15,15 @@
 
 Load these files as context in your AI coding tool:
 
-- [App Guides](llms-app-guides.txt): Concepts, tutorials, and how-tos (~112K tokens)
+- [App Guides](llms-app-guides.txt): Concepts, tutorials, and how-tos (~113K tokens)
 - [App API Reference](llms-app-api.txt): All endpoints, parameters, types, and errors (~178K tokens)
 
 ## Building a Bot
 
 Load these files as context in your AI coding tool:
 
-- [Bot Guides](llms-bot-guides.txt): Concepts, tutorials, and how-tos (~65K tokens)
-- [Bot API Reference](llms-bot-api.txt): All endpoints, parameters, types, and errors (~152K tokens)
+- [Bot Guides](llms-bot-guides.txt): Concepts, tutorials, and how-tos (~66K tokens)
+- [Bot API Reference](llms-bot-api.txt): All endpoints, parameters, types, and errors (~151K tokens)
 
 ## Quick Links
 
@@ -33,9 +33,9 @@ Load these files as context in your AI coding tool:
 
 ## Complete Files (large — most AI tools cannot load these fully)
 
-- [All App Docs](llms-app.txt): Combined app guides + API reference (~290K tokens)
+- [All App Docs](llms-app.txt): Combined app guides + API reference (~291K tokens)
 - [All Bot Docs](llms-bot.txt): Combined bot guides + API reference (~217K tokens)
-- [Everything](llms-full.txt): All documentation (~505K tokens)
+- [Everything](llms-full.txt): All documentation (~506K tokens)
 
 ## Overview
 

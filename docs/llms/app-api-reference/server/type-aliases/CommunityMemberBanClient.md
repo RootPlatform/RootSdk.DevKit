@@ -130,7 +130,6 @@ A promise that resolves when the ban is deleted.
 
 ```ts
 import {
-  CommunityMemberBan,
   CommunityMemberBanDeleteRequest,
   UserGuid,
   rootServer,
@@ -255,7 +254,6 @@ A promise that resolves when the member is kicked.
 
 ```ts
 import {
-  CommunityMemberBan,
   CommunityMemberBanKickRequest,
   UserGuid,
   rootServer,

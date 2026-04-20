@@ -43,9 +43,6 @@ A promise that resolves to the created `CommunityRole` object.
 import {
   CommunityRole,
   CommunityRoleCreateRequest,
-  CommunityRoleGuid,
-  CommunityPermission,
-  ChannelPermission,
   rootServer,
 } from "@rootsdk/server-bot";
 
@@ -135,7 +132,6 @@ A promise that resolves when the delete operation completes.
 
 ```ts
 import {
-  CommunityRole,
   CommunityRoleDeleteRequest,
   CommunityRoleGuid,
   rootServer,
@@ -188,8 +184,6 @@ import {
   CommunityRole,
   CommunityRoleEditRequest,
   CommunityRoleGuid,
-  CommunityPermission,
-  ChannelPermission,
   rootServer,
 } from "@rootsdk/server-bot";
 
@@ -332,7 +326,6 @@ To identify the `@everyone` role, compare against `WellKnownRootGuids.CommunityR
 ```ts
 import {
   CommunityRole,
-  CommunityRoleGuid,
   rootServer,
 } from "@rootsdk/server-bot";
 

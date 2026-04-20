@@ -119,7 +119,6 @@ A promise that resolves when the delete operation completes.
 ```ts
 import {
   ChannelGuid,
-  ChannelMessage,
   ChannelMessageDeleteRequest,
   MessageGuid,
   rootServer,
@@ -356,7 +355,6 @@ import {
   ChannelGuid,
   ChannelMessageListRequest,
   MessageDirectionTake,
-  MessageGuid,
   rootServer,
 } from "@rootsdk/server-app";
 
@@ -556,7 +554,6 @@ import {
   ChannelGuid,
   ChannelMessagePinListRequest,
   ChannelMessagePinListResponse,
-  MessageGuid,
   rootServer,
 } from "@rootsdk/server-app";
 
@@ -682,7 +679,6 @@ A promise that resolves when the reaction is removed.
 import {
   ChannelGuid,
   ChannelMessageReactionDeleteRequest,
-  ChannelMessageReaction,
   MessageGuid,
   rootServer,
 } from "@rootsdk/server-app";
@@ -832,7 +828,6 @@ A promise that resolves when the view time is updated.
 import {
   ChannelGuid,
   ChannelMessageSetViewTimeRequest,
-  MessageGuid,
   rootServer,
 } from "@rootsdk/server-app";
 

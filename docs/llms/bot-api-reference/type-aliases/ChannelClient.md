@@ -103,11 +103,9 @@ A promise that resolves when the delete operation completes.
 
 ```ts
 import {
-  Channel,
   ChannelDeleteRequest,
   ChannelGuid,
   ChannelGroupGuid,
-  ChannelType,
   rootServer,
 } from "@rootsdk/server-bot";
 
@@ -163,7 +161,6 @@ import {
   Channel,
   ChannelEditRequest,
   ChannelGuid,
-  ChannelGroupGuid,
   rootServer,
 } from "@rootsdk/server-bot";
 
@@ -217,7 +214,6 @@ import {
   Channel,
   ChannelGetRequest,
   ChannelGuid,
-  ChannelGroupGuid,
   rootServer,
 } from "@rootsdk/server-bot";
 
@@ -267,7 +263,6 @@ A promise that resolves to an array of `Channel` objects, sorted by their positi
 import {
   Channel,
   ChannelGroupGuid,
-  ChannelGuid,
   ChannelListRequest,
   rootServer,
 } from "@rootsdk/server-bot";
@@ -322,7 +317,6 @@ A promise that resolves when the move operation completes.
 
 ```ts
 import {
-  Channel,
   ChannelMoveRequest,
   ChannelGuid,
   ChannelGroupGuid,

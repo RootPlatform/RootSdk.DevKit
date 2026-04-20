@@ -9,7 +9,6 @@ summary: Configurable global settings. They're declared in your manifest and set
 
 Configurable global settings. They're declared in your manifest and set by community members with the `Manage Apps` permission during and after installation. The `settings` field is optional -- not every project needs it.
 
-> **Note:** This feature is a work in progress.
 ## Example
 
 Suppose your code needed to know which community members and roles should have moderation privileges. You'd declare a `roleAndMember` setting that gives the admin a picker to select them.
@@ -186,7 +185,7 @@ Select one or more community roles. Your server receives a `ReadOnlyMemberGroup`
 > **Note:** `member`, `role`, and `roleAndMember` all produce a `ReadOnlyMemberGroup` on the server. Choose based on the UI you want the admin to see.
 ### `text`
 
-> **Note:** This setting type is not yet available on the platform.
+> **Note:** The Root clients don't yet show a UI for this type. Admins can't configure it until client support ships.
 Free-form text input. Your server receives `string | undefined`.
 
 | Property | Type | Description |
@@ -196,7 +195,7 @@ Free-form text input. Your server receives `string | undefined`.
 
 ### `number`
 
-> **Note:** This setting type is not yet available on the platform.
+> **Note:** The Root clients don't yet show a UI for this type. Admins can't configure it until client support ships.
 Numeric input. Your server receives `number | undefined`.
 
 | Property | Type | Description |
@@ -208,7 +207,7 @@ Numeric input. Your server receives `number | undefined`.
 
 ### `checkbox`
 
-> **Note:** This setting type is not yet available on the platform.
+> **Note:** The Root clients don't yet show a UI for this type. Admins can't configure it until client support ships.
 Boolean toggle. Your server receives `boolean`.
 
 | Property | Type | Description |
@@ -217,7 +216,7 @@ Boolean toggle. Your server receives `boolean`.
 
 ### `channel`
 
-> **Note:** This setting type is not yet available on the platform.
+> **Note:** The Root clients don't yet show a UI for this type. Admins can't configure it until client support ships.
 Select one or more channels. Your server receives `ChannelGuid[]`.
 
 | Property | Type | Description |
@@ -227,7 +226,7 @@ Select one or more channels. Your server receives `ChannelGuid[]`.
 
 ### `channelGroup`
 
-> **Note:** This setting type is not yet available on the platform.
+> **Note:** The Root clients don't yet show a UI for this type. Admins can't configure it until client support ships.
 Select one or more channel groups. Your server receives `ChannelGroupGuid[]`.
 
 | Property | Type | Description |
@@ -237,7 +236,7 @@ Select one or more channel groups. Your server receives `ChannelGroupGuid[]`.
 
 ### `select`
 
-> **Note:** This setting type is not yet available on the platform.
+> **Note:** The Root clients don't yet show a UI for this type. Admins can't configure it until client support ships.
 Dropdown with custom options. Your server receives `string[]`.
 
 | Property | Type | Description |
@@ -247,12 +246,12 @@ Dropdown with custom options. Your server receives `string[]`.
 
 ### `timestamp`
 
-> **Note:** This setting type is not yet available on the platform.
+> **Note:** The Root clients don't yet show a UI for this type. Admins can't configure it until client support ships.
 ISO 8601 timestamp picker. Your server receives `Date | undefined`.
 
 ### `time`
 
-> **Note:** This setting type is not yet available on the platform.
+> **Note:** The Root clients don't yet show a UI for this type. Admins can't configure it until client support ships.
 Time-of-day picker. Your server receives `{ hours: number, minutes: number, seconds: number }`.
 
 | Property | Type | Description |
@@ -261,12 +260,12 @@ Time-of-day picker. Your server receives `{ hours: number, minutes: number, seco
 
 ### `date`
 
-> **Note:** This setting type is not yet available on the platform.
+> **Note:** The Root clients don't yet show a UI for this type. Admins can't configure it until client support ships.
 Date picker. Your server receives `{ year: number, month: number, day: number }`.
 
 ### `color`
 
-> **Note:** This setting type is not yet available on the platform.
+> **Note:** The Root clients don't yet show a UI for this type. Admins can't configure it until client support ships.
 Color picker. Your server receives `string | undefined` (hex code).
 
 | Property | Type | Description |
@@ -275,7 +274,7 @@ Color picker. Your server receives `string | undefined` (hex code).
 
 ### `button`
 
-> **Note:** This setting type is not yet available on the platform.
+> **Note:** The Root clients don't yet show a UI for this type. Admins can't configure it until client support ships.
 Action button displayed in settings. No value is sent to your server. Instead, a `button` event fires.
 
 | Property | Type | Description |

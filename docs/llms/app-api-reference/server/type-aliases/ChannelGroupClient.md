@@ -171,7 +171,6 @@ A promise that resolves when the edit completes.
 
 ```ts
 import {
-  ChannelGroup,
   ChannelGroupEditRequest,
   ChannelGroupGuid,
   rootServer,
@@ -286,7 +285,6 @@ A promise that resolves to an array of `ChannelGroup` objects.
 
 ```ts
 import {
-  ChannelListRequest,
   ChannelGroup,
   rootServer,
 } from "@rootsdk/server-app";
@@ -331,7 +329,6 @@ A promise that resolves when the move completes.
 
 ```ts
 import {
-  ChannelGroup,
   ChannelGroupMoveRequest,
   ChannelGroupGuid,
   rootServer,

@@ -41,24 +41,21 @@ A promise that resolves when the kick completes.
 
 ```ts
 import {
-  ChannelWebRtcMuteAndDeafenRequest,
+  ChannelWebRtcKickRequest,
   ChannelGuid,
   UserGuid,
-  DeviceGuid,
   rootServer,
 } from "@rootsdk/server-app";
 
 export async function kickExample(
   channelId: ChannelGuid,
-  userId: UserGuid,
-  deviceId?: DeviceGuid,
+  userId?: UserGuid,
 ): Promise<void> {
   try {
     // Set up the request
     const request: ChannelWebRtcKickRequest = {
       channelId: channelId,
       userId: userId,
-      deviceId: deviceId,
     };
 
     // Call the API
