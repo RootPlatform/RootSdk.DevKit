@@ -1,65 +1,121 @@
-.suggestion-list
-{
+.suggestion-list-wrapper h2 {
+  margin: 24px 0 12px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--rootsdk-text-tertiary);
+}
+
+.suggestion-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.suggestion-item
-{
-  margin-bottom: 1em;
-  padding: 0.5em;
-  border: 1px solid #ccc;
+.suggestion-item {
+  padding: 16px;
+  border: 1px solid var(--rootsdk-border);
+  border-radius: 12px;
+  background: var(--rootsdk-background-secondary);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.suggestion-text
-{
-  margin: 0;
+.suggestion-item:hover {
+  border-color: color-mix(in srgb, var(--rootsdk-brand-primary) 50%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--rootsdk-brand-primary) 15%, transparent),
+    0 8px 32px color-mix(in srgb, var(--rootsdk-brand-primary) 12%, transparent),
+    0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
-.suggestion-date
-{
-  margin: 0.5em 0;
-  font-size: 0.9em;
-  color: #555;
+.suggestion-text {
+  margin: 0 0 8px;
+  color: var(--rootsdk-text-primary);
+  font-size: 1rem;
+  line-height: 1.4;
 }
 
-.suggestion-vote-container
-{
+.suggestion-date {
+  margin: 0 0 12px;
+  font-size: 0.75rem;
+  color: var(--rootsdk-text-tertiary);
+}
+
+.suggestion-vote-container {
   display: flex;
   align-items: center;
+  gap: 12px;
 }
 
-.vote-button
-{
-  margin-right: 0.5em;
-  background: #007BFF;
-  color: #fff;
-  border: none;
-  padding: 0.3em 0.8em;
-  border-radius: 4px;
+.vote-button {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 48px;
+  padding: 6px 12px;
+  border: 1px solid var(--rootsdk-border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--rootsdk-text-secondary);
+  font-family: inherit;
   cursor: pointer;
+  transition: all 0.15s ease;
 }
 
-.vote-button:disabled
-{
-  background: #B0BEC5;
-  color: #7f8c8d;
-  cursor: not-allowed;
-  border: 1px solid #BDC3C7;
+.vote-button svg {
+  display: block;
+  width: 16px;
+  height: 16px;
 }
 
-.delete-button
-{
-  background: none;
+.vote-button:hover:not(:disabled) {
+  background: var(--rootsdk-highlight-normal);
+  border-color: var(--rootsdk-brand-primary);
+  color: var(--rootsdk-brand-primary);
+}
+
+.vote-button:disabled {
+  background: color-mix(in srgb, var(--rootsdk-brand-primary) 15%, transparent);
+  border-color: var(--rootsdk-brand-primary);
+  color: var(--rootsdk-brand-primary);
+  cursor: default;
+}
+
+.suggestion-vote-container > span {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--rootsdk-text-secondary);
+}
+
+.delete-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin-left: auto;
+  padding: 0;
   border: none;
-  color: red;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--rootsdk-text-tertiary);
   cursor: pointer;
-  margin-left: 10px;
-  font-size: 1.2rem;
+  transition: all 0.15s ease;
 }
 
-.delete-button:hover
-{
-  color: darkred;
+.delete-button svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+
+.delete-button:hover {
+  background: color-mix(in srgb, var(--rootsdk-error) 15%, transparent);
+  color: var(--rootsdk-error);
 }

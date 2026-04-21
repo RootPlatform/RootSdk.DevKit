@@ -1,0 +1,92 @@
+.add-suggestion {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.error-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--rootsdk-error);
+  background: color-mix(in srgb, var(--rootsdk-error) 15%, transparent);
+  color: var(--rootsdk-error);
+  font-size: 0.875rem;
+}
+
+.error-banner button {
+  background: transparent;
+  border: none;
+  color: var(--rootsdk-error);
+  cursor: pointer;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.error-banner button:hover {
+  background: color-mix(in srgb, var(--rootsdk-error) 10%, transparent);
+}
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  border: 1px solid var(--rootsdk-border);
+  border-radius: 12px;
+  background: var(--rootsdk-input);
+  transition: border-color 0.15s ease;
+}
+
+.input-wrapper:focus-within {
+  border-color: var(--rootsdk-brand-primary);
+}
+
+.input-wrapper input {
+  flex: 1;
+  padding: 10px 0;
+  border: none;
+  background: transparent;
+  color: var(--rootsdk-text-primary);
+  font-family: inherit;
+  font-size: 0.875rem;
+  outline: none;
+}
+
+.input-wrapper input::placeholder {
+  color: var(--rootsdk-text-tertiary);
+}
+
+.add-suggestion > button {
+  align-self: flex-start;
+  padding: 8px 24px;
+  border: none;
+  border-radius: 24px;
+  background: var(--rootsdk-text-primary);
+  color: var(--rootsdk-background-primary);
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.add-suggestion > button:hover:not(:disabled) {
+  opacity: 0.8;
+}
+
+.add-suggestion > button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.add-suggestion > button:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--rootsdk-background-primary),
+    0 0 0 4px var(--rootsdk-brand-primary);
+}

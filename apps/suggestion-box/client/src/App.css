@@ -1,0 +1,83 @@
+/* ---------------------------------------------------------------
+   Fallback --rootsdk-* tokens (light-first, dark via media query).
+   Root injects these at runtime based on user theme — the values
+   below only apply when running standalone (e.g. bare Vite dev).
+   Pattern mirrors apps/themes/client/src/App.css.
+   --------------------------------------------------------------- */
+:root {
+  --rootsdk-brand-primary: #7C3AED;
+
+  --rootsdk-text-primary: #1F2937;
+  --rootsdk-text-secondary: #6B7280;
+  --rootsdk-text-tertiary: #9CA3AF;
+
+  --rootsdk-background-primary: #FFFFFF;
+  --rootsdk-background-secondary: #F9FAFB;
+  --rootsdk-background-tertiary: #F3F4F6;
+
+  --rootsdk-input: #F9FAFB;
+  --rootsdk-border: #E5E7EB;
+  --rootsdk-highlight-normal: rgba(0, 0, 0, 0.06);
+
+  --rootsdk-error: #EF4444;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --rootsdk-text-primary: #F9FAFB;
+    --rootsdk-text-secondary: #9CA3AF;
+    --rootsdk-text-tertiary: #6B7280;
+
+    --rootsdk-background-primary: #111827;
+    --rootsdk-background-secondary: #1F2937;
+    --rootsdk-background-tertiary: #374151;
+
+    --rootsdk-input: #1F2937;
+    --rootsdk-border: #374151;
+    --rootsdk-highlight-normal: rgba(255, 255, 255, 0.06);
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--rootsdk-background-primary);
+  color: var(--rootsdk-text-primary);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.app-navbar {
+  display: flex;
+  align-items: center;
+  min-height: 69px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--rootsdk-border);
+}
+
+.app-navbar h1 {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.app-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

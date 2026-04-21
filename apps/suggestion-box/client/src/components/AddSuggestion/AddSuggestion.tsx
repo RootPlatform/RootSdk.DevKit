@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSuggestionCacheContext } from "../../context/SuggestionContext";
+import "./AddSuggestion.css";
 
 export const AddSuggestion: React.FC = () => {
   const placeholder: string = "Enter suggestion";
@@ -20,20 +21,26 @@ export const AddSuggestion: React.FC = () => {
   }, [text, error, clearError]);
 
   return (
-    <div>
+    <div className="add-suggestion">
       {error && (
         <div className="error-banner">
           {error}
           <button onClick={clearError}>Dismiss</button>
         </div>
       )}
-      <input
-        type="text"
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        placeholder={placeholder}
-      />
-      <button onClick={handleAddSuggestionClick}>Create new suggestion</button>
+      <div className="input-wrapper">
+        <input
+          type="text"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder={placeholder}
+        />
+      </div>
+      <button
+        onClick={handleAddSuggestionClick}
+        disabled={!text.trim()}>
+        Create new suggestion
+      </button>
     </div>
   );
 };
