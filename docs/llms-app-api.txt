@@ -1,7 +1,7 @@
 # Root App Developer Documentation — API Reference
 
 > TypeScript API reference for the Root App SDK (server and client). For conceptual guides, see llms-app-guides.txt.
-> Generated: 2026-04-20 | Content-Hash: d536033379fe
+> Generated: 2026-04-21 | Content-Hash: d536033379fe
 
 ## Instructions
 

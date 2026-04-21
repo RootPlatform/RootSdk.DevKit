@@ -1,7 +1,7 @@
 # Root Bot Developer Documentation — API Reference
 
 > TypeScript API reference for the Root Bot SDK. For conceptual guides, see llms-bot-guides.txt.
-> Generated: 2026-04-20 | Content-Hash: cc495d347f9d
+> Generated: 2026-04-21 | Content-Hash: cc495d347f9d
 
 ## Instructions
 

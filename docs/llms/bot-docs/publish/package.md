@@ -33,7 +33,6 @@ npx rootsdk build package [options]
 | ------ | -------- | ------- | ----------- |
 | `-o, --output-file <output-file>` | **No** | `./rootapp-<manifest.version>.pkg` (dots in version replaced by hyphens) | Output file for the generated package. Example: if `manifest.version` is `1.2.3`, the output is `./rootapp-1-2-3.pkg`. You can override this by specifying a custom file or directory path. |
 | `-p, --project-folder <folder>`   | **No** | `./` (current directory) | Path to the directory containing `root-manifest.json`. |
-| `--verbose`                       | **No** | (off) | Print step-by-step progress during packaging. Useful when diagnosing a slow build or unexpected package size. |
 
 ## Examples
 

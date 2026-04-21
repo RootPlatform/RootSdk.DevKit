@@ -1,7 +1,7 @@
 # Root App Developer Documentation
 
 > Developer documentation for building Apps on the Root platform.
-> Generated: 2026-04-20 | Content-Hash: 6a8fd696cf50
+> Generated: 2026-04-21 | Content-Hash: dc4980d24248
 
 ## Instructions
 
@@ -12,7 +12,7 @@
 - All async methods return Promises. Use async/await.
 - Bots are server-only — same community API as apps, but no client UI.
 
-> **Note:** This file is large (~291K tokens). For most AI tools, use the smaller segment files instead — see [llms.txt](llms.txt) for guidance.
+> **Note:** This file is large (~292K tokens). For most AI tools, use the smaller segment files instead — see [llms.txt](llms.txt) for guidance.
 
 ## Table of Contents
 
@@ -81,6 +81,7 @@
 - [Moderation](#file-app-docs-develop-server-community-api-moderation) - Build automated moderation tools that manage members, moderate content, and control voice channels.
 - [Community access overview](#file-app-docs-develop-server-community-api-overview) - The community access API lets your server code read and modify the community where it's installed.
 - [Permission update events](#file-app-docs-develop-server-community-api-permission-update-events) - Some API operations trigger side effects that modify other resources. This article explains why this happens and how to handle it.
+- [Rate limits](#file-app-docs-develop-server-community-api-rate-limits) - Stay under the community API's rate limits with pacing and retry-with-backoff.
 - [Voice channels](#file-app-docs-develop-server-community-api-voice-channels) - Monitor and moderate voice channel participants.
 - [Community log](#file-app-docs-develop-server-community-log) - Send diagnostic messages from your app server to the administrators of a Root community.
 - [GUIDs](#file-app-docs-develop-server-guids) - Identify entities in the Root SDK using typed, base64-encoded string identifiers.
@@ -6677,6 +6678,135 @@ This pattern applies whenever your code maintains state tied to specific channel
 
 ---
 
+## File: app-docs/develop/server/community-api/rate-limits.md
+
+# Rate limits
+
+Stay under the community API's rate limits with pacing and retry-with-backoff.
+
+## Why rate limits exist
+
+The platform enforces per-connection limits so that one misbehaving app or bot cannot degrade the experience for an entire community. Limits are not arbitrary caps. They are sized to the cost of the operation and the realistic human-scale usage pattern. A command mutates state and fans out events to every connected member, a query reads a single (often cached) row, and an upload commits bytes to persistent storage. The budgets reflect that.
+
+Exceeding a limit returns `RootApiException` with `errorCode` set to `ErrorCodeType.TooManyRequests`. The call fails, nothing else happens. The server does not currently return a `retry-after` hint, so backoff is purely client-side.
+
+## Operation classes and limits
+
+| Operation class | Limit | Typical calls |
+|---|---|---|
+| Commands (create, edit, delete) | ~5 req/s | `channelMessages.create`, `communityRoles.delete`, `communityMemberBans.kick` |
+| Queries (get, list) | ~20 req/s | `channelMessages.list`, `communityMembers.get`, `communityRoles.list` |
+| Calls | ~1 req/s | `channelWebRtcs.kick`, `channelWebRtcs.setMuteAndDeafenOther` |
+| Uploads | 100 files or 250 MB/hr | `channelFiles.create`, `dataStore.assets.create` |
+
+Limits are approximate and subject to change. Treat them as soft targets. Use pacing to avoid hitting them, and use `withRetry()` (see below) as the safety net rather than hard-coding counts.
+
+### Commands
+
+Mutations to community state: posting a message, editing a channel description, creating a role, deleting a pin, kicking a member. Commands are the expensive path because the server validates the request, persists the change, and broadcasts an event to every connected member of the community.
+
+### Queries
+
+Reads that do not mutate state: loading message history, resolving a member profile, listing roles for a picker. The ~20 req/s budget is four times the command budget because reads are cheaper (no validation of new state, no broadcast) and because UIs and backfills fundamentally need to read more than they write.
+
+### Calls
+
+Voice channel moderation operations: `channelWebRtcs.kick` removes a member from a voice channel, and `channelWebRtcs.setMuteAndDeafenOther` force-mutes or deafens a participant. The ~1 req/s budget reflects that each operation coordinates with real-time media infrastructure.
+
+### Uploads
+
+File and asset uploads: message attachments, channel banners, app-bundled assets. Unlike the others, uploads have two ceilings enforced together over a rolling hour: **100 files** (prevents many-tiny-file abuse) and **250 MB** (prevents few-huge-file abuse). Whichever you hit first stops you, and both reset on a rolling window, not a calendar hour. For bulk operations (migrating a community's existing media library, for example), plan the work across hours rather than minutes.
+
+## Handle `TooManyRequests`
+
+Catch `RootApiException`, check for `ErrorCodeType.TooManyRequests`, and retry with exponential backoff and jitter:
+
+```ts
+import { rootServer, RootApiException, ErrorCodeType } from "@rootsdk/server-app";
+
+async function withRetry<T>(operation: () => Promise<T>, maxRetries = 3): Promise<T>
+{
+  for (let attempt = 0; ; attempt++)
+  {
+    try
+    {
+      return await operation();
+    }
+    catch (err: unknown)
+    {
+      const retryable =
+        err instanceof RootApiException
+          ? err.errorCode === ErrorCodeType.TooManyRequests
+            || err.errorCode === ErrorCodeType.ServerError
+            || err.errorCode === ErrorCodeType.Timeout
+            || err.errorCode === ErrorCodeType.StillProcessing
+          : true;
+
+      if (attempt >= maxRetries || !retryable) throw err;
+
+      const cap = Math.min(1000 * 2 ** attempt, 15000);
+      const delay = Math.random() * cap;
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+}
+```
+
+Wrap any SDK call:
+
+```ts
+const msg = await withRetry(() =>
+  rootServer.community.channelMessages.create({ channelId, content }),
+);
+```
+
+**Full jitter** (a random delay between zero and the computed cap) spreads retries more effectively than a fixed delay or equal jitter when several bot instances hit the same limit at the same moment. Fixed delays produce synchronised retry storms, full jitter breaks the sync.
+
+## Pace loops
+
+Retry handles the unexpected. Pacing prevents the limit in the first place. When you iterate over a list and issue one command per item, insert a small delay between calls:
+
+```ts
+async function pace(delayMs: number = 250): Promise<void>
+{
+  await new Promise((resolve) => setTimeout(resolve, delayMs));
+}
+
+for (const channelId of channelIds)
+{
+  await withRetry(() =>
+    rootServer.community.channelMessages.create({ channelId, content }),
+  );
+  await pace(250);
+}
+```
+
+A 250 ms gap keeps a command loop at 4 req/s, comfortably below the ~5 req/s threshold with headroom for retries that overlap the loop. Queries can be paced much more aggressively (50 ms or less). Calls should not be looped at all, pace them manually or gate them behind a user action.
+
+## Retryable versus non-retryable errors
+
+| Error code | Retryable | Why |
+|---|---|---|
+| `TooManyRequests` | Yes | Rate limit, back off and try again |
+| `ServerError` | Yes | Transient server issue |
+| `Timeout` | Yes | Request timed out before completing |
+| `StillProcessing` | Yes | Server still working on a prior request |
+| `NotFound` | No | Resource does not exist, a retry will not change that |
+| `NoPermissionTo*` | No | Missing manifest permission, a retry will not grant it |
+| `AlreadyExists` | No | Retry would hit the same conflict |
+| `RequestValidationFailed` | No | Fix the request, then call once |
+
+Network-level failures (DNS errors, connection resets) that are not `RootApiException` instances are generally transient and worth retrying.
+
+## Key behaviors
+
+- **No server-provided `retry-after`**: backoff is entirely client-side.
+- **`setTimeout` is fine for retry waits**: retry delays are milliseconds to seconds. For work that must survive restarts (scheduled recurrences, delays of minutes or hours), use the job scheduler instead.
+- **Log retries at `warn`, final failures at `error`**: a successful retry is expected behavior under load, not a bug. Reserve `console.error` for the call that fails after all retries are exhausted.
+- **Pacing beats retry**: if you know up front that you are about to issue N commands, pace the loop. Reserve `withRetry()` for the calls whose rate you cannot predict.
+
+---
+
 ## File: app-docs/develop/server/community-api/voice-channels.md
 
 # Voice channels
@@ -8066,7 +8196,6 @@ npx rootsdk build package [options]
 | ------ | -------- | ------- | ----------- |
 | `-o, --output-file <output-file>` | **No** | `./rootapp-<manifest.version>.pkg` (dots in version replaced by hyphens) | Output file for the generated package. Example: if `manifest.version` is `1.2.3`, the output is `./rootapp-1-2-3.pkg`. You can override this by specifying a custom file or directory path. |
 | `-p, --project-folder <folder>`   | **No** | `./` (current directory) | Path to the directory containing `root-manifest.json`. |
-| `--verbose`                       | **No** | (off) | Print step-by-step progress during packaging. Useful when diagnosing a slow build or unexpected package size. |
 
 ## Examples
 
@@ -8160,35 +8289,12 @@ npx rootsdk upload package [options]
 
 ## Options
 
-You must supply the authentication token through exactly one of the three auth options below (`--auth-token-file`, `ROOT_AUTH_TOKEN`, or `--authToken`). The file form is preferred in CI and shared environments because the token never appears on a command line or in shell history.
-
 | Option                      | Required | Default | Description |
 | --------------------------- | -------- | ------- | ----------- |
 | `-f, --file <file>`         | **Yes**  | —       | Path to the package file to upload. |
-| `--auth-token-file <path>`  | One of * | —       | Read the authentication token from a file. Preferred for CI and shared environments. |
-| `ROOT_AUTH_TOKEN` env var   | One of * | —       | Authentication token read from the environment. Not visible to other processes via `ps`. |
-| `-a, --auth-token <token>`  | One of * | —       | Authentication token passed inline. Visible in the process list and shell history, so it is not recommended for production use. |
-| `--verbose`                 | **No**   | (off)   | Print step-by-step progress during upload (manifest extraction, per-chunk streaming, server response). |
-
-&ast; Exactly one of the three auth options is required. The older camelCase form `--authToken` is still accepted but deprecated, and will be removed in a future release.
+| `-a, --authToken <token>`   | **Yes**  | —       | Authentication token passed inline. |
 
 ## Examples
-
-Upload using a token file (recommended for CI):
-
-```bash
-npx rootsdk upload package \
-  --file ./dist/rootapp-1-2-3.pkg \
-  --auth-token-file ./secrets/root-token
-```
-
-Upload using the environment variable:
-
-```bash
-ROOT_AUTH_TOKEN=$TOKEN npx rootsdk upload package --file ./dist/rootapp-1-2-3.pkg
-```
-
-Upload using an explicit command-line flag (fine for a quick local upload, not recommended in CI):
 
 ```bash
 npx rootsdk upload package \

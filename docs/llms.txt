@@ -15,14 +15,14 @@
 
 Load these files as context in your AI coding tool:
 
-- [App Guides](llms-app-guides.txt): Concepts, tutorials, and how-tos (~113K tokens)
+- [App Guides](llms-app-guides.txt): Concepts, tutorials, and how-tos (~114K tokens)
 - [App API Reference](llms-app-api.txt): All endpoints, parameters, types, and errors (~178K tokens)
 
 ## Building a Bot
 
 Load these files as context in your AI coding tool:
 
-- [Bot Guides](llms-bot-guides.txt): Concepts, tutorials, and how-tos (~66K tokens)
+- [Bot Guides](llms-bot-guides.txt): Concepts, tutorials, and how-tos (~67K tokens)
 - [Bot API Reference](llms-bot-api.txt): All endpoints, parameters, types, and errors (~151K tokens)
 
 ## Quick Links
@@ -33,9 +33,9 @@ Load these files as context in your AI coding tool:
 
 ## Complete Files (large — most AI tools cannot load these fully)
 
-- [All App Docs](llms-app.txt): Combined app guides + API reference (~291K tokens)
-- [All Bot Docs](llms-bot.txt): Combined bot guides + API reference (~217K tokens)
-- [Everything](llms-full.txt): All documentation (~506K tokens)
+- [All App Docs](llms-app.txt): Combined app guides + API reference (~292K tokens)
+- [All Bot Docs](llms-bot.txt): Combined bot guides + API reference (~218K tokens)
+- [Everything](llms-full.txt): All documentation (~509K tokens)
 
 ## Overview
 
@@ -165,6 +165,7 @@ Individual articles covering configuration, design, development, and tutorials. 
 - [Message replies](llms/app-docs/develop/server/community-api/messaging/replies.md): Send messages that reference other messages, creating conversational context for your responses.
 - [Moderation](llms/app-docs/develop/server/community-api/moderation.md): Build automated moderation tools that manage members, moderate content, and control voice channels.
 - [Permission update events](llms/app-docs/develop/server/community-api/permission-update-events.md): Some API operations trigger side effects that modify other resources. This article explains why this happens and how to handle it.
+- [Rate limits](llms/app-docs/develop/server/community-api/rate-limits.md): Stay under the community API's rate limits with pacing and retry-with-backoff.
 - [Voice channels](llms/app-docs/develop/server/community-api/voice-channels.md): Monitor and moderate voice channel participants.
 - [Community log](llms/app-docs/develop/server/community-log.md): Send diagnostic messages from your app server to the administrators of a Root community.
 - [GUIDs](llms/app-docs/develop/server/guids.md): Identify entities in the Root SDK using typed, base64-encoded string identifiers.
@@ -223,6 +224,7 @@ Individual articles covering configuration, design, development, and tutorials. 
 - [Message replies](llms/bot-docs/develop/community-api/messaging/replies.md): Send messages that reference other messages, creating conversational context for your responses.
 - [Moderation](llms/bot-docs/develop/community-api/moderation.md): Build automated moderation tools that manage members, moderate content, and control voice channels.
 - [Permission update events](llms/bot-docs/develop/community-api/permission-update-events.md): Some API operations trigger side effects that modify other resources. This article explains why this happens and how to handle it.
+- [Rate limits](llms/bot-docs/develop/community-api/rate-limits.md): Stay under the community API's rate limits with pacing and retry-with-backoff.
 - [Voice channels](llms/bot-docs/develop/community-api/voice-channels.md): Monitor and moderate voice channel participants.
 - [GUIDs](llms/bot-docs/develop/guids.md): Identify entities in the Root SDK using typed, base64-encoded string identifiers.
 - [Root Job scheduler](llms/bot-docs/develop/job-scheduler.md): The Root `JobScheduler` is an API for scheduling tasks that need to execute at future date(s).
