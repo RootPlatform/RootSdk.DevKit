@@ -7,27 +7,27 @@ Developer toolkit for building apps and bots on the Root Platform. This guide he
 **Building a bot** (server-only automation):
 1. Copy `templates/bot/` to your target location
 2. Load `docs/llms-bot-guides.txt` (~61K tokens) and `docs/llms-bot-api.txt` (~141K tokens)
-3. Reference `how-to/` bots for working examples of each SDK domain
-4. For complete SDK usage per domain, always check the matching `how-to/` module — each one demonstrates every method. Sample bots only show targeted use cases.
+3. Reference `api-samples/` bots for working examples of each SDK domain
+4. For complete SDK usage per domain, always check the matching `api-samples/` module — each one demonstrates every method. Sample bots only show targeted use cases.
 
 **Building an app** (client UI + server):
 
 1. Load `docs/llms-app-guides.txt` (~106K tokens) and `docs/llms-app-api.txt` (~163K tokens).
-2. Walk the concern checklist below. For each concern that applies to your app, load the matching how-to **before writing code for that concern** — don't defer until you hit a wall.
+2. Walk the concern checklist below. For each concern that applies to your app, load the matching api sample **before writing code for that concern** — don't defer until you hit a wall.
 
-   | Concern | How-to | Triggers for |
+   | Concern | API Sample | Triggers for |
    |---|---|---|
-   | UI theming / dark mode | `how-to/client-app-theme` | any client UI |
-   | User profiles / identity | `how-to/client-app-users` | any UI showing user-scoped data |
-   | Client-server RPC | `how-to/networking-app-services` | any call back to the server |
-   | Persistence | `how-to/server-database` or `how-to/server-key-value-store` | any stored state |
-   | Role/member permissions | `how-to/server-global-settings`, `how-to/server-access-rules` | any role-gated behavior |
-   | Scheduling | `how-to/server-jobs` | timers, retries, delayed work |
-   | Retry / resilience | `how-to/server-resilience` | any external call |
+   | UI theming / dark mode | `api-samples/client-app-theme` | any client UI |
+   | User profiles / identity | `api-samples/client-app-users` | any UI showing user-scoped data |
+   | Client-server RPC | `api-samples/networking-app-services` | any call back to the server |
+   | Persistence | `api-samples/server-database` or `api-samples/server-key-value-store` | any stored state |
+   | Role/member permissions | `api-samples/server-global-settings`, `api-samples/server-access-rules` | any role-gated behavior |
+   | Scheduling | `api-samples/server-jobs` | timers, retries, delayed work |
+   | Retry / resilience | `api-samples/server-resilience` | any external call |
 
 3. Copy `templates/app/` for scaffolding. Read the template files — `server/src/main.ts`, `server/src/exampleService.ts`, `client/src/Example.tsx`, `networking/src/example.proto` — to understand the build layout.
 4. Consult `apps/*` for end-to-end shape. **Samples illustrate one possible shape — they do not cover every concern your app needs. Check each sample's `README.md` for its coverage scope before using it as a reference.**
-5. `how-to/` bots double as server-side references for apps (server code is identical between apps and bots). For complete SDK usage per domain, always check the matching how-to module — each demonstrates every method; samples only show targeted use cases.
+5. `api-samples/` bots double as server-side references for apps (server code is identical between apps and bots). For complete SDK usage per domain, always check the matching api sample module — each demonstrates every method; samples only show targeted use cases.
 
 **Not sure which to build?** Read `docs/llms/overview/choose-app-or-bot.md`.
 
@@ -36,7 +36,7 @@ Developer toolkit for building apps and bots on the Root Platform. This guide he
 - **Apps** import from `@rootsdk/server-app`. **Bots** import from `@rootsdk/server-bot`.
 - All server-side SDK code is identical between apps and bots except the import path.
 - The `rootServer` object is the SDK entry point. Everything hangs off `rootServer.community.*`, `rootServer.dataStore.*`, `rootServer.lifecycle.*`, etc.
-- **Set permissions** in `root-manifest.json` — each how-to README lists the permissions its APIs require. `schemas/permissions-map.json` maps every SDK method to its required permission.
+- **Set permissions** in `root-manifest.json` — each api-sample README lists the permissions its APIs require. `schemas/permissions-map.json` maps every SDK method to its required permission.
 
 ## Common Needs
 
@@ -44,15 +44,15 @@ When your task requires one of these, go to the linked module — don't invent a
 
 | Need | Where to look | Notes |
 |------|--------------|-------|
-| Make something configurable by community admins | `how-to/server-global-settings` + `docs/llms/bot-docs/configure/manifest-global-settings.md` | Settings are declared in `root-manifest.json` and edited by admins through the Root UI. Some setting types are not yet available — check the docs for platform status before using one. |
-| Persist data between restarts | `how-to/server-database` (SQLite) or `how-to/server-key-value-store` | Don't use the filesystem or in-memory state for data that must survive restarts. |
-| Run code on a schedule or delay | `how-to/server-jobs` | Don't use `setTimeout`/`setInterval` — jobs survive restarts, timers don't. |
-| Identify what type of entity a GUID represents | `how-to/server-guid-utils` | Distinguishes users from bots/apps, extracts timestamps — no API call needed. |
-| Retry after rate limits or transient errors | `how-to/server-resilience` | Wrap any SDK call in `withRetry()`. Retries TooManyRequests, ServerError, Timeout with exponential backoff + jitter. |
+| Make something configurable by community admins | `api-samples/server-global-settings` + `docs/llms/bot-docs/configure/manifest-global-settings.md` | Settings are declared in `root-manifest.json` and edited by admins through the Root UI. Some setting types are not yet available — check the docs for platform status before using one. |
+| Persist data between restarts | `api-samples/server-database` (SQLite) or `api-samples/server-key-value-store` | Don't use the filesystem or in-memory state for data that must survive restarts. |
+| Run code on a schedule or delay | `api-samples/server-jobs` | Don't use `setTimeout`/`setInterval` — jobs survive restarts, timers don't. |
+| Identify what type of entity a GUID represents | `api-samples/server-guid-utils` | Distinguishes users from bots/apps, extracts timestamps — no API call needed. |
+| Retry after rate limits or transient errors | `api-samples/server-resilience` | Wrap any SDK call in `withRetry()`. Retries TooManyRequests, ServerError, Timeout with exponential backoff + jitter. |
 | Set permissions for SDK calls | `schemas/permissions-map.json` | Maps every SDK method to its required `root-manifest.json` permission. |
-| Style a client UI to match Root (light/dark) | `how-to/client-app-theme` + `apps/themes` | Use `var(--rootsdk-*)` CSS tokens; don't hardcode colors. Tokens switch automatically with the user's theme. |
-| Show a user's profile, nickname, or avatar | `how-to/client-app-users` | Don't invent a user model — use `rootClient.users.*` and its profile-update events. |
-| Call the server from the client | `how-to/networking-app-services` | Define protobuf services and use the generated client/server bases; don't hand-roll JSON fetch. |
+| Style a client UI to match Root (light/dark) | `api-samples/client-app-theme` + `apps/themes` | Use `var(--rootsdk-*)` CSS tokens; don't hardcode colors. Tokens switch automatically with the user's theme. |
+| Show a user's profile, nickname, or avatar | `api-samples/client-app-users` | Don't invent a user model — use `rootClient.users.*` and its profile-update events. |
+| Call the server from the client | `api-samples/networking-app-services` | Define protobuf services and use the generated client/server bases; don't hand-roll JSON fetch. |
 
 ## Sample Apps
 
@@ -80,9 +80,9 @@ Complete, runnable bot examples in `bots/`. Server-only — no client UI.
 | `role-assignment` | Assign roles to members | Role and member-role APIs | Moderate |
 | `role-list` | List community roles | Role querying | Minimal |
 
-## How-To Index
+## API Samples Index
 
-Focused samples in `how-to/`, one per SDK domain. Each is a standalone bot with working code covering every method. Files are self-contained: one file = one complete answer, with behavioral nuances inline as comments. Server-side code is identical between apps and bots except for the import path and lifecycle, so these how-to bots double as server-side references for apps. Client code is app-only.
+Focused samples in `api-samples/`, one per SDK domain. Each is a standalone bot with working code covering every method. Files are self-contained: one file = one complete answer, with behavioral nuances inline as comments. Server-side code is identical between apps and bots except for the import path and lifecycle, so these api-sample bots double as server-side references for apps. Client code is app-only.
 
 ### Server — Community API
 
@@ -143,7 +143,7 @@ Focused samples in `how-to/`, one per SDK domain. Each is a standalone bot with 
 
 ## Documentation
 
-Full developer docs in `docs/`. The index is `docs/llms.txt`.
+Full developer docs in `docs/`. The index is `docs/index.md`.
 
 ### For bots
 
@@ -169,7 +169,7 @@ Full developer docs in `docs/`. The index is `docs/llms.txt`.
 
 ### Individual articles
 
-`docs/llms/` contains individual markdown files organized by topic. See `docs/llms.txt` for the full index with descriptions.
+`docs/llms/` contains individual markdown files organized by topic. See `docs/index.md` for the full index with descriptions.
 
 ## Schemas
 

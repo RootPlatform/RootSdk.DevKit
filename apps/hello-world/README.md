@@ -7,10 +7,10 @@ Minimal echo service. A client sends a string, the server echoes it back and bro
 **Demonstrates:** client-server RPC via protobuf, service broadcast to all clients, minimal app layout (client + server + networking workspaces).
 
 **Does NOT demonstrate:**
-- UI theming — see [`how-to/client-app-theme`](../../how-to/client-app-theme). The client UI here is unstyled; don't copy its raw HTML as a styling template.
-- Persistence — see [`how-to/server-database`](../../how-to/server-database) or [`how-to/server-key-value-store`](../../how-to/server-key-value-store). This sample keeps no state.
-- User identity / profiles — see [`how-to/client-app-users`](../../how-to/client-app-users).
-- Role/member permissions — see [`how-to/server-global-settings`](../../how-to/server-global-settings) and [`how-to/server-access-rules`](../../how-to/server-access-rules).
-- Retry / resilience — see [`how-to/server-resilience`](../../how-to/server-resilience).
+- UI theming — see [`api-samples/client-app-theme`](../../api-samples/client-app-theme). The client UI here is unstyled; don't copy its raw HTML as a styling template.
+- Persistence — see [`api-samples/server-database`](../../api-samples/server-database) or [`api-samples/server-key-value-store`](../../api-samples/server-key-value-store). This sample keeps no state.
+- User identity / profiles — see [`api-samples/client-app-users`](../../api-samples/client-app-users).
+- Role/member permissions — see [`api-samples/server-global-settings`](../../api-samples/server-global-settings) and [`api-samples/server-access-rules`](../../api-samples/server-access-rules).
+- Retry / resilience — see [`api-samples/server-resilience`](../../api-samples/server-resilience).
 
-Use this sample as a shape reference for the workspace layout and protobuf service round-trip. Consult the listed how-tos for concerns it doesn't cover.
+Use this sample as a shape reference for the workspace layout and protobuf service round-trip. Consult the listed api samples for concerns it doesn't cover.

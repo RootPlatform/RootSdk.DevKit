@@ -7,9 +7,9 @@ Community suggestion board — members post suggestions, upvote, and delete thei
 **Demonstrates:** multiple protobuf services (suggestions + votes), SQLite persistence via Knex with foreign-key cascades, React context for client-side caching, broadcast events for cross-client sync, domain error codes thrown as `RootServerException` and handled on the client, separate `shared/` workspace.
 
 **Does NOT demonstrate:**
-- User identity / profiles — see [`how-to/client-app-users`](../../how-to/client-app-users). Authors are rendered as raw user-ID strings.
-- Role/member permissions — see [`how-to/server-global-settings`](../../how-to/server-global-settings) and [`how-to/server-access-rules`](../../how-to/server-access-rules). Anyone connected can create or vote.
-- Scheduling — see [`how-to/server-jobs`](../../how-to/server-jobs).
-- Retry / resilience — see [`how-to/server-resilience`](../../how-to/server-resilience). The client restarts on unexpected errors; production code should retry transient failures instead.
+- User identity / profiles — see [`api-samples/client-app-users`](../../api-samples/client-app-users). Authors are rendered as raw user-ID strings.
+- Role/member permissions — see [`api-samples/server-global-settings`](../../api-samples/server-global-settings) and [`api-samples/server-access-rules`](../../api-samples/server-access-rules). Anyone connected can create or vote.
+- Scheduling — see [`api-samples/server-jobs`](../../api-samples/server-jobs).
+- Retry / resilience — see [`api-samples/server-resilience`](../../api-samples/server-resilience). The client restarts on unexpected errors; production code should retry transient failures instead.
 
-Use this sample as a shape reference for multi-service architecture, SQLite + repository, and client context caching. Consult the listed how-tos for concerns it doesn't cover.
+Use this sample as a shape reference for multi-service architecture, SQLite + repository, and client context caching. Consult the listed api samples for concerns it doesn't cover.

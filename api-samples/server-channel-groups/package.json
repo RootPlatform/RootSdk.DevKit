@@ -1,0 +1,22 @@
+{
+  "name": "@rootsdk-howto/server-channel-groups",
+  "author": "Root Communications, Inc.",
+  "description": "API Sample: Channel Groups — create, get, list, edit, move, delete, events",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@rootsdk/server-bot": "0.17.1-alpha.6"
+  },
+  "devDependencies": {
+    "@rootsdk/dev-tools": "0.17.1-alpha.6",
+    "typescript": "^5.8.2"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "node clean.js",
+    "bot": "rootsdk start devhost"
+  }
+}

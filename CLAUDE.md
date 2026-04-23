@@ -1,6 +1,6 @@
 # RootSdk.DevKit
 
-Developer toolkit for building apps and bots on the Root Platform. Read `AGENTS.md` for full navigation — samples, docs, how-tos, schemas, and decision guidance.
+Developer toolkit for building apps and bots on the Root Platform. Read `AGENTS.md` for full navigation — samples, docs, api-samples, schemas, and decision guidance.
 
 ## Key Conventions
 
