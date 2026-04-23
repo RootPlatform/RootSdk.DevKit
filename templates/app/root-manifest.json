@@ -8,7 +8,7 @@
     "server": {
       "launch": "server/dist/main.js",
       "deploy": ["server/dist", "networking/gen/server"],
-      "nodeModules": ["node_modules", "server/node_modules"]
+      "nodeModules": ["node_modules"]
     }
   }
 }

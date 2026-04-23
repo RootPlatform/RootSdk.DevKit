@@ -57,14 +57,13 @@ This tri-state model lets you grant specific permissions, restrict others, and l
 
 ```ts
 const overlay: ChannelOverlayPermission = {
-  channelView: true,           // Explicitly allow
   channelCreateMessage: true,  // Explicitly allow
   channelCreateFile: false,    // Explicitly deny
   // All other permissions: undefined (no change)
 };
 ```
 
-The `channelView` permission controls visibility as well as access. Setting `channelView: true` makes a hidden channel visible to the subject; setting `channelView: false` hides a channel the subject would otherwise see.
+The `channelView` permission controls both visibility and access. Grant visibility explicitly with `channelView: true`. Denying visibility with `channelView: false` has subtler semantics than other permissions; see the note under Step 4 below.
 
 ## How access rules work
 
@@ -79,6 +78,8 @@ Root calculates effective permissions through four stages. Before walking throug
 **Base permissions** are the starting permission set a member has before any channel-specific access rules are applied. Your code gets base permissions from two sources: its manifest declarations and its assigned community roles, merged with OR logic (if either source grants a permission, it's allowed). Human members get base permissions from their roles only.
 
 **Access rules gate channel access.** Base permissions describe what a member can do community-wide, but they don't automatically carry through to every channel. For channels with independent permissions, a member must have at least one access rule (targeting them directly or through a role) to see the channel at all. Without a matching access rule, the channel is invisible regardless of base permissions.
+
+**`channelFullControl` cannot be reduced by overlays.** When a subject's resolved permissions for a channel include `channelFullControl`, every other channel permission for that subject on that channel also resolves to `true`, and channel-scoped authorization checks short-circuit to allowed. Overlays denying individual permissions do not take effect once `channelFullControl` is in the set.
 
 ### Step 1: Initialize from base permissions
 
@@ -118,11 +119,13 @@ Root collects every access rule that targets a role your code has, then merges t
 
 If an access rule targets your code directly (by member ID rather than role), Root applies its overlay last. For each permission in the overlay:
 
-- **`true`**: the permission is allowed, regardless of what Steps 1–3 produced.
-- **`false`**: the permission is denied, regardless of what Steps 1–3 produced.
+- **`true`**: overrides any role-based overlay from Step 3 for this permission.
+- **`false`**: overrides any role-based overlay from Step 3 for this permission.
 - **`undefined`**: no change; the value from Step 3 stays.
 
 The final permission set determines what your code can do on that channel.
+
+**`channelView` has derived-visibility semantics.** In the permission struct returned by `ChannelClient.get` / `ChannelClient.list`, `channelView` is set to `true` if **any** access rule targets the subject on the channel, regardless of whether the overlay sets `channelView` explicitly. The mere existence of a rule (role or member scoped) is enough to produce `channelView: true`. Conversely, `channelView: false` in an overlay on its own won't hide the channel from a subject who's already reachable by that (or any other) access rule. To take visibility away, remove all matching rules. This is a separate evaluation path from the overlay merge above and is not affected by Step 4's override behavior.
 
 ### Examples
 
