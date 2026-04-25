@@ -1,0 +1,261 @@
+{
+	"$schema": "./catalog.schema.json",
+	"samples": {
+		"client-app-assets": {
+			"title": "Client Assets",
+			"audience": "app",
+			"covers": {
+				"clients": ["RootClientAsset"]
+			}
+		},
+		"client-app-lifecycle": {
+			"title": "Client Lifecycle",
+			"audience": "app",
+			"covers": {
+				"clients": ["RootClientLifecycle"],
+				"concepts": ["client-lifecycle"]
+			}
+		},
+		"client-app-theme": {
+			"title": "Client Theme",
+			"audience": "app",
+			"covers": {
+				"clients": ["RootClientTheme"],
+				"concepts": ["theme-mode"]
+			}
+		},
+		"client-app-users": {
+			"title": "Client Users",
+			"audience": "app",
+			"covers": {
+				"clients": ["RootClientUser"]
+			}
+		},
+		"networking-app-services": {
+			"title": "RPC Services",
+			"audience": "app",
+			"covers": {
+				"clients": ["RootServerService", "RootClientService"],
+				"concepts": [
+					"client-server-networking",
+					"plan-services",
+					"define-service",
+					"generate-service",
+					"implement-service",
+					"use-service",
+					"handle-exceptions"
+				]
+			}
+		},
+		"server-access-rules": {
+			"title": "Access Rules",
+			"audience": "both",
+			"covers": {
+				"clients": ["AccessRuleClient"],
+				"concepts": ["access-rules", "permission-update-events"]
+			}
+		},
+		"server-app-assets": {
+			"title": "Server Assets",
+			"audience": "app",
+			"covers": {
+				"clients": ["AssetClient"],
+				"concepts": ["assets"]
+			}
+		},
+		"server-app-client-attachment": {
+			"title": "Client Attachment",
+			"audience": "app",
+			"covers": {
+				"clients": ["AttachedClients"],
+				"concepts": ["client-attachment"]
+			}
+		},
+		"server-app-lifecycle": {
+			"title": "App Lifecycle",
+			"audience": "app",
+			"covers": {
+				"clients": ["RootAppLifecycle"],
+				"concepts": ["server-lifecycle"]
+			}
+		},
+		"server-bot-lifecycle": {
+			"title": "Bot Lifecycle",
+			"audience": "bot",
+			"covers": {
+				"clients": ["RootBotLifecycle"],
+				"concepts": ["server-lifecycle"]
+			}
+		},
+		"server-channel-groups": {
+			"title": "Channel Groups",
+			"audience": "both",
+			"covers": {
+				"clients": ["ChannelGroupClient"],
+				"concepts": ["channels"]
+			}
+		},
+		"server-channels": {
+			"title": "Channels",
+			"audience": "both",
+			"covers": {
+				"clients": ["ChannelClient"],
+				"concepts": ["channels"]
+			}
+		},
+		"server-community": {
+			"title": "Community",
+			"audience": "both",
+			"covers": {
+				"clients": ["CommunityClient"]
+			}
+		},
+		"server-community-logs": {
+			"title": "Community Logs",
+			"audience": "both",
+			"covers": {
+				"clients": ["CommunityAppLogClient"],
+				"concepts": ["community-log"]
+			}
+		},
+		"server-database": {
+			"title": "SQLite Database",
+			"audience": "both",
+			"covers": {
+				"clients": ["RootDatabaseConfig"],
+				"concepts": ["persistence-sqlite", "persistence-choose-approach"]
+			}
+		},
+		"server-directories": {
+			"title": "Channel Directories",
+			"audience": "both",
+			"covers": {
+				"clients": ["ChannelDirectoryClient"],
+				"concepts": ["files"]
+			}
+		},
+		"server-emojis": {
+			"title": "Community Emojis",
+			"audience": "both",
+			"covers": {
+				"clients": ["CommunityEmojiClient"],
+				"concepts": ["community-emojis"]
+			}
+		},
+		"server-files": {
+			"title": "Channel Files",
+			"audience": "both",
+			"covers": {
+				"clients": ["ChannelFileClient"],
+				"concepts": ["files"]
+			}
+		},
+		"server-global-settings": {
+			"title": "Global Settings",
+			"audience": "both",
+			"covers": {
+				"clients": ["GlobalSettings"],
+				"concepts": ["global-settings", "manifest-global-settings"]
+			}
+		},
+		"server-guid-utils": {
+			"title": "GUID Utilities",
+			"audience": "both",
+			"covers": {
+				"classes": ["RootGuidUtils"],
+				"concepts": ["guids"]
+			}
+		},
+		"server-invites": {
+			"title": "Member Invites",
+			"audience": "both",
+			"covers": {
+				"clients": ["CommunityMemberInviteClient"]
+			}
+		},
+		"server-jobs": {
+			"title": "Job Scheduler",
+			"audience": "both",
+			"covers": {
+				"clients": ["JobScheduler"],
+				"concepts": ["job-scheduler"]
+			}
+		},
+		"server-key-value-store": {
+			"title": "Key-Value Store",
+			"audience": "both",
+			"covers": {
+				"clients": ["KeyValueStore"],
+				"concepts": ["persistence-key-value-store", "persistence-choose-approach"]
+			}
+		},
+		"server-kick-ban": {
+			"title": "Kick & Ban",
+			"audience": "both",
+			"covers": {
+				"clients": ["CommunityMemberBanClient"],
+				"concepts": ["moderation"]
+			}
+		},
+		"server-member-groups": {
+			"title": "Member Groups",
+			"audience": "both",
+			"covers": {
+				"clients": ["MemberGroupClient"],
+				"concepts": ["member-groups"]
+			}
+		},
+		"server-member-roles": {
+			"title": "Member Roles",
+			"audience": "both",
+			"covers": {
+				"clients": ["CommunityMemberRoleClient"]
+			}
+		},
+		"server-members": {
+			"title": "Members",
+			"audience": "both",
+			"covers": {
+				"clients": ["CommunityMemberClient"]
+			}
+		},
+		"server-messages": {
+			"title": "Channel Messages",
+			"audience": "both",
+			"covers": {
+				"clients": ["ChannelMessageClient"],
+				"concepts": ["messaging", "mentions"]
+			},
+			"subFiles": {
+				"send": "src/send.ts",
+				"mentions": "src/mentions.ts",
+				"reactions": "src/reactions.ts",
+				"pins": "src/pins.ts",
+				"flag": "src/flag.ts"
+			}
+		},
+		"server-resilience": {
+			"title": "Resilience",
+			"audience": "both",
+			"covers": {
+				"classes": ["RootApiException"],
+				"concepts": ["rate-limits", "error-handling", "handle-real-time-failures"]
+			}
+		},
+		"server-roles": {
+			"title": "Community Roles",
+			"audience": "both",
+			"covers": {
+				"clients": ["CommunityRoleClient"]
+			}
+		},
+		"server-voice": {
+			"title": "Voice (WebRTC)",
+			"audience": "both",
+			"covers": {
+				"clients": ["ChannelWebRtcClient"],
+				"concepts": ["voice-channels"]
+			}
+		}
+	}
+}

@@ -1,0 +1,62 @@
+{
+	"$schema": "https://json-schema.org/draft-07/schema#",
+	"title": "API Sample Catalog",
+	"description": "Authoritative catalog mapping each api-samples/ folder to the SDK types and concepts it covers. Consumed by the docs build to render sample pointers in API reference pages and to validate that every Client type has an owning sample.",
+	"type": "object",
+	"required": ["samples"],
+	"additionalProperties": false,
+	"properties": {
+		"$schema": {
+			"type": "string"
+		},
+		"samples": {
+			"type": "object",
+			"description": "Keyed by api-samples/ folder name (e.g., 'server-access-rules').",
+			"additionalProperties": { "$ref": "#/definitions/sample" }
+		}
+	},
+	"definitions": {
+		"sample": {
+			"type": "object",
+			"required": ["title", "audience", "covers"],
+			"additionalProperties": false,
+			"properties": {
+				"title": {
+					"type": "string",
+					"description": "Display name shown in AGENTS.md tables, llms.txt sample sections, and worked-sample pointer lines."
+				},
+				"audience": {
+					"enum": ["app", "bot", "both"],
+					"description": "Whether the sample applies to apps, bots, or both. 'both' means the SDK surface exists under both @rootsdk/server-app and @rootsdk/server-bot."
+				},
+				"covers": {
+					"type": "object",
+					"description": "What this sample is the canonical worked example for.",
+					"additionalProperties": false,
+					"properties": {
+						"clients": {
+							"type": "array",
+							"items": { "type": "string" },
+							"description": "Type-alias or interface names accessed via rootServer.* or rootClient.* (e.g., 'AccessRuleClient', 'JobScheduler', 'RootClientTheme'). Each must exist as <name>.md under app-api-reference/ or bot-api-reference/."
+						},
+						"classes": {
+							"type": "array",
+							"items": { "type": "string" },
+							"description": "Class names (e.g., 'RootApiException', 'RootGuidUtils'). Each must exist as <name>.md under */classes/ in the API reference."
+						},
+						"concepts": {
+							"type": "array",
+							"items": { "type": "string" },
+							"description": "Concept slugs that match a docs file or directory under app-docs/ or bot-docs/. Prefix-matched: 'access-rules' resolves to access-rules.md; 'messaging' resolves to the messaging/ directory."
+						}
+					}
+				},
+				"subFiles": {
+					"type": "object",
+					"description": "Optional sub-feature → source file map for samples with multiple feature files (e.g., server-messages has separate files for send, mentions, reactions, pins, flag).",
+					"additionalProperties": { "type": "string" }
+				}
+			}
+		}
+	}
+}
