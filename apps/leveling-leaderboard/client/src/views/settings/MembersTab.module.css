@@ -1,0 +1,52 @@
+.tab {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background-color: var(--rootsdk-background-secondary);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.heading {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--rootsdk-text-primary);
+  margin: 0;
+}
+
+.help {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--rootsdk-text-secondary);
+}
+
+.pickerWrap {
+  /* Reserve space for the picker's internal dropdown panel — prevents the
+     tab's rounded panel from clipping the typeahead results on long lists. */
+  min-height: 280px;
+}
+
+.note {
+  margin: 0;
+  font-size: 12px;
+  color: var(--rootsdk-text-secondary);
+  background-color: var(--rootsdk-background-tertiary);
+  padding: 6px 10px;
+  border-radius: 6px;
+  align-self: flex-start;
+}
+
+.emptyHint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--rootsdk-text-tertiary);
+  font-style: italic;
+}

@@ -1,0 +1,15 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Children of .content handle their own scrolling. Keeping the scroll inside
+   each view (not on the viewport) means the scrollbar appears below the
+   sticky AppHeader and — for Settings — below the non-scrolling tab bar,
+   rather than visually overlapping either. */
+.content {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}

@@ -1,7 +1,7 @@
 # Root Bot Developer Documentation — API Reference
 
 > TypeScript API reference for the Root Bot SDK. For conceptual guides, see llms-bot-guides.txt.
-> Generated: 2026-04-23 | Content-Hash: 3d8bdb52490b
+> Generated: 2026-04-25 | Content-Hash: d8b8661f18f3
 
 ## Instructions
 
@@ -586,7 +586,7 @@ The `RootGuidType`.
 
 > `static` **toMilliseconds**(`strData`: `string`): `number`
 
-Extracts the creation timestamp from a GUID. Delegates to `RootGuidUtils.toMilliseconds()`.
+Extracts the creation timestamp from a GUID as a Unix millisecond timestamp. Delegates to RootGuidUtils.toMilliseconds().
 
 #### Parameters
 
@@ -598,7 +598,7 @@ Extracts the creation timestamp from a GUID. Delegates to `RootGuidUtils.toMilli
 
 `number`
 
-Milliseconds since an internal epoch.
+Unix milliseconds (ms since 1970-01-01 UTC).
 
 ### toRootGuidType()
 
@@ -696,7 +696,7 @@ The converted GUID value or undefined.
 
 > `static` **toMilliseconds**(`strData`: `string`): `number`
 
-Extracts the creation timestamp from a GUID as milliseconds since an internal epoch. Use the returned value to compare the relative age of GUIDs or sort entities by creation time.
+Extracts the creation timestamp from a GUID as a Unix millisecond timestamp. Pass the returned value to new Date() to get the creation time, or use it directly to compare the relative age of GUIDs or sort entities by creation time.
 
 #### Parameters
 
@@ -708,7 +708,7 @@ Extracts the creation timestamp from a GUID as milliseconds since an internal ep
 
 `number`
 
-Milliseconds since the Root epoch.
+Unix milliseconds (ms since 1970-01-01 UTC).
 
 ### toRootGuidType()
 

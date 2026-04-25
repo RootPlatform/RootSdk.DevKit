@@ -1,33 +1,27 @@
-# Root Design System
-
-Design tokens and patterns for building UIs that match the Root visual style.
-
-## Important: Theme-Aware Colors
-
-Root uses CSS custom properties (variables) prefixed with `--rootsdk-` for colors.
-**The Root hosting environment automatically sets these variables** based on the user's
-theme preference (light/dark). Your app does not need to know the actual color values -
-just reference the CSS variables and they will adapt automatically.
-
 ---
+path: app-docs/develop/client/design-system-reference.md
+audience: app
+category: guide
+summary: Style your apps to match the Root visual style using CSS color variables, spacing, typography, and component patterns provided by the Root SDK.
+---
+
+# Design system reference
+
+Style your apps to match the Root visual style using CSS color variables, spacing, typography, and component patterns provided by the Root SDK.
+
+## What is the Root design system?
+
+The Root design system is a set of CSS custom properties (variables) prefixed with `--rootsdk-` that the Root hosting environment injects into your App's client at runtime, plus conventions for spacing, radii, typography, shadows, and component patterns that match Root's first-party UI.
+
+The CSS variables hold the current theme's color values, allowing your App to automatically adapt when the user switches between light and dark mode. Root updates the variables automatically when the theme changes, so your App does not need to know the actual color values. Just reference the variables and they will adapt.
+
+If your App needs to perform additional logic when the theme changes (such as updating a canvas or third-party library), see [Theme mode](theme-mode.md).
 
 ## Colors
 
-### How to Use Colors
+### Color reference
 
-Reference colors using CSS variables:
-
-```css
-.my-element {
-  background-color: var(--rootsdk-background-secondary);
-  color: var(--rootsdk-text-primary);
-  border: 1px solid var(--rootsdk-border);
-}
-```
-
-### Color Reference
-
-#### Brand Colors
+#### Brand colors
 
 | Token | CSS Variable | Description |
 |-------|--------------|-------------|
@@ -35,7 +29,7 @@ Reference colors using CSS variables:
 | brandSecondary | `--rootsdk-brand-secondary` | Secondary brand color, used for success states and accents |
 | brandTertiary | `--rootsdk-brand-tertiary` | Tertiary brand color, used for additional accents |
 
-#### Text Colors
+#### Text colors
 
 | Token | CSS Variable | Description |
 |-------|--------------|-------------|
@@ -44,7 +38,7 @@ Reference colors using CSS variables:
 | textTertiary | `--rootsdk-text-tertiary` | Tertiary text color for disabled or placeholder text |
 | textWhite | `--rootsdk-text-white` | White text color, used on dark backgrounds regardless of theme |
 
-#### Background Colors
+#### Background colors
 
 | Token | CSS Variable | Description |
 |-------|--------------|-------------|
@@ -52,7 +46,7 @@ Reference colors using CSS variables:
 | backgroundSecondary | `--rootsdk-background-secondary` | Secondary background color for cards and panels |
 | backgroundTertiary | `--rootsdk-background-tertiary` | Tertiary background color for nested elements and dropdowns |
 
-#### Surface Colors
+#### Surface colors
 
 | Token | CSS Variable | Description |
 |-------|--------------|-------------|
@@ -60,7 +54,7 @@ Reference colors using CSS variables:
 | surfaceSecondary | `--rootsdk-surface-secondary` | Secondary surface color for nested elevated elements |
 | surfaceTertiary | `--rootsdk-surface-tertiary` | Tertiary surface color for deeply nested elements |
 
-#### Interactive Colors
+#### Interactive colors
 
 | Token | CSS Variable | Description |
 |-------|--------------|-------------|
@@ -72,7 +66,7 @@ Reference colors using CSS variables:
 | highlightNormal | `--rootsdk-highlight-normal` | Normal highlight for standard hover states |
 | highlightStrong | `--rootsdk-highlight-strong` | Strong highlight for active/pressed states |
 
-#### Status Colors
+#### Status colors
 
 | Token | CSS Variable | Description |
 |-------|--------------|-------------|
@@ -80,7 +74,7 @@ Reference colors using CSS variables:
 | warning | `--rootsdk-warning` | Warning color for caution states |
 | error | `--rootsdk-error` | Error color for error states and destructive actions |
 
-#### Mention Colors
+#### Mention colors
 
 | Token | CSS Variable | Description |
 |-------|--------------|-------------|
@@ -88,13 +82,107 @@ Reference colors using CSS variables:
 | communityMention | `--rootsdk-community-mention` | Background color for @everyone or community mentions |
 | channelMention | `--rootsdk-channel-mention` | Background color for channel mentions |
 
-#### Special Colors
+#### Special colors
 
 | Token | CSS Variable | Description |
 |-------|--------------|-------------|
 | backgroundBlur | `--rootsdk-background-blur` | Semi-transparent background for blur/overlay effects |
 
----
+### Use colors in CSS
+
+Reference Root color variables in your stylesheets using the standard CSS `var()` function.
+
+#### Basic usage
+
+```css
+.my-component {
+  background-color: var(--rootsdk-background-primary);
+  color: var(--rootsdk-text-primary);
+  border: 1px solid var(--rootsdk-border);
+}
+
+.my-button {
+  background-color: var(--rootsdk-brand-primary);
+  color: var(--rootsdk-text-white);
+}
+
+.my-button:hover {
+  background-color: var(--rootsdk-highlight-normal);
+}
+```
+
+#### Input fields
+
+```css
+.my-input {
+  background-color: var(--rootsdk-input);
+  border: 1px solid var(--rootsdk-border);
+  color: var(--rootsdk-text-primary);
+  caret-color: var(--rootsdk-text-primary);
+}
+
+.my-input:focus {
+  border-color: var(--rootsdk-brand-primary);
+}
+
+.my-input::placeholder {
+  color: var(--rootsdk-text-tertiary);
+}
+```
+
+#### Status messages
+
+```css
+.error-message {
+  color: var(--rootsdk-error);
+}
+
+.warning-message {
+  color: var(--rootsdk-warning);
+}
+
+.info-message {
+  color: var(--rootsdk-info);
+}
+```
+
+#### Links and interactive elements
+
+```css
+a {
+  color: var(--rootsdk-link);
+}
+
+.clickable-item {
+  color: var(--rootsdk-text-primary);
+}
+
+.clickable-item:hover {
+  background-color: var(--rootsdk-highlight-normal);
+}
+
+.muted-text {
+  color: var(--rootsdk-muted);
+}
+```
+
+#### Cards and containers
+
+```css
+.card {
+  background-color: var(--rootsdk-background-secondary);
+  border: 1px solid var(--rootsdk-border);
+}
+
+.card-header {
+  background-color: var(--rootsdk-background-tertiary);
+  color: var(--rootsdk-text-primary);
+}
+
+.card-content {
+  color: var(--rootsdk-text-secondary);
+}
+```
 
 ## Spacing
 
@@ -112,13 +200,11 @@ Use consistent spacing values for padding and margins.
 | 3xl | `32px` | Triple extra large spacing |
 | 4xl | `48px` | Major section spacing |
 
----
-
-## Border Radius
+## Border radius
 
 Root uses rounded corners extensively. The most common radius is `12px` (rounded-xl).
 
-| Name | Value | Tailwind | Use Case |
+| Name | Value | Tailwind | Use case |
 |------|-------|----------|----------|
 | none | `0` | `rounded-none` | No border radius (sharp corners) |
 | sm | `6px` | `rounded-md` | Small radius for icon buttons, close buttons |
@@ -127,17 +213,13 @@ Root uses rounded corners extensively. The most common radius is `12px` (rounded
 | xl | `16px` | `rounded-2xl` | Extra large radius for prominent containers |
 | full | `9999px` | `rounded-full` | Fully rounded for pills, buttons, avatars, switches |
 
----
-
-## Border Width
+## Border width
 
 | Name | Value | Description |
 |------|-------|-------------|
 | none | `0` | No border |
 | default | `1px` | Standard border width for inputs, cards, dividers |
 | thick | `2px` | Emphasized borders for focus states |
-
----
 
 ## Shadows
 
@@ -150,18 +232,16 @@ Use shadows for modals, dropdowns, and popovers.
 | md | `0 4px 8px rgba(0, 0, 0, 0.15)` | Medium shadow for cards |
 | lg | `0 0 12px rgba(0, 0, 0, 0.5)` | Large shadow for modals, dropdowns, popovers |
 
----
-
 ## Typography
 
-### Font Family
+### Font family
 
 - **Sans:** `system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif`
 - **Mono:** `source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace`
 
-### Font Sizes
+### Font sizes
 
-| Name | Size | Line Height | Description |
+| Name | Size | Line height | Description |
 |------|------|-------------|-------------|
 | xs | `12px` | `16px` | Extra small text for captions, badges |
 | sm | `13px` | `20px` | Small text for status indicators |
@@ -170,7 +250,7 @@ Use shadows for modals, dropdowns, and popovers.
 | xl | `20px` | `32px` | Extra large for modal titles |
 | 2xl | `24px` | `32px` | Major headings |
 
-### Font Weights
+### Font weights
 
 | Name | Value | Description |
 |------|-------|-------------|
@@ -178,8 +258,6 @@ Use shadows for modals, dropdowns, and popovers.
 | medium | `450` | Medium weight for modal titles, status text |
 | semibold | `500` | Semibold for buttons, panel text |
 | bold | `600` | Bold for strong emphasis |
-
----
 
 ## Transitions
 
@@ -189,17 +267,16 @@ Use shadows for modals, dropdowns, and popovers.
 | normal | `200ms` | Standard transition speed for hover states |
 | slow | `300ms` | Slower transitions for larger elements |
 
----
-
-## Component Patterns
+## Component patterns
 
 Common component styles extracted from Root first-party apps.
 
 ### panel
 
-Standard panel/card container with rounded corners
+Standard panel/card container with rounded corners.
 
 **CSS:**
+
 ```css
 .panel {
   background-color: var(--rootsdk-background-secondary);
@@ -214,6 +291,7 @@ Standard panel/card container with rounded corners
 ```
 
 **Tailwind:**
+
 ```
 // Panel: bg-background-secondary rounded-xl py-4 min-h-[80px]
 // With border: add border border-border
@@ -221,9 +299,10 @@ Standard panel/card container with rounded corners
 
 ### input
 
-Text input field with focus state
+Text input field with focus state.
 
 **CSS:**
+
 ```css
 .input {
   background-color: var(--rootsdk-input);
@@ -247,6 +326,7 @@ Text input field with focus state
 ```
 
 **Tailwind:**
+
 ```
 // Input: bg-input border border-border rounded-xl px-5 py-3.5 text-text-primary
 // Placeholder: placeholder-text-tertiary
@@ -255,9 +335,10 @@ Text input field with focus state
 
 ### button-primary
 
-Primary action button (pill-shaped)
+Primary action button (pill-shaped).
 
 **CSS:**
+
 ```css
 .button-primary {
   background-color: var(--rootsdk-text-primary);
@@ -287,6 +368,7 @@ Primary action button (pill-shaped)
 ```
 
 **Tailwind:**
+
 ```
 // Primary button: bg-text-primary text-background-tertiary rounded-full px-6 py-2 font-medium
 // Hover: hover:opacity-70
@@ -296,9 +378,10 @@ Primary action button (pill-shaped)
 
 ### button-outline
 
-Secondary outlined button (pill-shaped)
+Secondary outlined button (pill-shaped).
 
 **CSS:**
+
 ```css
 .button-outline {
   background-color: transparent;
@@ -329,6 +412,7 @@ Secondary outlined button (pill-shaped)
 ```
 
 **Tailwind:**
+
 ```
 // Outline button: bg-transparent border border-text-tertiary rounded-full px-6 py-2 font-medium
 // Hover: hover:opacity-70
@@ -338,9 +422,10 @@ Secondary outlined button (pill-shaped)
 
 ### button-danger
 
-Destructive action button
+Destructive action button.
 
 **CSS:**
+
 ```css
 .button-danger {
   background-color: var(--rootsdk-error);
@@ -365,6 +450,7 @@ Destructive action button
 ```
 
 **Tailwind:**
+
 ```
 // Danger button: bg-error text-text-white rounded-full px-6 py-2 font-medium
 // Hover: hover:opacity-70
@@ -373,9 +459,10 @@ Destructive action button
 
 ### modal
 
-Modal dialog container. CAUTION: Modals are not ideal for responsive design - prefer inline-edit pattern for edit flows. If you must use a modal, ensure it works at 320px width.
+Modal dialog container. Modals are not ideal for responsive design. Prefer the inline-edit pattern for edit flows. If you must use a modal, ensure it works at 320px width.
 
 **CSS:**
+
 ```css
 .modal-overlay {
   position: fixed;
@@ -422,8 +509,9 @@ Modal dialog container. CAUTION: Modals are not ideal for responsive design - pr
 ```
 
 **Tailwind:**
+
 ```
-// CAUTION: Prefer inline-edit pattern for better responsiveness
+// Prefer inline-edit pattern for better responsiveness
 // Overlay: fixed inset-0 bg-black/50 grid place-items-center p-4
 // Content: bg-background-primary border border-border rounded-lg shadow-lg max-w-[688px] w-full max-h-[90vh]
 // Header: flex items-center justify-between py-3 px-5
@@ -433,9 +521,10 @@ Modal dialog container. CAUTION: Modals are not ideal for responsive design - pr
 
 ### inline-edit
 
-RECOMMENDED: Inline edit pattern for responsive UIs. The item switches between view and edit modes in place, avoiding modals. Much better for small screens and mobile.
+Inline edit pattern for responsive UIs. The item switches between view and edit modes in place, avoiding modals. Recommended over modals for small screens and mobile.
 
 **CSS:**
+
 ```css
 /* Inline edit: item toggles between view and edit mode */
 .item-card {
@@ -496,8 +585,9 @@ RECOMMENDED: Inline edit pattern for responsive UIs. The item switches between v
 ```
 
 **Tailwind:**
+
 ```
-// RECOMMENDED over modals for responsive design
+// Recommended over modals for responsive design
 // Card: bg-background-secondary rounded-lg p-3
 // View mode: flex items-start justify-between gap-3
 // Content: flex-1 min-w-0 (for truncation)
@@ -509,9 +599,10 @@ RECOMMENDED: Inline edit pattern for responsive UIs. The item switches between v
 
 ### dropdown
 
-Dropdown/select menu
+Dropdown/select menu.
 
 **CSS:**
+
 ```css
 .dropdown {
   position: absolute;
@@ -542,6 +633,7 @@ Dropdown/select menu
 ```
 
 **Tailwind:**
+
 ```
 // Dropdown: absolute z-[100] bg-background-tertiary border border-border rounded-lg p-2 shadow-lg
 // Option: px-5 py-2.5 rounded-lg cursor-pointer hover:bg-highlight-normal
@@ -549,9 +641,10 @@ Dropdown/select menu
 
 ### switch
 
-Toggle switch component
+Toggle switch component.
 
 **CSS:**
+
 ```css
 .switch {
   position: relative;
@@ -583,6 +676,7 @@ Toggle switch component
 ```
 
 **Tailwind:**
+
 ```
 // Switch track: w-[44px] h-[24px] bg-highlight-normal rounded-full cursor-pointer transition-colors
 // Checked: data-[state=checked]:bg-brand-primary
@@ -592,9 +686,10 @@ Toggle switch component
 
 ### icon-button
 
-Square icon button
+Square icon button.
 
 **CSS:**
+
 ```css
 .icon-button {
   display: flex;
@@ -615,6 +710,7 @@ Square icon button
 ```
 
 **Tailwind:**
+
 ```
 // Icon button: p-1 rounded-md aspect-square flex items-center justify-center text-text-tertiary
 // Hover: hover:bg-highlight-strong hover:text-text-primary
@@ -622,9 +718,10 @@ Square icon button
 
 ### list-item
 
-Clickable list item with hover state
+Clickable list item with hover state.
 
 **CSS:**
+
 ```css
 .list-item {
   padding: 8px 12px;
@@ -639,13 +736,12 @@ Clickable list item with hover state
 ```
 
 **Tailwind:**
+
 ```
 // List item: px-3 py-2 rounded-lg cursor-pointer hover:bg-highlight-normal
 ```
 
----
-
-## Quick Reference
+## Quick reference
 
 | Element | Background | Border | Radius | Padding |
 |---------|------------|--------|--------|---------|

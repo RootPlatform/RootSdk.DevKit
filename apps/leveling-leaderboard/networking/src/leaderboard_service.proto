@@ -1,0 +1,276 @@
+syntax = "proto3";
+
+import "rootsdk/types.proto";
+
+// ============================================================================
+// LeaderboardService
+//
+// See DESIGN.md for behavior contract and client/server interaction shape.
+// All admin-only RPCs are gated server-side via an isAdmin check that tests
+// (callerUserId == community.ownerUserId) || globalSettings.general.admins
+// includes the caller.
+// ============================================================================
+
+// --- Core types -------------------------------------------------------------
+
+message LeaderboardEntry {
+  string user_id = 1;
+  int32 rank = 2;
+  int32 level = 3;
+  int32 total_xp = 4;
+  // Note: the server orders entries by total_xp DESC, last_award_at ASC
+  // (SPEC tie-breaker). last_award_at is NOT sent on the wire — rank already
+  // encodes the resolved order so the client just renders as received.
+}
+
+message AwardEntry {
+  // DB-generated unique id (xp_awards.id). Stable across the award's lifetime;
+  // used as the React key on the client so two awards with identical
+  // (timestamp, channel, amount) — possible when cooldown=0 and two
+  // ms-aligned earns slip through — never collide.
+  int64 id = 1;
+  string channel_id = 2;
+  // Channel name resolved server-side at response time.
+  string channel_name = 3;
+  int64 timestamp = 4;
+  int32 amount = 5;
+}
+
+message AppSettings {
+  int32 xp_per_message = 1;
+  int32 cooldown_seconds = 2;
+  int32 level_curve_coefficient = 3;
+}
+
+// Min/max bounds for AppSettings fields. Server is single source of truth;
+// client reads these from GetSettings to render form inputs. Avoids the
+// constant-duplication drift that would otherwise occur between server-side
+// validation and client-side form bounds.
+message AppSettingsLimits {
+  int32 xp_per_message_min = 1;
+  int32 xp_per_message_max = 2;
+  int32 cooldown_seconds_min = 3;
+  int32 cooldown_seconds_max = 4;
+  int32 level_curve_coefficient_min = 5;
+  int32 level_curve_coefficient_max = 6;
+}
+
+// Roles and users selected as XP-eligible. Empty in both fields means
+// "everyone is eligible" (see DESIGN.md Appendix → Eligible members).
+// Resolved to a flat set of user IDs on the server via rootServer.memberGroups.
+message XpEligibleMembers {
+  repeated string user_ids = 1;
+  repeated string community_role_ids = 2;
+}
+
+message Channel {
+  string channel_id = 1;
+  string name = 2;
+  bool excluded = 3;
+}
+
+message ChannelGroup {
+  string channel_group_id = 1;
+  string name = 2;
+  repeated Channel channels = 3;
+}
+
+// --- Errors -----------------------------------------------------------------
+// Positive values only. Negative values are reserved for built-in SDK errors.
+
+enum LeaderboardError {
+  LEADERBOARD_ERROR_UNSPECIFIED = 0;
+  NOT_ADMIN = 1;
+  INVALID_SETTINGS = 2;
+  MEMBER_NOT_FOUND = 3;
+}
+
+// --- Leaderboard ------------------------------------------------------------
+
+message GetLeaderboardRequest {}
+
+message GetLeaderboardResponse {
+  repeated LeaderboardEntry entries = 1;
+  // True when the caller is an app admin (community owner or in the admins
+  // MemberGroup sourced from globalSettings.general.admins). Client uses this
+  // flag to conditionally render the Settings gear.
+  bool am_i_admin = 2;
+}
+
+// --- My Stats ---------------------------------------------------------------
+
+message GetMyStatsRequest {}
+
+message GetMyStatsResponse {
+  int32 level = 1;
+  int32 total_xp = 2;
+  // Rank among all members in the community. 0 when the member has never
+  // earned XP (not on the board).
+  int32 rank = 3;
+  // Progress from current level boundary to next level boundary, 0.0 to 1.0.
+  double progress_to_next_level = 4;
+  // Up to 20 most recent awards, newest first.
+  repeated AwardEntry recent_awards = 5;
+}
+
+// --- Settings ---------------------------------------------------------------
+
+message GetSettingsRequest {}
+
+message GetSettingsResponse {
+  AppSettings settings = 1;
+  repeated string excluded_channel_ids = 2;
+  AppSettingsLimits limits = 3;
+  XpEligibleMembers xp_eligible_members = 4;
+}
+
+// Scoring settings, excluded channels, and XP-eligible members are separate
+// RPCs so concurrent admin edits to different Settings tabs don't stomp each
+// other. Server broadcasts SettingsUpdated with a full snapshot after any.
+
+message UpdateScoringSettingsRequest {
+  AppSettings settings = 1;
+}
+
+message UpdateScoringSettingsResponse {}
+
+message UpdateExcludedChannelsRequest {
+  repeated string excluded_channel_ids = 1;
+}
+
+message UpdateExcludedChannelsResponse {}
+
+message UpdateXpEligibleMembersRequest {
+  XpEligibleMembers members = 1;
+}
+
+message UpdateXpEligibleMembersResponse {}
+
+// --- Channel tree -----------------------------------------------------------
+
+message GetChannelTreeRequest {}
+
+message GetChannelTreeResponse {
+  repeated ChannelGroup groups = 1;
+}
+
+// --- Client telemetry -------------------------------------------------------
+//
+// Funnels client-side render errors caught by ErrorBoundary into the server's
+// structured log so production crashes are visible in your aggregator (vs.
+// stuck in browser consoles the user already closed). The handler validates
+// nothing beyond shape and writes a single log("error") line; size caps and
+// rate limits stay simple — replace this with a Sentry/Datadog client if your
+// app needs stack-frame mapping or grouping.
+
+message ReportClientErrorRequest {
+  // Free-form label identifying the boundary (e.g., "App", "HomeView",
+  // "Settings"). Helps disambiguate stack traces from different views.
+  string label = 1;
+  string message = 2;
+  // Stack trace as captured by the browser. Empty when unavailable.
+  string stack = 3;
+  // Browser/platform string from navigator.userAgent. Empty when omitted.
+  string user_agent = 4;
+}
+
+message ReportClientErrorResponse {}
+
+// --- Reset XP ---------------------------------------------------------------
+
+message ResetMemberXpRequest {
+  string user_id = 1;
+}
+
+message ResetMemberXpResponse {}
+
+message ResetAllXpRequest {}
+
+message ResetAllXpResponse {}
+
+// --- Broadcasts -------------------------------------------------------------
+//
+// Three event types with distinct audiences, per DESIGN.md "Broadcasts":
+//   - LeaderboardUpdated: "all" audience; coalesced 500ms
+//   - MemberXpChanged:    "all" audience; clients filter by user_id
+//   - SettingsUpdated:    "all" audience
+
+message LeaderboardUpdatedEvent {
+  repeated LeaderboardEntry entries = 1;
+  // True when ResetAllXp triggered this broadcast. Clients should clear any
+  // local caches and the home view should refetch GetMyStats. Avoids fanning
+  // out N targeted MemberXpChanged events to every member.
+  bool all_reset = 2;
+}
+
+message MemberXpChangedEvent {
+  // Tag 7 was a transient `is_resync` field used by an earlier
+  // UserAttached-based resync flow. Reserved so it isn't accidentally reused.
+  reserved 7;
+
+  string user_id = 1;
+  int32 total_xp = 2;
+  int32 level = 3;
+  int32 rank = 4;
+  // Progress from current-level boundary to next, 0.0–1.0. Computed server-side
+  // so clients don't need the level curve to render the progress bar.
+  double progress_to_next_level = 5;
+  // The award that caused this change. Empty when the event source was a
+  // ResetMemberXp (no award was issued).
+  AwardEntry award = 6;
+}
+
+// Admin-only: fires on UpdateScoringSettings / UpdateExcludedChannels /
+// UpdateXpEligibleMembers so other admin sessions see their Settings view
+// go stale. Delivered only to the admin audience — GetSettings is admin-
+// gated, so the corresponding broadcast must be too (otherwise every
+// connected client would receive the xp_eligible_members user/role IDs
+// that GetSettings refuses to serve them).
+message SettingsUpdatedEvent {
+  // Tag 4 was `admins_changed`, moved to the separate AdminsChangedEvent
+  // so non-admins can be told to refresh amIAdmin without receiving the
+  // admin-only snapshot payload. Reserved to prevent accidental reuse.
+  reserved 4;
+
+  AppSettings settings = 1;
+  repeated string excluded_channel_ids = 2;
+  XpEligibleMembers xp_eligible_members = 3;
+}
+
+// Public: fires when globalSettings.general.admins changes. Delivered to
+// "all" so every client can re-fetch GetLeaderboard and refresh its
+// amIAdmin flag (demoted admins need this to hide the gear; promoted
+// members need it to show the gear). Carries no payload — the fact that
+// admins shifted is the entire signal.
+message AdminsChangedEvent {}
+
+// --- Service ----------------------------------------------------------------
+
+service LeaderboardService {
+  // Any authenticated client.
+  rpc GetLeaderboard(GetLeaderboardRequest) returns (GetLeaderboardResponse);
+  rpc GetMyStats(GetMyStatsRequest) returns (GetMyStatsResponse);
+
+  // Admin-only. Server throws RootServerException(NOT_ADMIN) otherwise.
+  rpc GetSettings(GetSettingsRequest) returns (GetSettingsResponse);
+  rpc UpdateScoringSettings(UpdateScoringSettingsRequest) returns (UpdateScoringSettingsResponse);
+  rpc UpdateExcludedChannels(UpdateExcludedChannelsRequest) returns (UpdateExcludedChannelsResponse);
+  rpc UpdateXpEligibleMembers(UpdateXpEligibleMembersRequest) returns (UpdateXpEligibleMembersResponse);
+  rpc GetChannelTree(GetChannelTreeRequest) returns (GetChannelTreeResponse);
+  rpc ResetMemberXp(ResetMemberXpRequest) returns (ResetMemberXpResponse);
+  rpc ResetAllXp(ResetAllXpRequest) returns (ResetAllXpResponse);
+
+  // Any authenticated client. Rate-limited by message size at the SDK layer;
+  // payload caps in the server handler defend against runaway loops.
+  rpc ReportClientError(ReportClientErrorRequest) returns (ReportClientErrorResponse);
+
+  // Broadcasts. See DESIGN.md "Broadcasts" for audiences and coalescing rules.
+  //   BroadcastLeaderboardUpdated → "all" audience, coalesced 500ms
+  //   BroadcastMemberXpChanged    → "all" audience, client-side filter by user_id
+  //   BroadcastSettingsUpdated    → admin audience only (GetSettings is gated)
+  //   BroadcastAdminsChanged      → "all" audience (public; triggers amIAdmin refresh)
+  rpc BroadcastLeaderboardUpdated(LeaderboardUpdatedEvent) returns (rootsdk.Void);
+  rpc BroadcastMemberXpChanged(MemberXpChangedEvent) returns (rootsdk.Void);
+  rpc BroadcastSettingsUpdated(SettingsUpdatedEvent) returns (rootsdk.Void);
+  rpc BroadcastAdminsChanged(AdminsChangedEvent) returns (rootsdk.Void);
+}

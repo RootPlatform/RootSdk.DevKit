@@ -15,14 +15,14 @@
 
 Load these files as context in your AI coding tool:
 
-- [App Guides](llms-app-guides.txt): Concepts, tutorials, and how-tos (~115K tokens)
+- [App Guides](llms-app-guides.txt): Concepts and tutorials (~119K tokens)
 - [App API Reference](llms-app-api.txt): All endpoints, parameters, types, and errors (~192K tokens)
 
 ## Building a Bot
 
 Load these files as context in your AI coding tool:
 
-- [Bot Guides](llms-bot-guides.txt): Concepts, tutorials, and how-tos (~68K tokens)
+- [Bot Guides](llms-bot-guides.txt): Concepts and tutorials (~68K tokens)
 - [Bot API Reference](llms-bot-api.txt): All endpoints, parameters, types, and errors (~163K tokens)
 
 ## Quick Links
@@ -61,9 +61,9 @@ Cross-cutting behaviours, resolution rules, and lifecycle semantics. Load the li
 
 ## Complete Files (large — most AI tools cannot load these fully)
 
-- [All App Docs](llms-app.txt): Combined app guides + API reference (~306K tokens)
+- [All App Docs](llms-app.txt): Combined app guides + API reference (~310K tokens)
 - [All Bot Docs](llms-bot.txt): Combined bot guides + API reference (~230K tokens)
-- [Everything](llms-full.txt): All documentation (~533K tokens)
+- [Everything](llms-full.txt): All documentation (~538K tokens)
 
 ## Overview
 
@@ -168,7 +168,7 @@ Individual articles covering configuration, design, development, and tutorials. 
 - [Should your App look like Root?](llms/app-docs/design/should-it-look-like-root.md) **[guide]**: Does your App have its own brand colors? Or do you want to match Root’s colors? Either way works. It's your choice.
 - [Client lifecycle](llms/app-docs/develop/client/client-lifecycle.md) **[guide]**: Root controls when your App's client starts, when it stops, and when it gets reloaded.
 - [Client project overview](llms/app-docs/develop/client/client-project-overview.md) **[guide]**: This section shows how the client side of a Root App is set up.
-- [CSS colors](llms/app-docs/develop/client/css-colors.md) **[guide]**: Style your App to match the Root theme using CSS color variables provided by the Root SDK.
+- [Design system reference](llms/app-docs/develop/client/design-system-reference.md) **[guide]**: Style your apps to match the Root visual style using CSS color variables, spacing, typography, and component patterns provided by the Root SDK.
 - [Root responsive design](llms/app-docs/develop/client/responsive-ui.md) **[guide]**: Root apps are built using modern web technologies like React and TypeScript.
 - [Theme mode](llms/app-docs/develop/client/theme-mode.md) **[guide]**: Detect and respond to the user's theme preference in your App client.
 - [UI component library](llms/app-docs/develop/client/ui-components.md) **[guide]**: Root provides a library of pre-built UI components designed to integrate seamlessly with the Root platform.

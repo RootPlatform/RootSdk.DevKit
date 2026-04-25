@@ -47,7 +47,7 @@ The `RootGuidType`.
 
 > `static` **toMilliseconds**(`strData`: `string`): `number`
 
-Extracts the creation timestamp from a GUID. Delegates to `RootGuidUtils.toMilliseconds()`.
+Extracts the creation timestamp from a GUID as a Unix millisecond timestamp. Delegates to RootGuidUtils.toMilliseconds().
 
 #### Parameters
 
@@ -59,7 +59,7 @@ Extracts the creation timestamp from a GUID. Delegates to `RootGuidUtils.toMilli
 
 `number`
 
-Milliseconds since an internal epoch.
+Unix milliseconds (ms since 1970-01-01 UTC).
 
 ### toRootGuidType()
 

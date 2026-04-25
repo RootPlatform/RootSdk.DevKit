@@ -1,0 +1,33 @@
+{
+  "name": "@levelingleaderboard/app",
+  "author": "Root Communications, Inc.",
+  "description": "Leveling Leaderboard — DevKit sample app",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@rootsdk/client-app": "*",
+    "@rootsdk/client-app-ui": "*",
+    "@rootsdk/server-app": "*",
+    "@levelingleaderboard/gen-client": "file:./networking/gen/client",
+    "@levelingleaderboard/gen-server": "file:./networking/gen/server",
+    "@levelingleaderboard/gen-shared": "file:./networking/gen/shared"
+  },
+  "devDependencies": {
+    "@rootsdk/dev-tools": "*",
+    "typescript": "^5.8.2"
+  },
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "clean": "node clean.js"
+  },
+  "workspaces": {
+    "packages": [
+      "./networking",
+      "./server",
+      "./client"
+    ]
+  }
+}

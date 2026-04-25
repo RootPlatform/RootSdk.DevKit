@@ -1,0 +1,6 @@
+{
+  "name": "@levelingleaderboard/networking",
+  "scripts": {
+    "build": "rootsdk build proto"
+  }
+}

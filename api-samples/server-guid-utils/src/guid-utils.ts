@@ -96,13 +96,8 @@ export function toUuidString(guid: string): string {
   return RootGuidUtils.toUuidString(guid);
 }
 
-// SDK bug: parse() returns a base64 GUID string at runtime, but the .d.ts
-// declares the return type as RootGuidType (numeric enum). Runtime guard
-// required until the SDK fixes the return type to RootGuid.
 export function fromUuidString(uuid: string): string {
-  const result: unknown = RootGuidConverter.parse(uuid);
-  if (typeof result !== "string") throw new Error("Unexpected parse() return type");
-  return result;
+  return RootGuidConverter.parse(uuid);
 }
 
 // --- WELL-KNOWN GUIDS --------------------------------------------------------

@@ -1,0 +1,116 @@
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 64px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--rootsdk-border);
+  transition: background-color 150ms;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.row:hover {
+  background-color: var(--rootsdk-highlight-light);
+}
+
+.pulse {
+  animation: pulseBg 400ms ease-out;
+}
+
+@keyframes pulseBg {
+  0% { background-color: var(--rootsdk-highlight-light); }
+  100% { background-color: transparent; }
+}
+
+.rank {
+  width: 40px;
+  text-align: center;
+  font-weight: 500;
+  color: var(--rootsdk-text-secondary);
+  flex-shrink: 0;
+}
+
+.topThree .rank,
+.topThree .nicknameText {
+  color: var(--rootsdk-brand-secondary);
+}
+
+.me {
+  background-color: var(--rootsdk-highlight-light);
+  box-shadow: inset 3px 0 0 var(--rootsdk-brand-primary);
+}
+
+.me:hover {
+  background-color: var(--rootsdk-highlight-medium);
+}
+
+.identity {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.nickname {
+  font-weight: 500;
+  color: var(--rootsdk-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.nicknameText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.meTag {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.03em;
+  padding: 3px 6px;
+  border-radius: 4px;
+  color: var(--rootsdk-brand-primary);
+  background-color: var(--rootsdk-background-primary);
+  border: 1px solid var(--rootsdk-brand-primary);
+  text-transform: uppercase;
+}
+
+.meta {
+  display: none;
+  font-size: 12px;
+  color: var(--rootsdk-text-secondary);
+  margin-top: 2px;
+}
+
+.level {
+  width: 80px;
+  text-align: right;
+  color: var(--rootsdk-text-secondary);
+  flex-shrink: 0;
+}
+
+.xp {
+  width: 96px;
+  text-align: right;
+  font-weight: 500;
+  color: var(--rootsdk-text-primary);
+  flex-shrink: 0;
+}
+
+/* Mobile: drop the Rank/Level/XP columns, fold into the meta line. */
+@media (max-width: 639px) {
+  .rank { display: none; }
+  .level { display: none; }
+  .xp { display: none; }
+  .meta { display: block; }
+}

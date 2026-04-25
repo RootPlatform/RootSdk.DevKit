@@ -1,0 +1,89 @@
+.tab {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background-color: var(--rootsdk-background-secondary);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.heading {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--rootsdk-text-primary);
+  margin: 0;
+}
+
+.subheading {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--rootsdk-text-primary);
+  margin: 0;
+}
+
+.help {
+  margin: 0;
+  font-size: 13px;
+  color: var(--rootsdk-text-secondary);
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 640px) {
+  .formGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid var(--rootsdk-border);
+  margin: 0;
+}
+
+.pickerRow {
+  display: flex;
+  flex-direction: column;
+}
+
+.picker {
+  width: 100%;
+}
+
+/* align-items: flex-start keeps the button at its natural height rather
+   than stretching to match the TextInput's label + hint stack. */
+.confirmRow {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.confirmRow > :first-child {
+  flex: 1;
+  min-width: 200px;
+}
+
+.error {
+  margin: 0;
+  font-size: 13px;
+  color: var(--rootsdk-error);
+}

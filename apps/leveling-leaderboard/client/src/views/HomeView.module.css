@@ -1,0 +1,198 @@
+/* =============================================================================
+   HomeView — centered column. Leaderboard → You-section → Awards. Max 640px.
+   ============================================================================= */
+
+/* Full-width scroll container; keeps the scrollbar at the app edge rather than
+   visually inside the 640px content column. App.module.css's .content has
+   overflow: hidden so this is the actual scroll host. */
+.scroll {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.home {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* --- Rounded row container (shared by Top 10 + ghost row) ----------------- */
+/* LeaderboardRow is purely the row; both the Top 10 list and the single-row
+   "Your position" ghost share this container styling so the row visuals are
+   identical in both placements. */
+
+.leaderboard,
+.yourPositionList {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--rootsdk-background-secondary);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.emptyBoard {
+  margin: 0;
+  padding: 24px 16px;
+  color: var(--rootsdk-text-secondary);
+  font-size: 13px;
+  text-align: center;
+}
+
+/* --- "Your position" section (off-board) --------------------------------- */
+
+.yourPositionSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sectionHeading {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--rootsdk-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0 4px;
+}
+
+/* --- You card (progress + goal line) ------------------------------------- */
+
+.youCard {
+  background-color: var(--rootsdk-background-secondary);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.progressWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.progressTrack {
+  height: 8px;
+  width: 100%;
+  border-radius: 9999px;
+  background-color: var(--rootsdk-background-tertiary);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background-color: var(--rootsdk-brand-primary);
+  transition: width 300ms ease-out;
+}
+
+.goalLine {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  font-size: 14px;
+  flex-wrap: wrap;
+}
+
+.goalGap {
+  color: var(--rootsdk-text-primary);
+}
+
+.goalGap strong {
+  color: var(--rootsdk-brand-primary);
+  font-weight: 600;
+}
+
+.goalOnBoard {
+  color: var(--rootsdk-brand-secondary);
+  font-weight: 500;
+}
+
+.goalMeta {
+  color: var(--rootsdk-text-secondary);
+}
+
+.goalAside {
+  font-size: 12px;
+  color: var(--rootsdk-text-secondary);
+}
+
+.youZero {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.youZeroTitle {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--rootsdk-text-primary);
+}
+
+.youZeroBody {
+  font-size: 13px;
+  color: var(--rootsdk-text-secondary);
+}
+
+/* --- Recent awards -------------------------------------------------------- */
+
+.awardsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.awardsHeading {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--rootsdk-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0 4px;
+}
+
+.awards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background-color: var(--rootsdk-background-secondary);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.award {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--rootsdk-border);
+  font-size: 13px;
+}
+
+.award:last-child {
+  border-bottom: none;
+}
+
+.awardChannel {
+  flex: 1;
+  min-width: 0;
+  color: var(--rootsdk-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.awardTime {
+  color: var(--rootsdk-text-tertiary);
+}
+
+.awardAmount {
+  color: var(--rootsdk-brand-secondary);
+  font-weight: 500;
+  min-width: 60px;
+  text-align: right;
+}

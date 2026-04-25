@@ -1,14 +1,14 @@
 {
-  "id": "AC5eDkNLjQmLbs9oh6g9zg",
+  "id": "xxxxxxxxxxxxxxxxxxxxxx",
   "version": "1.0.0",
   "package": {
     "server": {
       "launch": "dist/main.js",
       "deploy": [
-        "dist"
+          "dist"
       ],
       "nodeModules": [
-        "node_modules"
+          "node_modules"
       ]
     }
   },

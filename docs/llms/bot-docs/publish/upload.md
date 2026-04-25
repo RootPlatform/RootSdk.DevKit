@@ -39,5 +39,5 @@ npx rootsdk upload package [options]
 ```bash
 npx rootsdk upload package \
   --file ./dist/rootapp-1-2-3.pkg \
-  --auth-token $TOKEN
+  --authToken $TOKEN
 ```

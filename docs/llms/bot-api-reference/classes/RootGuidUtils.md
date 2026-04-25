@@ -79,7 +79,7 @@ The converted GUID value or undefined.
 
 > `static` **toMilliseconds**(`strData`: `string`): `number`
 
-Extracts the creation timestamp from a GUID as milliseconds since an internal epoch. Use the returned value to compare the relative age of GUIDs or sort entities by creation time.
+Extracts the creation timestamp from a GUID as a Unix millisecond timestamp. Pass the returned value to new Date() to get the creation time, or use it directly to compare the relative age of GUIDs or sort entities by creation time.
 
 #### Parameters
 
@@ -91,7 +91,7 @@ Extracts the creation timestamp from a GUID as milliseconds since an internal ep
 
 `number`
 
-Milliseconds since the Root epoch.
+Unix milliseconds (ms since 1970-01-01 UTC).
 
 ### toRootGuidType()
 

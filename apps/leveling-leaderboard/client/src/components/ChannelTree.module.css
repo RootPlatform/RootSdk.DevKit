@@ -1,0 +1,101 @@
+.tree {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--rootsdk-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.group:not(:last-child) {
+  border-bottom: 1px solid var(--rootsdk-border);
+}
+
+.groupHeader {
+  appearance: none;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  cursor: pointer;
+  color: var(--rootsdk-text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  transition: background-color 150ms;
+}
+
+.groupHeader:hover {
+  background-color: var(--rootsdk-highlight-light);
+}
+
+.chevron {
+  display: inline-block;
+  width: 16px;
+  color: var(--rootsdk-text-secondary);
+  transition: transform 150ms;
+}
+
+.chevronOpen {
+  transform: rotate(90deg);
+}
+
+.groupName {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.badge {
+  font-size: 12px;
+  color: var(--rootsdk-text-secondary);
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background-color: var(--rootsdk-background-tertiary);
+}
+
+.channels {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--rootsdk-background-tertiary);
+}
+
+.channelRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 0 12px 0 32px;
+  font-size: 14px;
+  color: var(--rootsdk-text-primary);
+  cursor: pointer;
+  transition: background-color 150ms;
+}
+
+.channelRow:hover {
+  background-color: var(--rootsdk-highlight-light);
+}
+
+.channelName {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.toggle {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--rootsdk-brand-primary);
+}
+
+.empty {
+  padding: 12px 32px;
+  color: var(--rootsdk-text-tertiary);
+  font-size: 13px;
+}

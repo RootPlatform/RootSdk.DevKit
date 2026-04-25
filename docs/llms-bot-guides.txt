@@ -1,7 +1,7 @@
 # Root Bot Developer Documentation — Guides
 
-> Conceptual guides, tutorials, and how-tos for building Bots on the Root platform. For endpoint details and parameter specs, see llms-bot-api.txt.
-> Generated: 2026-04-23 | Content-Hash: ffd205d79d1a
+> Conceptual guides and tutorials for building Bots on the Root platform. For endpoint details and parameter specs, see llms-bot-api.txt.
+> Generated: 2026-04-25 | Content-Hash: 9f6ae3aeab6f
 
 ## Instructions
 
@@ -4987,7 +4987,7 @@ npx rootsdk upload package [options]
 ```bash
 npx rootsdk upload package \
   --file ./dist/rootapp-1-2-3.pkg \
-  --auth-token $TOKEN
+  --authToken $TOKEN
 ```
 
 ---

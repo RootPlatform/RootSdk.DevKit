@@ -1,0 +1,54 @@
+.settings {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+/* topArea stays at the top of the Settings view — not sticky, just not part
+   of the scroll container below. The 640px inner column matches the scrollArea
+   so tabs align vertically with the tab body content. */
+.topArea {
+  flex: none;
+  background-color: var(--rootsdk-background-primary);
+}
+
+.topInner {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 16px 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.scrollArea {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.scrollInner {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.staleNotice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background-color: var(--rootsdk-background-tertiary);
+  color: var(--rootsdk-text-primary);
+  font-size: 13px;
+}
+
+.staleNoticeText {
+  flex: 1;
+  min-width: 0;
+}
