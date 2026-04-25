@@ -5,14 +5,14 @@ Developer toolkit for building apps and bots on the Root Platform. This guide he
 ## Quick Start
 
 **Building a bot** (server-only automation):
-1. Copy `templates/bot/` to your target location
-2. Load `docs/llms-bot-guides.txt` (~61K tokens) and `docs/llms-bot-api.txt` (~141K tokens)
-3. Reference `api-samples/` bots for working examples of each SDK domain
+1. Copy `templates/bot/` to your target location.
+2. Load `docs/index.md` (the docs router, ~12K tokens). Use it to find specific per-page chunks under `docs/llms/bot-docs/` (concept guides) and `docs/llms/bot-api-reference/` (API reference). Fetch only the pages relevant to your task — each chunk is small and self-contained.
+3. Reference `api-samples/` bots for working examples of each SDK domain.
 4. For complete SDK usage per domain, always check the matching `api-samples/` module — each one demonstrates every method. Sample bots only show targeted use cases.
 
 **Building an app** (client UI + server):
 
-1. Load `docs/llms-app-guides.txt` (~106K tokens) and `docs/llms-app-api.txt` (~163K tokens).
+1. Load `docs/index.md` (the docs router, ~12K tokens). Use it to find per-page chunks under `docs/llms/app-docs/` (concept guides) and `docs/llms/app-api-reference/` (API reference). Don't pre-load all of the docs — fetch chunks as the task surfaces a need.
 2. Walk the concern checklist below. For each concern that applies to your app, load the matching api sample **before writing code for that concern** — don't defer until you hit a wall.
 
    | Concern | API Sample | Triggers for |
@@ -143,33 +143,20 @@ Focused samples in `api-samples/`, one per SDK domain. Each is a standalone bot 
 
 ## Documentation
 
-Full developer docs in `docs/`. The index is `docs/index.md`.
+Full developer docs in `docs/`. The DevKit ships them as a router (`docs/index.md`, ~12K tokens) plus per-topic markdown chunks under `docs/llms/`. Workflow:
 
-### For bots
+1. Read `docs/index.md` to find the chunks relevant to your task — it lists every page with a description.
+2. Fetch only the chunks you need. Each one is self-contained and small (usually 1–20 KB), so context stays free for actual work.
 
-| File | Contents | Tokens |
-|------|----------|--------|
-| `docs/llms-bot-guides.txt` | Concepts, tutorials, how-tos | ~61K |
-| `docs/llms-bot-api.txt` | All endpoints, parameters, types, errors | ~141K |
-| `docs/llms-bot.txt` | Combined (guides + API) | ~202K |
+### Bot docs
 
-### For apps
+- `docs/llms/bot-docs/` — concept guides (audience: bots).
+- `docs/llms/bot-api-reference/` — TypeScript API reference (audience: bots).
 
-| File | Contents | Tokens |
-|------|----------|--------|
-| `docs/llms-app-guides.txt` | Concepts, tutorials, how-tos | ~106K |
-| `docs/llms-app-api.txt` | All endpoints, parameters, types, errors | ~163K |
-| `docs/llms-app.txt` | Combined (guides + API) | ~270K |
+### App docs
 
-### Everything
-
-| File | Contents | Tokens |
-|------|----------|--------|
-| `docs/llms-full.txt` | All documentation | ~470K |
-
-### Individual articles
-
-`docs/llms/` contains individual markdown files organized by topic. See `docs/index.md` for the full index with descriptions.
+- `docs/llms/app-docs/` — concept guides (audience: apps).
+- `docs/llms/app-api-reference/` — TypeScript API reference (audience: apps).
 
 ## Schemas
 

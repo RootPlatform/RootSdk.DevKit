@@ -5,6 +5,8 @@ category: reference
 summary: Provides methods for uploading files and converting asset URIs into displayable URLs. Available via `rootClient.assets`.
 ---
 
+> **Worked sample**: `api-samples/client-app-assets/` — Client Assets
+
 > **RootClientAsset** = `object`
 
 Provides methods for uploading files and converting asset URIs into displayable URLs. Available via `rootClient.assets`.

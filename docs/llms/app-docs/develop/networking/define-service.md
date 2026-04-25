@@ -5,6 +5,8 @@ category: guide
 summary: This article covers how to define your App's networking services.
 ---
 
+> **Worked sample**: `api-samples/networking-app-services/` — RPC Services
+
 # Define a service
 
 This article covers how to define your App's networking services.

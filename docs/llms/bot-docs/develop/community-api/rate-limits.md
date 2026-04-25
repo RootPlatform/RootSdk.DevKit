@@ -5,6 +5,8 @@ category: guide
 summary: Stay under the community API's rate limits with pacing and retry-with-backoff.
 ---
 
+> **Worked sample**: `api-samples/server-resilience/` — Resilience
+
 # Rate limits
 
 Stay under the community API's rate limits with pacing and retry-with-backoff.

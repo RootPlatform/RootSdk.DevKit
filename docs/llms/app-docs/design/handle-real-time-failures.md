@@ -5,6 +5,8 @@ category: guide
 summary: Real-time software, by its nature, involves rapid data changes and constant synchronization. Networking failures and disconnects will happen.
 ---
 
+> **Worked sample**: `api-samples/server-resilience/` — Resilience
+
 # Handle failures in a real-time environment
 
 Real-time software, by its nature, involves rapid data changes and constant synchronization. Networking failures and disconnects will happen. Your job is to make sure your App handles these problems without losing data or confusing users. This guide shows how to make your Root App resilient when things go wrong.

@@ -5,6 +5,8 @@ category: guide
 summary: Override channel and channel group permissions for specific roles or members.
 ---
 
+> **Worked sample**: `api-samples/server-access-rules/` — Access Rules
+
 # Access rules
 
 Override channel and channel group permissions for specific roles or members.

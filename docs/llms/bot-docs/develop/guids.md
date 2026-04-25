@@ -5,6 +5,8 @@ category: guide
 summary: Identify entities in the Root SDK using typed, base64-encoded string identifiers.
 ---
 
+> **Worked sample**: `api-samples/server-guid-utils/` — GUID Utilities
+
 # GUIDs
 
 Identify entities in the Root SDK using typed, base64-encoded string identifiers.

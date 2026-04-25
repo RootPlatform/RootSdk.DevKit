@@ -5,6 +5,8 @@ category: reference
 summary: Type alias for `MemberGroupClientBase` (Member Groups).
 ---
 
+> **Worked sample**: `api-samples/server-member-groups/` — Member Groups
+
 > **MemberGroupClient** = `MemberGroupClientBase` & `object`
 
 ## Type Declaration

@@ -5,6 +5,8 @@ category: reference
 summary: Lifecycle methods for your app's client-side component. Available via `rootClient.lifecycle`.
 ---
 
+> **Worked sample**: `api-samples/client-app-lifecycle/` — Client Lifecycle
+
 > **RootClientLifecycle** = `object`
 
 Lifecycle methods for your app's client-side component. Available via `rootClient.lifecycle`.

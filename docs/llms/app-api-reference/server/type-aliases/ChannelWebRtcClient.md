@@ -5,6 +5,8 @@ category: reference
 summary: Service client for monitoring and moderating voice channel participants.
 ---
 
+> **Worked sample**: `api-samples/server-voice/` — Voice (WebRTC)
+
 > **ChannelWebRtcClient** = [`TypedEventEmitter`](TypedEventEmitter.md)<[`ChannelWebRtcEvents`](ChannelWebRtcEvents.md)> & `object`
 
 Service client for monitoring and moderating voice channel participants. Provides methods to list active participants, kick users from voice, and apply server-side mute or deafen states.
@@ -36,36 +38,6 @@ A promise that resolves when the kick completes.
 #### Throws
 
 `RootApiException` with `errorCode` set to `NoPermissionToKick` if missing required permissions, or `NotFound` if the user is not in the voice channel.
-
-#### Example
-
-```ts
-import {
-  ChannelWebRtcKickRequest,
-  ChannelGuid,
-  UserGuid,
-  rootServer,
-} from "@rootsdk/server-app";
-
-export async function kickExample(
-  channelId: ChannelGuid,
-  userId?: UserGuid,
-): Promise<void> {
-  try {
-    // Set up the request
-    const request: ChannelWebRtcKickRequest = {
-      channelId: channelId,
-      userId: userId,
-    };
-
-    // Call the API
-    await rootServer.community.channelWebRtcs.kick(request);
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
 
 #### Authorization
 
@@ -105,37 +77,6 @@ A promise that resolves to a `ChannelWebRtcListResponse` containing the session 
 
 `RootApiException` with `errorCode` set to `NoPermissionToRead` if missing required permissions.
 
-#### Example
-
-```ts
-import {
-  ChannelWebRtcListRequest,
-  ChannelWebRtcListResponse,
-  ChannelGuid,
-  rootServer,
-} from "@rootsdk/server-app";
-
-export async function listExample(
-  channelId: ChannelGuid,
-): Promise<ChannelWebRtcListResponse> {
-  try {
-    // Set up the request
-    const request: ChannelWebRtcListRequest = {
-      channelId: channelId,
-    };
-
-    // Call the API
-    const response: ChannelWebRtcListResponse =
-      await rootServer.community.channelWebRtcs.list(request);
-
-    return response;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
-
 ### setMuteAndDeafenOther()
 
 > **setMuteAndDeafenOther**(`request`: [`ChannelWebRtcSetMuteAndDeafenOtherRequest`](ChannelWebRtcSetMuteAndDeafenOtherRequest.md)): `Promise`<`void`>
@@ -157,40 +98,6 @@ A promise that resolves when the state change completes.
 #### Throws
 
 `RootApiException` with `errorCode` set to `NoPermissionToMute` if missing required permissions, or `NotFound` if the user is not in the voice channel.
-
-#### Example
-
-```ts
-import {
-  ChannelWebRtcSetMuteAndDeafenOtherRequest,
-  ChannelGuid,
-  UserGuid,
-  rootServer,
-} from "@rootsdk/server-app";
-
-export async function setMuteAndDeafenOtherExample(
-  channelId: ChannelGuid,
-  userId: UserGuid,
-  isMuted?: boolean,
-  isDeafened?: boolean,
-): Promise<void> {
-  try {
-    // Set up the request
-    const request: ChannelWebRtcSetMuteAndDeafenOtherRequest = {
-      channelId: channelId,
-      userId: userId,
-      isMuted: isMuted,
-      isDeafened: isDeafened,
-    };
-
-    // Call the API
-    await rootServer.community.channelWebRtcs.setMuteAndDeafenOther(request);
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
 
 #### Authorization
 

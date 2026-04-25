@@ -5,6 +5,8 @@ category: guide
 summary: The KeyValueStore type stores your data as key-value pairs. Data is stored in a SQLite file so it will persist across restarts of your server.
 ---
 
+> **Worked sample**: `api-samples/server-key-value-store/` — Key-Value Store
+
 # Key-value store persistence
 
 The [KeyValueStore](../../../../app-api-reference/server/type-aliases/KeyValueStore.md) type stores your data as key-value pairs. Data is stored in a SQLite file so it will persist across restarts of your server. Root automatically backs up and restores the data file so you won't lose data if your server restarts unexpectedly.

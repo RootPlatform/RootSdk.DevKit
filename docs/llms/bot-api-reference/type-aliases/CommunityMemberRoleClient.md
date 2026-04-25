@@ -5,6 +5,8 @@ category: reference
 summary: Service client for managing role assignments on community members.
 ---
 
+> **Worked sample**: `api-samples/server-member-roles/` — Member Roles
+
 > **CommunityMemberRoleClient** = [`TypedEventEmitter`](TypedEventEmitter.md)<[`CommunityMemberRoleEvents`](CommunityMemberRoleEvents.md)> & `object`
 
 Service client for managing role assignments on community members. Use this client to add roles to members, remove roles from members, list a member's roles, or set a member's primary displayed role.
@@ -37,36 +39,6 @@ A promise that resolves when the role has been assigned.
 
 `RootApiException` with `errorCode` set to `NotFound` if the role or any user does not exist, or `NoPermissionToAdd` if missing required permissions or attempting to assign the `@everyone` role.
 
-#### Example
-
-```ts
-import {
-  CommunityMemberRoleAddRequest,
-  CommunityRoleGuid,
-  UserGuid,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function addExample(
-  communityRoleId: CommunityRoleGuid,
-  userIds: UserGuid[],
-): Promise<void> {
-  try {
-    // Set up the request
-    const request: CommunityMemberRoleAddRequest = {
-      communityRoleId: communityRoleId,
-      userIds: userIds,
-    };
-
-    // Call the API
-    await rootServer.community.communityMemberRoles.add(request);
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
-
 ### list()
 
 > **list**(`request`: [`CommunityMemberRoleListRequest`](CommunityMemberRoleListRequest.md)): `Promise`<[`CommunityMemberRoleListResponse`](CommunityMemberRoleListResponse.md)>
@@ -88,36 +60,6 @@ A promise that resolves to a `CommunityMemberRoleListResponse` containing the me
 #### Throws
 
 `RootApiException` with `errorCode` set to `NoPermissionToRead` if the caller is not a member of the community.
-
-#### Example
-
-```ts
-import {
-  CommunityMemberRoleListRequest,
-  CommunityMemberRoleListResponse,
-  UserGuid,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function listExample(
-  userId: UserGuid,
-): Promise<CommunityMemberRoleListResponse> {
-  try {
-    // Set up the request
-    const request: CommunityMemberRoleListRequest = {
-      userId: userId,
-    };
-    // Call the API
-    const communityMemberRoles: CommunityMemberRoleListResponse =
-      await rootServer.community.communityMemberRoles.list(request);
-
-    return communityMemberRoles;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
 
 ### remove()
 
@@ -141,36 +83,6 @@ A promise that resolves when the role has been removed.
 
 `RootApiException` with `errorCode` set to `NotFound` if the role or any user does not exist, or `NoPermissionToDelete` if missing required permissions or attempting to remove the `@everyone` role.
 
-#### Example
-
-```ts
-import {
-  CommunityMemberRoleRemoveRequest,
-  CommunityRoleGuid,
-  UserGuid,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function removeExample(
-  communityRoleId: CommunityRoleGuid,
-  userIds: UserGuid[],
-): Promise<void> {
-  try {
-    // Set up the request
-    const request: CommunityMemberRoleRemoveRequest = {
-      communityRoleId: communityRoleId,
-      userIds: userIds,
-    };
-
-    // Call the API
-    await rootServer.community.communityMemberRoles.remove(request);
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
-
 ### setPrimary()
 
 > **setPrimary**(`request`: [`CommunityMemberRoleSetPrimaryRequest`](CommunityMemberRoleSetPrimaryRequest.md)): `Promise`<`void`>
@@ -193,32 +105,3 @@ A promise that resolves when the primary role has been set.
 
 `RootApiException` with `errorCode` set to `NotFound` if the role does not exist, or `NoPermissionToAdd` if missing required permissions or attempting to set `@everyone` as primary.
 
-#### Example
-
-```ts
-import {
-  CommunityMemberRoleSetPrimaryRequest,
-  CommunityRoleGuid,
-  UserGuid,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function setPrimaryExample(
-  userId: UserGuid,
-  communityRoleId: CommunityRoleGuid,
-): Promise<void> {
-  try {
-    // Set up the request
-    const request: CommunityMemberRoleSetPrimaryRequest = {
-      userId: userId,
-      communityRoleId: communityRoleId,
-    };
-
-    // Call the API
-    await rootServer.community.communityMemberRoles.setPrimary(request);
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```

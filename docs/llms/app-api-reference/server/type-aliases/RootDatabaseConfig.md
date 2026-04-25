@@ -5,6 +5,8 @@ category: reference
 summary: Root-provided configuration for database access. Root automatically creates an instance of `RootDatabaseConfig` for you and exposes it via the...
 ---
 
+> **Worked sample**: `api-samples/server-database/` — SQLite Database
+
 > **RootDatabaseConfig** = `object`
 
 Root-provided configuration for database access. Root automatically creates an instance of `RootDatabaseConfig` for you and exposes it via the `rootServer.dataStore.config` property.

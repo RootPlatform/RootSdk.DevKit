@@ -5,6 +5,8 @@ category: guide
 summary: Manage custom emojis that members use in community messages.
 ---
 
+> **Worked sample**: `api-samples/server-emojis/` — Community Emojis
+
 # Community emojis
 
 Manage custom emojis that members use in community messages.

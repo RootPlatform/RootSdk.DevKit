@@ -5,6 +5,8 @@ category: guide
 summary: Track when community members are actively viewing your app.
 ---
 
+> **Worked sample**: `api-samples/server-app-client-attachment/` — Client Attachment
+
 # Client attachment
 
 Track when community members are actively viewing your app.

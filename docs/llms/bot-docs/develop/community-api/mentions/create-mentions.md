@@ -5,6 +5,8 @@ category: guide
 summary: Include mentions in your messages so they appear as highlighted, clickable text in Root clients.
 ---
 
+> **Worked sample**: `api-samples/server-messages/` — Channel Messages
+
 # Create mentions
 
 Include mentions in your messages so they appear as highlighted, clickable text in Root clients.

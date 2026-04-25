@@ -5,6 +5,8 @@ category: guide
 summary: This article covers how to use the Root tooling to generate your App's networking code from your protobuf definition.
 ---
 
+> **Worked sample**: `api-samples/networking-app-services/` — RPC Services
+
 # Generate a service
 
 This article covers how to use the Root tooling to generate your App's networking code from your protobuf definition.

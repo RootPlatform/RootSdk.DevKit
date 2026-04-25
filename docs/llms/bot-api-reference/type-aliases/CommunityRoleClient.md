@@ -5,6 +5,8 @@ category: reference
 summary: Service client for managing roles within a community. Roles define sets of permissions that can be assigned to community members, controlling what...
 ---
 
+> **Worked sample**: `api-samples/server-roles/` — Community Roles
+
 > **CommunityRoleClient** = [`TypedEventEmitter`](TypedEventEmitter.md)<[`CommunityRoleEvents`](CommunityRoleEvents.md)> & `object`
 
 Service client for managing roles within a community. Roles define sets of permissions that can be assigned to community members, controlling what actions they can perform within the community and its channels.
@@ -37,75 +39,6 @@ A promise that resolves to the created `CommunityRole` object.
 
 `RootApiException` with `errorCode` set to `NoPermissionToCreate` if missing required permissions, or `NoPermissionToAdd` if attempting to grant permissions that your code does not have.
 
-#### Example
-
-```ts
-import {
-  CommunityRole,
-  CommunityRoleCreateRequest,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function createExample(): Promise<CommunityRole> {
-  try {
-    // Set up the request
-    const request: CommunityRoleCreateRequest = {
-      name: "MyCommunityRole",
-      colorHex: "#00FF00",
-      isMentionable: false,
-      communityPermission: {
-        communityManageCommunity: false,
-        communityManageRoles: false,
-        communityManageEmojis: false,
-        communityManageAuditLog: false,
-        communityCreateInvite: false,
-        communityManageInvites: false,
-        communityCreateBan: false,
-        communityManageBans: false,
-        communityFullControl: false,
-        communityKick: false,
-        communityChangeMyNickname: false,
-        communityChangeOtherNickname: false,
-        communityCreateChannelGroup: false,
-        communityManageApps: false,
-      },
-      channelPermission: {
-        channelFullControl: false,
-        channelView: true,
-        channelUseExternalEmoji: false,
-        channelCreateMessage: true,
-        channelDeleteMessageOther: false,
-        channelManagePinnedMessages: false,
-        channelViewMessageHistory: false,
-        channelCreateMessageAttachment: false,
-        channelCreateMessageMention: false,
-        channelCreateMessageReaction: false,
-        channelMakeMessagePublic: false,
-        channelMoveUserOther: false,
-        channelVoiceTalk: false,
-        channelVoiceMuteOther: false,
-        channelVoiceDeafenOther: false,
-        channelVoiceKick: false,
-        channelVideoStreamMedia: false,
-        channelCreateFile: false,
-        channelManageFiles: false,
-        channelViewFile: false,
-        channelAppKick: false,
-      },
-    };
-
-    // Call the API
-    const communityRole: CommunityRole =
-      await rootServer.community.communityRoles.create(request);
-
-    return communityRole;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
-
 ### delete()
 
 > **delete**(`request`: [`CommunityRoleDeleteRequest`](CommunityRoleDeleteRequest.md)): `Promise`<`void`>
@@ -127,33 +60,6 @@ A promise that resolves when the delete operation completes.
 #### Throws
 
 `RootApiException` with `errorCode` set to `NotFound` if the role does not exist, or `NoPermissionToDelete` if missing required permissions or attempting to delete the `@everyone` role.
-
-#### Example
-
-```ts
-import {
-  CommunityRoleDeleteRequest,
-  CommunityRoleGuid,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function deleteExample(
-  communityRoleId: CommunityRoleGuid,
-): Promise<void> {
-  try {
-    // Set up the request
-    const request: CommunityRoleDeleteRequest = {
-      id: communityRoleId,
-    };
-
-    // Call the API
-    await rootServer.community.communityRoles.delete(request);
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
 
 ### edit()
 
@@ -177,79 +83,6 @@ A promise that resolves to the updated `CommunityRole` object.
 
 `RootApiException` with `errorCode` set to `NotFound` if the role does not exist, `NoPermissionToEdit` if missing required permissions, or `NoPermissionToAdd` if attempting to grant permissions that your code does not have.
 
-#### Example
-
-```ts
-import {
-  CommunityRole,
-  CommunityRoleEditRequest,
-  CommunityRoleGuid,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function editExample(
-  communityRoleId: CommunityRoleGuid,
-): Promise<CommunityRole> {
-  try {
-    // Set up the request
-    const request: CommunityRoleEditRequest = {
-      id: communityRoleId,
-      name: "MyCommunityRole",
-      colorHex: "#00FF00",
-      isMentionable: false,
-      communityPermission: {
-        communityManageCommunity: false,
-        communityManageRoles: false,
-        communityManageEmojis: false,
-        communityManageAuditLog: false,
-        communityCreateInvite: false,
-        communityManageInvites: false,
-        communityCreateBan: false,
-        communityManageBans: false,
-        communityFullControl: false,
-        communityKick: false,
-        communityChangeMyNickname: false,
-        communityChangeOtherNickname: false,
-        communityCreateChannelGroup: false,
-        communityManageApps: false,
-      },
-      channelPermission: {
-        channelFullControl: false,
-        channelView: true,
-        channelUseExternalEmoji: false,
-        channelCreateMessage: true,
-        channelDeleteMessageOther: false,
-        channelManagePinnedMessages: false,
-        channelViewMessageHistory: true,
-        channelCreateMessageAttachment: false,
-        channelCreateMessageMention: false,
-        channelCreateMessageReaction: false,
-        channelMakeMessagePublic: false,
-        channelMoveUserOther: false,
-        channelVoiceTalk: false,
-        channelVoiceMuteOther: false,
-        channelVoiceDeafenOther: false,
-        channelVoiceKick: false,
-        channelVideoStreamMedia: false,
-        channelCreateFile: false,
-        channelManageFiles: false,
-        channelViewFile: false,
-        channelAppKick: false,
-      },
-    };
-
-    // Call the API
-    const communityRole: CommunityRole =
-      await rootServer.community.communityRoles.edit(request);
-
-    return communityRole;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
-
 ### get()
 
 > **get**(`request`: [`CommunityRoleGetRequest`](CommunityRoleGetRequest.md)): `Promise`<[`CommunityRole`](CommunityRole.md)>
@@ -272,37 +105,6 @@ A promise that resolves to the `CommunityRole` object.
 
 `RootApiException` with `errorCode` set to `NotFound` if the role does not exist, or `NoPermissionToRead` if the caller is not a member of the community.
 
-#### Example
-
-```ts
-import {
-  CommunityRole,
-  CommunityRoleGetRequest,
-  CommunityRoleGuid,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function getExample(
-  communityRoleId: CommunityRoleGuid,
-): Promise<CommunityRole> {
-  try {
-    // Set up the request
-    const request: CommunityRoleGetRequest = {
-      id: communityRoleId,
-    };
-
-    // Call the API
-    const communityRole: CommunityRole =
-      await rootServer.community.communityRoles.get(request);
-
-    return communityRole;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
-
 ### list()
 
 > **list**(): `Promise`<[`CommunityRole`](CommunityRole.md)[]>
@@ -320,28 +122,6 @@ A promise that resolves to an array of `CommunityRole` objects.
 `RootApiException` with `errorCode` set to `NoPermissionToRead` if the caller is not a member of the community.
 
 To identify the `@everyone` role, compare against `WellKnownRootGuids.CommunityRoles.EveryoneRole`.
-
-#### Example
-
-```ts
-import {
-  CommunityRole,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function listExample(): Promise<CommunityRole[]> {
-  try {
-    // Call the API
-    const communityRoles: CommunityRole[] =
-      await rootServer.community.communityRoles.list();
-
-    return communityRoles;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
 
 ### move()
 
@@ -365,31 +145,3 @@ A promise that resolves when the move operation completes.
 
 `RootApiException` with `errorCode` set to `NotFound` if the role or target position role does not exist, or `NoPermissionToEdit` if missing required permissions.
 
-#### Example
-
-```ts
-import {
-  CommunityRoleGuid,
-  CommunityRoleMoveRequest,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function moveExample(
-  communityRoleId: CommunityRoleGuid,
-  beforeCommunityRoleId?: CommunityRoleGuid,
-): Promise<void> {
-  try {
-    // Set up the request
-    const request: CommunityRoleMoveRequest = {
-      id: communityRoleId,
-      beforeCommunityRoleId: beforeCommunityRoleId,
-    };
-
-    // Call the API
-    await rootServer.community.communityRoles.move(request);
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```

@@ -5,6 +5,8 @@ category: guide
 summary: Monitor and moderate voice channel participants.
 ---
 
+> **Worked sample**: `api-samples/server-voice/` — Voice (WebRTC)
+
 # Voice channels
 
 Monitor and moderate voice channel participants.

@@ -5,6 +5,8 @@ category: guide
 summary: Notify users, reference roles, and link to channels directly within message content.
 ---
 
+> **Worked sample**: `api-samples/server-messages/` — Channel Messages
+
 # Mentions overview
 
 Notify users, reference roles, and link to channels directly within message content.

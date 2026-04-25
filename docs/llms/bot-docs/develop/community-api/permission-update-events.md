@@ -5,6 +5,8 @@ category: guide
 summary: Some API operations trigger side effects that modify other resources. This article explains why this happens and how to handle it.
 ---
 
+> **Worked sample**: `api-samples/server-access-rules/` — Access Rules
+
 # Permission update events
 
 Some API operations trigger side effects that modify other resources. This article explains why this happens and how to handle it.

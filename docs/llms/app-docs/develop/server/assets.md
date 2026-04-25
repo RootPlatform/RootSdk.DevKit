@@ -5,6 +5,8 @@ category: guide
 summary: Convert temporary upload tokens into permanent file references that your app can store and use later.
 ---
 
+> **Worked sample**: `api-samples/server-app-assets/` — Server Assets
+
 # Assets
 
 Convert temporary upload tokens into permanent file references that your app can store and use later.

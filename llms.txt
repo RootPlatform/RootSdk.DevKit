@@ -13,14 +13,9 @@
 
 ## Documentation
 
-- [Documentation Index](docs/index.md): Full index of all developer documentation with descriptions
-- [Bot Guides](docs/llms-bot-guides.txt): Concepts, tutorials, and how-tos (~61K tokens)
-- [Bot API Reference](docs/llms-bot-api.txt): All endpoints, parameters, types, and errors (~141K tokens)
-- [App Guides](docs/llms-app-guides.txt): Concepts, tutorials, and how-tos (~106K tokens)
-- [App API Reference](docs/llms-app-api.txt): All endpoints, parameters, types, and errors (~163K tokens)
-- [All Bot Docs](docs/llms-bot.txt): Combined bot guides + API reference (~202K tokens)
-- [All App Docs](docs/llms-app.txt): Combined app guides + API reference (~270K tokens)
-- [Everything](docs/llms-full.txt): All documentation (~470K tokens)
+- [Documentation Index](docs/index.md): Index of all developer documentation. Use this to find the per-page chunk you need under `docs/llms/`, then read just that file. Each chunk is small (usually 1–20 KB) and self-contained — fetching one keeps your context budget free for actual work.
+- [Concept guides](docs/llms/app-docs/) and [API reference](docs/llms/app-api-reference/): App-side per-page chunks.
+- [Concept guides](docs/llms/bot-docs/) and [API reference](docs/llms/bot-api-reference/): Bot-side per-page chunks.
 
 ## Samples
 

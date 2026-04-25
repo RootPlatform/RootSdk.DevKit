@@ -5,6 +5,8 @@ category: reference
 summary: Community-scoped global settings container. Provides keyed access to setting values by group and item, and emits events when settings change.
 ---
 
+> **Worked sample**: `api-samples/server-global-settings/` — Global Settings
+
 > **GlobalSettings** = `object` & [`TypedEventEmitter`](TypedEventEmitter.md)<[`GlobalSettingsEvents`](GlobalSettingsEvents.md)>
 
 Community-scoped global settings container. Provides keyed access to setting values by group and item, and emits events when settings change.

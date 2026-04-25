@@ -5,6 +5,8 @@ category: guide
 summary: Send messages to channels, respond to user activity, and manage message features like reactions and pins.
 ---
 
+> **Worked sample**: `api-samples/server-messages/` — Channel Messages
+
 # Channel messages
 
 Send messages to channels, respond to user activity, and manage message features like reactions and pins.

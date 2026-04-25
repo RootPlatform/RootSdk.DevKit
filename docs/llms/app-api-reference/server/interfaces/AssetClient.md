@@ -5,6 +5,8 @@ category: reference
 summary: Client for converting temporary upload tokens into permanent asset URIs.
 ---
 
+> **Worked sample**: `api-samples/server-app-assets/` — Server Assets
+
 Client for converting temporary upload tokens into permanent asset URIs. Use this to persist files that your app's client has uploaded so they can be referenced later.
 
 This client is only available to apps. Bots cannot create assets.
@@ -38,36 +40,6 @@ A promise that resolves to an `AssetAppCreateResponse` containing a map of token
 #### Throws
 
 `RootApiException` with `errorCode` set to `ErrorCodeType.NoPermissionToRead` if the app is not a member of the community.
-
-#### Example
-
-```ts
-import {
-  AssetAppCreateRequest,
-  AssetAppCreateResponse,
-  rootServer,
-} from "@rootsdk/server-app";
-
-export async function createExample(
-  tokens: string[],
-): Promise<AssetAppCreateResponse> {
-  try {
-    // Set up the request
-    const request: AssetAppCreateRequest = {
-      tokens: tokens,
-    };
-
-    // Call the API
-    const result: AssetAppCreateResponse =
-      await rootServer.dataStore.assets.create(request);
-
-    return result;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
 
 ### get()
 

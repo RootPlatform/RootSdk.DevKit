@@ -5,6 +5,8 @@ category: guide
 summary: Build automated moderation tools that manage members, moderate content, and control voice channels.
 ---
 
+> **Worked sample**: `api-samples/server-kick-ban/` — Kick & Ban
+
 # Moderation
 
 Build automated moderation tools that manage members, moderate content, and control voice channels.

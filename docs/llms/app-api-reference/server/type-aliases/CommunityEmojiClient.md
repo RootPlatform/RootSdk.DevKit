@@ -5,6 +5,8 @@ category: reference
 summary: Service client for managing custom emojis within a community. Community emojis are custom images associated with shortcodes that members can use in...
 ---
 
+> **Worked sample**: `api-samples/server-emojis/` — Community Emojis
+
 > **CommunityEmojiClient** = [`TypedEventEmitter`](TypedEventEmitter.md)<[`CommunityEmojiEvents`](CommunityEmojiEvents.md)> & `object`
 
 Service client for managing custom emojis within a community. Community emojis are custom images associated with shortcodes that members can use in messages.

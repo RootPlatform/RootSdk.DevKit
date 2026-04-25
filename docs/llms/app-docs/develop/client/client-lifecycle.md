@@ -5,6 +5,8 @@ category: guide
 summary: Root controls when your App's client starts, when it stops, and when it gets reloaded.
 ---
 
+> **Worked sample**: `api-samples/client-app-lifecycle/` — Client Lifecycle
+
 # Client lifecycle
 
 Root controls when your App's client starts, when it stops, and when it gets reloaded. This article explains the different phases of the client lifecycle and how Root manages the client for you.

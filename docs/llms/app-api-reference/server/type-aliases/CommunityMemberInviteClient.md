@@ -5,6 +5,8 @@ category: reference
 summary: Service client for managing member invitations within a community.
 ---
 
+> **Worked sample**: `api-samples/server-invites/` — Member Invites
+
 > **CommunityMemberInviteClient** = `object`
 
 Service client for managing member invitations within a community. Member invitations allow existing community members to invite users to join the community with optional role assignments.
@@ -34,35 +36,6 @@ A promise that resolves when the invitation has been deleted.
 #### Throws
 
 `RootApiException` with `errorCode` set to `NotFound` if the invitation does not exist, or `NoPermissionToDelete` if missing required permissions.
-
-#### Example
-
-```ts
-import {
-  CommunityMemberInviteDeleteRequest,
-  UserGuid,
-  rootServer,
-} from "@rootsdk/server-app";
-
-export async function deleteExample(
-  invitedUserId: UserGuid,
-  senderUserId: UserGuid,
-): Promise<void> {
-  try {
-    // Set up the request
-    const request: CommunityMemberInviteDeleteRequest = {
-      invitedUserId: invitedUserId,
-      senderUserId: senderUserId,
-    };
-
-    // Call the API
-    await rootServer.community.communityMemberInvites.delete(request);
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
 
 #### Authorization
 
@@ -98,39 +71,6 @@ A promise that resolves to the `CommunityMemberInvite` object.
 
 `RootApiException` with `errorCode` set to `NotFound` if the invitation does not exist, or `NoPermissionToRead` if missing required permissions.
 
-#### Example
-
-```ts
-import {
-  CommunityMemberInvite,
-  CommunityMemberInviteGetRequest,
-  UserGuid,
-  rootServer,
-} from "@rootsdk/server-app";
-
-export async function getExample(
-  invitedUserId: UserGuid,
-  senderUserId: UserGuid,
-): Promise<CommunityMemberInvite> {
-  try {
-    // Set up the request
-    const request: CommunityMemberInviteGetRequest = {
-      invitedUserId: invitedUserId,
-      senderUserId: senderUserId,
-    };
-
-    // Call the API
-    const communityMemberInvite =
-      await rootServer.community.communityMemberInvites.get(request);
-
-    return communityMemberInvite;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
-
 #### Authorization
 
 Declare the following permissions in your manifest:
@@ -158,25 +98,6 @@ A promise that resolves to an array of `CommunityMemberInvite` objects represent
 #### Throws
 
 `RootApiException` with `errorCode` set to `NoPermissionToRead` if missing required permissions.
-
-#### Example
-
-```ts
-import { CommunityMemberInvite, rootServer } from "@rootsdk/server-app";
-
-export async function listExample(): Promise<CommunityMemberInvite[]> {
-  try {
-    // Call the API
-    const communityMemberInvites: CommunityMemberInvite[] =
-      await rootServer.community.communityMemberInvites.list();
-
-    return communityMemberInvites;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
 
 #### Authorization
 

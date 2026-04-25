@@ -5,6 +5,8 @@ category: reference
 summary: Service client for managing directories (folders) within a channel's file system.
 ---
 
+> **Worked sample**: `api-samples/server-directories/` — Channel Directories
+
 > **ChannelDirectoryClient** = [`TypedEventEmitter`](TypedEventEmitter.md)<[`ChannelDirectoryEvents`](ChannelDirectoryEvents.md)> & `object`
 
 Service client for managing directories (folders) within a channel's file system. Directories organize files hierarchically and can be nested to create folder structures.
@@ -34,39 +36,6 @@ A promise that resolves to the created `ChannelDirectory` object.
 #### Throws
 
 `RootApiException` with `errorCode` set to `NoPermissionToCreate` if missing required permissions, or `RequestValidationFailed` if the request is invalid.
-
-#### Example
-
-```ts
-import {
-  ChannelDirectory,
-  ChannelDirectoryCreateRequest,
-  ChannelGuid,
-  rootServer,
-} from "@rootsdk/server-app";
-
-export async function createExample(
-  channelId: ChannelGuid,
-): Promise<ChannelDirectory> {
-  try {
-    // Set up the request
-    const request: ChannelDirectoryCreateRequest = {
-      channelId: channelId,
-      name: "MyChannelDirectoryName",
-      parentDirectoryId: undefined,
-    };
-
-    // Call the API
-    const directory: ChannelDirectory =
-      await rootServer.community.channelDirectories.create(request);
-
-    return directory;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
 
 #### Authorization
 
@@ -106,36 +75,6 @@ A promise that resolves when the deletion completes.
 
 `RootApiException` with `errorCode` set to `NotFound` if the directory does not exist, or `NoPermissionToDelete` if missing required permissions.
 
-#### Example
-
-```ts
-import {
-  ChannelDirectoryDeleteRequest,
-  ChannelGuid,
-  DirectoryGuid,
-  rootServer,
-} from "@rootsdk/server-app";
-
-export async function deleteExample(
-  directoryId: DirectoryGuid,
-  channelId: ChannelGuid,
-): Promise<void> {
-  try {
-    // Set up the request
-    const request: ChannelDirectoryDeleteRequest = {
-      id: directoryId,
-      channelId: channelId,
-    };
-
-    // Call the API
-    await rootServer.community.channelDirectories.delete(request);
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
-
 #### Authorization
 
 Declare the following permissions in your manifest:
@@ -173,41 +112,6 @@ A promise that resolves to a `ChannelDirectoryEditResponse` containing the updat
 #### Throws
 
 `RootApiException` with `errorCode` set to `NotFound` if the directory does not exist, or `NoPermissionToEdit` if missing required permissions.
-
-#### Example
-
-```ts
-import {
-  ChannelDirectory,
-  ChannelDirectoryEditRequest,
-  ChannelGuid,
-  DirectoryGuid,
-  rootServer,
-} from "@rootsdk/server-app";
-
-export async function editExample(
-  directoryId: DirectoryGuid,
-  channelId: ChannelGuid,
-): Promise<ChannelDirectory> {
-  try {
-    // Set up the request
-    const request: ChannelDirectoryEditRequest = {
-      id: directoryId,
-      channelId: channelId,
-      name: "MyNewChannelDirectoryName",
-    };
-
-    // Call the API
-    const directory: ChannelDirectory =
-      await rootServer.community.channelDirectories.edit(request);
-
-    return directory;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
 
 #### Authorization
 
@@ -247,40 +151,6 @@ A promise that resolves to the `ChannelDirectory` object.
 
 `RootApiException` with `errorCode` set to `NotFound` if the directory does not exist, or `NoPermissionToRead` if missing required permissions.
 
-#### Example
-
-```ts
-import {
-  ChannelDirectory,
-  ChannelDirectoryGetRequest,
-  ChannelGuid,
-  DirectoryGuid,
-  rootServer,
-} from "@rootsdk/server-app";
-
-export async function getExample(
-  channelId: ChannelGuid,
-  directoryId: DirectoryGuid,
-): Promise<ChannelDirectory> {
-  try {
-    // Set up the request
-    const request: ChannelDirectoryGetRequest = {
-      id: directoryId,
-      channelId: channelId,
-    };
-
-    // Call the API
-    const directory: ChannelDirectory =
-      await rootServer.community.channelDirectories.get(request);
-
-    return directory;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
-
 #### Authorization
 
 Declare the following permissions in your manifest:
@@ -319,37 +189,6 @@ A promise that resolves to an array of `ChannelDirectory` objects containing all
 
 `RootApiException` with `errorCode` set to `NoPermissionToRead` if missing required permissions.
 
-#### Example
-
-```ts
-import {
-  ChannelDirectory,
-  ChannelDirectoryListRequest,
-  ChannelGuid,
-  rootServer,
-} from "@rootsdk/server-app";
-
-export async function listExample(
-  channelId: ChannelGuid,
-): Promise<ChannelDirectory[]> {
-  try {
-    // Set up the request
-    const request: ChannelDirectoryListRequest = {
-      channelId: channelId,
-    };
-
-    // Call the API
-    const response: ChannelDirectory[] =
-      await rootServer.community.channelDirectories.list(request);
-
-    return response;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
-
 #### Authorization
 
 Declare the following permissions in your manifest:
@@ -387,40 +226,6 @@ A promise that resolves to a `ChannelDirectoryMoveResponse` containing the move 
 #### Throws
 
 `RootApiException` with `errorCode` set to `NotFound` if the directory does not exist, or `NoPermissionToMove` if missing required permissions.
-
-#### Example
-
-```ts
-import {
-  ChannelDirectoryMoveRequest,
-  ChannelGuid,
-  DirectoryGuid,
-  rootServer,
-} from "@rootsdk/server-app";
-
-export async function moveExample(
-  directoryId: DirectoryGuid,
-  channelId: ChannelGuid,
-  oldParentDirectoryId: DirectoryGuid,
-  newParentDirectoryId: DirectoryGuid,
-): Promise<void> {
-  try {
-    // Set up the request
-    const request: ChannelDirectoryMoveRequest = {
-      id: directoryId,
-      channelId: channelId,
-      oldParentDirectoryId: oldParentDirectoryId,
-      newParentDirectoryId: newParentDirectoryId,
-    };
-
-    // Call the API
-    await rootServer.community.channelDirectories.move(request);
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
 
 #### Authorization
 

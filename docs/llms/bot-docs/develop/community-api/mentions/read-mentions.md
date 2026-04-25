@@ -5,6 +5,8 @@ category: guide
 summary: Extract mention data from messages your code receives to identify referenced users, roles, and channels.
 ---
 
+> **Worked sample**: `api-samples/server-messages/` — Channel Messages
+
 # Read mentions
 
 Extract mention data from messages your code receives to identify referenced users, roles, and channels.

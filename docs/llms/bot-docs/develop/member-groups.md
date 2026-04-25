@@ -5,6 +5,8 @@ category: guide
 summary: A member group combines users and community roles into a named audience you can use for targeting broadcasts and organizing custom access control.
 ---
 
+> **Worked sample**: `api-samples/server-member-groups/` — Member Groups
+
 # Member groups
 
 A member group combines users and community roles into a named audience you can use for targeting broadcasts and organizing custom access control.

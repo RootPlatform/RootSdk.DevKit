@@ -5,6 +5,8 @@ category: reference
 summary: Query and subscribe to client attachment state for your app.
 ---
 
+> **Worked sample**: `api-samples/server-app-client-attachment/` — Client Attachment
+
 > **AttachedClients** = `object` & [`TypedEventEmitter`](TypedEventEmitter.md)<[`ClientEvents`](ClientEvents.md)>
 
 Query and subscribe to client attachment state for your app.

@@ -5,6 +5,8 @@ category: guide
 summary: Root supports two ways to store persistent data in your server: a **key-value store** and a **SQLite database**.
 ---
 
+> **Worked sample**: `api-samples/server-key-value-store/` — Key-Value Store
+
 # Choose your approach: persistence
 
 Root supports two ways to store persistent data in your server: a **key-value store** and a **SQLite database**. The key-value store is fully ready to use while SQLite requires some setup. This article explains what they are and when to use each.

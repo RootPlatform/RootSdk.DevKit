@@ -5,6 +5,8 @@ category: guide
 summary: Send and receive messages with file attachments.
 ---
 
+> **Worked sample**: `api-samples/server-messages/` — Channel Messages
+
 # Message attachments
 
 Send and receive messages with file attachments.

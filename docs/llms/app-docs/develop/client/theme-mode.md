@@ -5,6 +5,8 @@ category: guide
 summary: Detect and respond to the user's theme preference in your App client.
 ---
 
+> **Worked sample**: `api-samples/client-app-theme/` — Client Theme
+
 # Theme mode
 
 Detect and respond to the user's theme preference in your App client.

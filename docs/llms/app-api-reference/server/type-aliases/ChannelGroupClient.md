@@ -5,6 +5,8 @@ category: reference
 summary: Service client for managing channel groups within a community.
 ---
 
+> **Worked sample**: `api-samples/server-channel-groups/` — Channel Groups
+
 > **ChannelGroupClient** = [`TypedEventEmitter`](TypedEventEmitter.md)<[`ChannelGroupEvents`](ChannelGroupEvents.md)> & `object`
 
 Service client for managing channel groups within a community. Channel groups are containers that organize channels and define shared permission settings.
@@ -34,35 +36,6 @@ A promise that resolves to the created `ChannelGroup` object.
 #### Throws
 
 `RootApiException` with `errorCode` set to `NoPermissionToCreate` if missing required permissions, or `RequestValidationFailed` if the request is invalid.
-
-#### Example
-
-```ts
-import {
-  ChannelGroup,
-  ChannelGroupCreateRequest,
-  rootServer,
-} from "@rootsdk/server-app";
-
-export async function createExample(): Promise<ChannelGroup> {
-  try {
-    // Set up the request
-    const request: ChannelGroupCreateRequest = {
-      name: "MyChannelGroupName",
-      accessRuleCreates: [],
-    };
-
-    // Call the API
-    const channelGroup: ChannelGroup =
-      await rootServer.community.channelGroups.create(request);
-
-    return channelGroup;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
 
 #### Authorization
 
@@ -97,33 +70,6 @@ A promise that resolves when the deletion completes.
 #### Throws
 
 `RootApiException` with `errorCode` set to `NotFound` if the channel group does not exist, or `NoPermissionToDelete` if missing required permissions.
-
-#### Example
-
-```ts
-import {
-  ChannelGroupDeleteRequest,
-  ChannelGroupGuid,
-  rootServer,
-} from "@rootsdk/server-app";
-
-export async function deleteExample(
-  channelGroupId: ChannelGroupGuid,
-): Promise<void> {
-  try {
-    // Set up the request
-    const request: ChannelGroupDeleteRequest = {
-      id: channelGroupId,
-    };
-
-    // Call the API
-    await rootServer.community.channelGroups.delete(request);
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
 
 #### Authorization
 
@@ -167,35 +113,6 @@ A promise that resolves when the edit completes.
 
 `RootApiException` with `errorCode` set to `NotFound` if the channel group does not exist, or `NoPermissionToEdit` if missing required permissions.
 
-#### Example
-
-```ts
-import {
-  ChannelGroupEditRequest,
-  ChannelGroupGuid,
-  rootServer,
-} from "@rootsdk/server-app";
-
-export async function editExample(
-  channelGroupId: ChannelGroupGuid,
-): Promise<void> {
-  try {
-    // Set up the request
-    const request: ChannelGroupEditRequest = {
-      id: channelGroupId,
-      name: "MyChannelGroupName",
-      accessRuleUpdate: undefined,
-    };
-
-    // Call the API
-    await rootServer.community.channelGroups.edit(request);
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
-
 #### Authorization
 
 Declare the following permissions in your manifest:
@@ -234,37 +151,6 @@ A promise that resolves to the `ChannelGroup` object.
 
 `RootApiException` with `errorCode` set to `NotFound` if the channel group does not exist or your code cannot see it.
 
-#### Example
-
-```ts
-import {
-  ChannelGroup,
-  ChannelGroupGetRequest,
-  ChannelGroupGuid,
-  rootServer,
-} from "@rootsdk/server-app";
-
-export async function getExample(
-  channelGroupId: ChannelGroupGuid,
-): Promise<ChannelGroup> {
-  try {
-    // Set up the request
-    const request: ChannelGroupGetRequest = {
-      id: channelGroupId,
-    };
-
-    // Call the API
-    const channelGroup: ChannelGroup =
-      await rootServer.community.channelGroups.get(request);
-
-    return channelGroup;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
-
 ### list()
 
 > **list**(): `Promise`<[`ChannelGroup`](ChannelGroup.md)[]>
@@ -280,28 +166,6 @@ A promise that resolves to an array of `ChannelGroup` objects.
 #### Throws
 
 `RootApiException` with `errorCode` set to `NoPermissionToRead` if missing required permissions.
-
-#### Example
-
-```ts
-import {
-  ChannelGroup,
-  rootServer,
-} from "@rootsdk/server-app";
-
-export async function listExample(): Promise<ChannelGroup[]> {
-  try {
-    // Call the API
-    const channelGroups: ChannelGroup[] =
-      await rootServer.community.channelGroups.list();
-
-    return channelGroups;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
 
 ### move()
 
@@ -324,35 +188,6 @@ A promise that resolves when the move completes.
 #### Throws
 
 `RootApiException` with `errorCode` set to `NotFound` if the channel group does not exist, or `NoPermissionToMove` if missing required permissions.
-
-#### Example
-
-```ts
-import {
-  ChannelGroupMoveRequest,
-  ChannelGroupGuid,
-  rootServer,
-} from "@rootsdk/server-app";
-
-export async function moveExample(
-  channelGroupId: ChannelGroupGuid,
-  beforeChannelGroupId: ChannelGroupGuid,
-): Promise<void> {
-  try {
-    // Set up the request
-    const request: ChannelGroupMoveRequest = {
-      id: channelGroupId,
-      beforeChannelGroupId: beforeChannelGroupId,
-    };
-
-    // Call the API
-    await rootServer.community.channelGroups.move(request);
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
 
 #### Authorization
 

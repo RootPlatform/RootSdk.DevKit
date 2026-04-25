@@ -5,6 +5,8 @@ category: guide
 summary: Read and manage files within channels using directories and file metadata.
 ---
 
+> **Worked sample**: `api-samples/server-files/` — Channel Files
+
 # Channel files
 
 Read and manage files within channels using directories and file metadata.

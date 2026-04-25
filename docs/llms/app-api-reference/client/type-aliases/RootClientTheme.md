@@ -5,6 +5,8 @@ category: reference
 summary: Provides access to the host Root client's current theme. Available via `rootClient.theme`.
 ---
 
+> **Worked sample**: `api-samples/client-app-theme/` — Client Theme
+
 > **RootClientTheme** = `object` & [`TypedEventEmitter`](TypedEventEmitter.md)<[`RootClientThemeEvents`](RootClientThemeEvents.md)>
 
 Provides access to the host Root client's current theme. Available via `rootClient.theme`.

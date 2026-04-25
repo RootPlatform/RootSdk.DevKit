@@ -5,6 +5,8 @@ category: guide
 summary: This article covers how to implement the server side of your App's networking services.
 ---
 
+> **Worked sample**: `api-samples/networking-app-services/` — RPC Services
+
 # Implement the server side of a service
 
 This article covers how to implement the server side of your App's networking services.

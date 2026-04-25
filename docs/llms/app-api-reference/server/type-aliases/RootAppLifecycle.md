@@ -5,6 +5,8 @@ category: reference
 summary: Manages the startup and shutdown sequence for your app's server. Access via `rootServer.lifecycle`.
 ---
 
+> **Worked sample**: `api-samples/server-app-lifecycle/` — App Lifecycle
+
 > **RootAppLifecycle** = `object`
 
 Manages the startup and shutdown sequence for your app's server. Access via `rootServer.lifecycle`.

@@ -5,6 +5,8 @@ category: reference
 summary: Service client for managing channels within a community. Channels are the primary containers for content within channel groups, supporting different...
 ---
 
+> **Worked sample**: `api-samples/server-channels/` — Channels
+
 > **ChannelClient** = [`TypedEventEmitter`](TypedEventEmitter.md)<[`ChannelEvents`](ChannelEvents.md)> & `object`
 
 Service client for managing channels within a community. Channels are the primary containers for content within channel groups, supporting different types such as text, threaded text, voice, and app channels.
@@ -37,43 +39,6 @@ A promise that resolves to the created `Channel` object.
 
 `RootApiException` with `errorCode` set to `NoPermissionToCreate` if missing required permissions, `NotFound` if the channel group does not exist, or `RequestValidationFailed` if the request is invalid.
 
-#### Example
-
-```ts
-import {
-  Channel,
-  ChannelCreateRequest,
-  ChannelGroupGuid,
-  ChannelType,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function createExample(
-  channelGroupId: ChannelGroupGuid,
-): Promise<Channel> {
-  try {
-    // Set up the request
-    const request: ChannelCreateRequest = {
-      channelGroupId: channelGroupId,
-      channelType: ChannelType.Text,
-      iconTokenUri: undefined,
-      name: "MyChannelName",
-      description: "My Channel Description",
-      useChannelGroupPermission: true,
-    };
-
-    // Call the API
-    const channel: Channel =
-      await rootServer.community.channels.create(request);
-
-    return channel;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
-
 ### delete()
 
 > **delete**(`request`: [`ChannelDeleteRequest`](ChannelDeleteRequest.md), `eventHandlers?`: `object`): `Promise`<`void`>
@@ -98,35 +63,6 @@ A promise that resolves when the delete operation completes.
 #### Throws
 
 `RootApiException` with `errorCode` set to `NotFound` if the channel does not exist, or `NoPermissionToDelete` if missing required permissions.
-
-#### Example
-
-```ts
-import {
-  ChannelDeleteRequest,
-  ChannelGuid,
-  ChannelGroupGuid,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function deleteExample(
-  channelGroupId: ChannelGroupGuid,
-  channelId: ChannelGuid,
-): Promise<void> {
-  try {
-    // Set up the request
-    const request: ChannelDeleteRequest = {
-      id: channelId,
-    };
-
-    // Call the API
-    await rootServer.community.channels.delete(request);
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
 
 ### edit()
 
@@ -154,37 +90,6 @@ A promise that resolves when the edit operation completes.
 
 `RootApiException` with `errorCode` set to `NotFound` if the channel does not exist, or `NoPermissionToEdit` if missing required permissions.
 
-#### Example
-
-```ts
-import {
-  Channel,
-  ChannelEditRequest,
-  ChannelGuid,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function editExample(channelId: ChannelGuid): Promise<void> {
-  try {
-    // Set up the request
-    const request: ChannelEditRequest = {
-      id: channelId,
-      updateIcon: false,
-      iconTokenUri: undefined,
-      name: "MyNewChannelName",
-      description: "My New Channel Description",
-      useChannelGroupPermission: true,
-    };
-
-    // Call the API
-    await rootServer.community.channels.edit(request);
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
-
 ### get()
 
 > **get**(`request`: [`ChannelGetRequest`](ChannelGetRequest.md)): `Promise`<[`Channel`](Channel.md)>
@@ -207,34 +112,6 @@ A promise that resolves to the `Channel` object.
 
 `RootApiException` with `errorCode` set to `NotFound` if the channel does not exist, or `NoPermissionToRead` if missing required permissions.
 
-#### Example
-
-```ts
-import {
-  Channel,
-  ChannelGetRequest,
-  ChannelGuid,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function getExample(channelId: ChannelGuid): Promise<Channel> {
-  try {
-    // Set up the request
-    const request: ChannelGetRequest = {
-      id: channelId,
-    };
-
-    // Call the API
-    const channel: Channel = await rootServer.community.channels.get(request);
-
-    return channel;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
-
 ### list()
 
 > **list**(`request`: [`ChannelListRequest`](ChannelListRequest.md)): `Promise`<[`Channel`](Channel.md)[]>
@@ -256,37 +133,6 @@ A promise that resolves to an array of `Channel` objects, sorted by their positi
 #### Throws
 
 `RootApiException` with `errorCode` set to `NotFound` if the channel group does not exist, or `NoPermissionToRead` if missing required permissions.
-
-#### Example
-
-```ts
-import {
-  Channel,
-  ChannelGroupGuid,
-  ChannelListRequest,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function listExample(
-  channelGroupId: ChannelGroupGuid,
-): Promise<Channel[]> {
-  try {
-    // Set up the request
-    const request: ChannelListRequest = {
-      channelGroupId: channelGroupId,
-    };
-
-    // Call the API
-    const channels: Channel[] =
-      await rootServer.community.channels.list(request);
-
-    return channels;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
 
 ### move()
 
@@ -313,36 +159,3 @@ A promise that resolves when the move operation completes.
 
 `RootApiException` with `errorCode` set to `NotFound` if the channel or target channel group does not exist, or `NoPermissionToMove` if missing required permissions.
 
-#### Example
-
-```ts
-import {
-  ChannelMoveRequest,
-  ChannelGuid,
-  ChannelGroupGuid,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function moveExample(
-  channelId: ChannelGuid,
-  oldChannelGroupId: ChannelGroupGuid,
-  newChannelGroupId: ChannelGroupGuid,
-  beforeChannelId?: ChannelGuid,
-): Promise<void> {
-  try {
-    // Set up the request
-    const request: ChannelMoveRequest = {
-      id: channelId,
-      oldChannelGroupId: oldChannelGroupId,
-      newChannelGroupId: newChannelGroupId,
-      beforeChannelId: beforeChannelId,
-    };
-
-    // Call the API
-    await rootServer.community.channels.move(request);
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```

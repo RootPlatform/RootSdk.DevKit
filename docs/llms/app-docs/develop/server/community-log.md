@@ -5,6 +5,8 @@ category: guide
 summary: Send diagnostic messages from your app server to the administrators of a Root community.
 ---
 
+> **Worked sample**: `api-samples/server-community-logs/` — Community Logs
+
 # Community log
 
 Send diagnostic messages from your app server to the administrators of a Root community.

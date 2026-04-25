@@ -5,6 +5,8 @@ category: guide
 summary: _Global Settings_ let community members with the `Manage Apps` permission configure how your code behaves, either during installation or later.
 ---
 
+> **Worked sample**: `api-samples/server-global-settings/` — Global Settings
+
 # Choose your Global Settings
 
 _Global Settings_ let community members with the `Manage Apps` permission configure how your code behaves, either during installation or later. The settings apply to everyone in the community.

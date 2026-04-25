@@ -5,6 +5,8 @@ category: guide
 summary: This article covers the concepts you'll use when planning your App's networking services.
 ---
 
+> **Worked sample**: `api-samples/networking-app-services/` — RPC Services
+
 # Plan your services
 
 This article covers the concepts you'll use when planning your App's networking services.

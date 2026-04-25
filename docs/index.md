@@ -11,25 +11,15 @@
 - All async methods return Promises. Use async/await.
 - Bots are server-only — same community API as apps, but no client UI.
 
-## Building an App
+## How to read these docs
 
-Load these files as context in your AI coding tool:
-
-- [App Guides](llms-app-guides.txt): Concepts and tutorials (~119K tokens)
-- [App API Reference](llms-app-api.txt): All endpoints, parameters, types, and errors (~192K tokens)
-
-## Building a Bot
-
-Load these files as context in your AI coding tool:
-
-- [Bot Guides](llms-bot-guides.txt): Concepts and tutorials (~68K tokens)
-- [Bot API Reference](llms-bot-api.txt): All endpoints, parameters, types, and errors (~163K tokens)
+This file is the index. Use it to find the per-page chunk you need under `llms/`, then fetch only that file. Each chunk is small (usually 1–20 KB) and self-contained — fetching one rather than loading a giant bundle keeps your context budget free for actual work.
 
 ## Quick Links
 
 - [Choose App or Bot](llms/overview/choose-app-or-bot.md): Not sure which to build? Start here.
-- [App Quickstart](llms/app-docs/get-started/index.md): Get your first app running
-- [Bot Quickstart](llms/bot-docs/get-started/index.md): Get your first bot running
+- [App Quickstart](llms/app-docs/get-started/index.md): Get your first app running.
+- [Bot Quickstart](llms/bot-docs/get-started/index.md): Get your first bot running.
 
 ## Concepts
 
@@ -59,11 +49,49 @@ Cross-cutting behaviours, resolution rules, and lifecycle semantics. Load the li
 - **How Root Apps work**: Root Apps follow a client-server model, which means they have three main parts: → [Root App overview](llms/app-docs/get-started/app-overview.md)
 - **How channel files work**: Understanding the directory structure helps you build file management features. → [Channel files](llms/bot-docs/develop/community-api/files.md)
 
-## Complete Files (large — most AI tools cannot load these fully)
+## Worked samples
 
-- [All App Docs](llms-app.txt): Combined app guides + API reference (~310K tokens)
-- [All Bot Docs](llms-bot.txt): Combined bot guides + API reference (~230K tokens)
-- [Everything](llms-full.txt): All documentation (~538K tokens)
+Hand-curated runnable code in the DevKit. Each sample is a complete project with manifest, README, and source covering one SDK domain.
+
+### Server SDK
+
+- `api-samples/networking-app-services/` — RPC Services
+- `api-samples/server-access-rules/` — Access Rules
+- `api-samples/server-app-assets/` — Server Assets
+- `api-samples/server-app-client-attachment/` — Client Attachment
+- `api-samples/server-app-lifecycle/` — App Lifecycle
+- `api-samples/server-bot-lifecycle/` — Bot Lifecycle
+- `api-samples/server-channel-groups/` — Channel Groups
+- `api-samples/server-channels/` — Channels
+- `api-samples/server-community/` — Community
+- `api-samples/server-community-logs/` — Community Logs
+- `api-samples/server-database/` — SQLite Database
+- `api-samples/server-directories/` — Channel Directories
+- `api-samples/server-emojis/` — Community Emojis
+- `api-samples/server-files/` — Channel Files
+- `api-samples/server-global-settings/` — Global Settings
+- `api-samples/server-invites/` — Member Invites
+- `api-samples/server-jobs/` — Job Scheduler
+- `api-samples/server-key-value-store/` — Key-Value Store
+- `api-samples/server-kick-ban/` — Kick & Ban
+- `api-samples/server-member-groups/` — Member Groups
+- `api-samples/server-member-roles/` — Member Roles
+- `api-samples/server-members/` — Members
+- `api-samples/server-messages/` — Channel Messages
+- `api-samples/server-roles/` — Community Roles
+- `api-samples/server-voice/` — Voice (WebRTC)
+
+### Browser SDK (Apps only)
+
+- `api-samples/client-app-assets/` — Client Assets
+- `api-samples/client-app-lifecycle/` — Client Lifecycle
+- `api-samples/client-app-theme/` — Client Theme
+- `api-samples/client-app-users/` — Client Users
+
+### Patterns
+
+- `api-samples/server-guid-utils/` — GUID Utilities
+- `api-samples/server-resilience/` — Resilience
 
 ## Overview
 

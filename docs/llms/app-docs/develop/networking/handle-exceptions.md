@@ -5,6 +5,8 @@ category: guide
 summary: `RootServerException` is a special exception type that's thrown on the server and caught on the client.
 ---
 
+> **Worked sample**: `api-samples/networking-app-services/` — RPC Services
+
 # Exception handling
 
 `RootServerException` is a special exception type that's thrown on the server and caught on the client. It's the only exception type that can cross the server-client boundary. The Root infrastructure uses it for system errors and you use it for your own error notifications.

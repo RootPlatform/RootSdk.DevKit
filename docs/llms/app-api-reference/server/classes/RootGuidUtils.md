@@ -5,6 +5,8 @@ category: reference
 summary: Static utility class for converting and inspecting Root GUIDs. Cannot be instantiated.
 ---
 
+> **Worked sample**: `api-samples/server-guid-utils/` — GUID Utilities
+
 Static utility class for converting and inspecting Root GUIDs. Cannot be instantiated.
 
 ## Methods

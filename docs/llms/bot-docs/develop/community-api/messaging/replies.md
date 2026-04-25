@@ -5,6 +5,8 @@ category: guide
 summary: Send messages that reference other messages, creating conversational context for your responses.
 ---
 
+> **Worked sample**: `api-samples/server-messages/` — Channel Messages
+
 # Message replies
 
 Send messages that reference other messages, creating conversational context for your responses.

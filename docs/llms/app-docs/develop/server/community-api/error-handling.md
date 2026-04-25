@@ -5,6 +5,8 @@ category: guide
 summary: This reference describes how to handle errors from the community access API.
 ---
 
+> **Worked sample**: `api-samples/server-resilience/` — Resilience
+
 # Error handling
 
 This reference describes how to handle errors from the community access API.

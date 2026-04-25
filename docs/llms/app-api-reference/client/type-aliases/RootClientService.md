@@ -5,6 +5,8 @@ category: reference
 summary: Base type that generated client-side service classes implement.
 ---
 
+> **Worked sample**: `api-samples/networking-app-services/` — RPC Services
+
 > **RootClientService** = `object`
 
 Base type that generated client-side service classes implement. When you define a networking service for your app, Root generates a client class that implements this type. You do not implement this type directly.

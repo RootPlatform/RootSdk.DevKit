@@ -5,6 +5,8 @@ category: guide
 summary: Use a **SQLite** database to store your structured data persistently.
 ---
 
+> **Worked sample**: `api-samples/server-database/` — SQLite Database
+
 # SQLite persistence
 
 Use a **SQLite** database to store your structured data persistently.

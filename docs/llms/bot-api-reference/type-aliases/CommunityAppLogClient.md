@@ -5,6 +5,8 @@ category: reference
 summary: Client for writing diagnostic logs visible to community members with the **Manage Apps** permission.
 ---
 
+> **Worked sample**: `api-samples/server-community-logs/` — Community Logs
+
 > **CommunityAppLogClient** = `object`
 
 Client for writing diagnostic logs visible to community members with the **Manage Apps** permission. Use this to record significant events, warnings, or errors from your app that those members may need to review.
@@ -33,35 +35,3 @@ Writes a log entry to the community's app log.
 
 A promise that resolves to a `CommunityAppLogCreateResponse` containing the log entry ID.
 
-#### Example
-
-```ts
-import {
-  CommunityAppLogType,
-  CommunityAppLogCreateRequest,
-  CommunityAppLogCreateResponse,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function createExample(
-  communityAppLogType: CommunityAppLogType,
-  message: string,
-): Promise<CommunityAppLogCreateResponse> {
-  try {
-    // Set up the request
-    const request: CommunityAppLogCreateRequest = {
-      communityAppLogType: communityAppLogType,
-      message: message,
-    };
-
-    // Call the API
-    const result: CommunityAppLogCreateResponse =
-      await rootServer.dataStore.logs.community.create(request);
-
-    return result;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```

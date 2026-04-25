@@ -5,6 +5,8 @@ category: guide
 summary: Configurable global settings. They're declared in your manifest and set by community members with the `Manage Apps` permission during and after...
 ---
 
+> **Worked sample**: `api-samples/server-global-settings/` — Global Settings
+
 # Manifest `settings`
 
 Configurable global settings. They're declared in your manifest and set by community members with the `Manage Apps` permission during and after installation. The `settings` field is optional -- not every project needs it.

@@ -5,6 +5,8 @@ category: reference
 summary: `KeyValueStore` is a key-value storage mechanism. It provides an asynchronous API for storing, retrieving, updating,
 ---
 
+> **Worked sample**: `api-samples/server-key-value-store/` — Key-Value Store
+
 > **KeyValueStore** = `object`
 
 `KeyValueStore` is a key-value storage mechanism. It provides an asynchronous API for storing, retrieving, updating,
@@ -37,14 +39,6 @@ Deletes a key-value pair from the store by key.
 
 A promise that resolves when the key is deleted.
 
-#### Example
-
-```ts
-import { rootServer } from "@rootsdk/server-bot";
-
-await rootServer.dataStore.appData.delete("myKey");
-```
-
 ### deleteLike()
 
 > **deleteLike**(`keyPattern`: `string`): `Promise`<`void`>
@@ -62,14 +56,6 @@ Deletes key-value pairs from the store that match a pattern.
 `Promise`<`void`>
 
 A promise that resolves when the matching keys are deleted.
-
-#### Example
-
-```ts
-import { rootServer } from "@rootsdk/server-bot";
-
-await rootServer.dataStore.appData.deleteLike("user%");
-```
 
 ### get()
 
@@ -95,14 +81,6 @@ Retrieves a stored value associated with the given key.
 
 A promise that resolves to the stored value or `undefined` if not found.
 
-#### Example
-
-```ts
-import { rootServer } from "@rootsdk/server-bot";
-
-const value = await rootServer.dataStore.appData.get<string>("myKey");
-```
-
 ### select()
 
 > **select**<`T`>(`keyPattern`: `string`): `Promise`<[`KeyValue`](KeyValue.md)<`T`>[]>
@@ -126,15 +104,6 @@ Selects key-value pairs from the store that match a key pattern.
 `Promise`<[`KeyValue`](KeyValue.md)<`T`>[]>
 
 A promise that resolves with an array of matching key-value pairs.
-
-#### Example
-
-```ts
-import { rootServer, KeyValue } from "@rootsdk/server-bot";
-
-const pairs: KeyValue<string>[] =
-  await rootServer.dataStore.appData.select("myKey%");
-```
 
 ### selectValue()
 
@@ -160,15 +129,6 @@ Selects values from the store that match a key pattern.
 
 A promise that resolves with an array of matching values.
 
-#### Example
-
-```ts
-import { rootServer } from "@rootsdk/server-bot";
-
-const values: string[] =
-  await rootServer.dataStore.appData.selectValue("myKey%");
-```
-
 ### set()
 
 > **set**<`T`>(`values`: [`KeyValue`](KeyValue.md)<`T`> | [`KeyValue`](KeyValue.md)<`T`>[]): `Promise`<`void`>
@@ -192,33 +152,6 @@ Sets a key-value pair in the store. If the key already exists, it updates the va
 `Promise`<`void`>
 
 A promise that resolves when the operation is complete.
-
-#### Example
-
-```ts
-import { rootServer, KeyValue } from "@rootsdk/server-bot";
-
-// set a single key-value pair
-await rootServer.dataStore.appData.set({ key: "myKey", value: "myValue" });
-
-// set an array of key-value pairs.
-await rootServer.dataStore.appData.set([
-  { key: "key1", value: "value1" },
-  { key: "key2", value: "value2" },
-]);
-
-// include an expiration date
-const expiresAt = new Date();
-expiresAt.setDate(expiresAt.getDate() + 30); // 30 days from now
-
-const keyValue: KeyValue<string> = {
-  key: "myKey",
-  value: "myValue",
-  expires_at: expiresAt,
-};
-
-await rootServer.dataStore.appData.set(keyValue);
-```
 
 ### update()
 
@@ -250,12 +183,3 @@ operation. The transformation function is applied to the default and the result 
 
 A promise that resolves with the updated value.
 
-#### Example
-
-```ts
-import { rootServer } from "@rootsdk/server-bot";
-
-// update the value for the key "counter" by applying the passed function
-// the last argument in the call is the default value
-await rootServer.dataStore.appData.update("counter", (val) => val + 1, 0);
-```

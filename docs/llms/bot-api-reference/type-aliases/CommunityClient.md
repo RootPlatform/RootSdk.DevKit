@@ -5,6 +5,8 @@ category: reference
 summary: Service client for managing community settings and properties.
 ---
 
+> **Worked sample**: `api-samples/server-community/` — Community
+
 > **CommunityClient** = [`TypedEventEmitter`](TypedEventEmitter.md)<[`CommunityEvents`](CommunityEvents.md)> & `object`
 
 Service client for managing community settings and properties. A community is the top-level container that holds all channels, channel groups, members, and roles.
@@ -37,40 +39,6 @@ A promise that resolves to the updated `Community` object.
 
 `RootApiException` with `errorCode` set to `NoPermissionToEdit` if missing required permissions, or `RequestValidationFailed` if the request is invalid.
 
-#### Example
-
-```ts
-import {
-  Community,
-  CommunityEditRequest,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function editExample(): Promise<Community> {
-  try {
-    // Set up the request
-    const request: CommunityEditRequest = {
-      name: "MyNewCommunityName",
-      pictureHex: "#FF0000",
-      updatePicture: false,
-      pictureTokenUri: undefined,
-      defaultChannelId: undefined,
-      rejectUnverifiedEmail: false,
-			isAgeRestricted: false
-    };
-
-    // Call the API
-    const community: Community =
-      await rootServer.community.communities.edit(request);
-
-    return community;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
-
 ### get()
 
 > **get**(): `Promise`<[`Community`](Community.md)>
@@ -83,20 +51,3 @@ Retrieves the current community's properties.
 
 A promise that resolves to the `Community` object.
 
-#### Example
-
-```ts
-import { Community, rootServer } from "@rootsdk/server-bot";
-
-export async function getExample(): Promise<Community> {
-  try {
-    // Call the API
-    const community: Community = await rootServer.community.communities.get();
-
-    return community;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```

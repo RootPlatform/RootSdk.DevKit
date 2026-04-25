@@ -5,6 +5,8 @@ category: guide
 summary: The Root `JobScheduler` is an API for scheduling tasks that need to execute at future date(s).
 ---
 
+> **Worked sample**: `api-samples/server-jobs/` — Job Scheduler
+
 # Root Job scheduler
 
 The Root `JobScheduler` is an API for scheduling tasks that need to execute at future date(s). The API supports operations such as create, retrieve, edit, delete, and list. Behind the scenes, your jobs are stored in a database that's automatically backed up by Root.

@@ -5,6 +5,8 @@ category: reference
 summary: Provides access to community member profiles. Available via `rootClient.users`.
 ---
 
+> **Worked sample**: `api-samples/client-app-users/` — Client Users
+
 > **RootClientUser** = `object` & [`TypedEventEmitter`](TypedEventEmitter.md)<`RootClientUserEvents`>
 
 Provides access to community member profiles. Available via `rootClient.users`.

@@ -5,6 +5,8 @@ category: guide
 summary: Organize community content into channels and group related channels together.
 ---
 
+> **Worked sample**: `api-samples/server-channels/` — Channels
+
 # Channels and channel groups
 
 Organize community content into channels and group related channels together.

@@ -5,6 +5,8 @@ category: reference
 summary: Service client for managing member bans and kicks within a community.
 ---
 
+> **Worked sample**: `api-samples/server-kick-ban/` — Kick & Ban
+
 > **CommunityMemberBanClient** = [`TypedEventEmitter`](TypedEventEmitter.md)<[`CommunityMemberBanEvents`](CommunityMemberBanEvents.md)> & `object`
 
 Service client for managing member bans and kicks within a community. Bans prevent users from rejoining the community, while kicks remove users without preventing them from rejoining.
@@ -36,39 +38,6 @@ A promise that resolves to the created `CommunityMemberBan` object.
 #### Throws
 
 `RootApiException` with `errorCode` set to `NoPermissionToBan` if missing required permissions or attempting to ban the community owner, `NotFound` if the member does not exist, or `NoPermissionToKick` if attempting to ban an app.
-
-#### Example
-
-```ts
-import {
-  CommunityMemberBan,
-  CommunityMemberBanCreateRequest,
-  UserGuid,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function createExample(
-  userId: UserGuid,
-): Promise<CommunityMemberBan> {
-  try {
-    // Set up the request
-    const request: CommunityMemberBanCreateRequest = {
-      userId: userId,
-      reason: "Why the user should be banned from the community",
-      expiresAt: undefined,
-    };
-
-    // Call the API
-    const communityMemberBan: CommunityMemberBan =
-      await rootServer.community.communityMemberBans.create(request);
-
-    return communityMemberBan;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
 
 ### createBulk()
 
@@ -114,31 +83,6 @@ A promise that resolves when the ban is deleted.
 
 `RootApiException` with `errorCode` set to `NoPermissionToBan` if missing required permissions, or `NotFound` if the ban does not exist.
 
-#### Example
-
-```ts
-import {
-  CommunityMemberBanDeleteRequest,
-  UserGuid,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function deleteExample(userId: UserGuid): Promise<void> {
-  try {
-    // Set up the request
-    const request: CommunityMemberBanDeleteRequest = {
-      userId: userId,
-    };
-
-    // Call the API
-    await rootServer.community.communityMemberBans.delete(request);
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
-
 ### get()
 
 > **get**(`request`: [`CommunityMemberBanGetRequest`](CommunityMemberBanGetRequest.md)): `Promise`<[`CommunityMemberBan`](CommunityMemberBan.md)>
@@ -161,37 +105,6 @@ A promise that resolves to the `CommunityMemberBan` object.
 
 `RootApiException` with `errorCode` set to `NoPermissionToBan` if missing required permissions, or `NotFound` if the ban does not exist.
 
-#### Example
-
-```ts
-import {
-  CommunityMemberBan,
-  CommunityMemberBanGetRequest,
-  UserGuid,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function getExample(
-  userId: UserGuid,
-): Promise<CommunityMemberBan> {
-  try {
-    // Set up the request
-    const request: CommunityMemberBanGetRequest = {
-      userId: userId,
-    };
-
-    // Call the API
-    const communityMemberBan =
-      await rootServer.community.communityMemberBans.get(request);
-
-    return communityMemberBan;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
-
 ### kick()
 
 > **kick**(`request`: [`CommunityMemberBanKickRequest`](CommunityMemberBanKickRequest.md)): `Promise`<`void`>
@@ -213,31 +126,6 @@ A promise that resolves when the member is kicked.
 #### Throws
 
 `RootApiException` with `errorCode` set to `NoPermissionToKick` if missing required permissions or attempting to kick an app, `NoPermissionToBan` if attempting to kick the community owner, or `NotFound` if the member does not exist.
-
-#### Example
-
-```ts
-import {
-  CommunityMemberBanKickRequest,
-  UserGuid,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function kickExample(userId: UserGuid): Promise<void> {
-  try {
-    // Set up the request
-    const request: CommunityMemberBanKickRequest = {
-      userId: userId,
-    };
-
-    // Call the API
-    await rootServer.community.communityMemberBans.kick(request);
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
 
 ### kickBulk()
 
@@ -277,21 +165,3 @@ A promise that resolves to an array of `CommunityMemberBan` objects.
 
 `RootApiException` with `errorCode` set to `NoPermissionToBan` if missing required permissions.
 
-#### Example
-
-```ts
-import { CommunityMemberBan, rootServer } from "@rootsdk/server-bot";
-
-export async function listExample(): Promise<CommunityMemberBan[]> {
-  try {
-    // Call the API
-    const communityMemberBans: CommunityMemberBan[] =
-      await rootServer.community.communityMemberBans.list();
-
-    return communityMemberBans;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```

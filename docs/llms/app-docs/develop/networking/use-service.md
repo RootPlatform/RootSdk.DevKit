@@ -5,6 +5,8 @@ category: guide
 summary: This article covers how to use a service in the client side of your App.
 ---
 
+> **Worked sample**: `api-samples/networking-app-services/` — RPC Services
+
 # Use a service from the client side
 
 This article covers how to use a service in the client side of your App.

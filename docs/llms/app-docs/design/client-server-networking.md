@@ -5,6 +5,8 @@ category: guide
 summary: Root Apps follow a **client-server model** with a **thin client**. Your server does most of the work and is the source of truth for all data.
 ---
 
+> **Worked sample**: `api-samples/networking-app-services/` — RPC Services
+
 # Plan your App's client-server networking API
 
 Root Apps follow a **client-server model** with a **thin client**. Your server does most of the work and is the source of truth for all data. You define a networking API, so clients can send actions to the server and receive updates in return.

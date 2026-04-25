@@ -5,6 +5,8 @@ category: reference
 summary: Service client for managing messages within channels. Messages are the primary content units in text channels, supporting rich content with...
 ---
 
+> **Worked sample**: `api-samples/server-messages/` — Channel Messages
+
 > **ChannelMessageClient** = [`TypedEventEmitter`](TypedEventEmitter.md)<[`ChannelMessageEvents`](ChannelMessageEvents.md)> & `object`
 
 Service client for managing messages within channels. Messages are the primary content units in text channels, supporting rich content with responses, attachments, reactions, and pins.
@@ -37,40 +39,6 @@ A promise that resolves to the created `ChannelMessage` object.
 
 `RootApiException` with `errorCode` set to `NoPermissionToCreate` if missing required permissions, `NotFound` if the channel does not exist, or `RequestValidationFailed` if the request is invalid.
 
-#### Example
-
-```ts
-import {
-  ChannelGuid,
-  ChannelMessage,
-  ChannelMessageCreateRequest,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function createExample(
-  channelId: ChannelGuid,
-): Promise<ChannelMessage> {
-  try {
-    // Set up the request
-    const request: ChannelMessageCreateRequest = {
-      channelId: channelId,
-      content: "Example Message",
-      attachmentTokenUris: undefined,
-      needsParentMessageNotification: false,
-    };
-
-    // Call the API
-    const message: ChannelMessage =
-      await rootServer.community.channelMessages.create(request);
-
-    return message;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
-
 ### delete()
 
 > **delete**(`request`: [`ChannelMessageDeleteRequest`](ChannelMessageDeleteRequest.md)): `Promise`<`void`>
@@ -92,36 +60,6 @@ A promise that resolves when the delete operation completes.
 #### Throws
 
 `RootApiException` with `errorCode` set to `NotFound` if the message does not exist, or `NoPermissionToDelete` if missing required permissions.
-
-#### Example
-
-```ts
-import {
-  ChannelGuid,
-  ChannelMessageDeleteRequest,
-  MessageGuid,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function deleteExample(
-  channelId: ChannelGuid,
-  messageId: MessageGuid,
-): Promise<void> {
-  try {
-    // Set up the request
-    const request: ChannelMessageDeleteRequest = {
-      id: messageId,
-      channelId: channelId,
-    };
-
-    // Call the API
-    await rootServer.community.channelMessages.delete(request);
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
 
 ### edit()
 
@@ -145,42 +83,6 @@ A promise that resolves to the updated `ChannelMessage` object.
 
 `RootApiException` with `errorCode` set to `NotFound` if the message does not exist, or `NoPermissionToEdit` if missing required permissions.
 
-#### Example
-
-```ts
-import {
-  ChannelGuid,
-  MessageGuid,
-  ChannelMessage,
-  ChannelMessageEditRequest,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function editExample(
-  messageId: MessageGuid,
-  channelId: ChannelGuid,
-): Promise<ChannelMessage> {
-  try {
-    // Set up the request
-    const request: ChannelMessageEditRequest = {
-      id: messageId,
-      channelId: channelId,
-      content: "Edited Example Message",
-      uris: undefined,
-    };
-
-    // Call the API
-    const message: ChannelMessage =
-      await rootServer.community.channelMessages.edit(request);
-
-    return message;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
-
 ### flag()
 
 > **flag**(`request`: [`ChannelMessageFlagRequest`](ChannelMessageFlagRequest.md)): `Promise`<`void`>
@@ -202,39 +104,6 @@ A promise that resolves when the flag operation completes.
 #### Throws
 
 `RootApiException` with `errorCode` set to `NotFound` if the message does not exist.
-
-#### Example
-
-```ts
-import {
-  ChannelGuid,
-  ChannelMessageFlagRequest,
-  ContentFlagReason,
-  MessageGuid,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function flagExample(
-  channelId: ChannelGuid,
-  messageId: MessageGuid,
-  reason: ContentFlagReason,
-): Promise<void> {
-  try {
-    // Set up the request
-    const request: ChannelMessageFlagRequest = {
-      channelId: channelId,
-      id: messageId,
-      reason: reason,
-    };
-
-    // Call the API
-    await rootServer.community.channelMessages.flag(request);
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
 
 ### get()
 
@@ -258,40 +127,6 @@ A promise that resolves to the `ChannelMessage` object.
 
 `RootApiException` with `errorCode` set to `NotFound` if the message does not exist, or `NoPermissionToRead` if missing required permissions.
 
-#### Example
-
-```ts
-import {
-  ChannelGuid,
-  ChannelMessage,
-  ChannelMessageGetRequest,
-  MessageGuid,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function getExample(
-  channelId: ChannelGuid,
-  messageId: MessageGuid,
-): Promise<ChannelMessage> {
-  try {
-    // Set up the request
-    const request: ChannelMessageGetRequest = {
-      channelId: channelId,
-      id: messageId,
-    };
-
-    // Call the API
-    const message: ChannelMessage =
-      await rootServer.community.channelMessages.get(request);
-
-    return message;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
-
 ### list()
 
 > **list**(`request`: [`ChannelMessageListRequest`](ChannelMessageListRequest.md)): `Promise`<[`ChannelMessageListResponse`](ChannelMessageListResponse.md)>
@@ -313,40 +148,6 @@ A promise that resolves to a `ChannelMessageListResponse` containing messages an
 #### Throws
 
 `RootApiException` with `errorCode` set to `NotFound` if the channel does not exist, or `NoPermissionToRead` if missing required permissions.
-
-#### Example
-
-```ts
-import {
-  ChannelMessageListResponse,
-  ChannelGuid,
-  ChannelMessageListRequest,
-  MessageDirectionTake,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function listExample(
-  channelId: ChannelGuid,
-): Promise<ChannelMessageListResponse> {
-  try {
-    // Set up the request
-    const request: ChannelMessageListRequest = {
-      channelId: channelId,
-      messageDirectionTake: MessageDirectionTake.Both,
-      dateAt: new Date(),
-    };
-
-    // Call the API
-    const messages: ChannelMessageListResponse =
-      await rootServer.community.channelMessages.list(request);
-
-    return messages;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
 
 ### pinCreate()
 
@@ -370,36 +171,6 @@ A promise that resolves when the pin operation completes.
 
 `RootApiException` with `errorCode` set to `NotFound` if the message does not exist, or `NoPermissionToEdit` if missing required permissions.
 
-#### Example
-
-```ts
-import {
-  ChannelGuid,
-  ChannelMessagePinCreateRequest,
-  MessageGuid,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function pinCreateExample(
-  channelId: ChannelGuid,
-  messageId: MessageGuid,
-): Promise<void> {
-  try {
-    // Set up the request
-    const request: ChannelMessagePinCreateRequest = {
-      channelId: channelId,
-      messageId: messageId,
-    };
-
-    // Call the API
-    await rootServer.community.channelMessages.pinCreate(request);
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
-
 ### pinDelete()
 
 > **pinDelete**(`request`: [`ChannelMessagePinDeleteRequest`](ChannelMessagePinDeleteRequest.md)): `Promise`<`void`>
@@ -421,36 +192,6 @@ A promise that resolves when the unpin operation completes.
 #### Throws
 
 `RootApiException` with `errorCode` set to `NotFound` if the message or pin does not exist, or `NoPermissionToEdit` if missing required permissions.
-
-#### Example
-
-```ts
-import {
-  ChannelGuid,
-  ChannelMessagePinDeleteRequest,
-  MessageGuid,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function pinDeleteExample(
-  channelId: ChannelGuid,
-  messageId: MessageGuid,
-): Promise<void> {
-  try {
-    // Set up the request
-    const request: ChannelMessagePinDeleteRequest = {
-      channelId: channelId,
-      messageId: messageId,
-    };
-
-    // Call the API
-    await rootServer.community.channelMessages.pinDelete(request);
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
 
 ### pinList()
 
@@ -474,36 +215,6 @@ A promise that resolves to a `ChannelMessagePinListResponse` containing pinned m
 
 `RootApiException` with `errorCode` set to `NotFound` if the channel does not exist, or `NoPermissionToRead` if missing required permissions.
 
-#### Example
-
-```ts
-import {
-  ChannelGuid,
-  ChannelMessagePinListRequest,
-  ChannelMessagePinListResponse,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function pinListExample(
-  channelId: ChannelGuid,
-): Promise<ChannelMessagePinListResponse> {
-  try {
-    // Set up the request
-    const request: ChannelMessagePinListRequest = {
-      channelId: channelId,
-    };
-
-    // Call the API
-    const pinList = await rootServer.community.channelMessages.pinList(request);
-
-    return pinList;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
-
 ### reactionCreate()
 
 > **reactionCreate**(`request`: [`ChannelMessageReactionCreateRequest`](ChannelMessageReactionCreateRequest.md)): `Promise`<[`ChannelMessageReaction`](ChannelMessageReaction.md)>
@@ -526,42 +237,6 @@ A promise that resolves to the created `ChannelMessageReaction` object.
 
 `RootApiException` with `errorCode` set to `NotFound` if the message does not exist, or `AlreadyExists` if the user has already added this reaction.
 
-#### Example
-
-```ts
-import {
-  ChannelGuid,
-  ChannelMessageReactionCreateRequest,
-  ChannelMessageReaction,
-  MessageGuid,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function reactionCreateExample(
-  channelId: ChannelGuid,
-  messageId: MessageGuid,
-  shortcode: string,
-): Promise<ChannelMessageReaction> {
-  try {
-    // Set up the request
-    const request: ChannelMessageReactionCreateRequest = {
-      channelId: channelId,
-      messageId: messageId,
-      shortcode: shortcode,
-    };
-
-    // Call the API
-    const reaction =
-      await rootServer.community.channelMessages.reactionCreate(request);
-
-    return reaction;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
-
 ### reactionDelete()
 
 > **reactionDelete**(`request`: [`ChannelMessageReactionDeleteRequest`](ChannelMessageReactionDeleteRequest.md)): `Promise`<`void`>
@@ -583,38 +258,6 @@ A promise that resolves when the reaction is removed.
 #### Throws
 
 `RootApiException` with `errorCode` set to `NotFound` if the message or reaction does not exist.
-
-#### Example
-
-```ts
-import {
-  ChannelGuid,
-  ChannelMessageReactionDeleteRequest,
-  MessageGuid,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function reactionDeleteExample(
-  channelId: ChannelGuid,
-  messageId: MessageGuid,
-  shortcode: string,
-): Promise<void> {
-  try {
-    // Set up the request
-    const request: ChannelMessageReactionDeleteRequest = {
-      channelId: channelId,
-      messageId: messageId,
-      shortcode: shortcode,
-    };
-
-    // Call the API
-    await rootServer.community.channelMessages.reactionDelete(request);
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
 
 ### reactionDeleteFull()
 
@@ -664,35 +307,6 @@ A promise that resolves when the typing indicator is updated.
 
 `RootApiException` with `errorCode` set to `NotFound` if the channel does not exist, or `NoPermissionToType` if missing required permissions.
 
-#### Example
-
-```ts
-import {
-  ChannelGuid,
-  ChannelMessageSetTypingIndicatorRequest,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function setTypingIndicatorExample(
-  channelId: ChannelGuid,
-  isTyping: boolean,
-): Promise<void> {
-  try {
-    // Set up the request
-    const request: ChannelMessageSetTypingIndicatorRequest = {
-      channelId: channelId,
-      isTyping: isTyping,
-    };
-
-    // Call the API
-    await rootServer.community.channelMessages.setTypingIndicator(request);
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
-
 ### setViewTime()
 
 > **setViewTime**(`request`: [`ChannelMessageSetViewTimeRequest`](ChannelMessageSetViewTimeRequest.md)): `Promise`<`void`>
@@ -715,29 +329,3 @@ A promise that resolves when the view time is updated.
 
 `RootApiException` with `errorCode` set to `NotFound` if the channel does not exist.
 
-#### Example
-
-```ts
-import {
-  ChannelGuid,
-  ChannelMessageSetViewTimeRequest,
-  rootServer,
-} from "@rootsdk/server-bot";
-
-export async function setViewTimeExample(
-  channelId: ChannelGuid,
-): Promise<void> {
-  try {
-    // Set up the request
-    const request: ChannelMessageSetViewTimeRequest = {
-      channelId: channelId,
-    };
-
-    // Call the API
-    await rootServer.community.channelMessages.setViewTime(request);
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```

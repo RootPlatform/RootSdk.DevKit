@@ -5,6 +5,8 @@ category: guide
 summary: Your server runs in the Root cloud, and Root manages when it starts, stops, and restarts.
 ---
 
+> **Worked sample**: `api-samples/server-bot-lifecycle/` — Bot Lifecycle
+
 # Server lifecycle
 
 Your server runs in the Root cloud, and Root manages when it starts, stops, and restarts. This article explains how the server lifecycle works, how to define your entry point, run initialization code, and handle orderly shutdowns.

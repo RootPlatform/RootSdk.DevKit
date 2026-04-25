@@ -5,6 +5,8 @@ category: reference
 summary: Service client for managing access rules that control permissions for specific roles or members on channels and channel groups.
 ---
 
+> **Worked sample**: `api-samples/server-access-rules/` — Access Rules
+
 > **AccessRuleClient** = `object`
 
 Service client for managing access rules that control permissions for specific roles or members on channels and channel groups.
@@ -37,66 +39,6 @@ Access this client via `rootServer.community.accessRules`.
 
 `Promise`<`void`>
 
-#### Example
-
-```ts
-import {
-  ChannelOrChannelGroupGuid,
-  RoleOrMemberGuid,
-  AccessRuleBulkCreateEditDeleteRequest,
-  rootServer,
-} from "@rootsdk/server-app";
-
-export async function bulkCreateEditDeleteExample(
-  channelOrChannelGroupId: ChannelOrChannelGroupGuid,
-  roleOrMemberId: RoleOrMemberGuid,
-): Promise<void> {
-  try {
-    // Set up the request
-    // 'undefined' values will not modify existing permissions, you can omit them if desired, they're included here for clarity
-    const request: AccessRuleBulkCreateEditDeleteRequest = {
-      creates: [
-        {
-          channelOrChannelGroupId: channelOrChannelGroupId,
-          roleOrMemberId: roleOrMemberId,
-          overlay: {
-            channelFullControl: undefined,
-            channelView: true,
-            channelUseExternalEmoji: undefined,
-            channelCreateMessage: true,
-            channelDeleteMessageOther: undefined,
-            channelManagePinnedMessages: undefined,
-            channelViewMessageHistory: undefined,
-            channelCreateMessageAttachment: undefined,
-            channelCreateMessageMention: undefined,
-            channelCreateMessageReaction: undefined,
-            channelMakeMessagePublic: undefined,
-            channelMoveUserOther: undefined,
-            channelVoiceTalk: undefined,
-            channelVoiceMuteOther: undefined,
-            channelVoiceDeafenOther: undefined,
-            channelVoiceKick: undefined,
-            channelVideoStreamMedia: undefined,
-            channelCreateFile: undefined,
-            channelManageFiles: undefined,
-            channelViewFile: undefined,
-            channelAppKick: undefined,
-          },
-        },
-      ],
-      edits: [],
-      deletes: [],
-    };
-
-    // Call the API
-    await rootServer.community.accessRules.bulkCreateEditDelete(request);
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
-
 ### create()
 
 > **create**(`request`: [`AccessRuleCreateRequest`](AccessRuleCreateRequest.md), `eventHandlers?`: `object`): `Promise`<`void`>
@@ -126,60 +68,6 @@ A promise that resolves when the access rule is created.
 #### Throws
 
 `RootApiException` with `errorCode` set to `NoPermissionToCreate` if missing required permissions, `AlreadyExists` if the rule already exists, or `RequestValidationFailed` if the request is invalid.
-
-#### Example
-
-```ts
-import {
-  ChannelOrChannelGroupGuid,
-  RoleOrMemberGuid,
-  AccessRuleCreateRequest,
-  rootServer,
-} from "@rootsdk/server-app";
-
-export async function createExample(
-  channelOrChannelGroupId: ChannelOrChannelGroupGuid,
-  roleOrMemberId: RoleOrMemberGuid,
-): Promise<void> {
-  try {
-    // Set up the request
-    // 'undefined' values will not modify existing permissions, you can omit them if desired, they're included here for clarity
-    const request: AccessRuleCreateRequest = {
-      channelOrChannelGroupId: channelOrChannelGroupId,
-      roleOrMemberId: roleOrMemberId,
-      overlay: {
-        channelFullControl: undefined,
-        channelView: true,
-        channelUseExternalEmoji: undefined,
-        channelCreateMessage: true,
-        channelDeleteMessageOther: undefined,
-        channelManagePinnedMessages: undefined,
-        channelViewMessageHistory: undefined,
-        channelCreateMessageAttachment: undefined,
-        channelCreateMessageMention: undefined,
-        channelCreateMessageReaction: undefined,
-        channelMakeMessagePublic: undefined,
-        channelMoveUserOther: undefined,
-        channelVoiceTalk: undefined,
-        channelVoiceMuteOther: undefined,
-        channelVoiceDeafenOther: undefined,
-        channelVoiceKick: undefined,
-        channelVideoStreamMedia: undefined,
-        channelCreateFile: undefined,
-        channelManageFiles: undefined,
-        channelViewFile: undefined,
-        channelAppKick: undefined,
-      },
-    };
-
-    // Call the API
-    await rootServer.community.accessRules.create(request);
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
 
 #### Authorization
 
@@ -227,36 +115,6 @@ A promise that resolves when the deletion completes.
 
 `RootApiException` with `errorCode` set to `NotFound` if the access rule does not exist, or `NoPermissionToDelete` if missing required permissions.
 
-#### Example
-
-```ts
-import {
-  ChannelOrChannelGroupGuid,
-  RoleOrMemberGuid,
-  AccessRuleDeleteRequest,
-  rootServer,
-} from "@rootsdk/server-app";
-
-export async function deleteExample(
-  channelOrChannelGroupId: ChannelOrChannelGroupGuid,
-  roleOrMemberId: RoleOrMemberGuid,
-): Promise<void> {
-  try {
-    // Set up the request
-    const request: AccessRuleDeleteRequest = {
-      channelOrChannelGroupId: channelOrChannelGroupId,
-      roleOrMemberId: roleOrMemberId,
-    };
-
-    // Call the API
-    await rootServer.community.accessRules.delete(request);
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
-
 #### Authorization
 
 Declare the following permissions in your manifest:
@@ -303,60 +161,6 @@ A promise that resolves when the edit completes.
 
 `RootApiException` with `errorCode` set to `NotFound` if the access rule does not exist, or `NoPermissionToEdit` if missing required permissions.
 
-#### Example
-
-```ts
-import {
-  ChannelOrChannelGroupGuid,
-  RoleOrMemberGuid,
-  AccessRuleEditRequest,
-  rootServer,
-} from "@rootsdk/server-app";
-
-export async function editExample(
-  channelOrChannelGroupId: ChannelOrChannelGroupGuid,
-  roleOrMemberId: RoleOrMemberGuid,
-): Promise<void> {
-  try {
-    // Set up the request
-    // 'undefined' values will not modify existing permissions, you can omit them if desired, they're included here for clarity
-    const request: AccessRuleEditRequest = {
-      channelOrChannelGroupId: channelOrChannelGroupId,
-      roleOrMemberId: roleOrMemberId,
-      overlay: {
-        channelFullControl: undefined,
-        channelView: true,
-        channelUseExternalEmoji: undefined,
-        channelCreateMessage: true,
-        channelDeleteMessageOther: undefined,
-        channelManagePinnedMessages: undefined,
-        channelViewMessageHistory: undefined,
-        channelCreateMessageAttachment: undefined,
-        channelCreateMessageMention: undefined,
-        channelCreateMessageReaction: undefined,
-        channelMakeMessagePublic: undefined,
-        channelMoveUserOther: undefined,
-        channelVoiceTalk: undefined,
-        channelVoiceMuteOther: undefined,
-        channelVoiceDeafenOther: undefined,
-        channelVoiceKick: undefined,
-        channelVideoStreamMedia: undefined,
-        channelCreateFile: undefined,
-        channelManageFiles: undefined,
-        channelViewFile: undefined,
-        channelAppKick: undefined,
-      },
-    };
-
-    // Call the API
-    await rootServer.community.accessRules.edit(request);
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
-
 #### Authorization
 
 Declare the following permissions in your manifest:
@@ -395,40 +199,6 @@ A promise that resolves to the `AccessRule` object.
 
 `RootApiException` with `errorCode` set to `NotFound` if the access rule does not exist, or `NoPermissionToRead` if missing required permissions.
 
-#### Example
-
-```ts
-import {
-  ChannelOrChannelGroupGuid,
-  RoleOrMemberGuid,
-  AccessRule,
-  AccessRuleGetRequest,
-  rootServer,
-} from "@rootsdk/server-app";
-
-export async function getExample(
-  channelOrChannelGroupId: ChannelOrChannelGroupGuid,
-  roleOrMemberId: RoleOrMemberGuid,
-): Promise<AccessRule> {
-  try {
-    // Set up the request
-    const request: AccessRuleGetRequest = {
-      channelOrChannelGroupId: channelOrChannelGroupId,
-      roleOrMemberId: roleOrMemberId,
-    };
-
-    // Call the API
-    const accessRule: AccessRule =
-      await rootServer.community.accessRules.get(request);
-
-    return accessRule;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
-
 ### listByChannelOrChannelGroup()
 
 > **listByChannelOrChannelGroup**(`request`: [`AccessRuleListByChannelOrChannelGroupRequest`](AccessRuleListByChannelOrChannelGroupRequest.md)): `Promise`<[`AccessRule`](AccessRule.md)[]>
@@ -450,39 +220,6 @@ A promise that resolves to an array of `AccessRule` objects.
 #### Throws
 
 `RootApiException` with `errorCode` set to `NotFound` if the target does not exist, or `NoPermissionToRead` if missing required permissions.
-
-#### Example
-
-```ts
-import {
-  ChannelOrChannelGroupGuid,
-  AccessRule,
-  AccessRuleListByChannelOrChannelGroupRequest,
-  rootServer,
-} from "@rootsdk/server-app";
-
-export async function listByChannelOrChannelGroupExample(
-  channelOrChannelGroupId: ChannelOrChannelGroupGuid,
-): Promise<AccessRule[]> {
-  try {
-    // Set up the request
-    const request: AccessRuleListByChannelOrChannelGroupRequest = {
-      channelOrChannelGroupId: channelOrChannelGroupId,
-    };
-
-    // Call the API
-    const accessRules: AccessRule[] =
-      await rootServer.community.accessRules.listByChannelOrChannelGroup(
-        request,
-      );
-
-    return accessRules;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
 
 ### listByRoleOrMember()
 
@@ -506,33 +243,3 @@ A promise that resolves to an array of `AccessRule` objects.
 
 `RootApiException` with `errorCode` set to `NotFound` if the target does not exist, or `NoPermissionToRead` if missing required permissions.
 
-#### Example
-
-```ts
-import {
-  RoleOrMemberGuid,
-  AccessRuleListByRoleOrMemberRequest,
-  AccessRule,
-  rootServer,
-} from "@rootsdk/server-app";
-
-export async function listByRoleOrMemberExample(
-  roleOrMemberId: RoleOrMemberGuid,
-): Promise<AccessRule[]> {
-  try {
-    // Set up the request
-    const request: AccessRuleListByRoleOrMemberRequest = {
-      roleOrMemberId: roleOrMemberId,
-    };
-
-    // Call the API
-    const accessRules: AccessRule[] =
-      await rootServer.community.accessRules.listByRoleOrMember(request);
-
-    return accessRules;
-  } catch (error) {
-    // Detect error
-    throw error;
-  }
-}
-```
