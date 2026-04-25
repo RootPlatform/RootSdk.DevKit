@@ -1,7 +1,7 @@
 # Root App Developer Documentation — Guides
 
 > Conceptual guides and tutorials for building Apps on the Root platform. For endpoint details and parameter specs, see llms-app-api.txt.
-> Generated: 2026-04-25 | Content-Hash: f2bfef534c04
+> Generated: 2026-04-25 | Content-Hash: f48b976c5aa8
 
 ## Instructions
 
@@ -2563,17 +2563,6 @@ Clickable list item with hover state.
 ```
 // List item: px-3 py-2 rounded-lg cursor-pointer hover:bg-highlight-normal
 ```
-
-## Quick reference
-
-| Element | Background | Border | Radius | Padding |
-|---------|------------|--------|--------|---------|
-| Panel/Card | `background-secondary` | `1px border` | `12px` | `16px` |
-| Input | `input` | `1px border` | `12px` | `14px 20px` |
-| Button | `text-primary` | none | `9999px` (pill) | `8px 24px` |
-| Modal | `background-primary` | `1px border` | `8px` | `20-24px` |
-| Dropdown | `background-tertiary` | `1px border` | `8px` | `8px` |
-| List Item | transparent | none | `8px` | `8px 12px` |
 
 ---
 

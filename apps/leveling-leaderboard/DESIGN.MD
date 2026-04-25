@@ -407,7 +407,9 @@ Eligibility changes apply to future awards only. Members who earned XP while pre
 
 ### Excluded channels
 
-Messages in excluded channels never earn XP. Useful for announcement channels, bot-only channels, or anywhere activity should not count toward rank. Admins manage the excluded list from Settings → Channels.
+Messages in excluded channels never earn XP. Useful for announcement channels, bot-only channels, or anywhere activity should not count toward rank. Admins manage the excluded list from Settings → Channels. Default is empty — every channel earns XP until an admin excludes it.
+
+**Fork note for privacy-sensitive deployments.** This sample's deny-list default means any channel earns XP, including admin-only or staff-only channels with restricted access rules. If that's wrong for your fork, derive the default from the EVERYONE role's visibility instead of relying on the admin to remember to exclude private channels: `await rootServer.community.accessRules.listByRoleOrMember({ roleOrMemberId: WellKnownRootGuids.CommunityRoles.EveryoneRole })` returns the channel set the EVERYONE role can view at startup. Combine that with an access-rule subscription (or a periodic refresh) to keep it live, and AND the result with the admin's existing deny-list in the message handler.
 
 ## Roles and permissions
 
