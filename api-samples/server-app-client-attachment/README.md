@@ -1,12 +1,12 @@
-# API Sample: Clients (App)
+# API Sample: Client Attachment
 
-Track connected users and devices in real time.
+Track when members attach to your app — connect/disconnect events for users and devices.
 
 ## Source Files
 
 | File | What it covers |
 |------|---------------|
-| [clients-app.ts](src/clients-app.ts) | Query connected clients, listen for connection events |
+| [client-attachment.ts](src/client-attachment.ts) | Query attached clients, listen for attach/detach events |
 
 ## SDK Methods
 
@@ -26,7 +26,7 @@ Track connected users and devices in real time.
 ```
 
 - No permissions required for client tracking — it is app-scoped introspection
-- `channel.createMessage` — only for the `/server-app-connected-clients` command trigger
+- `channel.createMessage` — only for the `/server-app-client-attachment` command trigger
 
 ## Events
 

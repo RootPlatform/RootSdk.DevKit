@@ -1,7 +1,7 @@
 // ============================================================================
-// API Sample: Clients (App)
+// API Sample: Client Attachment
 // SDK: rootServer.clients.getClients, .getClient, .getDeviceIds, .on/.off
-// Permissions: channel.createMessage (for the /server-app-connected-clients command only)
+// Permissions: channel.createMessage (for the /server-app-client-attachment command only)
 // Events: user.attached, user.detached, user.device.attached, user.device.detached
 // Works in: Apps only (@rootsdk/server-app)
 //           rootServer.clients (AttachedClients) is NOT available in
@@ -112,13 +112,13 @@ function onDeviceDetached(ctx: ClientContext): void {
   );
 }
 
-// --- COMMAND HANDLER: /server-app-connected-clients -------------------------------------------
+// --- COMMAND HANDLER: /server-app-client-attachment -------------------------------------------
 // Lists connected clients, looks up a specific user, and reports device counts.
 
 async function onClientsCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
   if (evt.messageType === MessageType.System) return;
   const content = evt.messageContent?.trim() ?? "";
-  if (!content.startsWith("/server-app-connected-clients")) return;
+  if (!content.startsWith("/server-app-client-attachment")) return;
 
   const channelId: ChannelGuid = evt.channelId;
   const messages = rootServer.community.channelMessages;

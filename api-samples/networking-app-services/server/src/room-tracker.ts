@@ -10,7 +10,7 @@
 // so RoomService can broadcast to the correct audience using Client[] targeting.
 //
 // Production apps should clean up disconnected users via rootServer.clients
-// events (user.detached). See clients-app/ api sample for the event patterns.
+// events (user.detached). See client-attachment/ api sample for the event patterns.
 //
 // ============================================================================
 

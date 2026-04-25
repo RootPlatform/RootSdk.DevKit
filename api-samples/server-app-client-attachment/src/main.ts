@@ -1,5 +1,5 @@
 import { rootServer, RootAppStartState } from "@rootsdk/server-app";
-import { initializeClients } from "./clients-app";
+import { initializeClients } from "./client-attachment";
 
 async function onStarting(state: RootAppStartState) {
   initializeClients(state);

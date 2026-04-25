@@ -119,7 +119,7 @@ Focused samples in `api-samples/`, one per SDK domain. Each is a standalone bot 
 |--------|--------|-------------|
 | `server-app-lifecycle` | App lifecycle | start, stop, addService, start state |
 | `server-bot-lifecycle` | Bot lifecycle | start, stop, start state |
-| `server-app-connected-clients` | Connected clients | list attached clients, send to specific clients |
+| `server-app-client-attachment` | Client attachment | list attached clients, send to specific clients |
 | `server-app-assets` | Server assets | convert upload tokens to permanent file refs |
 | `server-global-settings` | Global settings | read manifest-declared settings |
 | `server-guid-utils` | GUID utilities | parse, create, validate Root GUIDs |
