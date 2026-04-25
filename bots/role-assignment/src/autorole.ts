@@ -3,32 +3,20 @@ import {
   RootApiException,
   ErrorCodeType,
   RootBotStartState,
+  RootGuidUtils,
+  RootGuidType,
   MessageType,
   ChannelMessageEvent,
   ChannelMessageCreatedEvent,
   CommunityMemberRoleAddRequest,
   CommunityRoleGuid,
+  ReadOnlyMemberGroup,
   UserGuid,
 } from "@rootsdk/server-bot";
 
-// Resolved once at startup from the start state snapshot
-let participantRoleId: CommunityRoleGuid | undefined;
+const MESSAGE_THRESHOLD = 5;
 
 export function initializeAutorole(state: RootBotStartState): void {
-  // Resolve the role at startup from the start state snapshot instead of
-  // making an API call every time a member hits the message threshold.
-  const roleName = "Participant";
-  for (const [roleId, role] of state.communityRoles) {
-    if (role.name === roleName) {
-      participantRoleId = roleId;
-      break;
-    }
-  }
-
-  if (!participantRoleId) {
-    console.error(`Role "${roleName}" not found — auto-role assignment will be disabled`);
-  }
-
   rootServer.community.channelMessages.on(ChannelMessageEvent.ChannelMessageCreated, onMessage);
 }
 
@@ -37,7 +25,12 @@ async function onMessage(evt: ChannelMessageCreatedEvent): Promise<void> {
     if (evt.messageType === MessageType.System)
       return;
 
-    if (!participantRoleId)
+    if (RootGuidUtils.toRootGuidType(evt.userId) !== RootGuidType.Person)
+      return;
+
+    const setting = rootServer.globalSettings?.general?.assignedRole as ReadOnlyMemberGroup | undefined;
+    const roleId: CommunityRoleGuid | undefined = setting?.communityRoleIds[0];
+    if (!roleId)
       return;
 
     const count: number = await rootServer.dataStore.appData.update(
@@ -46,9 +39,11 @@ async function onMessage(evt: ChannelMessageCreatedEvent): Promise<void> {
       0
     );
 
-    // Assign the role once after the member posts their 5th message
-    if (count === 5) {
-      await assignRole(evt.userId, participantRoleId);
+    if (count > MESSAGE_THRESHOLD)
+      return;
+
+    if (count === MESSAGE_THRESHOLD) {
+      await assignRole(evt.userId, roleId);
     }
   } catch (xcpt: unknown) {
     if (xcpt instanceof RootApiException) {

@@ -31,9 +31,10 @@ async function onJoined(evt: CommunityJoinedEvent): Promise<void> {
     const memberRequest: CommunityMemberGetRequest = { userId: evt.userId };
     const member: CommunityMember = await rootServer.community.communityMembers.get(memberRequest);
 
+    const mention = `[@${member.nickname}](root://user/${evt.userId})`;
     const messageRequest: ChannelMessageCreateRequest = {
       channelId: community.defaultChannelId,
-      content: member.nickname + " joined",
+      content: `${mention} joined`,
     };
     await rootServer.community.channelMessages.create(messageRequest);
   } catch (xcpt: unknown) {

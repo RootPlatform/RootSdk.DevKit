@@ -1,0 +1,206 @@
+syntax = "proto3";
+
+import "rootsdk/types.proto";
+
+// ============================================================================
+// RolePickerService
+//
+// See DESIGN.md for the full behavior contract. Briefly:
+//   - Admins curate groups of self-assignable community roles via in-app
+//     Settings. Each group has a title, optional description, and an
+//     "exclusive" flag (at most one role from the group at a time).
+//   - Members open the app and click toggles to add/remove those roles
+//     from themselves.
+//
+// Auth gates:
+//   - GetPicker, ToggleRole, ReportClientError: any authenticated client.
+//   - UpdateGroups, GetAssignableRoles: admin-only via requireAdmin.
+//   - Picker config IS the public view (every member renders from it),
+//     so PickerConfigChanged broadcasts to "all". This is the inverse of
+//     leveling-leaderboard's SettingsUpdated, which is admin-only because
+//     its payload carried admin-only data (XP-eligible user/role IDs).
+//     The split is conditional on payload sensitivity — this sample's
+//     payload is public, so a single broadcast suffices.
+// ============================================================================
+
+// --- Core types -------------------------------------------------------------
+
+// One self-assignable role exposed to members.
+message PickerRole {
+  string role_id = 1;
+  // Resolved at response time from rootServer.community.communityRoles.list().
+  // Not stored in our config — kept fresh by the role-event subscription
+  // (rename → update; delete → cull).
+  string name = 2;
+  // CSS hex color (e.g., "#3b82f6") sourced from the role's platform-set
+  // color. Empty when the role has no color set; client falls back to a
+  // neutral swatch token in that case.
+  string color = 3;
+  // Optional admin-supplied description shown in this app's picker. Useful
+  // when the role's native description is too terse, missing, or framed for
+  // moderators rather than members. Empty when not overridden.
+  string description = 4;
+}
+
+// A grouping of related roles. Renders as a section in both the member view
+// and the admin editor.
+message PickerGroup {
+  // Stable ID minted server-side on group creation. Used as the React key
+  // and as the addressable identifier for admin updates. Survives renames
+  // and reorderings; clients should NOT use the title as identity.
+  string group_id = 1;
+  string title = 2;
+  string description = 3;
+  // Exclusive group: at most one of this group's roles can be held at a
+  // time. Toggling a role on removes any siblings the caller already has,
+  // server-side, atomically. Renders as radio-button-style on the client.
+  bool exclusive = 4;
+  repeated PickerRole roles = 5;
+}
+
+// Validation bounds for admin-supplied fields. Server is the single source of
+// truth; client reads these from GetPicker and uses them for input maxLength
+// and form validation. Keeps the two ends from drifting.
+message PickerLimits {
+  int32 group_title_max_chars = 1;
+  int32 group_description_max_chars = 2;
+  int32 role_description_max_chars = 3;
+  int32 max_groups = 4;
+  int32 max_roles_per_group = 5;
+}
+
+// --- Errors -----------------------------------------------------------------
+// Positive values only. Negative values are reserved for built-in SDK errors.
+
+enum RolePickerError {
+  ROLE_PICKER_ERROR_UNSPECIFIED = 0;
+  NOT_ADMIN = 1;
+  // ToggleRole referenced a role not currently in the picker config. Could
+  // mean the caller's view is stale (admin just removed it) or the caller
+  // crafted the request manually. Either way: refetch and try again.
+  ROLE_NOT_IN_PICKER = 2;
+  // UpdateGroups payload violated a field-length / count limit, structural
+  // shape (duplicate IDs, etc.), or referenced a role the bot can't assign.
+  INVALID_CONFIG = 3;
+  // The toggle target is configured in the picker, but the platform refused
+  // to assign it (hierarchy, permission revoked since startup, etc.).
+  ROLE_NOT_ASSIGNABLE = 4;
+}
+
+// --- Member-facing RPCs -----------------------------------------------------
+
+message GetPickerRequest {}
+
+message GetPickerResponse {
+  repeated PickerGroup groups = 1;
+  // Caller's currently held role IDs, filtered to the set exposed in the
+  // picker. Roles the caller has that aren't in the picker are NOT included
+  // — those are out of this app's scope.
+  repeated string my_role_ids = 2;
+  // True when the caller is an app admin (community owner OR in
+  // globalSettings.general.admins MemberGroup). Controls gear visibility
+  // and Settings access.
+  bool am_i_admin = 3;
+  PickerLimits limits = 4;
+}
+
+message ToggleRoleRequest {
+  string role_id = 1;
+  // Desired final state. true → add (with exclusive-group siblings removed
+  // server-side); false → remove. Sent explicitly rather than inferring
+  // toggle direction from current state to avoid races where the client's
+  // local view is stale (admin reconfigured between fetch and click).
+  // Idempotent: repeated requests with the same desired state succeed
+  // without spurious side effects.
+  bool desired = 2;
+}
+
+message ToggleRoleResponse {
+  // Caller's full set of role IDs in the picker after the change. Client
+  // replaces local state from this payload — same shape as my_role_ids in
+  // GetPickerResponse.
+  repeated string my_role_ids = 1;
+}
+
+// --- Admin-only RPCs --------------------------------------------------------
+
+// Wholesale replace of the picker config. Concurrent admin edits would
+// otherwise need server-side patch ops (move-role-X-to-group-Y, etc.) that
+// add complexity for a config that's edited by at most a handful of admins.
+// Auto-save is debounced client-side (~500 ms), so the snapshot in flight
+// is bounded; last-writer-wins is acceptable for this volume.
+message UpdateGroupsRequest {
+  repeated PickerGroup groups = 1;
+}
+message UpdateGroupsResponse {}
+
+// Returns the universe of community roles the admin can pick from when adding
+// a role to a group. Filters out:
+//   - the @everyone role (auto-assigned; nothing to "pick")
+//   - roles already in the picker (via `exclude_role_ids` in the request)
+// Does NOT filter by bot manageability — the SDK's manageability semantics
+// don't surface a clean "can-this-role-be-assigned?" predicate. Roles the
+// bot can't actually assign at runtime fail with ROLE_NOT_ASSIGNABLE on
+// ToggleRole; admin sees the error and removes the role from the picker.
+message GetAssignableRolesRequest {
+  repeated string exclude_role_ids = 1;
+}
+message GetAssignableRolesResponse {
+  repeated PickerRole roles = 1;
+}
+
+// --- Client telemetry -------------------------------------------------------
+//
+// Funnels client-side render errors caught by ErrorBoundary into the server's
+// structured log. Same shape and rationale as leveling-leaderboard's
+// equivalent — see that sample's proto for the long-form comment.
+
+message ReportClientErrorRequest {
+  string label = 1;
+  string message = 2;
+  string stack = 3;
+  string user_agent = 4;
+}
+message ReportClientErrorResponse {}
+
+// --- Broadcasts -------------------------------------------------------------
+//
+// Two events, both "all" audience:
+//
+//   PickerConfigChanged: fires on admin UpdateGroups, and on platform-side
+//     role rename/delete events that mutate the picker config (the
+//     communityRoleSync subscription writes through the same path). Carries
+//     the full new groups payload — clients re-render entirely. The picker
+//     config IS the public view; no privacy-driven audience split.
+//
+//   AdminsChanged: empty signal mirroring leveling-leaderboard. Fires when
+//     globalSettings.general.admins shifts so demoted/promoted users
+//     re-fetch GetPicker and pick up their new amIAdmin flag.
+
+message PickerConfigChangedEvent {
+  repeated PickerGroup groups = 1;
+}
+
+message AdminsChangedEvent {}
+
+// --- Service ---------------------------------------------------------------
+
+service RolePickerService {
+  // Any authenticated client.
+  rpc GetPicker(GetPickerRequest) returns (GetPickerResponse);
+  rpc ToggleRole(ToggleRoleRequest) returns (ToggleRoleResponse);
+
+  // Admin-only. Server throws RootServerException(NOT_ADMIN) otherwise.
+  rpc UpdateGroups(UpdateGroupsRequest) returns (UpdateGroupsResponse);
+  rpc GetAssignableRoles(GetAssignableRolesRequest) returns (GetAssignableRolesResponse);
+
+  // Any authenticated client. Payload caps in the handler defend against
+  // runaway-loop floods.
+  rpc ReportClientError(ReportClientErrorRequest) returns (ReportClientErrorResponse);
+
+  // Broadcasts.
+  //   BroadcastPickerConfigChanged → "all" audience (picker is public)
+  //   BroadcastAdminsChanged       → "all" audience (triggers amIAdmin refresh)
+  rpc BroadcastPickerConfigChanged(PickerConfigChangedEvent) returns (rootsdk.Void);
+  rpc BroadcastAdminsChanged(AdminsChangedEvent) returns (rootsdk.Void);
+}

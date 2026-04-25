@@ -1,0 +1,49 @@
+.button {
+  min-height: 44px;
+  border-radius: 9999px;
+  padding: 8px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  transition: opacity 200ms;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.primary {
+  background-color: var(--rootsdk-brand-primary);
+  color: var(--rootsdk-text-white);
+}
+
+.outline {
+  background-color: transparent;
+  color: var(--rootsdk-text-primary);
+  border: 1px solid var(--rootsdk-text-tertiary);
+}
+
+.danger {
+  background-color: var(--rootsdk-error);
+  color: var(--rootsdk-text-white);
+}
+
+.text {
+  background-color: transparent;
+  color: var(--rootsdk-text-primary);
+  padding: 8px 12px;
+}
+
+.button:hover {
+  opacity: 0.7;
+}
+
+.button:active {
+  opacity: 0.5;
+  transform: scale(0.98);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

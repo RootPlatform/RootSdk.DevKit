@@ -12,6 +12,25 @@
       ]
     }
   },
+  "settings": {
+    "groups": [
+      {
+        "key": "general",
+        "title": "General",
+        "items": [
+          {
+            "key": "assignedRole",
+            "title": "Assigned Role",
+            "description": "Role granted to a member after they post the message threshold",
+            "required": true,
+            "roleOrMember": {
+              "selectBehavior": "roleSingle"
+            }
+          }
+        ]
+      }
+    ]
+  },
   "permissions": {
     "community": {
       "manageRoles": true

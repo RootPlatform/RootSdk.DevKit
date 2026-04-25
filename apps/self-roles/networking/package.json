@@ -1,0 +1,6 @@
+{
+  "name": "@selfroles/networking",
+  "scripts": {
+    "build": "rootsdk build proto"
+  }
+}

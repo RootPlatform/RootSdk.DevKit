@@ -2,6 +2,8 @@ import {
   rootServer,
   RootApiException,
   ErrorCodeType,
+  RootGuidUtils,
+  RootGuidType,
   MessageType,
   ChannelMessageEvent,
   ChannelMessageCreatedEvent,
@@ -14,6 +16,7 @@ import {
   ChannelType,
   ChannelGroup,
   ChannelListRequest,
+  ReadOnlyMemberGroup,
 } from "@rootsdk/server-bot";
 
 export function initializeAnnounce(): void {
@@ -24,9 +27,14 @@ async function onMessage(evt: ChannelMessageCreatedEvent): Promise<void> {
   try {
     if (evt.messageType === MessageType.System) return;
 
+    if (RootGuidUtils.toRootGuidType(evt.userId) !== RootGuidType.Person) return;
+
     const command: string = "/announce ";
 
     if (!evt.messageContent?.startsWith(command)) return;
+
+    const announcers = rootServer.globalSettings?.general?.announcers as ReadOnlyMemberGroup | undefined;
+    if (!announcers || !(await announcers.isMember({ userId: evt.userId }))) return;
 
     const nickname: string = await getMemberNickname(evt.userId);
     const mention = "[@" + nickname + "](root://user/" + evt.userId + ")";

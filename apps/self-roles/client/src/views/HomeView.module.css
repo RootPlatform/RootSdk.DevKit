@@ -1,0 +1,50 @@
+.home {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 16px;
+  max-width: 720px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.errorBanner {
+  padding: 10px 14px;
+  background: var(--rootsdk-color-danger-surface, #fef2f2);
+  color: var(--rootsdk-color-danger-text, #991b1b);
+  border: 1px solid var(--rootsdk-color-danger-border, #fecaca);
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.groupHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.groupTitle {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--rootsdk-color-text-primary, #111827);
+}
+
+.groupDescription {
+  font-size: 13px;
+  color: var(--rootsdk-color-text-secondary, #6b7280);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.roles {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}

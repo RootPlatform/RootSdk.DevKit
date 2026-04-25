@@ -2,6 +2,8 @@ import {
   rootServer,
   RootApiException,
   ErrorCodeType,
+  RootGuidUtils,
+  RootGuidType,
   MessageType,
   ChannelMessageEvent,
   ChannelMessageCreatedEvent,
@@ -18,6 +20,9 @@ export function initializeEcho(): void {
 async function onMessage(evt: ChannelMessageCreatedEvent): Promise<void> {
   try {
     if (evt.messageType === MessageType.System)
+      return;
+
+    if (RootGuidUtils.toRootGuidType(evt.userId) !== RootGuidType.Person)
       return;
 
     const prefix: string = "/echo ";

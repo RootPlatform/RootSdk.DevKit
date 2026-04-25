@@ -2,13 +2,17 @@
   "id": "xxxxxxxxxxxxxxxxxxxxxx",
   "version": "1.0.0",
   "package": {
+    "client": {
+      "deploy": "client/dist"
+    },
     "server": {
-      "launch": "dist/main.js",
+      "launch": "server/dist/main.js",
       "deploy": [
-          "dist"
+        "server/dist",
+        "networking/gen/server"
       ],
       "nodeModules": [
-          "node_modules"
+        "node_modules"
       ]
     }
   },
@@ -19,10 +23,11 @@
         "title": "General",
         "items": [
           {
-            "key": "announcers",
-            "title": "Announcers",
-            "description": "Roles and members allowed to use /announce",
+            "key": "admins",
+            "title": "App admins",
+            "description": "Roles and members who can access Settings in this app.",
             "required": true,
+            "confirmation": "Save",
             "roleOrMember": {
               "selectBehavior": "roleMultiAndUserMulti"
             }
@@ -32,8 +37,8 @@
     ]
   },
   "permissions": {
-    "channel": {
-      "createMessage": true
+    "community": {
+      "manageRoles": true
     }
   }
 }

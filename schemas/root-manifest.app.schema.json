@@ -151,7 +151,7 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Settings",
       "description": "Configurable global settings. They're declared in your manifest and set by community members with the `Manage Apps` permission during and after installation.",
-      "x-doc-details": "Settings are accessed at runtime via rootServer.globalSettings[groupKey][itemKey]. Each setting type determines the UI the admin sees and the SDK type your server receives. The SDK supports every setting type listed below, but the Root desktop and mobile clients have not yet shipped admin UI for every type. Today, only member, role, and roleAndMember types have admin-facing UI.",
+      "x-doc-details": "Settings are accessed at runtime via rootServer.globalSettings[groupKey][itemKey]. Each setting type determines the UI the admin sees and the SDK type your server receives. The SDK supports every setting type listed below, but the Root desktop and mobile clients have not yet shipped admin UI for every type. Today, only the roleOrMember type has admin-facing UI.",
       "type": "object",
       "required": [
         "groups"
@@ -353,73 +353,33 @@
                       },
                       "additionalProperties": false
                     },
-                    "member": {
+                    "roleOrMember": {
                       "type": [
                         "object",
                         "null"
                       ],
-                      "description": "Select one or more community members. The admin sees a member picker.",
+                      "description": "Picker for roles and/or community members. The admin sees a picker shaped by selectBehavior.",
                       "x-doc-runtime-type": "ReadOnlyMemberGroup",
-                      "x-doc-details": "All three member/role types (member, role, roleAndMember) produce a ReadOnlyMemberGroup on the server. Choose based on the UI you want the admin to see. The member group is automatically kept in sync — deleted users and roles are removed, and memberUserIds is recalculated when role membership changes.",
+                      "x-doc-details": "Produces a ReadOnlyMemberGroup on the server regardless of which selectBehavior is chosen. The behavior controls what kind of picker the admin sees: a single user, multiple users, a single role, multiple roles, or both roles and users. The member group is automatically kept in sync — deleted users and roles are removed, and memberUserIds is recalculated when role membership changes.",
+                      "required": [
+                        "selectBehavior"
+                      ],
                       "properties": {
-                        "multiSelect": {
-                          "type": "boolean",
-                          "description": "Allow multiple selections.",
+                        "selectBehavior": {
+                          "type": "string",
+                          "description": "Controls what the admin can pick. `userSingle`/`userMulti` show a member picker; `roleSingle`/`roleMulti` show a role picker; `roleMultiAndUserMulti` shows a combined picker.",
+                          "enum": [
+                            "userSingle",
+                            "userMulti",
+                            "roleSingle",
+                            "roleMulti",
+                            "roleMultiAndUserMulti"
+                          ],
                           "examples": [
-                            false,
-                            true
+                            "roleMultiAndUserMulti",
+                            "roleSingle"
                           ]
                         },
-                        "userIds": {
-                          "type": "array",
-                          "description": "Default user IDs shown in the picker during installation. Typically left as an empty array.",
-                          "items": {
-                            "type": "string"
-                          },
-                          "examples": [
-                            []
-                          ]
-                        }
-                      },
-                      "additionalProperties": false
-                    },
-                    "role": {
-                      "type": [
-                        "object",
-                        "null"
-                      ],
-                      "description": "Select one or more community roles. The admin sees a role picker.",
-                      "x-doc-runtime-type": "ReadOnlyMemberGroup",
-                      "properties": {
-                        "multiSelect": {
-                          "type": "boolean",
-                          "description": "Allow multiple role selections.",
-                          "examples": [
-                            false,
-                            true
-                          ]
-                        },
-                        "communityRoleIds": {
-                          "type": "array",
-                          "description": "Default role IDs shown in the picker during installation. Typically left as an empty array.",
-                          "items": {
-                            "type": "string"
-                          },
-                          "examples": [
-                            []
-                          ]
-                        }
-                      },
-                      "additionalProperties": false
-                    },
-                    "roleAndMember": {
-                      "type": [
-                        "object",
-                        "null"
-                      ],
-                      "description": "Combined selector for users and roles. The admin sees a picker for both members and roles.",
-                      "x-doc-runtime-type": "ReadOnlyMemberGroup",
-                      "properties": {
                         "userIds": {
                           "type": "array",
                           "description": "Default user IDs shown in the picker during installation. Typically left as an empty array.",
@@ -676,7 +636,8 @@
                   "description": "Select the roles and members who can moderate.",
                   "required": true,
                   "confirmation": "Save",
-                  "roleAndMember": {
+                  "roleOrMember": {
+                    "selectBehavior": "roleMultiAndUserMulti",
                     "userIds": [],
                     "communityRoleIds": []
                   }

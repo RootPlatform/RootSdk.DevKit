@@ -2,6 +2,8 @@ import {
   rootServer,
   RootApiException,
   ErrorCodeType,
+  RootGuidUtils,
+  RootGuidType,
   MessageType,
   ChannelMessageEvent,
   ChannelMessageCreatedEvent,
@@ -21,6 +23,8 @@ async function onMessage(evt: ChannelMessageCreatedEvent): Promise<void> {
   try {
     if (evt.messageType === MessageType.System) return;
 
+    if (RootGuidUtils.toRootGuidType(evt.userId) !== RootGuidType.Person) return;
+
     const { botName, target } = parseInput(evt.messageContent);
 
     if (botName !== "/role") return;
@@ -34,13 +38,13 @@ async function onMessage(evt: ChannelMessageCreatedEvent): Promise<void> {
           "(RoleBot) " +
           member.nickname +
           " has roles: " +
-          (await getMemberRoleNames(member)).join(" ");
+          (await getMemberRoleNames(member)).join(", ");
         break;
 
       case "community":
         reply =
           "(RoleBot) the community has roles: " +
-          (await getCommunityRoleNames()).join(" ");
+          (await getCommunityRoleNames()).join(", ");
         break;
     }
 
@@ -77,7 +81,7 @@ function parseInput(input: string): { botName: string; target: string } {
 
   const [, botName, target] = match;
 
-  return { botName, target };
+  return { botName, target: target.trim() };
 }
 
 async function getMember(userId: UserGuid): Promise<CommunityMember> {

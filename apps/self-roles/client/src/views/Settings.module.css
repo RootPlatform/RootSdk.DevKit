@@ -1,0 +1,231 @@
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  max-width: 720px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.heading {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--rootsdk-color-text-primary, #111827);
+}
+
+.subhead {
+  margin: 0;
+  color: var(--rootsdk-color-text-secondary, #6b7280);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.emptyState {
+  padding: 16px;
+  background: var(--rootsdk-color-surface-subtle, #f9fafb);
+  border: 1px dashed var(--rootsdk-color-border-subtle, #e5e7eb);
+  border-radius: 8px;
+  text-align: center;
+  color: var(--rootsdk-color-text-secondary, #6b7280);
+}
+
+.groups {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.groupCard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  background: var(--rootsdk-color-surface, #ffffff);
+  border: 1px solid var(--rootsdk-color-border-subtle, #e5e7eb);
+  border-radius: 8px;
+}
+
+.groupHeader {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.groupTitleInput {
+  flex: 1 1 auto;
+  font-weight: 600;
+}
+
+.groupActions {
+  display: flex;
+  gap: 4px;
+}
+
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--rootsdk-color-border-subtle, #e5e7eb);
+  background: var(--rootsdk-color-surface, #ffffff);
+  border-radius: 6px;
+  color: var(--rootsdk-color-text-secondary, #6b7280);
+  cursor: pointer;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+
+.iconButton:hover:not(:disabled) {
+  background: var(--rootsdk-color-surface-hover, #f9fafb);
+  color: var(--rootsdk-color-text-primary, #111827);
+}
+
+.iconButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.checkboxRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--rootsdk-color-text-secondary, #6b7280);
+}
+
+.rolesSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rolesHeader {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--rootsdk-color-text-secondary, #6b7280);
+}
+
+.rolesList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.roleRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  background: var(--rootsdk-color-surface-subtle, #f9fafb);
+  border-radius: 6px;
+}
+
+.swatch {
+  flex: 0 0 10px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--rootsdk-color-border, #d1d5db);
+  border: 1px solid var(--rootsdk-color-border-subtle, #e5e7eb);
+}
+
+.roleName {
+  flex: 1 1 auto;
+  font-size: 13px;
+  color: var(--rootsdk-color-text-primary, #111827);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.emptyHint {
+  font-size: 13px;
+  color: var(--rootsdk-color-text-secondary, #6b7280);
+  margin: 0;
+  padding: 8px 0;
+}
+
+.limitHint {
+  font-size: 12px;
+  color: var(--rootsdk-color-text-secondary, #6b7280);
+  margin: 0;
+}
+
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.modal {
+  background: var(--rootsdk-color-surface, #ffffff);
+  border-radius: 10px;
+  width: 100%;
+  max-width: 420px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modalTitle {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--rootsdk-color-text-primary, #111827);
+}
+
+.modalRoles {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+  max-height: 50vh;
+}
+
+.modalRoleRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--rootsdk-color-border-subtle, #e5e7eb);
+  background: var(--rootsdk-color-surface, #ffffff);
+  border-radius: 6px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.modalRoleRow:hover {
+  background: var(--rootsdk-color-surface-hover, #f9fafb);
+}
