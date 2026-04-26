@@ -6,7 +6,7 @@
   padding: 12px 14px;
   background: var(--rootsdk-background-secondary);
   border: 1px solid var(--rootsdk-border);
-  border-radius: 8px;
+  border-radius: 12px;
   text-align: left;
   cursor: pointer;
   transition: background-color 0.12s ease, border-color 0.12s ease;
@@ -15,6 +15,17 @@
 
 .row:hover:not(:disabled) {
   background: var(--rootsdk-highlight-light);
+}
+
+/* Selectable-card pattern (see design-system-reference.md): when the row
+   is the active selection, outline the WHOLE row in brand-primary. The
+   right-side indicator filling is the secondary signal; this outline is
+   what makes the selected state read at a glance. The 1px → 1.5px width
+   bump is what gives the border the visual punch — without it, the
+   border-color change alone is too subtle on dark surfaces. */
+.row[aria-checked="true"] {
+  border-width: 1.5px;
+  border-color: var(--rootsdk-brand-primary);
 }
 
 .row:disabled {

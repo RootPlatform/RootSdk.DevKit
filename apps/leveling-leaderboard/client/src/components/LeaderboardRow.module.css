@@ -44,7 +44,7 @@
 }
 
 .me:hover {
-  background-color: var(--rootsdk-highlight-medium);
+  background-color: var(--rootsdk-highlight-normal);
 }
 
 .identity {

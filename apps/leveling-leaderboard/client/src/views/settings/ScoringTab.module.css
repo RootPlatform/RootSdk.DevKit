@@ -23,7 +23,7 @@
 
 .heading {
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--rootsdk-text-primary);
   margin: 0;
 }

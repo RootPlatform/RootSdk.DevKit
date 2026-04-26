@@ -5,7 +5,13 @@ import styles from "./Button.module.css";
 // Button — four variants. 44px min height, pill shape, DESIGN.md tokens.
 // ============================================================================
 
-export type ButtonVariant = "primary" | "outline" | "danger" | "text";
+// `quiet` is a flat, tinted-bg button with smaller padding than the full-
+// pill primary/outline/danger. Use it for inline secondary actions that
+// shouldn't read as declaratively as `outline` (whose visible border can
+// feel heavy on small contextual buttons). Pairs naturally with `primary`
+// or `danger` as the louder peer in a primary-secondary pair.
+// See design-system-reference.md "button-quiet".
+export type ButtonVariant = "primary" | "outline" | "danger" | "text" | "quiet";
 
 interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;

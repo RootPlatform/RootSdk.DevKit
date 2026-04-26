@@ -42,7 +42,7 @@
   align-items: center;
   gap: 10px;
   padding: 10px 14px;
-  border-radius: 8px;
+  border-radius: 12px;
   background-color: var(--rootsdk-background-tertiary);
   color: var(--rootsdk-text-primary);
   font-size: 13px;

@@ -22,7 +22,7 @@
 
 .heading {
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 500;
   margin: 0;
   color: var(--rootsdk-text-primary);
 }
@@ -38,7 +38,7 @@
   padding: 16px;
   background: var(--rootsdk-background-tertiary);
   border: 1px dashed var(--rootsdk-border);
-  border-radius: 8px;
+  border-radius: 12px;
   text-align: center;
   color: var(--rootsdk-text-secondary);
 }
@@ -56,7 +56,7 @@
   padding: 16px;
   background: var(--rootsdk-background-secondary);
   border: 1px solid var(--rootsdk-border);
-  border-radius: 8px;
+  border-radius: 12px;
 }
 
 .groupHeader {
@@ -65,9 +65,71 @@
   align-items: center;
 }
 
+/* Display state of the group title (default render). Looks like a plain
+   heading, but is a button so click-to-edit is keyboard-accessible. The
+   transparent border + padding + radius mirror the input-mode dimensions
+   so swapping between display and edit doesn't shift surrounding layout.
+   Pencil hint icon fades in on hover/focus to communicate the click-to-
+   edit affordance. */
+.groupTitle {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  min-height: 44px;
+  margin: 0;
+  padding: 10px 16px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--rootsdk-text-primary);
+  text-align: left;
+  cursor: text;
+  transition: background-color 150ms, border-color 150ms;
+}
+
+.groupTitle:hover,
+.groupTitle:focus-visible {
+  background: var(--rootsdk-highlight-light);
+  border-color: var(--rootsdk-border);
+}
+
+.groupTitle:focus-visible {
+  outline: none;
+}
+
+.groupTitleText {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.groupTitleEditHint {
+  flex: 0 0 auto;
+  color: var(--rootsdk-text-tertiary);
+  opacity: 0;
+  transition: opacity 150ms;
+}
+
+.groupTitle:hover .groupTitleEditHint,
+.groupTitle:focus-visible .groupTitleEditHint {
+  opacity: 1;
+}
+
+/* Edit state. Forces font-size to match the display heading (16px) so
+   swapping modes doesn't visibly resize the title — only the chrome
+   changes (transparent → input border + bg). */
 .groupTitleInput {
   flex: 1 1 auto;
-  font-weight: 600;
+  font-weight: 500;
+}
+
+.groupTitleInput input {
+  font-size: 16px;
 }
 
 /* Inline invalid-field marker — applied to the group title input when its
@@ -122,17 +184,21 @@
   gap: 8px;
 }
 
-/* Constrains add-buttons so they don't stretch to the full width of their
-   flex-column parent. Without this, both "+ Add role" and "+ Add group"
-   render as oversized full-width primary pills that dominate the page —
-   visually claiming primary-action attention even when contextual. */
+/* Right-aligns add-buttons within their flex-column parent. Two reasons:
+   1. Without `align-self`, the button stretches to fill the column width
+      and reads as too dominant for a primary action.
+   2. Right-alignment matches Root's first-party convention of placing
+      primary actions on the right of their context (Create Role, Delete,
+      etc.). It also puts these buttons in a different visual column from
+      the left-anchored card content above them, so the eye reads "global
+      action" at the bottom rather than "another row in the stack". */
 .addAction {
-  align-self: flex-start;
+  align-self: flex-end;
 }
 
 .rolesHeader {
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--rootsdk-text-secondary);
@@ -207,7 +273,7 @@
 .modal {
   background: var(--rootsdk-background-secondary);
   border: 1px solid var(--rootsdk-border);
-  border-radius: 10px;
+  border-radius: 12px;
   width: 100%;
   max-width: 420px;
   max-height: 80vh;
@@ -226,7 +292,7 @@
 
 .modalTitle {
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 500;
   margin: 0;
   color: var(--rootsdk-text-primary);
 }

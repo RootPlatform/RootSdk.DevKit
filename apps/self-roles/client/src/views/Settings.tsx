@@ -380,23 +380,60 @@ const GroupCard: React.FC<GroupCardProps> = ({
   const atRoleLimit = limits ? group.roles.length >= limits.maxRolesPerGroup : false;
   const titleInvalid = group.title.trim().length === 0;
 
+  // Inline-edit title (see design-system-reference.md "inline-edit"):
+  // default render is a heading-styled button; clicking swaps to a
+  // TextInput with autofocus, blurring exits back to the heading.
+  // Newly-created groups (server temp ID prefix `t.`) auto-open in edit
+  // mode so the user can type the name without an extra click.
+  // Empty titles force edit mode — `titleInvalid || isEditingTitle` —
+  // so the user can't blur out leaving a blank heading.
+  const [isEditingTitle, setIsEditingTitle] = useState(() =>
+    group.groupId.startsWith("t."),
+  );
+  const showInput = isEditingTitle || titleInvalid;
+
   return (
     <div className={styles.groupCard}>
       <div className={styles.groupHeader}>
-        <TextInput
-          value={group.title}
-          onChange={(v) => onChange({ title: v })}
-          placeholder="Group title"
-          maxLength={limits?.groupTitleMaxChars}
-          className={[
-            styles.groupTitleInput,
-            titleInvalid ? styles.fieldInvalid : undefined,
-          ]
-            .filter(Boolean)
-            .join(" ")}
-          aria-label="Group title"
-          aria-invalid={titleInvalid || undefined}
-        />
+        {showInput ? (
+          <TextInput
+            value={group.title}
+            onChange={(v) => onChange({ title: v })}
+            placeholder="Group title"
+            maxLength={limits?.groupTitleMaxChars}
+            className={[
+              styles.groupTitleInput,
+              titleInvalid ? styles.fieldInvalid : undefined,
+            ]
+              .filter(Boolean)
+              .join(" ")}
+            aria-label="Group title"
+            aria-invalid={titleInvalid || undefined}
+            autoFocus
+            onBlur={() => setIsEditingTitle(false)}
+            onKeyDown={(e) => {
+              // Enter/Escape both commit local state already (every
+              // keystroke fires onChange); they just exit edit mode.
+              if (e.key === "Enter" || e.key === "Escape") {
+                e.currentTarget.blur();
+              }
+            }}
+          />
+        ) : (
+          <button
+            type="button"
+            className={styles.groupTitle}
+            onClick={() => setIsEditingTitle(true)}
+            aria-label={`Edit ${group.title} group title`}
+          >
+            <span className={styles.groupTitleText}>{group.title}</span>
+            <Icon
+              name="Pencil"
+              size={14}
+              className={styles.groupTitleEditHint}
+            />
+          </button>
+        )}
         <div className={styles.groupActions}>
           <button
             type="button"
@@ -486,7 +523,7 @@ const GroupCard: React.FC<GroupCardProps> = ({
           </ul>
         )}
         <Button
-          variant="outline"
+          variant="quiet"
           onClick={() => setShowRolePicker(true)}
           disabled={atRoleLimit}
           className={styles.addAction}
