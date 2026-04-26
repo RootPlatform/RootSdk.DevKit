@@ -15,8 +15,10 @@ import { log, errFields } from "./log";
 // `sendBroadcast` is typed void (synchronous fire-and-forget), but typing
 // the parameter as `() => void | Promise<void>` future-proofs us against
 // any SDK change that makes broadcasts async — and gives us a single place
-// to keep that contract honest. All broadcast call sites (messageHandler,
-// broadcaster, service RPCs) route through this helper for consistency.
+// to keep that contract honest. Every broadcast call site in this app
+// routes through this helper for consistency; forks that grow additional
+// reactive paths (message handlers, scheduled jobs, etc.) should do the
+// same so error handling stays uniform.
 // ============================================================================
 
 export async function safeBroadcast(

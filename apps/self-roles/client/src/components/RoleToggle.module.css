@@ -4,18 +4,17 @@
   gap: 12px;
   width: 100%;
   padding: 12px 14px;
-  background: var(--rootsdk-color-surface, #ffffff);
-  border: 1px solid var(--rootsdk-color-border-subtle, #e5e7eb);
+  background: var(--rootsdk-background-secondary);
+  border: 1px solid var(--rootsdk-border);
   border-radius: 8px;
   text-align: left;
   cursor: pointer;
   transition: background-color 0.12s ease, border-color 0.12s ease;
-  color: var(--rootsdk-color-text-primary, #111827);
+  color: var(--rootsdk-text-primary);
 }
 
 .row:hover:not(:disabled) {
-  background: var(--rootsdk-color-surface-hover, #f9fafb);
-  border-color: var(--rootsdk-color-border, #d1d5db);
+  background: var(--rootsdk-highlight-light);
 }
 
 .row:disabled {
@@ -28,8 +27,8 @@
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: var(--rootsdk-color-border, #d1d5db);
-  border: 1px solid var(--rootsdk-color-border-subtle, #e5e7eb);
+  background: var(--rootsdk-border);
+  border: 1px solid var(--rootsdk-border);
 }
 
 .body {
@@ -43,7 +42,7 @@
 .name {
   font-size: 14px;
   font-weight: 500;
-  color: var(--rootsdk-color-text-primary, #111827);
+  color: var(--rootsdk-text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -51,8 +50,15 @@
 
 .description {
   font-size: 12px;
-  color: var(--rootsdk-color-text-secondary, #6b7280);
+  color: var(--rootsdk-text-secondary);
   line-height: 1.35;
+}
+
+.unassignableHint {
+  font-size: 12px;
+  color: var(--rootsdk-error);
+  line-height: 1.35;
+  margin-top: 2px;
 }
 
 .checkbox,
@@ -63,10 +69,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1.5px solid var(--rootsdk-color-border, #d1d5db);
-  background: var(--rootsdk-color-surface, #ffffff);
+  border: 1.5px solid var(--rootsdk-border);
+  background: var(--rootsdk-background-primary);
   font-size: 13px;
-  color: var(--rootsdk-color-text-on-accent, #ffffff);
+  color: var(--rootsdk-text-white);
   transition: background-color 0.12s ease, border-color 0.12s ease;
 }
 
@@ -79,8 +85,8 @@
 }
 
 .indicatorOn {
-  background: var(--rootsdk-color-accent, #3b82f6);
-  border-color: var(--rootsdk-color-accent, #3b82f6);
+  background: var(--rootsdk-brand-primary);
+  border-color: var(--rootsdk-brand-primary);
 }
 
 .radio.indicatorOn::after {
@@ -88,5 +94,5 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--rootsdk-color-text-on-accent, #ffffff);
+  background: var(--rootsdk-text-white);
 }

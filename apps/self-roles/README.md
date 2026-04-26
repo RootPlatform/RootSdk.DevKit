@@ -27,17 +27,20 @@ Members open the app and click toggles to add or remove "self-assignable" commun
 
 ```json
 {
-  "community": { "manageRoles": true }
+  "community": { "fullControl": true }
 }
 ```
 
-`community.manageRoles` is the only permission required — the bot needs it to call `communityMemberRoles.add` and `.remove`. No `fullControl`, no channel access, no message events.
+`fullControl` looks heavy, but it's the right declaration for this sample. Root enforces a **subset-of-permissions** check on every role assignment: an app can only assign a role whose permissions are a subset of the app's own. Since this sample's picker is admin-curated and can contain arbitrary community roles (each carrying its own community + channel permissions), the manifest has to declare a superset large enough that any plausible role passes the check. `fullControl` is the only practical declaration that satisfies that for *any* picker contents.
+
+A fork that knows in advance which roles will be in the picker can narrow the manifest to a tighter superset and constrain the admin's role-add picker accordingly. That's a meaningfully different sample (admin role-curation gated by manifest scope) and probably belongs as a separate api-sample if you want to teach it.
 
 ## Known limits
 
 - **No reconnect-driven catch-up.** Same as `leveling-leaderboard`. The client SDK doesn't currently surface a reconnect event; broadcasts that fire during a brief outage are lost. Wire `PickerProvider.reload()` to a reconnect hook when one exists.
 - **Cross-process settings cache coherence.** The in-memory picker cache is correct for a single-process app server. Replace with a per-call DB read or a small pub/sub if scaling horizontally.
 - **Last-writer-wins on concurrent admin edits.** Two admins editing groups in parallel see last-save-wins. Acceptable for a config edited by a handful of people; a fork that needs finer concurrency would split `UpdateGroups` into smaller patch RPCs (`MoveRole`, `RenameGroup`, etc.) and merge server-side.
-- **Bot manageability isn't pre-filtered.** `GetAssignableRoles` returns all non-everyone community roles; the SDK doesn't expose a clean "is-this-role-assignable-by-me?" predicate. Roles the bot can't actually assign at runtime fail with `ROLE_NOT_ASSIGNABLE` on `ToggleRole`; admin sees the error and removes the role from the picker.
+- **No pre-flight subset check on `GetAssignableRoles`.** Root only lets an app assign a role whose permissions are a subset of the app's own (see Permissions above). The SDK doesn't expose a "is-this-role-a-subset-of-mine?" predicate the picker can call up-front, so we surface the constraint at toggle time via `ROLE_NOT_ASSIGNABLE`. With `fullControl` declared this is rare — you'd hit it only if Root's permission model gains a permission the app doesn't have. A fork using a narrower manifest would hit it more often and would want its own pre-flight check (compute the role's permissions vs the manifest's at admin role-add time).
+- **`myRoleIds` staleness on `PickerConfigChanged`.** The broadcast carries the new picker config but not a per-recipient role-membership update. If an admin adds a role to the picker that the member already holds (assigned outside this app via Root's native role UI), the toggle renders OFF until the next full refresh — the member's actual role state is correct on the server, the local view just hasn't caught up. Two fork paths if this matters: (a) targeted broadcast that includes a fresh `my_role_ids` per recipient; or (b) trigger a `softReload()` from the broadcast handler at the cost of one extra round trip per config change. Left as documented behavior here so the broadcast stays a single public event.
 
 Use this sample as a shape reference for member-driven self-service, KV-backed config, role enumeration/assignment, and exclusive-group enforcement. Pair with `leveling-leaderboard` for the admin-driven mutation patterns and SQLite-backed aggregation. Reuse the lib helpers (`adminCheck`, `safeBroadcast`, `useDebouncedMutation`) verbatim where they fit.

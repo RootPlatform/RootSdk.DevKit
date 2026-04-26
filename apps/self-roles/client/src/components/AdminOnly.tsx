@@ -1,22 +1,30 @@
 import React from "react";
-import { usePicker } from "../contexts/PickerContext";
 
 // ============================================================================
-// AdminOnly — conditional wrapper gated on the server-provided amIAdmin flag.
+// AdminOnly — conditional wrapper gated on a server-resolved admin flag.
 //
-// DESIGN.md Layout: the gear icon is hidden from non-admins and the app shell
-// snaps a non-admin back to home if view === "settings" somehow, so AdminOnly
-// should be unreachable through normal navigation. It exists as a defensive
-// rendering guard.
+// The flag is INJECTED via the `isAdmin` prop rather than read from a
+// specific context, so this component is truly app-agnostic and can be
+// copied verbatim into any Root sample. Apps wire it from their own state
+// container (e.g., usePicker().amIAdmin in self-roles, useLeaderboard()
+// .amIAdmin in leveling-leaderboard).
+//
+// Defence-in-depth wrapper: even if the calling shell has its own
+// gear/route gate (which it should), AdminOnly ensures the wrapped UI
+// disappears if the flag flips false mid-session.
 // ============================================================================
 
 interface Props {
   children: React.ReactNode;
+  isAdmin: boolean;
   fallback?: React.ReactNode;
 }
 
-export const AdminOnly: React.FC<Props> = ({ children, fallback = null }) => {
-  const { amIAdmin } = usePicker();
-  if (!amIAdmin) return <>{fallback}</>;
+export const AdminOnly: React.FC<Props> = ({
+  children,
+  isAdmin,
+  fallback = null,
+}) => {
+  if (!isAdmin) return <>{fallback}</>;
   return <>{children}</>;
 };

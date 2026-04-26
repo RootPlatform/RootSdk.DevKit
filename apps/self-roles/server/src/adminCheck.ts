@@ -23,11 +23,13 @@ import { log } from "./lib/log";
 // runtime ownership transfer). The admins reference is re-captured whenever
 // globalSettings fires an "update" event.
 //
-// An onAdminsChanged callback is invoked whenever admins shift so the service
-// can broadcast the public AdminsChanged event — clients then re-fetch
-// GetLeaderboard to refresh their amIAdmin flag. (The admin-only
-// SettingsUpdated event carries a settings snapshot and has a different
-// audience — see leaderboardService.ts for the split rationale.)
+// An onAdminsChanged callback is invoked whenever admins shift so the
+// service can broadcast a public AdminsChanged event — clients then
+// re-fetch their amIAdmin flag. Apps that ALSO broadcast an admin-only
+// settings snapshot (different audience, separate event) split admins
+// signaling from the snapshot so non-admins don't receive privileged
+// payloads. This sample's picker config is public, so a single broadcast
+// suffices; see DESIGN.md "Broadcasts" for the conditional split rationale.
 // ============================================================================
 
 let ownerUserId: UserGuid | undefined;
@@ -72,7 +74,20 @@ export async function initializeAdminCheck(
   // change. If more keys are added later, a diff on `current.general.admins`
   // would avoid spurious broadcasts — keeping correctness the simple way
   // until that's actually relevant.
-  state.globalSettings?.on("update", (evt) => {
+  //
+  // Optional chain on `state.globalSettings` is defensive: the SDK should
+  // always provide it for an app whose manifest declares `settings`, so
+  // this branch should be unreachable in practice. If the SDK ever omits
+  // globalSettings (manifest mistake, SDK regression), AdminsChanged
+  // broadcasts simply never fire — `isAdmin` still works against the
+  // owner ID cache, the app keeps running, and the missing wire-up
+  // surfaces during admin-config testing rather than as a startup crash.
+  // Logged below so the gap is visible if it happens.
+  if (!state.globalSettings) {
+    log("warn", "globalSettings missing from RootAppStartState; AdminsChanged broadcasts will not fire");
+    return;
+  }
+  state.globalSettings.on("update", (evt) => {
     adminsGroup = readAdminsGroup(evt.current);
     for (const cb of onChangeCallbacks) {
       try {
@@ -90,10 +105,10 @@ export async function initializeAdminCheck(
 }
 
 // Register a listener that fires whenever globalSettings updates (which
-// admins are part of). Multiple subscribers are allowed; they're invoked in
-// registration order. The service uses this to broadcast SettingsUpdated
-// so clients refresh their amIAdmin flag — future modules can hook here
-// for related concerns (e.g., audit logging).
+// admins are part of). Multiple subscribers are allowed; they're invoked
+// in registration order. The service uses this to fire its public
+// admins-changed broadcast so clients refresh their amIAdmin flag — future
+// modules can hook here for related concerns (e.g., audit logging).
 export function onAdminsChanged(cb: () => void): void {
   onChangeCallbacks.push(cb);
 }
@@ -101,13 +116,32 @@ export function onAdminsChanged(cb: () => void): void {
 export async function isAdmin(userId: UserGuid): Promise<boolean> {
   if (userId === getOwnerUserId()) return true;
   if (!adminsGroup) return false;
-  return adminsGroup.isMember({ userId });
+  // Fail-closed on transient errors. A platform hiccup mid-isMember would
+  // otherwise propagate up through getPicker/requireAdmin and surface as
+  // a full QueryError view. Returning false instead degrades gracefully:
+  // non-admins are unaffected; an actual admin briefly loses admin chrome
+  // until the SDK recovers and the next isAdmin call succeeds. Logged so
+  // a real failure is visible to operators.
+  try {
+    return await adminsGroup.isMember({ userId });
+  } catch (err) {
+    log("warn", "adminsGroup.isMember failed; returning false (fail-closed)", {
+      userId,
+      error: err instanceof Error ? err.message : String(err),
+    });
+    return false;
+  }
 }
 
-// Returns the current admins ReadOnlyMemberGroup, or undefined if globalSettings
-// hasn't surfaced one yet (transient startup state, or admins not configured).
-// Used as a broadcast audience for admin-only events — NOT for authorization
-// checks (use isAdmin for that; it includes the owner fallback).
+// Returns the current admins ReadOnlyMemberGroup, or undefined if
+// globalSettings hasn't surfaced one yet (transient startup state, or
+// admins not configured). Used as a broadcast audience for admin-only
+// events — NOT for authorization checks (use isAdmin for that; it
+// includes the owner fallback).
+//
+// Not called by this sample (all broadcasts are public). Kept for parity
+// with apps whose payloads include admin-only data and need to gate the
+// broadcast audience on the admins MemberGroup.
 export function getAdminsGroup(): ReadOnlyMemberGroup | undefined {
   return adminsGroup;
 }

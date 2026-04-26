@@ -260,8 +260,12 @@ service LeaderboardService {
   rpc ResetMemberXp(ResetMemberXpRequest) returns (ResetMemberXpResponse);
   rpc ResetAllXp(ResetAllXpRequest) returns (ResetAllXpResponse);
 
-  // Any authenticated client. Rate-limited by message size at the SDK layer;
-  // payload caps in the server handler defend against runaway loops.
+  // Any authenticated client. The handler truncates each text field to
+  // bound log line size (see truncate() in leaderboardService.ts), but
+  // does NOT rate-limit per caller — a render-loop ErrorBoundary that
+  // thrashes would still spam server logs at the SDK's RPC rate limit.
+  // A production fork that needs flood protection should add a per-userId
+  // recent-call-count check and drop calls beyond N per minute.
   rpc ReportClientError(ReportClientErrorRequest) returns (ReportClientErrorResponse);
 
   // Broadcasts. See DESIGN.md "Broadcasts" for audiences and coalescing rules.

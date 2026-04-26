@@ -37,10 +37,23 @@ export interface PickerState {
   limits: PickerLimits | undefined;
   loading: boolean;
   error: Error | undefined;
+  // Full reload with loader flash — flips loading=true so HomeView/Settings
+  // show <Loader /> while the GetPicker round-trip is in flight. Right for
+  // explicit user retries (QueryError onRetry) where the user expects
+  // visible feedback that something's happening.
   reload: () => Promise<void>;
-  // Optimistically replace local myRoleIds — used by HomeView after a
-  // successful ToggleRole RPC so the UI doesn't wait for a broadcast or
-  // refetch to reflect the change.
+  // Background refresh — does NOT flip loading=true, so the existing UI
+  // stays mounted and just updates in place when the response arrives.
+  // Right for broadcast-driven refreshes where flashing the loader would
+  // blink the page on every external state change. Used by the
+  // AdminsChanged subscription. Errors are still captured to `error` so a
+  // failed soft-reload surfaces on the next render.
+  softReload: () => Promise<void>;
+  // Replaces local myRoleIds from the server's authoritative response after
+  // a ToggleRole RPC succeeds. NOT optimistic — we wait for the server's
+  // resulting role list before updating, because exclusive groups may flip
+  // multiple roles in a single RPC (sibling-removal + add) and predicting
+  // that client-side would duplicate server logic. See HomeView.
   setMyRoleIds: (ids: string[]) => void;
 }
 
@@ -56,8 +69,11 @@ export const PickerProvider: React.FC<{ children: React.ReactNode }> = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | undefined>(undefined);
 
-  const reload = useCallback(async () => {
-    setLoading(true);
+  // Internal: shared fetch body. `withLoader` controls whether we flip the
+  // `loading` state during the round-trip. Public reload uses true (visible
+  // loader); softReload uses false (silent refresh).
+  const fetchPicker = useCallback(async (withLoader: boolean) => {
+    if (withLoader) setLoading(true);
     setError(undefined);
     try {
       const response = await withClientRetry(() =>
@@ -70,9 +86,12 @@ export const PickerProvider: React.FC<{ children: React.ReactNode }> = ({
     } catch (err: unknown) {
       setError(err instanceof Error ? err : new Error(String(err)));
     } finally {
-      setLoading(false);
+      if (withLoader) setLoading(false);
     }
   }, []);
+
+  const reload = useCallback(() => fetchPicker(true), [fetchPicker]);
+  const softReload = useCallback(() => fetchPicker(false), [fetchPicker]);
 
   useEffect(() => {
     void reload();
@@ -97,10 +116,13 @@ export const PickerProvider: React.FC<{ children: React.ReactNode }> = ({
     };
   }, []);
 
-  // Refresh when globalSettings admins change (mirrors leveling-leaderboard).
+  // Refresh amIAdmin (and the rest of the picker payload) when
+  // globalSettings admins change. softReload (vs reload) so the HomeView /
+  // Settings don't flash <Loader /> on every admin reconfiguration — the
+  // existing data is still valid; only amIAdmin might have flipped.
   useEffect(() => {
     const onAdmins = () => {
-      void reload();
+      void softReload();
     };
     rolePickerServiceClient.on(
       RolePickerServiceClientEvent.AdminsChanged,
@@ -112,7 +134,7 @@ export const PickerProvider: React.FC<{ children: React.ReactNode }> = ({
         onAdmins,
       );
     };
-  }, [reload]);
+  }, [softReload]);
 
   const setMyRoleIds = useCallback((ids: string[]) => {
     setMyRoleIdsState(new Set(ids));
@@ -126,6 +148,7 @@ export const PickerProvider: React.FC<{ children: React.ReactNode }> = ({
     loading,
     error,
     reload,
+    softReload,
     setMyRoleIds,
   };
   return <PickerCtx.Provider value={value}>{children}</PickerCtx.Provider>;

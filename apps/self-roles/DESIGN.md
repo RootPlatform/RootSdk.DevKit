@@ -2,7 +2,7 @@
 
 This document is the behavior contract and implementation guide for the `self-roles` sample app.
 
-The sample teaches a different SDK shape than [`leveling-leaderboard`](../leveling-leaderboard/DESIGN.MD) — member-driven mutations, role enumeration/assignment, KV-backed config — while reusing the same admin-gating, broadcast, and auto-save patterns. Where a pattern appears in both, this doc names it briefly and links to the `leveling-leaderboard` source instead of restating; that keeps the focus on what's unique here.
+The sample teaches a different SDK shape than [`leveling-leaderboard`](../leveling-leaderboard/DESIGN.md) — member-driven mutations, role enumeration/assignment, KV-backed config — while reusing the same admin-gating, broadcast, and auto-save patterns. Where a pattern appears in both, this doc names it briefly and links to the `leveling-leaderboard` source instead of restating; that keeps the focus on what's unique here.
 
 ---
 
@@ -18,7 +18,8 @@ These files are domain-agnostic — drop them straight into a new app:
 | `server/src/lib/retry.ts` | `withRetry()` wrapper for SDK calls |
 | `server/src/lib/safeBroadcast.ts` | Logs-and-swallows broadcast failures so they don't propagate |
 | `server/src/adminCheck.ts` | Admin gating against `globalSettings.general.admins` + community owner |
-| `client/src/components/{ErrorBoundary,Loader,EmptyState,QueryError,Button,TextInput,Icon,AdminOnly,AutoSaveStatus,AppHeader}.tsx` | Generic UI primitives. Update import paths and the app title in `AppHeader`. |
+| `client/src/components/{Loader,EmptyState,QueryError,Button,TextInput,Icon,AutoSaveStatus}.tsx` | Generic UI primitives. No SDK or app-specific imports. |
+| `client/src/components/{ErrorBoundary,AdminOnly,AppHeader}.tsx` | App-agnostic by design — they take SDK-bound values (telemetry hook, `isAdmin`, app title) as props rather than reading them from this app's contexts. Verbatim-copyable; only the wiring in `App.tsx` needs to be redone for the new app. |
 | `client/src/lib/{retry,rootColorScheme,useDebouncedMutation}.ts` | Client-side retry, theme→`color-scheme` bridge, debounced auto-save hook |
 | `client/src/styles/globals.css` | Root theme tokens + reset |
 | `client/src/index.tsx` | React entrypoint (verbatim — only mounts `<App/>`) |
@@ -85,7 +86,7 @@ We do **not** store role names or color hexes. Those come from `rootServer.commu
 
 `communityRoleSync.ts` subscribes to two community-role events:
 
-- **`CommunityRoleDeleted`** — the role left the community. We cull it from any group it appears in. Groups that go empty as a result are removed entirely (an empty group is just a section header with nothing under it). After mutation, fire the `onPickerConfigChanged` callback so the service broadcasts `PickerConfigChanged` to all clients.
+- **`CommunityRoleDeleted`** — the role left the community. We cull it from any group it appears in. Groups that become empty as a result are **preserved** in the stored config, not deleted — the admin authored that group with a title, and silently dropping it on a delete event would erase intent. The HomeView filters empty groups at render time so members don't see useless section headers; the admin editor still shows them so the admin can either repopulate or explicitly delete. After mutation, fire the `onPickerConfigChanged` callback so the service broadcasts `PickerConfigChanged` to all clients.
 - **`CommunityRoleEdited`** — the role's name or color changed. We don't store either, so no KV write — but already-connected clients have stale text rendered. Cheap pre-filter: only emit a change when the edited role is actually in our picker. Otherwise an unrelated role rename would force every client to re-render the picker.
 
 `CommunityRoleCreated` and `CommunityRoleMoved` don't affect us — a new role isn't in our picker until an admin adds it; the platform's role ordering is independent of our picker order.
@@ -147,8 +148,26 @@ Returned on `GetPicker`; refreshed via a `reload()` call on every `AdminsChanged
 ## Permissions and roles
 
 ```json
-{ "community": { "manageRoles": true } }
+{ "community": { "fullControl": true } }
 ```
+
+### Why `fullControl`
+
+Root's role-assignment model is **permission subset**, not rank or hierarchy. From the API docs: *"Your code can only assign roles whose permissions are a subset of its own."* The SDK throws `NoPermissionToAdd` (1001) if any permission on the target role isn't also on the app.
+
+For a generic self-roles app whose picker contents are admin-curated at runtime, the manifest can't predict which permissions any given role will carry. Most community roles carry at least channel-level basics (`createMessage`, `viewMessageHistory`, etc.) so the assigning app needs those declared too. The cleanest universal declaration is `community.fullControl: true`, which (per the manifest docs) "grants every community permission and bypasses all channel-specific permissions" — making the subset check trivially true for any role.
+
+### Forks with tighter scope
+
+A production fork that knows its picker's role set ahead of time can declare a narrower superset. Two reasonable shapes:
+
+1. **Manifest-scoped picker.** Manifest declares only the permissions the curated roles actually need (e.g. `community.manageRoles` + `channel.createMessage`). Admin role-add picker filters out roles that carry permissions outside the manifest. Members never see "can't be assigned" because impossible-to-assign roles never reach the picker.
+
+2. **Per-role permission diff at admin-add time.** Manifest stays narrow; admin picker shows every role; when an admin selects a role, server checks the role's permissions against the manifest's and either accepts or refuses with a clear "your manifest doesn't grant <X>" message.
+
+Both are real patterns. Neither is the right shape for *this* sample because they're meaningfully more complex and shift the focus away from self-roles toward permission gymnastics. Captured as fork-options.
+
+
 
 One app-level role:
 

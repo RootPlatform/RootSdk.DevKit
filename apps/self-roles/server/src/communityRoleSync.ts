@@ -41,6 +41,21 @@ export function onPickerConfigChanged(cb: () => void): void {
   onChangeCallbacks.push(cb);
 }
 
+// Single-flight queue: each role event handler runs to completion before
+// the next one starts. Without this, two near-simultaneous role-deleted
+// events both `readConfig()` against the same baseline, mutate, and then
+// the second `writeConfig()` overwrites the first — losing the first
+// role's cull on disk. The promise chain serializes them at the cost of
+// a few ms of latency per event, which is fine for an edge-case stream.
+//
+// Errors don't poison the chain: the catch swallows so the next op still
+// runs. Each op also has its own try/catch in the handlers.
+let queueTail: Promise<void> = Promise.resolve();
+
+function enqueue(op: () => Promise<void>): void {
+  queueTail = queueTail.then(op).catch(() => undefined);
+}
+
 function emitChange(): void {
   for (const cb of onChangeCallbacks) {
     try {
@@ -55,44 +70,50 @@ export function initializeCommunityRoleSync(): void {
   rootServer.community.communityRoles.on(
     CommunityRoleEvent.CommunityRoleDeleted,
     (evt) => {
-      void onRoleDeleted(evt).catch((err) =>
-        log("error", "communityRoleSync.onRoleDeleted failed", {
-          roleId: evt.communityRoleId,
-          ...errFields(err),
-        }),
-      );
+      enqueue(async () => {
+        try {
+          await onRoleDeleted(evt);
+        } catch (err) {
+          log("error", "communityRoleSync.onRoleDeleted failed", {
+            roleId: evt.communityRoleId,
+            ...errFields(err),
+          });
+        }
+      });
     },
   );
 
   rootServer.community.communityRoles.on(
     CommunityRoleEvent.CommunityRoleEdited,
     (evt) => {
-      void onRoleEdited(evt).catch((err) =>
-        log("error", "communityRoleSync.onRoleEdited failed", {
-          roleId: evt.id,
-          ...errFields(err),
-        }),
-      );
+      enqueue(async () => {
+        try {
+          await onRoleEdited(evt);
+        } catch (err) {
+          log("error", "communityRoleSync.onRoleEdited failed", {
+            roleId: evt.id,
+            ...errFields(err),
+          });
+        }
+      });
     },
   );
 }
 
 async function onRoleDeleted(evt: CommunityRoleDeletedEvent): Promise<void> {
   const config = readConfig();
-  // Walk groups, drop the deleted role from each. Discard groups that go
-  // empty as a result — an empty group has nothing for members to toggle
-  // and would just clutter the UI with a section header. Admins can add
-  // roles to a group later and re-create it then if they want.
+  // Walk groups, drop the deleted role from each. We do NOT cull groups
+  // that go empty as a result — empty groups are valid state that the
+  // admin editor needs to render (so an admin can re-add roles without
+  // recreating the group). HomeView filters empty groups for members at
+  // render time. See resolveGroups in rolePickerService.ts.
   let touched = false;
-  const newGroups = config.groups
-    .map((g) => {
-      const filtered = g.roles.filter((r) => r.roleId !== evt.communityRoleId);
-      if (filtered.length !== g.roles.length) touched = true;
-      return { ...g, roles: filtered };
-    })
-    .filter((g) => g.roles.length > 0);
+  const newGroups = config.groups.map((g) => {
+    const filtered = g.roles.filter((r) => r.roleId !== evt.communityRoleId);
+    if (filtered.length !== g.roles.length) touched = true;
+    return { ...g, roles: filtered };
+  });
 
-  if (newGroups.length !== config.groups.length) touched = true;
   if (!touched) return;
 
   await writeConfig({ groups: newGroups });
@@ -112,6 +133,14 @@ async function onRoleEdited(evt: CommunityRoleEditedEvent): Promise<void> {
   // Otherwise an unrelated role rename would cause every client of every
   // app on the platform to re-render — the SDK's role event is community-
   // wide, not picker-scoped.
+  //
+  // Slight over-broadcast: the event payload includes name/colorHex but
+  // also community/channel-permission and is-mentionable, any of which can
+  // trip "edited" without affecting our picker rendering. We could diff
+  // against communityRoles.list to only emit on display-relevant changes,
+  // but the cost of a redundant re-render is one client refresh against
+  // a tiny payload — cheaper than maintaining a parallel cache to diff
+  // against. Acceptable trade-off for a sample.
   const config = readConfig();
   const inPicker = config.groups.some((g) =>
     g.roles.some((r) => r.roleId === evt.id),

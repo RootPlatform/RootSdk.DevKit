@@ -82,8 +82,16 @@ enum RolePickerError {
   // UpdateGroups payload violated a field-length / count limit, structural
   // shape (duplicate IDs, etc.), or referenced a role the bot can't assign.
   INVALID_CONFIG = 3;
-  // The toggle target is configured in the picker, but the platform refused
-  // to assign it (hierarchy, permission revoked since startup, etc.).
+  // The toggle target is configured in the picker, but the platform
+  // refused the mutation. Used for BOTH directions of ToggleRole:
+  //   - Add path: NoPermissionToAdd (subset-of-permissions check failed —
+  //     the role grants permissions the app's manifest doesn't include).
+  //   - Remove path: NoPermissionToDelete / NoPermissionToEdit (less
+  //     common; surfaced for visibility rather than diagnosed).
+  // Despite the name, this code is the catch-all for any platform
+  // refusal of a role-assignment mutation. The server-side error logger
+  // distinguishes add vs remove for admin diagnostics; the client just
+  // displays the per-direction message and locks the row for the session.
   ROLE_NOT_ASSIGNABLE = 4;
 }
 
@@ -127,12 +135,23 @@ message ToggleRoleResponse {
 // Wholesale replace of the picker config. Concurrent admin edits would
 // otherwise need server-side patch ops (move-role-X-to-group-Y, etc.) that
 // add complexity for a config that's edited by at most a handful of admins.
-// Auto-save is debounced client-side (~500 ms), so the snapshot in flight
-// is bounded; last-writer-wins is acceptable for this volume.
+// Auto-save is debounced client-side (~150 ms — see useDebouncedMutation),
+// so the snapshot in flight is bounded; last-writer-wins is acceptable for
+// this volume.
 message UpdateGroupsRequest {
   repeated PickerGroup groups = 1;
 }
-message UpdateGroupsResponse {}
+message UpdateGroupsResponse {
+  // Maps client-sent temporary group IDs (`t.*`) to the canonical
+  // server-minted IDs (`g.*`) the server stored. The client walks its
+  // local working copy and rewrites any `t.*` to its canonical `g.*`
+  // value on save success — without this, every subsequent edit re-sends
+  // the same temp ID, the server re-mints a NEW canonical ID each time,
+  // and the KV blob churns through fresh group identities on every
+  // keystroke. Empty when no remappings happened (no new groups in the
+  // request).
+  map<string, string> id_remappings = 1;
+}
 
 // Returns the universe of community roles the admin can pick from when adding
 // a role to a group. Filters out:
@@ -194,8 +213,13 @@ service RolePickerService {
   rpc UpdateGroups(UpdateGroupsRequest) returns (UpdateGroupsResponse);
   rpc GetAssignableRoles(GetAssignableRolesRequest) returns (GetAssignableRolesResponse);
 
-  // Any authenticated client. Payload caps in the handler defend against
-  // runaway-loop floods.
+  // Any authenticated client. The handler truncates each text field to
+  // bound log line size (see truncate() in rolePickerService.ts) AND
+  // rate-limits per userId via an in-memory token bucket
+  // (checkErrorReportRate, default 30/min/user) — a render-loop
+  // ErrorBoundary that thrashes will be cut off after the first burst
+  // with a single warning logged per window. The bucket map is swept
+  // periodically to bound memory; see ERROR_REPORT_SWEEP_INTERVAL_MS.
   rpc ReportClientError(ReportClientErrorRequest) returns (ReportClientErrorResponse);
 
   // Broadcasts.

@@ -1,18 +1,26 @@
+/* App.module.css `.content` is overflow:hidden — this view is the scroll
+   host for itself. Same shape as Settings; without this, content past the
+   viewport is silently clipped when a community has many groups/roles. */
 .home {
+  height: 100%;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  padding: 16px;
+  gap: 32px;
+  padding: 20px 16px 40px;
   max-width: 720px;
   margin: 0 auto;
   width: 100%;
 }
 
+/* Tinted error banner. We don't have a dedicated error-surface token, so we
+   color-mix the error color with transparent at low alpha for the bg.
+   Mirrors AutoSaveStatus's pattern. */
 .errorBanner {
   padding: 10px 14px;
-  background: var(--rootsdk-color-danger-surface, #fef2f2);
-  color: var(--rootsdk-color-danger-text, #991b1b);
-  border: 1px solid var(--rootsdk-color-danger-border, #fecaca);
+  background: color-mix(in srgb, var(--rootsdk-error) 12%, transparent);
+  color: var(--rootsdk-error);
+  border: 1px solid color-mix(in srgb, var(--rootsdk-error) 40%, transparent);
   border-radius: 8px;
   font-size: 14px;
 }
@@ -27,18 +35,30 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+  margin-bottom: 4px;
 }
 
 .groupTitle {
   font-size: 16px;
   font-weight: 600;
   margin: 0;
-  color: var(--rootsdk-color-text-primary, #111827);
+  color: var(--rootsdk-text-primary);
+}
+
+/* Quiet helper line under the title — communicates the group's selection
+   mode ("Pick one" vs "Pick any") and, when something's selected, an
+   at-a-glance count. Tertiary text color keeps it subordinate to the
+   title and the role rows; the information is contextual, not primary. */
+.groupHelper {
+  font-size: 12px;
+  color: var(--rootsdk-text-tertiary);
+  margin: 0;
+  line-height: 1.35;
 }
 
 .groupDescription {
   font-size: 13px;
-  color: var(--rootsdk-color-text-secondary, #6b7280);
+  color: var(--rootsdk-text-secondary);
   margin: 0;
   line-height: 1.4;
 }

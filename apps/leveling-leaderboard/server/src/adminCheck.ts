@@ -101,7 +101,21 @@ export function onAdminsChanged(cb: () => void): void {
 export async function isAdmin(userId: UserGuid): Promise<boolean> {
   if (userId === getOwnerUserId()) return true;
   if (!adminsGroup) return false;
-  return adminsGroup.isMember({ userId });
+  // Fail-closed on transient errors. A platform hiccup mid-isMember would
+  // otherwise propagate up through GetLeaderboard / GetSettings and
+  // surface as a full QueryError view. Returning false instead degrades
+  // gracefully: non-admins are unaffected; an actual admin briefly loses
+  // admin chrome until the SDK recovers and the next isAdmin call
+  // succeeds. Logged so a real failure is visible to operators.
+  try {
+    return await adminsGroup.isMember({ userId });
+  } catch (err) {
+    log("warn", "adminsGroup.isMember failed; returning false (fail-closed)", {
+      userId,
+      error: err instanceof Error ? err.message : String(err),
+    });
+    return false;
+  }
 }
 
 // Returns the current admins ReadOnlyMemberGroup, or undefined if globalSettings

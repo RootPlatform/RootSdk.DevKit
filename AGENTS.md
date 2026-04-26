@@ -66,6 +66,8 @@ Complete, runnable app examples in `apps/`. Use these as end-to-end references f
 | `suggestion-box` | Community suggestion board | Multiple services, voting, error handling, client state management | Complex |
 | `themes` | UI theming showcase | Root design tokens, CSS variables, icons — no networking | Minimal (UI) |
 | `tic-tac-toe` | Real-time multiplayer game | Shared game state, turn logic, multiple services | Complex |
+| `leveling-leaderboard` | XP from messages → live top-10 leaderboard with admin Settings | Admin gating via `globalSettings.general.admins`, message-driven aggregation, atomic SQL with cooldown, coalesced "all" broadcast, in-app debounced auto-save, ErrorBoundary telemetry funnel | Complex |
+| `self-roles` | Member-driven self-assignable role picker (Discord "reaction-roles" equivalent) | Member-driven mutations, role enumeration + assignment, KV-backed config, `CommunityRoleDeleted/Edited` subscriptions, exclusive-group server-side enforcement, public broadcast (vs admin-only) | Complex |
 
 ## Sample Bots
 

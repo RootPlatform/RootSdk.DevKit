@@ -26,6 +26,15 @@ import { log, errFields } from "./lib/log";
 
 async function onStarting(state: RootAppStartState): Promise<void> {
   await initializeAdminCheck(state);
+  // initializePickerStore reconciles the stored config against the live
+  // role universe before the role-event subscription is wired up. There
+  // is a tiny window between this completing and initializeCommunityRoleSync
+  // subscribing where a CommunityRoleDeleted event could fire and be
+  // missed. Self-heals on the next admin save (which calls broadcastConfig
+  // → resolveGroups → live role list) or on the next process restart
+  // (which re-runs the reconcile). Acceptable trade-off versus the
+  // alternative of subscribing first and risking the subscription
+  // delivering events while the config cache is still empty.
   await initializePickerStore();
   initializeCommunityRoleSync();
 

@@ -1,5 +1,6 @@
 import { rootServer, CommunityRoleGuid } from "@rootsdk/server-app";
 import { withRetry } from "./lib/retry";
+import { log } from "./lib/log";
 
 // ============================================================================
 // pickerStore — persistence for the admin-curated picker config (groups + the
@@ -25,10 +26,12 @@ import { withRetry } from "./lib/retry";
 //
 // In-memory cache:
 //   - Hydrated on initialize(), refreshed only on writes. Reads are sync.
-//   - All callers of getConfig() must treat the returned value as immutable;
-//     mutations would corrupt the cache. We return the live reference (not a
-//     deep clone) for hot-path read performance — see the freeze guard in
-//     readConfig().
+//   - readConfig() returns the live reference, not a deep clone. Callers
+//     must treat the returned object as immutable; mutating it would corrupt
+//     the cache. We don't Object.freeze defensively because the call sites
+//     are few and the cost of a recursive freeze on every write isn't
+//     worth it for a sample. A production fork that wants belt-and-braces
+//     can wrap the cache in Object.freeze on each writeConfig() call.
 // ============================================================================
 
 const KV_KEY = "picker.config";
@@ -63,6 +66,40 @@ export async function initializePickerStore(): Promise<void> {
     rootServer.dataStore.appData.get<PickerConfig>(KV_KEY),
   );
   cache = stored ?? EMPTY_CONFIG;
+
+  // Reconcile against the live community-role universe. The runtime
+  // CommunityRoleDeleted subscription only catches deletions that happen
+  // while the app is running; a role deleted during downtime (deploy,
+  // crash, restart) leaves a stale role ID in our config that the
+  // resolveGroups response-time filter merely hides — but the KV blob
+  // still carries it. Without this one-shot reconcile, the picker config
+  // accumulates orphan IDs across restarts. Cheap to do once at startup;
+  // fixes the gap that the README "known limits" used to imply was
+  // unaddressed.
+  await reconcileAgainstLiveRoles();
+}
+
+async function reconcileAgainstLiveRoles(): Promise<void> {
+  if (!cache || cache.groups.length === 0) return;
+  const live = await withRetry("communityRoles.list", () =>
+    rootServer.community.communityRoles.list(),
+  );
+  const liveIds = new Set(live.map((r) => r.id));
+
+  let dropped = 0;
+  const reconciled: PickerConfig = {
+    groups: cache.groups.map((g) => {
+      const filtered = g.roles.filter((r) => liveIds.has(r.roleId));
+      dropped += g.roles.length - filtered.length;
+      return { ...g, roles: filtered };
+    }),
+  };
+  if (dropped === 0) return;
+
+  await writeConfig(reconciled);
+  log("info", "picker config reconciled against live roles at startup", {
+    droppedRoleCount: dropped,
+  });
 }
 
 // Returns the current config. Synchronous — the cache is hydrated at startup
