@@ -1,0 +1,118 @@
+.settings {
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px 16px 40px;
+  max-width: 720px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.subhead {
+  margin: 0;
+  color: var(--rootsdk-text-secondary);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  background: var(--rootsdk-background-secondary);
+  border: 1px solid var(--rootsdk-border);
+  border-radius: 12px;
+}
+
+/* See design-system-reference.md "Section header conventions" — sub-section
+   labels inside a containing card use ALL-CAPS, letter-spaced, secondary
+   color. */
+.sectionLabel {
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--rootsdk-text-secondary);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fieldLabel {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--rootsdk-text-primary);
+}
+
+.fieldHint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--rootsdk-text-secondary);
+  line-height: 1.4;
+}
+
+/* Segmented control for canvas size selection. Three-button row visually
+   grouped via the parent's flex layout. Active option uses the
+   selectable-card pattern: brand-primary border + bg tint. The Reset
+   button below is what actually commits in populated mode; in empty mode
+   the size click commits directly. */
+.sizeSelector {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.sizeOption {
+  appearance: none;
+  flex: 1 1 auto;
+  min-width: 80px;
+  min-height: 44px;
+  padding: 10px 16px;
+  background: var(--rootsdk-background-tertiary);
+  border: 1px solid var(--rootsdk-border);
+  border-radius: 8px;
+  color: var(--rootsdk-text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 150ms, border-color 150ms;
+}
+
+.sizeOption:hover:not(:disabled) {
+  background: var(--rootsdk-highlight-light);
+}
+
+.sizeOption:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.sizeOptionActive {
+  border-width: 1.5px;
+  border-color: var(--rootsdk-brand-primary);
+  background: color-mix(in srgb, var(--rootsdk-brand-primary) 10%, transparent);
+}
+
+/* Right-aligned action row holding the Reset / Clear button. The button
+   itself supplies the danger-color visual cue for the destructive
+   intent — no extra container styling needed. Stacks naturally under the
+   type-to-confirm input via the parent .section's column flex layout. */
+.resetActions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.errorBanner {
+  padding: 8px 12px;
+  background: color-mix(in srgb, var(--rootsdk-error) 12%, transparent);
+  color: var(--rootsdk-error);
+  border: 1px solid color-mix(in srgb, var(--rootsdk-error) 40%, transparent);
+  border-radius: 8px;
+  font-size: 13px;
+}

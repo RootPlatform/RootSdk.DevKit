@@ -2,8 +2,10 @@ import React from "react";
 import iconsData from "../generated/icons.json";
 
 // ============================================================================
-// Icon — name-based lookup into the DevKit icon library (144 icons, 12 categories).
-// Source: copied from apps/themes/client/src/generated/icons.json.
+// Icon — name-based lookup into the DevKit icon library (144 icons, 12
+// categories). The icons.json snapshot under src/generated/ is the same
+// set the rest of DevKit ships; copy it into client/src/generated/ when
+// porting this component to a new app.
 //
 // The SDK icon set uses fill="currentColor" so icons inherit text color.
 //

@@ -43,3 +43,26 @@ select {
   line-height: inherit;
   color: inherit;
 }
+
+/* Themed focus ring. Component-level CSS can override per-element, but the
+   default `:focus-visible` rule guarantees keyboard users always have a
+   visible target — defaulting to the browser's native ring would clash
+   with our token palette in either light or dark theme. */
+:focus-visible {
+  outline: 2px solid var(--rootsdk-brand-primary);
+  outline-offset: 2px;
+}
+
+/* Honor prefers-reduced-motion. Almost-zero (1ms) instead of 0 because
+   some browsers skip transitions entirely at duration 0, which can break
+   transitionend listeners that other code might rely on. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}

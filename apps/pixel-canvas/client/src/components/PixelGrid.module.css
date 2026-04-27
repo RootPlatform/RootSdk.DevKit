@@ -1,0 +1,54 @@
+.grid {
+  display: grid;
+  gap: 0;
+  /* Slight outer ring to anchor the canvas as a discrete object. */
+  border: 1px solid var(--rootsdk-border);
+  border-radius: 4px;
+  overflow: hidden;
+  /* Disable browser's default touch behaviors that would intercept taps —
+     specifically double-tap-to-zoom on iOS, which eats fast tapping. */
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.cell {
+  appearance: none;
+  border: none;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+  /* Default empty-cell color (neutral canvas surface). Reads as a faint
+     "blank" in both themes. Placed cells override via inline style. */
+  background-color: var(--rootsdk-background-tertiary);
+  /* Remove iOS Safari's default tap highlight; we render our own preview
+     ring via .selected. */
+  -webkit-tap-highlight-color: transparent;
+  transition: filter 100ms;
+}
+
+.cell:hover:not(.selected) {
+  /* Subtle hover lift so users see they've moused over a cell. Filter
+     keeps the cell color visible (vs replacing background). */
+  filter: brightness(1.15);
+}
+
+.placed {
+  /* No additional styling beyond the inline backgroundColor — but we tag
+     the class so a future fork could add a hover treatment specific to
+     placed cells (e.g. show last-placer chip on hover at desktop sizes). */
+}
+
+.empty {
+  /* Same — tagged for forks. */
+}
+
+/* Selected cell: brand-primary inset ring drawn via box-shadow. Inset
+   keeps the ring inside the cell so it doesn't bleed into neighbors;
+   the 1.5px width matches the selectable-card pattern. */
+.selected {
+  box-shadow:
+    inset 0 0 0 1.5px var(--rootsdk-brand-primary),
+    inset 0 0 0 3px var(--rootsdk-background-primary);
+  z-index: 1;
+}

@@ -43,10 +43,12 @@ async function onStarting(state: RootAppStartState): Promise<void> {
   initializeMessageHandler();
   initializeLeaderboardBroadcaster();
 
+  // notifyAdminsChanged routes through safeBroadcast internally, so any
+  // broadcast failure is logged there and never re-thrown — no outer
+  // catch needed. `void` discards the returned Promise so the
+  // synchronous-callback contract of onAdminsChanged is preserved.
   onAdminsChanged(() => {
-    void leaderboardService.notifyAdminsChanged().catch((err) =>
-      log("error", "admins-changed broadcast failed", errFields(err)),
-    );
+    void leaderboardService.notifyAdminsChanged();
   });
 
   rootServer.lifecycle.addService(leaderboardService);

@@ -38,12 +38,17 @@ async function onStarting(state: RootAppStartState): Promise<void> {
   await initializePickerStore();
   initializeCommunityRoleSync();
 
+  // notifyAdminsChanged routes through safeBroadcast internally, so any
+  // broadcast failure is logged there and never re-thrown — no outer
+  // catch needed. `void` discards the returned Promise so the
+  // synchronous-callback contract of onAdminsChanged is preserved.
   onAdminsChanged(() => {
-    void rolePickerService.notifyAdminsChanged().catch((err) =>
-      log("error", "admins-changed broadcast failed", errFields(err)),
-    );
+    void rolePickerService.notifyAdminsChanged();
   });
 
+  // broadcastConfig also resolves community roles via withRetry which
+  // CAN throw on retry exhaustion (separate from the safeBroadcast call
+  // it eventually makes). Keep the outer catch here.
   onPickerConfigChanged(() => {
     void rolePickerService.broadcastConfig().catch((err) =>
       log("error", "picker-config-changed broadcast failed", errFields(err)),

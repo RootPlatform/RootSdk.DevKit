@@ -1,0 +1,50 @@
+syntax = "proto3";
+package uifeaturebyrole;
+
+import "rootsdk/types.proto";
+
+// ============================================================================
+// ViewerService — answers "what UI features can the calling user see?"
+//
+// This recipe composes server-global-settings (read the configured moderator
+// role), server-member-roles (check whether the caller is in it), and
+// networking-app-services (the RPC + broadcast plumbing).
+//
+// The server is the source of truth. The client uses the returned flags to
+// gate UI visibility ONLY — never to gate actions. Action gating must be
+// enforced server-side (see recipe #20: gate a client action behind a
+// permission AND enforce it server-side).
+// ============================================================================
+
+message GetViewerContextRequest {}
+
+message GetViewerContextResponse {
+  // The authenticated user's ID. Populated server-side from the calling
+  // client.userId so the client can't spoof.
+  string user_id = 1;
+
+  // True if the caller is in the moderator role group configured by an admin
+  // via globalSettings (manifest item `general.moderatorRole`). False if the
+  // setting is unset or the caller isn't in the group.
+  bool is_moderator = 2;
+
+  // True if the caller is the community owner. Always elevated regardless
+  // of moderator-role configuration — defence in depth so the owner can
+  // never lock themselves out by misconfiguring the moderator setting.
+  bool is_owner = 3;
+}
+
+// Empty payload — the broadcast is a "go ask again" signal. Each client
+// re-fetches its own viewer context; the response naturally filters to the
+// calling user's flags.
+//
+// Fires when (a) globalSettings updates (the configured role may have
+// changed) or (b) any user's role membership changes (the caller's flags
+// may have changed even if settings didn't).
+message RolesChangedEvent {}
+
+service ViewerService {
+  rpc GetViewerContext(GetViewerContextRequest) returns (GetViewerContextResponse);
+
+  rpc BroadcastRolesChanged(RolesChangedEvent) returns (rootsdk.Void);
+}

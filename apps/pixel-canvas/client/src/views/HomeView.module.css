@@ -1,0 +1,41 @@
+/* App.module.css `.content` is overflow:hidden — this view is the scroll
+   host for itself. Same pattern as the other DevKit samples. */
+.home {
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 16px 40px;
+  width: 100%;
+}
+
+/* Canvas wrap: centers the grid horizontally on wide displays and lets it
+   fill the row on narrow ones. The PixelGrid itself sets explicit pixel
+   dimensions via inline style so this wrap just centers. */
+.canvasWrap {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.errorBanner {
+  /* Anchored to the canvas's actual rendered width via the --canvas-width
+     CSS variable set by HomeView (cellSize × cells, e.g. 576px at 32×32
+     max-viewport). max-width: 100% caps it on viewports narrower than the
+     canvas, where width: 100% takes over instead. */
+  width: var(--canvas-width, 100%);
+  max-width: 100%;
+  padding: 10px 14px;
+  background: color-mix(in srgb, var(--rootsdk-error) 12%, transparent);
+  color: var(--rootsdk-error);
+  border: 1px solid color-mix(in srgb, var(--rootsdk-error) 40%, transparent);
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+/* The palette and ActionPanel pick up the same --canvas-width variable so
+   they line up flush with the canvas's left and right edges instead of
+   the previous fixed 600px max-width (which left 24px of overhang at the
+   right edge because the floored cellSize × cells is usually narrower). */

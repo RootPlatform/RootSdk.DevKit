@@ -10,13 +10,21 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
+  /* Never shrink the button or wrap its text. In a flex parent next to
+     a wider sibling, the default flex-shrink: 1 + default whitespace
+     handling lets the button squeeze and stack its label across two
+     lines (e.g. "Clear / canvas"). Both rules together guarantee the
+     button preserves its natural content size; the sibling is the one
+     that should give up width. */
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 /* High-contrast neutral pill — text-primary as bg + background-tertiary as
    text. The two tokens sit on opposite ends of the contrast scale and swap
    with the theme, so a single recipe gives you a white-on-dark pill in
    dark mode and a black-on-light pill in light mode automatically. Matches
-   Root's first-party UI; brand-primary is reserved for accents (active
+   Root's native UI; brand-primary is reserved for accents (active
    tab indicators, selected-row outlines, active radio fills) — NOT for
    button fills. See design-system-reference.md "button-primary". */
 .primary {

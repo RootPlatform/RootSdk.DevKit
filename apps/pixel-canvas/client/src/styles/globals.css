@@ -1,0 +1,69 @@
+/* =============================================================================
+   Global reset + base styles. All colors, sizes, and radii reference Root
+   CSS custom properties. See DESIGN.md "Visual tokens".
+   ============================================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--rootsdk-text-primary);
+  background-color: var(--rootsdk-background-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  cursor: pointer;
+}
+
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+}
+
+/* Themed focus ring. Component-level CSS can override per-element, but the
+   default `:focus-visible` rule guarantees keyboard users always have a
+   visible target — defaulting to the browser's native ring would clash
+   with our token palette in either light or dark theme. */
+:focus-visible {
+  outline: 2px solid var(--rootsdk-brand-primary);
+  outline-offset: 2px;
+}
+
+/* Honor prefers-reduced-motion. Almost-zero (1ms) instead of 0 because
+   some browsers skip transitions entirely at duration 0, which can break
+   transitionend listeners that other code might rely on. The 1ms keeps
+   the event firing but is imperceptible to users. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}

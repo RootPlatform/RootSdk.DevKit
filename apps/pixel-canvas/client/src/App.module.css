@@ -1,0 +1,15 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Children of .content handle their own scrolling (HomeView and Settings
+   each set height: 100% + overflow-y: auto). Keeping the scroll inside each
+   view rather than on the viewport means the scrollbar appears below the
+   sticky AppHeader rather than visually overlapping it. */
+.content {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}

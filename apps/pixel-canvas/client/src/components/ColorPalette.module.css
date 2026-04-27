@@ -1,0 +1,70 @@
+.palette {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  /* Width is anchored to the canvas's actual rendered pixel width via the
+     --canvas-width CSS variable that HomeView sets on the .home container
+     (cellSize × cells — e.g. 576px at 32×32 max-viewport). On viewports
+     narrower than the canvas, max-width: 100% caps the palette to the
+     parent so it doesn't overflow horizontally. */
+  width: var(--canvas-width, 100%);
+  max-width: 100%;
+  /* Padding so the brand-primary selected ring on edge swatches isn't
+     clipped by the scroll container's overflow boundary. */
+  padding: 4px 2px;
+  /* Hide scrollbar visually on Webkit; the strip self-evident scrolls
+     with horizontal swipe / wheel. */
+  scrollbar-width: thin;
+  scroll-snap-type: x mandatory;
+  /* Disable iOS rubber-band overscroll on this strip — feels janky when
+     the scroll is "free" inside a constrained app surface. */
+  overscroll-behavior-x: contain;
+}
+
+.disabled {
+  opacity: 0.5;
+}
+
+.swatch {
+  flex: 0 0 auto;
+  /* 32×32 chosen so all 16 palette entries fit on a single row at the
+     canvas's max-width (600px): 16 × 32 + 15 × 4px gap = 572px. Below
+     32px the touch-target floor would feel cramped; above this all 16
+     don't fit and the strip horizontal-scrolls (the intentional mobile
+     fallback when the viewport itself is narrower than 572px). */
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--rootsdk-border);
+  border-radius: 8px;
+  cursor: pointer;
+  /* Default state: thin border for definition. Selected state: thick
+     brand-primary border (selectable-card pattern). The transition
+     animates between them so selection feels tactile. */
+  transition: transform 100ms, box-shadow 150ms, border-color 150ms;
+  scroll-snap-align: center;
+  appearance: none;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.swatch:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+.swatch:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.selected {
+  /* Inset ring + outer ring for double-emphasis. Inset keeps the swatch
+     color showing through; outer pops the brand-primary against the
+     panel background. Same hierarchy as the selectable-card pattern. */
+  border-color: var(--rootsdk-brand-primary);
+  box-shadow:
+    0 0 0 2px var(--rootsdk-brand-primary),
+    inset 0 0 0 2px var(--rootsdk-background-secondary);
+}
+
+.swatch:disabled {
+  cursor: not-allowed;
+}

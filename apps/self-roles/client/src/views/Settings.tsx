@@ -281,18 +281,20 @@ const SettingsInner: React.FC = () => {
 
   return (
     <div className={styles.settings}>
-      <div className={styles.headerRow}>
-        <h1 className={styles.heading}>Self-Roles</h1>
-        <AutoSaveStatus
-          error={save.error}
-          onRetry={save.retry}
-          onDismissError={save.clearError}
-        />
-      </div>
+      {/* No in-view <h1> — AppHeader already shows "Self-Roles" above
+          this view, so a duplicate page title here would just stack the
+          same words on top of each other. AutoSaveStatus renders null
+          when there's no error, so dropping the wrapper row leaves no
+          empty slot in the layout. */}
       <p className={styles.subhead}>
         Curate groups of community roles members can assign to themselves. An
         exclusive group lets members pick at most one of its roles at a time.
       </p>
+      <AutoSaveStatus
+        error={save.error}
+        onRetry={save.retry}
+        onDismissError={save.clearError}
+      />
 
       {local.length === 0 ? (
         <div className={styles.emptyState}>

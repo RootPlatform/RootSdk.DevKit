@@ -1,0 +1,218 @@
+syntax = "proto3";
+
+import "rootsdk/types.proto";
+
+// ============================================================================
+// PixelCanvasService
+//
+// See DESIGN.md for the full behavior contract. Briefly:
+//   - A single shared pixel grid. Members place colored pixels from a
+//     fixed palette; anyone can overwrite anyone (r/place model).
+//   - Per-user cooldown enforced server-side via an in-memory Map. The
+//     cooldown slot is claimed synchronously (no await between read/check
+//     and claim) so concurrent same-user requests can't bypass it. KV
+//     writes for the canvas blob serialize through an in-process queue
+//     so different-user placements don't blob-overwrite each other. See
+//     canvasStore.ts for the full atomicity story.
+//   - Admins (globalSettings.general.admins + community owner) can
+//     change cooldown, canvas size, and clear the canvas.
+//
+// Auth gates:
+//   - GetCanvas, PlacePixel, ReportClientError: any authenticated client.
+//   - GetSettings, UpdateSettings, ClearCanvas: admin-only via
+//     requireAdmin (throws RootServerException(NOT_ADMIN) otherwise).
+//
+// Broadcast audiences:
+//   - PixelPlaced, CanvasCleared, SettingsChanged, AdminsChanged: all "all".
+//   - Settings payloads carry no sensitive data — picker config is the
+//     same for everyone (cooldown is public, canvas size is public).
+//     Compare leveling-leaderboard's SettingsUpdated which is admin-only
+//     because its payload carried per-member XP-eligibility data.
+// ============================================================================
+
+// --- Core types -------------------------------------------------------------
+
+// Per-pixel metadata. Stored sparsely (only PLACED pixels have entries; cleared
+// or never-touched cells are absent and render as the empty-canvas color).
+message PixelData {
+  // Hex color string from the server's allowed palette (e.g., "#3B82F6"
+  // — server canonicalizes to uppercase, so stored values match this case).
+  // Validated against the palette on PlacePixel — clients can't smuggle
+  // arbitrary colors.
+  string color = 1;
+  // Last placer of this pixel. Surfaced in the action-panel info during
+  // preview ("placed by @alice, 3 min ago").
+  string user_id = 2;
+  // ms epoch. Server-authoritative (not client-supplied). Used for
+  // relative-time rendering and as a fallback ordering signal.
+  int64 placed_at = 3;
+}
+
+message PixelEntry {
+  int32 x = 1;
+  int32 y = 2;
+  PixelData data = 3;
+}
+
+// Min/max bounds for AppSettings fields. Server is source of truth; client
+// reads these from GetCanvas / GetSettings to render Settings form bounds.
+// Avoids drift between server-side validation and client-side input limits.
+message CanvasLimits {
+  int32 cooldown_seconds_min = 1;
+  int32 cooldown_seconds_max = 2;
+  // Canvas dimensions are restricted to a small set of square sizes for
+  // sample simplicity. Non-square or arbitrary sizes are a fork option.
+  repeated int32 allowed_canvas_sizes = 3;
+}
+
+// --- Errors -----------------------------------------------------------------
+// Positive values only. Negative values are reserved for built-in SDK errors.
+
+enum PixelCanvasError {
+  PIXEL_CANVAS_ERROR_UNSPECIFIED = 0;
+  NOT_ADMIN = 1;
+  // PlacePixel attempted before the caller's cooldown elapsed. Client
+  // should surface this as "wait Ns" in the action panel — though under
+  // normal use the client's countdown blocks the call before it ever
+  // reaches the server.
+  COOLDOWN_NOT_ELAPSED = 2;
+  // PlacePixel x/y is outside the current canvas bounds. Stale client
+  // (admin shrunk the canvas mid-session) or hostile request.
+  INVALID_COORDINATES = 3;
+  // PlacePixel color is not in the server's allowed palette.
+  INVALID_COLOR = 4;
+  // UpdateSettings cooldown_seconds or canvas_size out of allowed range.
+  INVALID_SETTINGS = 5;
+}
+
+// --- Member-facing RPCs -----------------------------------------------------
+
+message GetCanvasRequest {}
+
+message GetCanvasResponse {
+  int32 width = 1;
+  int32 height = 2;
+  // Sparse — only placed pixels appear here. Empty cells are absent and
+  // render client-side as a neutral background (--rootsdk-background-tertiary).
+  repeated PixelEntry pixels = 3;
+  // Caller's last-placement timestamp (ms epoch, 0 if never placed). Used
+  // by the client to compute remaining cooldown locally. Per-caller
+  // value — populated from the server's per-user cooldown map.
+  int64 my_last_placed_at = 4;
+  int32 cooldown_seconds = 5;
+  // Allowed color palette. Hex strings, validated against this list on
+  // PlacePixel server-side. Sent to the client so the picker UI doesn't
+  // need a hardcoded list (single source of truth on the server).
+  repeated string palette = 6;
+  bool am_i_admin = 7;
+  CanvasLimits limits = 8;
+}
+
+message PlacePixelRequest {
+  int32 x = 1;
+  int32 y = 2;
+  // Must match one of the strings in the server's palette. Comparison is
+  // case-insensitive — server canonicalizes to uppercase and stores +
+  // broadcasts the canonical form, so a client that derives a hex string
+  // via getComputedStyle() or any CSS roundtrip (which lowercases) still
+  // matches.
+  string color = 3;
+}
+
+message PlacePixelResponse {
+  // Server's authoritative placement timestamp (ms epoch). Client uses this
+  // to update its local "next allowed at" countdown without waiting for
+  // the broadcast to arrive.
+  int64 placed_at = 1;
+}
+
+// --- Admin-only RPCs --------------------------------------------------------
+
+message GetSettingsRequest {}
+
+message GetSettingsResponse {
+  int32 cooldown_seconds = 1;
+  int32 canvas_size = 2;
+  CanvasLimits limits = 3;
+}
+
+// Wholesale settings replace. Concurrent admin edits would otherwise need
+// finer-grained patches (UpdateCooldown, UpdateSize). Keeping a single
+// snapshot RPC simplifies the contract; auto-save debounce + last-writer-
+// wins is acceptable for a config edited by a handful of people.
+message UpdateSettingsRequest {
+  int32 cooldown_seconds = 1;
+  int32 canvas_size = 2;
+}
+message UpdateSettingsResponse {}
+
+// Wipe the canvas. Returns when storage is committed. The associated
+// CanvasCleared broadcast carries the dimensions so clients reset their
+// local state to a fresh empty grid.
+message ClearCanvasRequest {}
+message ClearCanvasResponse {}
+
+// --- Client telemetry -------------------------------------------------------
+//
+// Funnels client-side render errors caught by ErrorBoundary into the server's
+// structured log. Same shape as leveling-leaderboard / self-roles.
+
+message ReportClientErrorRequest {
+  string label = 1;
+  string message = 2;
+  string stack = 3;
+  string user_agent = 4;
+}
+message ReportClientErrorResponse {}
+
+// --- Broadcasts -------------------------------------------------------------
+
+// Public. Fires for every successful PlacePixel. High-frequency by design —
+// per-pixel events are the demo. Each event is small (~60 bytes on the
+// wire); per-user cooldown caps total rate to active_users / cooldown_sec.
+message PixelPlacedEvent {
+  int32 x = 1;
+  int32 y = 2;
+  string color = 3;
+  string user_id = 4;
+  int64 placed_at = 5;
+}
+
+// Public. Fires when an admin clears the canvas, or as a side effect of a
+// canvas-size change. Carries new dimensions so clients can re-render an
+// empty grid of the right shape without a full GetCanvas refetch.
+message CanvasClearedEvent {
+  int32 width = 1;
+  int32 height = 2;
+}
+
+// Public. Fires when an admin saves new cooldown / size settings. Clients
+// update their local cooldown computation; size changes are paired with a
+// CanvasCleared since size changes always wipe the canvas.
+message SettingsChangedEvent {
+  int32 cooldown_seconds = 1;
+  int32 canvas_size = 2;
+}
+
+// Public empty signal. Fires when globalSettings.general.admins shifts.
+// Clients re-fetch GetCanvas to refresh amIAdmin. Mirrors the same pattern
+// in leveling-leaderboard and self-roles.
+message AdminsChangedEvent {}
+
+// --- Service ---------------------------------------------------------------
+
+service PixelCanvasService {
+  rpc GetCanvas(GetCanvasRequest) returns (GetCanvasResponse);
+  rpc PlacePixel(PlacePixelRequest) returns (PlacePixelResponse);
+
+  rpc GetSettings(GetSettingsRequest) returns (GetSettingsResponse);
+  rpc UpdateSettings(UpdateSettingsRequest) returns (UpdateSettingsResponse);
+  rpc ClearCanvas(ClearCanvasRequest) returns (ClearCanvasResponse);
+
+  rpc ReportClientError(ReportClientErrorRequest) returns (ReportClientErrorResponse);
+
+  rpc BroadcastPixelPlaced(PixelPlacedEvent) returns (rootsdk.Void);
+  rpc BroadcastCanvasCleared(CanvasClearedEvent) returns (rootsdk.Void);
+  rpc BroadcastSettingsChanged(SettingsChangedEvent) returns (rootsdk.Void);
+  rpc BroadcastAdminsChanged(AdminsChangedEvent) returns (rootsdk.Void);
+}

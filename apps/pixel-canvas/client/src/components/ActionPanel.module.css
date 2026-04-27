@@ -1,0 +1,53 @@
+.panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 56px;
+  padding: 12px 16px;
+  background: var(--rootsdk-background-secondary);
+  border: 1px solid var(--rootsdk-border);
+  border-radius: 12px;
+  /* Anchor to the canvas's actual rendered width (cellSize × cells, e.g.
+     576px at 32×32 max-viewport) via the --canvas-width CSS variable
+     HomeView sets on its container. On narrower viewports max-width: 100%
+     caps the panel to its parent so it doesn't overflow. */
+  width: var(--canvas-width, 100%);
+  max-width: 100%;
+}
+
+.text {
+  flex: 1 1 auto;
+  font-size: 14px;
+  color: var(--rootsdk-text-secondary);
+}
+
+.info {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.coords {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--rootsdk-text-primary);
+}
+
+.previewSwatch {
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  border: 1px solid var(--rootsdk-border);
+}
+
+.provenance {
+  font-size: 13px;
+  color: var(--rootsdk-text-secondary);
+}

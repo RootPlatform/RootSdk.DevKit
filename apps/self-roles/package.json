@@ -8,7 +8,7 @@
     "node": ">=22"
   },
   "dependencies": {
-    "@rootsdk/client-app": "0*",
+    "@rootsdk/client-app": "*",
     "@rootsdk/client-app-ui": "*",
     "@rootsdk/server-app": "*",
     "@selfroles/gen-client": "file:./networking/gen/client",

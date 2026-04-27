@@ -2,7 +2,9 @@ import React, { forwardRef } from "react";
 import styles from "./Button.module.css";
 
 // ============================================================================
-// Button — four variants. 44px min height, pill shape, DESIGN.md tokens.
+// Button — five variants (primary, outline, danger, text, quiet). 44px min
+// height for the full-pill variants, 32px for quiet. See Button.module.css
+// for the recipes and design-system-reference.md for canonical tokens.
 // ============================================================================
 
 // `quiet` is a flat, tinted-bg button with smaller padding than the full-

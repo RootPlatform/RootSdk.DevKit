@@ -1,0 +1,6 @@
+{
+  "name": "@pixelcanvas/networking",
+  "scripts": {
+    "build": "rootsdk build proto"
+  }
+}
