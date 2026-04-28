@@ -98,6 +98,17 @@ The render is plain conditional JSX:
 | **Mounting/unmounting subscriptions cleanly** in larger components (e.g., scoped per route) | A general client-lifecycle concern with its own composition. |
 | **Per-user targeted broadcasts** instead of `"all"` audience | Larger-scale optimization; out of recipe scope. See leveling-leaderboard's broadcast section for the tradeoff narration. |
 
+## Test-only files in this recipe
+
+> ⚠️ **`server/src/test-driver.ts`** is test infrastructure, **not part of the recipe's lesson.** It exposes a `/test-ui-feature-by-role` slash command that lets the harness in `Code/Ops.Testing/test-devkit/test-recipes/` exercise the recipe's RPC service — Node-side test code can't directly invoke gen-client RPCs across the SDK boundary.
+>
+> **If you fork this recipe:**
+> - Delete `server/src/test-driver.ts`
+> - Remove the `import` and `initializeTestDriver(state.communityId)` line from `server/src/main.ts`
+> - Drop `permissions.channel.createMessage` from `root-manifest.json` if your recipe doesn't otherwise need to post messages
+>
+> The test driver synthesises `Client` objects to call `viewerService.getViewerContext` for arbitrary user IDs. Production recipes should never expose a self-test command.
+
 ## Build and run
 
 ```bash

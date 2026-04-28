@@ -26,11 +26,19 @@ import {
   CommunityMemberRoleDeletedEvent,
 } from "@rootsdk/server-app";
 import { viewerService } from "./viewer-service";
+// Test driver — see test-driver.ts. Forks of this recipe should DELETE
+// test-driver.ts and remove this import + the initializeTestDriver() call below.
+import { initializeTestDriver } from "./test-driver";
 
 async function onStarting(state: RootAppStartState): Promise<void> {
   // Register the RPC service. Must happen inside onStarting, before start()
   // resolves — registering after has no effect.
   rootServer.lifecycle.addService(viewerService);
+
+  // Wire the test-only slash-command driver. See test-driver.ts header for why
+  // this exists and what to delete when forking. Captures the communityId so
+  // the driver can build synthetic Client objects for the test users.
+  initializeTestDriver(state.communityId);
 
   // Broadcast on settings change. The configured moderator role may have
   // moved or been cleared, so every client's `is_moderator` flag is

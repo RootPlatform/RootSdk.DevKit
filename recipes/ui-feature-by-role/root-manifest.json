@@ -7,8 +7,13 @@
     },
     "server": {
       "launch": "server/dist/main.js",
-      "deploy": ["server/dist", "networking/gen/server"],
-      "nodeModules": ["node_modules", "server/node_modules"]
+      "deploy": [
+        "server/dist",
+        "networking/gen/server"
+      ],
+      "nodeModules": [
+        "node_modules"
+      ]
     }
   },
   "settings": {
@@ -22,6 +27,7 @@
             "title": "Moderator Role",
             "description": "Users in the selected role(s) see the moderator panel. The community owner is always elevated regardless of this setting.",
             "required": false,
+            "confirmation": "Save",
             "roleOrMember": {
               "selectBehavior": "roleMultiAndUserMulti"
             }
@@ -30,5 +36,9 @@
       }
     ]
   },
-  "permissions": {}
+  "permissions": {
+    "channel": {
+      "createMessage": true
+    }
+  }
 }
