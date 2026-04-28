@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import styles from "./App.module.css";
 import { AppHeader } from "./components/AppHeader";
 import { ErrorBoundary, type ErrorReport } from "./components/ErrorBoundary";
@@ -45,6 +45,16 @@ const AppShell: React.FC = () => {
 
   const openSettings = useCallback(() => setView("settings"), []);
   const goHome = useCallback(() => setView("home"), []);
+
+  // Reset view to home when admin status flips off. The effectiveView
+  // computation below masks the user's view for the current render, but
+  // the underlying `view` state survives — without this effect, an
+  // admin who's demoted-then-re-promoted would land back in Settings
+  // without explicit navigation, which feels like the SDK silently
+  // restored a prior state.
+  useEffect(() => {
+    if (!amIAdmin) setView("home");
+  }, [amIAdmin]);
 
   const effectiveView: View = view === "settings" && !amIAdmin ? "home" : view;
 

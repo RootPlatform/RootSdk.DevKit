@@ -86,18 +86,41 @@ Different from `leveling-leaderboard`'s atomic SQL pattern — that one was prot
 
 Per-user cooldown is in-memory only. Lost on restart. Acceptable trade-off: at restart, every user gets one "free" placement before their cooldown re-establishes. Persisting to KV would add a write per placement; not worth the cost.
 
+#### Commit-but-reported-failure recovery
+
+`writeValue` can complete the storage commit and have the SDK report failure on the response (timeout post-commit). KV holds the new state; the in-memory `cache` still holds the pre-write state. Without intervention, the next serialized write would compose against stale `cache` and overwrite KV with the older snapshot.
+
+Defense, in three layers:
+
+1. **`refreshCacheFromKv`** runs inside the failure path of every serialized write. The next queued work picks up authoritative state instead of composing against stale local cache.
+2. **Placement-side commit detection.** `placePixelIfCooldownElapsed` doesn't just refresh — it then checks whether the refreshed cache contains a pixel matching the exact `(color, userId, placedAt)` triple it tried to write. If yes, the storage layer accepted the write; treat as success. The synchronous cooldown claim earlier in the same function makes the triple unique enough that no concurrent request could match it. Without this detection, a quietly-committed write would still throw to the RPC, suppressing the broadcast and leaving every connected client showing stale pixels until their next GetCanvas.
+3. **`clearCanvas`** symmetrizes the same trick: refresh, check that pixels is empty AND dimensions match what we tried to write, return success if so.
+
+If `refreshCacheFromKv` itself exhausts retries, `cacheNeedsRefresh` is set; the next queued write retries the refresh once more and aborts the operation if it still can't recover. Better to fail one placement loudly than to silently corrupt KV by writing back stale state. A 30-second background timer also retries the refresh while the flag is set, so an idle server (no placements, no clears) eventually catches up without needing a write to fire first.
+
 ### Broadcasts: per-pixel, no coalescing
 
-The `PixelPlaced` event fires to the `"all"` audience for every successful placement. Compare `leveling-leaderboard`'s `LeaderboardUpdated` which is coalesced 500ms because chat-driven XP can spike to dozens of changes per second. Pixel placements are naturally rate-limited per-user by the cooldown; the coalescing pressure isn't there. The "I see your contribution land instantly" UX depends on each pixel being its own event.
+The `PixelPlaced` event fires to the `"all"` audience for every successful placement, with `except: client` (the placer). The placer already has authoritative state from the direct `PlacePixel` response and applies it locally via `applyOwnPlacement` — echoing the broadcast back to them is dead weight on the wire (1/N of every placement's fanout). The trade-off: a lost direct response leaves the placer with no recovery path; they'd manually retry, hit `COOLDOWN_NOT_ELAPSED` (the original placement DID commit and started the cooldown), and wait it out. Tail case for a real network blip; the per-placement wire savings are worth it for a sample teaching efficient broadcast audiences.
+
+Compare `leveling-leaderboard`'s `LeaderboardUpdated` which is coalesced 500ms because chat-driven XP can spike to dozens of changes per second. Pixel placements are naturally rate-limited per-user by the cooldown; the coalescing pressure isn't there. The "I see your contribution land instantly" UX depends on each pixel being its own event.
 
 Rate ceiling: with cooldown C seconds and N active painters, max global rate is N/C events/sec. Default C=30s, N=100 → 3.3 events/sec. Comfortable. At N=1000, 33 events/sec. Higher but still fine at "all" audience. For N≥10K, see Known Limits in README.
 
-Other broadcasts:
+#### Wire format: palette-index encoding
+
+Color crosses the wire as a `uint32 palette_index` (varint, 1 byte for our 16-color palette) rather than a hex string (~9 bytes including proto framing). At max community traffic (1k painters at 30s cooldown ≈ 33 events/sec), that's ~250 KB/sec of redundant color-string bytes removed from the global fanout. The same indexing applies to `PixelData` in `GetCanvas` — a fully-painted 64×64 snapshot saves ~28 KB on the wire.
+
+Server-internal storage stays as canonical hex (KV blob format). Decoupling storage from the wire format means a future palette mutation can't invalidate stored history; encoding/decoding happens at the wire boundary in `pixelCanvasService.ts`. Forks that allow runtime palette mutation need a `PaletteChanged` broadcast and a re-render pass on existing pixels.
+
+Orphan handling — a stored hex no longer in `PALETTE` (e.g., post-deploy palette reorder) — is **log + skip on the encode path** (server) and **log + skip on the decode path** (client). Symmetric: a drifted entry disappears from the canvas rather than rendering as a misleading fake-white pixel with the original placer's name. Users can re-paint the cell. The fail-loud-by-skipping policy makes the drift visible in operator logs instead of silently absorbing it.
+
+#### Other broadcasts
+
 - `CanvasCleared`: fires on admin Clear, and as a side effect of admin canvas-size change. Carries new dimensions.
 - `SettingsChanged`: cooldown / size payload, public.
-- `AdminsChanged`: empty signal, mirrors the convention in other samples.
+- `AdminsChanged`: empty signal — clients respond by firing the lightweight `GetAmIAdmin` RPC (1-byte response) instead of refetching the full `GetCanvas` snapshot. Refetching a ~200 KB pixels blob to update a single boolean every time `globalSettings.general.admins` flapped was the dominant wire-efficiency miss before that RPC existed.
 
-All four broadcasts use the `"all"` audience because nothing in the payload is admin-only. Compare `leveling-leaderboard`'s `SettingsUpdated` which is admin-only (it carries XP-eligible user/role IDs).
+All four broadcasts use the `"all"` audience because nothing in the payload is admin-only. Compare `leveling-leaderboard`'s `SettingsUpdated` which is admin-only (it carries XP-eligible user/role IDs). `PixelPlaced` narrows further to `except: client` for the placer-echo savings noted above.
 
 ### Client error telemetry: `ReportClientError`
 
@@ -253,7 +276,11 @@ Server is single source of truth. Shipped via `CanvasLimits` in `GetCanvas` / `G
 ## Out of scope (mirrors README)
 
 - Pixel-protection modes (own-only, time-protected)
-- Custom palette
+- Custom palette — the palette is sent once via `GetCanvas.palette` and
+  is not refreshable post-mount. A fork that lets admins edit the palette
+  would need a `PaletteChanged` broadcast and a corresponding subscriber
+  in `CanvasContext` that updates `palette` and re-runs the
+  selectedColor-still-in-palette guard in `HomeView`.
 - Live cursors / presence
 - Canvas history / replay
 - Per-channel canvases

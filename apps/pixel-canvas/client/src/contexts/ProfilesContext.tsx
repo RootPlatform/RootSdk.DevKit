@@ -8,6 +8,7 @@ import React, {
 } from "react";
 import { rootClient, RootClientUserEvent } from "@rootsdk/client-app";
 import type { UserProfile as SdkUserProfile } from "@rootsdk/client-app";
+import { withClientRetry } from "../lib/retry";
 
 // ============================================================================
 // ProfilesContext — batched user profile cache.
@@ -43,6 +44,10 @@ export interface ProfilesState {
 
 const ProfilesCtx = createContext<ProfilesState | undefined>(undefined);
 
+// Window during which a failed userId is excluded from re-requests. See
+// failedAtRef in the provider for rationale.
+const FAIL_BACKOFF_MS = 30_000;
+
 function toProfile(p: SdkUserProfile): UserProfile {
   return {
     id: p.id,
@@ -65,6 +70,20 @@ export const ProfilesProvider: React.FC<{ children: React.ReactNode }> = ({
   // pending state update queues against a stale fiber). Checked inside
   // flush before any setState.
   const isMountedRef = useRef(true);
+  // Per-ID negative cache. When getUserProfiles fails, we record the
+  // failure timestamp here and refuse to re-request the same IDs until
+  // the backoff window elapses. Without this, a failing platform → user
+  // taps a placed cell → re-fail → re-tap loop fires a doomed roundtrip
+  // for every interaction. 30s is long enough to ride out a transient
+  // outage but short enough that recovery is observable to a user
+  // who's still poking around when service comes back.
+  //
+  // Like knownRef, this Map grows monotonically with the IDs touched
+  // per session — past-window entries are observably-equivalent-to-
+  // empty (request() ignores them) but accumulate. Bounded by user
+  // interaction surface area; for community-scale apps this is small.
+  // Forks at very large scale should add LRU eviction here too.
+  const failedAtRef = useRef<Map<string, number>>(new Map());
 
   const flush = useCallback(async () => {
     flushTimerRef.current = undefined;
@@ -73,8 +92,20 @@ export const ProfilesProvider: React.FC<{ children: React.ReactNode }> = ({
     if (ids.length === 0) return;
     for (const id of ids) knownRef.current.add(id);
     try {
-      const fetched = await rootClient.users.getUserProfiles(ids);
+      // Wrap in withClientRetry so a single transient blip (a network
+      // jitter, a brief platform hiccup) doesn't drop these IDs
+      // straight into the FAIL_BACKOFF_MS negative-cache window — the
+      // user would otherwise see "placed 3 min ago" instead of
+      // "placed by @nick" for 30s after any one-off failure. Real
+      // outages still hit the catch and enter backoff.
+      const fetched = await withClientRetry(() =>
+        rootClient.users.getUserProfiles(ids),
+      );
       if (!isMountedRef.current) return;
+      // Clear any prior negative-cache entries for IDs we successfully
+      // fetched, so a future temporary failure can re-enter backoff
+      // cleanly.
+      for (const p of fetched) failedAtRef.current.delete(p.id);
       setProfiles((prev) => {
         const next = { ...prev };
         for (const p of fetched) {
@@ -84,16 +115,26 @@ export const ProfilesProvider: React.FC<{ children: React.ReactNode }> = ({
       });
     } catch (err) {
       console.error("[ProfilesContext] getUserProfiles failed:", err);
-      // Un-mark so a later request retries.
-      for (const id of ids) knownRef.current.delete(id);
+      // Un-mark so a later request CAN retry, but record the failure
+      // timestamp so request() refuses to enqueue the same IDs again
+      // for FAIL_BACKOFF_MS. Without that, an immediate re-request
+      // (e.g., user re-tapping the same cell) would re-fire and re-fail.
+      const now = Date.now();
+      for (const id of ids) {
+        knownRef.current.delete(id);
+        failedAtRef.current.set(id, now);
+      }
     }
   }, []);
 
   const request = useCallback(
     (userIds: string[]) => {
+      const now = Date.now();
       let added = false;
       for (const id of userIds) {
         if (knownRef.current.has(id) || pendingRef.current.has(id)) continue;
+        const failedAt = failedAtRef.current.get(id);
+        if (failedAt !== undefined && now - failedAt < FAIL_BACKOFF_MS) continue;
         pendingRef.current.add(id);
         added = true;
       }

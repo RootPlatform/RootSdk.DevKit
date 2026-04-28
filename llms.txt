@@ -19,12 +19,16 @@
 
 ## Samples
 
-- [Sample Apps](apps/): 6 complete, runnable app examples (hello-world, data-storage, protobuf-service, suggestion-box, themes, tic-tac-toe)
-- [Sample Bots](bots/): 6 complete, runnable bot examples (hello-world, all-channel-broadcast, new-member-welcome, reset-channel-description, role-assignment, role-list)
+- [Sample Apps](apps/): Complete, runnable app examples (hello-world, data-storage, leveling-leaderboard, pixel-canvas, protobuf-service, self-roles, suggestion-box, themes, tic-tac-toe). See [AGENTS.md](AGENTS.md#sample-apps) for the catalogue.
+- [Sample Bots](bots/): Complete, runnable bot examples (hello-world, all-channel-broadcast, new-member-welcome, reset-channel-description, role-assignment, role-list).
+
+## Recipes
+
+- [Recipes](recipes/): Composition tasks — synthesize multiple api-samples into working answers for "how do I do X?" goals. Sit between api-samples (per-method primitives) and apps (full architectural exemplars). See [AGENTS.md](AGENTS.md#recipes) for the catalogue.
 
 ## API Samples
 
-- [API Samples](api-samples/): 30 standalone bots, one per SDK domain. Every method covered with working code.
+- [API Samples](api-samples/): Standalone bots, one per SDK domain. Every method covered with working code.
 
 ## Schemas
 

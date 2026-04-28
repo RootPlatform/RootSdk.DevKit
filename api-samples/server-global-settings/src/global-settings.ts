@@ -8,9 +8,9 @@
 // ============================================================================
 //
 // Global settings are configuration defined in root-manifest.json. Community
-// admins edit them through the Root platform UI. The app reads values at
-// startup (state.globalSettings) or at runtime (rootServer.globalSettings)
-// and subscribes to changes via the 'update' event.
+// admins edit them through the Root platform UI. Read values at startup
+// (state.globalSettings) or at runtime (rootServer.globalSettings) and
+// subscribe to changes via the 'update' event.
 //
 // Settings are organized as groups → items. Each item has a type:
 //
@@ -28,6 +28,17 @@
 //   date              { year, month, day }               coming soon
 //   color             string | undefined                 coming soon
 //
+// Reading values: indexing into rootServer.globalSettings returns a
+// GlobalSetting — the union of every leaf type above. The manifest is the
+// contract: your code knows which leaf type it declared, so cast to it
+// directly.
+//
+//   const vip = rootServer.globalSettings?.general?.vipMembers as
+//     ReadOnlyMemberGroup | undefined;
+//
+// The `?.` chains cover (a) no settings block in the manifest and (b) admin
+// hasn't configured this item yet.
+//
 // This api sample demonstrates the roleOrMember picker. New sections will be
 // added as more types become available on the platform.
 //
@@ -36,7 +47,6 @@
 import {
   rootServer,
   RootBotStartState,
-  GlobalSettings,
   GlobalSettingsUpdateEvent,
   ReadOnlyMemberGroup,
   ChannelMessageEvent,
@@ -47,58 +57,56 @@ import {
   RootApiException,
 } from "@rootsdk/server-bot"; // For apps: import from "@rootsdk/server-app"
 
-// Capture startup state for use in the command handler
-let startupSettings: GlobalSettings | undefined;
+// In real code you'd get the userId from whatever event you're handling —
+// we just grab any community member at startup to demonstrate the call shape.
 let firstMemberId: UserGuid | undefined;
 
 // ── SUBSCRIBE ────────────────────────────────────────────────────────────────
 
 export function initializeGlobalSettings(state: RootBotStartState): void {
-  const messages = rootServer.community.channelMessages;
-
-  // Settings are available on the start state. This is the same object as
-  // rootServer.globalSettings — just provided earlier for convenience.
-  startupSettings = state.globalSettings;
-
-  // Capture a member ID for the isMember() check later
   firstMemberId = [...state.communityMembers.keys()][0];
+
+  // Read at startup. state.globalSettings is the same object
+  // rootServer.globalSettings returns at runtime — it's just provided on the
+  // start state so you can read it inside onStarting before any event fires.
+  const startupVip = state.globalSettings?.general?.vipMembers as
+    | ReadOnlyMemberGroup
+    | undefined;
+  console.log(
+    `[global-settings] startup vipMembers: ${
+      startupVip?.memberUserIds.length ?? 0
+    } member(s)`,
+  );
 
   // Subscribe to settings changes. The platform fires this event when a
   // community admin edits settings through the UI.
-  if (startupSettings) {
-    startupSettings.on("update", onSettingsUpdate);
-  }
+  // TODO(SDK): GlobalSettingsEvent enum unreleased — swap "update" →
+  // GlobalSettingsEvent.Update once it ships (same value, enum-clean).
+  state.globalSettings?.on("update", onSettingsUpdate);
 
   // Command trigger
-  messages.on(ChannelMessageEvent.ChannelMessageCreated, onGlobalSettingsCommand);
+  rootServer.community.channelMessages.on(
+    ChannelMessageEvent.ChannelMessageCreated,
+    onGlobalSettingsCommand,
+  );
 }
 
 // ── UPDATE EVENT ─────────────────────────────────────────────────────────────
 
-// The update event provides both previous and current settings so you can
-// diff the changes. Both are full GlobalSettings snapshots — not deltas.
+// The update event provides both previous and current settings as full
+// snapshots (not deltas) so you can diff exactly what changed.
 function onSettingsUpdate(event: GlobalSettingsUpdateEvent): void {
+  const prev = event.previous?.general?.vipMembers as
+    | ReadOnlyMemberGroup
+    | undefined;
+  const curr = event.current?.general?.vipMembers as
+    | ReadOnlyMemberGroup
+    | undefined;
   console.log(
-    `[global-settings] Settings updated for community ${event.communityId}`,
+    `[global-settings] vipMembers updated for ${event.communityId}: ${
+      prev?.memberUserIds.length ?? 0
+    } → ${curr?.memberUserIds.length ?? 0}`,
   );
-
-  // Example: detect when vipMembers changed
-  const prevRaw: unknown = event.previous?.["general"]?.["vipMembers"];
-  const prev: ReadOnlyMemberGroup | undefined =
-    prevRaw && typeof prevRaw === "object" && "memberUserIds" in prevRaw
-      ? (prevRaw as ReadOnlyMemberGroup)
-      : undefined;
-  const currRaw: unknown = event.current?.["general"]?.["vipMembers"];
-  const curr: ReadOnlyMemberGroup | undefined =
-    currRaw && typeof currRaw === "object" && "memberUserIds" in currRaw
-      ? (currRaw as ReadOnlyMemberGroup)
-      : undefined;
-
-  if (prev && curr) {
-    console.log(
-      `[global-settings] VIP members: ${prev.memberUserIds.length} → ${curr.memberUserIds.length}`,
-    );
-  }
 }
 
 // ── COMMAND HANDLER ──────────────────────────────────────────────────────────
@@ -115,57 +123,31 @@ async function onGlobalSettingsCommand(
   const lines: string[] = [];
 
   try {
-    // ── roleOrMember picker ───────────────────────────────────────────
-
-    // 1. Read settings at startup
-    //    Settings are provided on the RootBotStartState / RootAppStartState
-    //    object. They're available before the command handler runs.
-    if (!startupSettings) {
-      await messages.create({
-        channelId,
-        content: "No global settings configured — skipping all checks.",
-      });
-      return;
-    }
-    lines.push("✓ globalSettings available at startup");
-
-    // 2. Read settings at runtime
-    //    rootServer.globalSettings returns the current settings object.
-    const runtimeSettings: GlobalSettings | undefined = rootServer.globalSettings;
-    if (!runtimeSettings) {
-      await messages.create({
-        channelId,
-        content: "rootServer.globalSettings is undefined — skipping.",
-      });
-      return;
-    }
-    lines.push("✓ rootServer.globalSettings available at runtime");
-
-    // 3. Read the roleOrMember value
-    //    Access by group key → item key. The value is a ReadOnlyMemberGroup.
-    //    ReadOnlyMemberGroup combines direct users and role-based members:
-    //      .userIds           — directly assigned user IDs
-    //      .communityRoleIds  — assigned role IDs
-    //      .memberUserIds     — effective membership (users + role members)
+    // Read at runtime. Cast to the leaf type the manifest declared — the
+    // SDK's index signature returns GlobalSetting (a union), and we know
+    // this slot is a roleOrMember because that's what root-manifest.json
+    // says.
     //
-    //    The selectBehavior in root-manifest.json controls the UI picker:
-    //      "user"                  — single user
-    //      "users"                 — multiple users
-    //      "role"                  — single role
-    //      "roles"                 — multiple roles
-    //      "roleMultiAndUserMulti" — multiple roles and users (most common)
-    const vipRaw: unknown = runtimeSettings["general"]?.["vipMembers"];
-    const vipGroup: ReadOnlyMemberGroup | undefined =
-      vipRaw && typeof vipRaw === "object" && "memberUserIds" in vipRaw
-        ? (vipRaw as ReadOnlyMemberGroup)
-        : undefined;
+    // ReadOnlyMemberGroup combines direct users and role-based members:
+    //   .userIds           — directly assigned user IDs
+    //   .communityRoleIds  — assigned role IDs
+    //   .memberUserIds     — effective membership (users + role members)
+    //
+    // The selectBehavior in root-manifest.json controls the UI picker:
+    //   "user"                  — single user
+    //   "users"                 — multiple users
+    //   "role"                  — single role
+    //   "roles"                 — multiple roles
+    //   "roleMultiAndUserMulti" — multiple roles and users (most common)
+    const vipGroup = rootServer.globalSettings?.general?.vipMembers as
+      | ReadOnlyMemberGroup
+      | undefined;
 
     if (!vipGroup) {
       await messages.create({
         channelId,
         content:
-          "Settings configured but general.vipMembers is empty — " +
-          "select users or roles in the app settings UI.",
+          "general.vipMembers is empty — select users or roles in the app settings UI, then run /server-global-settings again.",
       });
       return;
     }
@@ -177,9 +159,8 @@ async function onGlobalSettingsCommand(
         `memberUserIds=[${vipGroup.memberUserIds.join(", ")}]`,
     );
 
-    // 4. Check membership
-    //    isMember() checks effective membership (direct users + role members).
-    //    Pass an object with a userId string — typically from an event payload.
+    // isMember() checks effective membership (direct users + role members).
+    // Pass an object with a userId string — typically from an event payload.
     if (firstMemberId) {
       const isMember = await vipGroup.isMember({ userId: firstMemberId });
       lines.push(`✓ isMember(${firstMemberId}): ${isMember}`);
@@ -187,11 +168,9 @@ async function onGlobalSettingsCommand(
       lines.push("✓ isMember: no community members to check");
     }
 
-    // 5. Verify update event subscription
-    //    We subscribed in initializeGlobalSettings(). The event fires when
-    //    an admin changes settings — it won't fire during this test, but
-    //    we verify the subscription is active.
-    lines.push("✓ update event: subscribed");
+    lines.push(
+      "✓ update event: subscribed (fires when an admin edits settings)",
+    );
 
     await messages.create({ channelId, content: lines.join("\n") });
   } catch (err: unknown) {

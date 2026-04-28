@@ -97,6 +97,18 @@ enum RolePickerError {
 
 // --- Member-facing RPCs -----------------------------------------------------
 
+// Lightweight per-caller refresh of just the admin flag. Client fires
+// this on AdminsChanged broadcasts instead of refetching the full
+// GetPicker snapshot — refetching the entire picker config to update
+// one boolean every time globalSettings.general.admins flaps was the
+// dominant wire-efficiency miss before this RPC existed. Response is
+// 1 byte; bounded thundering herd on each broadcast (every connected
+// client fires one) is fine because each call is tiny.
+message GetAmIAdminRequest {}
+message GetAmIAdminResponse {
+  bool am_i_admin = 1;
+}
+
 message GetPickerRequest {}
 
 message GetPickerResponse {
@@ -207,6 +219,7 @@ message AdminsChangedEvent {}
 service RolePickerService {
   // Any authenticated client.
   rpc GetPicker(GetPickerRequest) returns (GetPickerResponse);
+  rpc GetAmIAdmin(GetAmIAdminRequest) returns (GetAmIAdminResponse);
   rpc ToggleRole(ToggleRoleRequest) returns (ToggleRoleResponse);
 
   // Admin-only. Server throws RootServerException(NOT_ADMIN) otherwise.

@@ -11,6 +11,8 @@ import {
 import {
   GetPickerRequest,
   GetPickerResponse,
+  GetAmIAdminRequest,
+  GetAmIAdminResponse,
   ToggleRoleRequest,
   ToggleRoleResponse,
   UpdateGroupsRequest,
@@ -116,6 +118,24 @@ export class RolePickerService extends RolePickerServiceBase {
         maxRolesPerGroup: LIMIT_MAX_ROLES_PER_GROUP,
       },
     };
+  }
+
+  // Lightweight per-caller admin check. The client subscribes to
+  // AdminsChanged broadcasts and calls this on each event instead of
+  // refetching the whole GetPicker snapshot — refetching the full
+  // picker config every time globalSettings.general.admins flapped
+  // was the dominant wire-efficiency miss. Response is one bool.
+  //
+  // We still ship amIAdmin in GetPickerResponse for the mount path
+  // (one round trip populates everything); GetAmIAdmin is the
+  // delta-refresh shape for the broadcast-driven path. The two are
+  // intentionally redundant — neither call is wasted because they
+  // serve different lifecycle moments.
+  async getAmIAdmin(
+    _request: GetAmIAdminRequest,
+    client: Client,
+  ): Promise<GetAmIAdminResponse> {
+    return { amIAdmin: await isAdmin(client.userId) };
   }
 
   async toggleRole(
@@ -320,6 +340,27 @@ export class RolePickerService extends RolePickerServiceBase {
     // We log the FIRST drop in a window so the existence of a flood is
     // still visible without flooding the log itself.
     if (!checkErrorReportRate(client.userId)) {
+      return {};
+    }
+    // Defensive size cap on each field BEFORE we touch it. truncate()
+    // narrows the logged value but the proto-deserialized request
+    // strings are already in memory at full wire size — a hostile or
+    // buggy client could send multi-MB stacks. Reject anything 10×
+    // past the truncate limit so the per-request memory footprint is
+    // bounded.
+    if (
+      request.label.length > LIMIT_ERROR_LABEL_CHARS * 10 ||
+      request.message.length > LIMIT_ERROR_MESSAGE_CHARS * 10 ||
+      request.stack.length > LIMIT_ERROR_STACK_CHARS * 10 ||
+      request.userAgent.length > LIMIT_ERROR_USER_AGENT_CHARS * 10
+    ) {
+      log("warn", "client error report dropped: oversized field", {
+        userId: client.userId,
+        labelLen: request.label.length,
+        messageLen: request.message.length,
+        stackLen: request.stack.length,
+        userAgentLen: request.userAgent.length,
+      });
       return {};
     }
     log("error", "client error reported", {

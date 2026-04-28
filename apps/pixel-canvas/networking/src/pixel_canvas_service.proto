@@ -35,11 +35,19 @@ import "rootsdk/types.proto";
 // Per-pixel metadata. Stored sparsely (only PLACED pixels have entries; cleared
 // or never-touched cells are absent and render as the empty-canvas color).
 message PixelData {
-  // Hex color string from the server's allowed palette (e.g., "#3B82F6"
-  // — server canonicalizes to uppercase, so stored values match this case).
-  // Validated against the palette on PlacePixel — clients can't smuggle
-  // arbitrary colors.
-  string color = 1;
+  // Index into the palette returned by GetCanvas.palette. Wire-efficient
+  // alternative to a hex string: 1 byte (varint) vs ~9 bytes per entry,
+  // ~28KB savings on a fully-painted 64×64 GetCanvas snapshot. Clients
+  // resolve this against their cached palette to get the actual hex
+  // color for rendering. Server validates `palette_index < palette.length`
+  // on placement; an out-of-range value is rejected with INVALID_COLOR.
+  //
+  // Storage is hex on the server (KV blob holds the canonical hex
+  // string) — only the wire is indexed. Decoupling storage from the
+  // wire format means a future palette mutation can't invalidate stored
+  // history; the index is computed at the wire boundary in
+  // pixelCanvasService.ts.
+  uint32 palette_index = 1;
   // Last placer of this pixel. Surfaced in the action-panel info during
   // preview ("placed by @alice, 3 min ago").
   string user_id = 2;
@@ -79,13 +87,28 @@ enum PixelCanvasError {
   // PlacePixel x/y is outside the current canvas bounds. Stale client
   // (admin shrunk the canvas mid-session) or hostile request.
   INVALID_COORDINATES = 3;
-  // PlacePixel color is not in the server's allowed palette.
+  // PlacePixel palette_index is out of bounds for the server's palette
+  // (PALETTE.length). Wire is indexed (see PixelData.palette_index)
+  // so this is a simple integer bounds check, not a hex-string
+  // membership test.
   INVALID_COLOR = 4;
   // UpdateSettings cooldown_seconds or canvas_size out of allowed range.
   INVALID_SETTINGS = 5;
 }
 
 // --- Member-facing RPCs -----------------------------------------------------
+
+// Lightweight per-caller refresh of just the admin flag. Client fires
+// this on AdminsChanged broadcasts instead of refetching the full
+// GetCanvas snapshot — refetching ~200 KB of pixel data to update one
+// boolean every time globalSettings.general.admins flaps was the
+// dominant wire-efficiency miss before this RPC existed. Response is
+// 1 byte; bounded thundering herd on each broadcast (every connected
+// client fires one) is fine because each call is tiny.
+message GetAmIAdminRequest {}
+message GetAmIAdminResponse {
+  bool am_i_admin = 1;
+}
 
 message GetCanvasRequest {}
 
@@ -111,12 +134,14 @@ message GetCanvasResponse {
 message PlacePixelRequest {
   int32 x = 1;
   int32 y = 2;
-  // Must match one of the strings in the server's palette. Comparison is
-  // case-insensitive — server canonicalizes to uppercase and stores +
-  // broadcasts the canonical form, so a client that derives a hex string
-  // via getComputedStyle() or any CSS roundtrip (which lowercases) still
-  // matches.
-  string color = 3;
+  // Index into the palette returned by GetCanvas.palette. The client
+  // resolves the user's selected hex color to its index before sending;
+  // server bounds-checks against PALETTE.length and rejects with
+  // INVALID_COLOR if out of range. Indexed wire eliminates the
+  // "client smuggles an arbitrary hex string" attack surface entirely
+  // — there's nothing to validate against a list, just an integer
+  // bounds check.
+  uint32 palette_index = 3;
 }
 
 message PlacePixelResponse {
@@ -128,18 +153,15 @@ message PlacePixelResponse {
 
 // --- Admin-only RPCs --------------------------------------------------------
 
-message GetSettingsRequest {}
-
-message GetSettingsResponse {
-  int32 cooldown_seconds = 1;
-  int32 canvas_size = 2;
-  CanvasLimits limits = 3;
-}
-
 // Wholesale settings replace. Concurrent admin edits would otherwise need
 // finer-grained patches (UpdateCooldown, UpdateSize). Keeping a single
 // snapshot RPC simplifies the contract; auto-save debounce + last-writer-
 // wins is acceptable for a config edited by a handful of people.
+//
+// No GetSettings RPC: the client reads cooldownSeconds + canvasSize +
+// limits straight off CanvasContext (populated from GetCanvas). A
+// separate GetSettings would be a redundant fetch for the same data
+// — see DESIGN.md.
 message UpdateSettingsRequest {
   int32 cooldown_seconds = 1;
   int32 canvas_size = 2;
@@ -168,12 +190,24 @@ message ReportClientErrorResponse {}
 // --- Broadcasts -------------------------------------------------------------
 
 // Public. Fires for every successful PlacePixel. High-frequency by design —
-// per-pixel events are the demo. Each event is small (~60 bytes on the
-// wire); per-user cooldown caps total rate to active_users / cooldown_sec.
+// per-pixel events are the demo. Per-user cooldown caps total rate to
+// active_users / cooldown_sec.
+//
+// Color crosses the wire as a palette_index (varint, 1 byte for our
+// 16-color palette) rather than a hex string (~9 bytes including proto
+// framing). At max community traffic (1k painters at 30s cooldown ≈ 33
+// events/sec), that's ~250 KB/sec of redundant color-string bytes
+// removed from the global fanout. Clients resolve against their cached
+// palette to render. Same encoding rationale as PixelData.palette_index.
+//
+// Audience uses `except: client` (the placer) — they got `placed_at`
+// in the direct PlacePixel response and applied locally via
+// applyOwnPlacement, so echoing the broadcast back to them is dead
+// weight. See pixelCanvasService.placePixel.
 message PixelPlacedEvent {
   int32 x = 1;
   int32 y = 2;
-  string color = 3;
+  uint32 palette_index = 3;
   string user_id = 4;
   int64 placed_at = 5;
 }
@@ -203,9 +237,9 @@ message AdminsChangedEvent {}
 
 service PixelCanvasService {
   rpc GetCanvas(GetCanvasRequest) returns (GetCanvasResponse);
+  rpc GetAmIAdmin(GetAmIAdminRequest) returns (GetAmIAdminResponse);
   rpc PlacePixel(PlacePixelRequest) returns (PlacePixelResponse);
 
-  rpc GetSettings(GetSettingsRequest) returns (GetSettingsResponse);
   rpc UpdateSettings(UpdateSettingsRequest) returns (UpdateSettingsResponse);
   rpc ClearCanvas(ClearCanvasRequest) returns (ClearCanvasResponse);
 

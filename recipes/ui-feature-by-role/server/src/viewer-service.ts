@@ -42,38 +42,37 @@ export class ViewerService extends ViewerServiceBase {
     // Owner check first. The community owner is always elevated regardless
     // of moderator-role configuration, so misconfiguring or clearing the
     // moderator setting can't lock the owner out of admin features.
+    //
+    // Read pattern: re-fetch on each call. Fine for the recipe's scope —
+    // ownership is stable, so the round-trip is harmless at small call
+    // rates. At scale: cache ownerUserId at startup and refresh inside
+    // rootServer.community.communities.on(CommunityEvent.CommunityEdited,
+    // ...). The same handler can also broadcastRolesChanged so clients
+    // refetch their is_owner flag on ownership transfer (which this
+    // recipe doesn't currently signal).
     const community = await rootServer.community.communities.get();
     const isOwner = community.ownerUserId === userId;
 
-    // Moderator check. The roleOrMember picker resolves to a
-    // ReadOnlyMemberGroup whose `memberUserIds` already includes both
-    // directly-assigned users and role-based members. .isMember() does the
-    // lookup; no manual role-list traversal needed.
+    // Moderator check. Re-read on each call — rootServer.globalSettings is
+    // a live SDK object, so re-reading is free and admins can change the
+    // setting at any time. Cast to the leaf type the manifest declared
+    // (roleOrMember → ReadOnlyMemberGroup); the SDK's index signature
+    // returns GlobalSetting (a union). Undefined when no settings block
+    // in manifest, or admin hasn't picked anyone yet.
+    //
+    // ReadOnlyMemberGroup.memberUserIds includes both directly-assigned
+    // users and role-based members. .isMember() does the lookup — no
+    // manual role-list traversal needed.
     let isModerator = false;
-    const moderatorRole = readModeratorRoleSetting();
+    const moderatorRole = rootServer.globalSettings?.general?.moderatorRole as
+      | ReadOnlyMemberGroup
+      | undefined;
     if (moderatorRole) {
       isModerator = await moderatorRole.isMember({ userId });
     }
 
     return { userId, isModerator, isOwner };
   }
-}
-
-// Reads `general.moderatorRole` from globalSettings and returns the
-// ReadOnlyMemberGroup, or undefined if the setting is missing/cleared.
-//
-// We re-read on every request rather than caching at startup because admins
-// can change the setting at any time. The platform resolves role membership
-// inside the group itself, so reading is cheap.
-function readModeratorRoleSetting(): ReadOnlyMemberGroup | undefined {
-  const settings = rootServer.globalSettings;
-  if (!settings) return undefined;
-
-  const raw: unknown = settings["general"]?.["moderatorRole"];
-  if (raw && typeof raw === "object" && "memberUserIds" in raw) {
-    return raw as ReadOnlyMemberGroup;
-  }
-  return undefined;
 }
 
 // Singleton instance. main.ts passes this to rootServer.lifecycle.addService.

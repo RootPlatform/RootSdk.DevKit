@@ -48,7 +48,12 @@ export async function getSettings(): Promise<AppSettings> {
       const stored = await withRetry("appSettingsStore.get", () =>
         rootServer.dataStore.appData.get<AppSettings>(KV_KEY),
       );
-      cache = stored ?? DEFAULT_SETTINGS;
+      // Defensive clone of DEFAULT_SETTINGS so cache doesn't alias the
+      // exported constant. All current call paths return via {...cache}
+      // so no actual mutation hazard, but a future maintainer who adds
+      // a non-cloning return path could accidentally mutate the shared
+      // default and corrupt every subsequent first-run.
+      cache = stored ?? { ...DEFAULT_SETTINGS };
       return cache;
     } finally {
       // Clear `inflight` regardless of resolution so a later call after
@@ -62,9 +67,20 @@ export async function getSettings(): Promise<AppSettings> {
 }
 
 export async function updateSettings(next: AppSettings): Promise<void> {
-  await withRetry("appSettingsStore.set", () =>
-    rootServer.dataStore.appData.set({ key: KV_KEY, value: next }),
-  );
-  // Invalidate, don't eagerly reload — see header comment.
-  cache = undefined;
+  try {
+    await withRetry("appSettingsStore.set", () =>
+      rootServer.dataStore.appData.set({ key: KV_KEY, value: next }),
+    );
+  } finally {
+    // Invalidate unconditionally — covers the commit-but-reported-failure
+    // case (KV accepted the write but the SDK timed out on the response).
+    // Without this, the cache stays pinned at the prior value: the next
+    // getSettings returns stale data, and pixelCanvasService.updateSettings
+    // pre-reads `previous = await loadSettings()` to compute sizeChanged,
+    // so the next admin save composes against stale state. One extra KV
+    // roundtrip on the next read after a (rare) failure is the cost of
+    // closing that window. canvasStore has the same defense via
+    // refreshCacheFromKv; this matches the pattern.
+    cache = undefined;
+  }
 }

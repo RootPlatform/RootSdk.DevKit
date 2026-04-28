@@ -1,8 +1,7 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import styles from "./Settings.module.css";
 import { useCanvas } from "../contexts/CanvasContext";
 import { pixelCanvasServiceClient } from "@pixelcanvas/gen-client";
-import type { CanvasLimits } from "@pixelcanvas/gen-shared";
 import { Loader } from "../components/Loader";
 import { QueryError } from "../components/QueryError";
 import { AdminOnly } from "../components/AdminOnly";
@@ -79,78 +78,164 @@ const SettingsInner: React.FC = () => {
   // keystroke doesn't wipe the user's edit. Last-writer-wins between
   // concurrent admin edits remains — the UI just doesn't lie about
   // which value is currently authoritative.
+  // Settings reads everything from CanvasContext — there's no separate
+  // GetSettings RPC. The data CanvasContext loads via GetCanvas
+  // (cooldownSeconds, width-as-canvasSize, limits) is exactly what
+  // Settings needs, and going through ctx means we share the
+  // broadcast-driven invalidation path: a peer admin's resize in
+  // another tab is reflected here automatically without a per-view
+  // refetch. The earlier dedicated GetSettings RPC was redundant — it
+  // duplicated state, added a second loading/error path, and stayed
+  // stale to broadcasts unless we manually re-invoked it.
   const {
     pixels: livePixels,
     width: canvasSize,
     cooldownSeconds,
+    limits,
+    loading,
+    error,
+    reload,
   } = useCanvas();
   const livePixelCount = livePixels.size;
   const isEmpty = livePixelCount === 0;
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | undefined>(undefined);
   // The size the admin has clicked in the UI. Initially mirrors
-  // canvasSize (server's actual size). In empty mode every click commits
-  // and re-mirrors. In populated mode it can drift ahead of canvasSize
-  // while the admin lines up a reset; the gap is what makes
-  // `sizeChanged` true and flips the button label to "Reset to N×N".
+  // canvasSize (server's actual size) via the seed effect below. In
+  // empty mode every click commits and re-mirrors. In populated mode it
+  // can drift ahead of canvasSize while the admin lines up a reset; the
+  // gap is what makes `sizeChanged` true and flips the button label to
+  // "Reset to N×N".
   const [selectedSize, setSelectedSize] = useState(0);
-  const [limits, setLimits] = useState<CanvasLimits | undefined>(undefined);
 
   // Reset-button state (populated mode only).
   const [confirmTyped, setConfirmTyped] = useState("");
   const [resetting, setResetting] = useState(false);
   const [resetError, setResetError] = useState<string | undefined>(undefined);
 
-  const reload = useCallback(async () => {
-    setLoading(true);
-    setError(undefined);
-    try {
-      const r = await withClientRetry(() =>
-        pixelCanvasServiceClient.getSettings({}),
-      );
-      // cooldownSeconds + canvasSize are sourced from CanvasContext
-      // (broadcast-driven), so we don't store them locally. We DO seed
-      // selectedSize from GetSettings's reply on first load —
-      // CanvasContext's width may not have hydrated yet at the moment
-      // Settings mounts (it's its own getCanvas roundtrip), and this
-      // avoids a transient `0` value that would mark every size as
-      // "changed" until the broadcast arrives.
-      setSelectedSize(r.canvasSize);
-      setLimits(r.limits);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err : new Error(String(err)));
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
+  // Pending-edit refs. The auto-save's mutationFn and handleReset both
+  // need to know "the user's latest typed cooldown" — reading from
+  // ctx.cooldownSeconds gives the broadcast-confirmed (stale) value when
+  // the user has typed but the auto-save hasn't fired yet. Refs let the
+  // mutationFn read at FIRE time (not closure-capture time), so a
+  // concurrent admin's resize that updates ctx.canvasSize between
+  // typing and debounce-fire doesn't get clobbered by a stale closure
+  // payload.
+  //
+  // - cooldownIntentRef: undefined when no edit pending; set on user
+  //   typing; auto-clears when ctx catches up to it (auto-save landed
+  //   successfully). After clear, handleReset / size auto-save fall
+  //   back to the live ctx cooldown.
+  // - ctxCooldownRef + canvasSizeRef: live ctx values, updated via
+  //   useEffect so the mutationFn can read them at fire time.
+  const cooldownIntentRef = useRef<number | undefined>(undefined);
+  const ctxCooldownRef = useRef(cooldownSeconds);
+  const canvasSizeRef = useRef(canvasSize);
   useEffect(() => {
-    void reload();
-  }, [reload]);
+    ctxCooldownRef.current = cooldownSeconds;
+    // Clear the local intent when ctx matches it. Two paths land here:
+    //   (a) the user's auto-save committed and the broadcast came back
+    //       — the typical case; ctx is now genuinely current.
+    //   (b) a peer admin happened to set the same value the local user
+    //       typed. The intent clears as if our save landed; harmless
+    //       because the final state is identical.
+    // "ctx caught up" is the loose semantic — we don't try to
+    // distinguish these because the outcomes are observably the same
+    // (the user's value is now authoritative). A tighter "track this
+    // specific edit by token" scheme would close the (b) ambiguity but
+    // adds bookkeeping for no behavior change.
+    //
+    // KNOWN LIMITATION — peer edit during local typing: if a peer admin
+    // commits a DIFFERENT cooldown value before our local user's auto-
+    // save fires, ctx jumps to the peer's value. Our intent (the user's
+    // typed value) doesn't equal ctx, so we don't clear it. NumberInput
+    // resyncs display to ctx (the peer's value) once focus leaves —
+    // the user now SEES the peer's value but our intent ref still
+    // holds their original typed value. A subsequent Reset
+    // (sizeChanged=true) reads `cooldownIntentRef.current ?? ctx` and
+    // commits the user's stale typed value alongside the resize,
+    // silently overwriting the peer's edit. The user's perception was
+    // "I'm resetting at the cooldown I see" but Reset commits a
+    // different value.
+    //
+    // Closing this perfectly would need either (a) clearing intent on
+    // every ctx change (which loses the user's typing if they typed
+    // and immediately clicked Reset before any save fired), or (b)
+    // explicit conflict-resolution UX ("Settings changed elsewhere —
+    // refresh?"). Both are bigger changes than this sample warrants.
+    // Last-writer-wins is the documented semantic; this case sits at
+    // the seam.
+    if (cooldownIntentRef.current === cooldownSeconds) {
+      cooldownIntentRef.current = undefined;
+    }
+  }, [cooldownSeconds]);
+  useEffect(() => {
+    canvasSizeRef.current = canvasSize;
+  }, [canvasSize]);
 
-  // Auto-save mutation, used for cooldown changes (always) and for
-  // empty-mode size changes (where commit-on-click is appropriate because
-  // there's nothing to destroy). Errors surface in AutoSaveStatus.
-  const save = useDebouncedMutation<{ cooldownSeconds: number; canvasSize: number }>({
-    mutationFn: async (next) => {
-      await withClientRetry(() =>
-        pixelCanvasServiceClient.updateSettings(next),
-      );
+  // Auto-save mutation. The payload is a discriminated union — each
+  // mutation only carries the field the user intended to change. The
+  // OTHER field is read from a live ref at fire time, not closure-
+  // captured at type/click time. Without that, a cooldown auto-save
+  // queued before a peer admin's resize would replay the user's stale
+  // canvasSize as a destructive resize when the debounce eventually
+  // fires (server sees sizeChanged from NEW→OLD and resizes-and-clears
+  // the canvas back to the prior dimension).
+  type Mutation =
+    | { kind: "cooldown"; cooldownSeconds: number }
+    | { kind: "size"; canvasSize: number };
+  const save = useDebouncedMutation<Mutation>({
+    mutationFn: async (m) => {
+      // For the field the user changed, use the payload (their intent).
+      // For the other, use the live ref (latest authoritative state).
+      // cooldown defaults to live ctx when no user-edit is pending;
+      // canvas size always tracks ctx (we don't auto-save populated-mode
+      // size changes — those go through the explicit Reset flow).
+      if (m.kind === "cooldown") {
+        await withClientRetry(() =>
+          pixelCanvasServiceClient.updateSettings({
+            cooldownSeconds: m.cooldownSeconds,
+            canvasSize: canvasSizeRef.current,
+          }),
+        );
+      } else {
+        await withClientRetry(() =>
+          pixelCanvasServiceClient.updateSettings({
+            cooldownSeconds: cooldownIntentRef.current ?? ctxCooldownRef.current,
+            canvasSize: m.canvasSize,
+          }),
+        );
+      }
     },
   });
 
   const updateCooldown = useCallback(
     (next: number) => {
-      // cooldownSeconds is now sourced from CanvasContext, so we don't
-      // setLocal — the broadcast that fires after the auto-save lands
-      // will update ctx and re-render this view with the new value.
-      // NumberInput's display state holds the user's typed text in the
-      // meantime so the input doesn't flicker between commit and
-      // broadcast-arrival.
-      save.mutate({ cooldownSeconds: next, canvasSize });
+      // Short-circuit no-ops. NumberInput fires onChange on every
+      // in-range keystroke; if the user types a value back to what's
+      // currently authoritative AND there's no pending divergent intent,
+      // the resulting RPC is a guaranteed no-op (server is idempotent
+      // and the SettingsChanged broadcast is already gated on a real
+      // change — see pixelCanvasService.updateSettings). Skipping it
+      // saves a roundtrip without changing observable state.
+      //
+      // Also clear any stale save.error pill: if a prior save failed and
+      // the user has now reverted their typing back to the authoritative
+      // value, the failed-save state is no longer meaningful — they're
+      // not trying to commit anything different from what the server
+      // already has. Without this, the AutoSaveStatus error pill stays
+      // up with a Retry button that would just no-op against current
+      // server state.
+      if (next === cooldownSeconds && cooldownIntentRef.current === undefined) {
+        save.clearError();
+        return;
+      }
+      // Capture user intent in the ref so handleReset and any subsequent
+      // size auto-save read the just-typed value rather than ctx (which
+      // is the broadcast-confirmed value, not yet aware of this edit).
+      cooldownIntentRef.current = next;
+      save.mutate({ kind: "cooldown", cooldownSeconds: next });
     },
-    [save, canvasSize],
+    [save, cooldownSeconds],
   );
 
   const handleSizeClick = useCallback(
@@ -158,27 +243,50 @@ const SettingsInner: React.FC = () => {
       if (next === selectedSize) return;
       setSelectedSize(next);
       if (isEmpty) {
-        // Empty canvas: commit immediately. Server's updateSettings does a
-        // server-side clear (a no-op on already-empty pixels) and broadcasts
-        // CanvasCleared with the new dimensions. Local canvasSize updates
-        // automatically via the broadcast → CanvasContext.width path.
-        save.mutate({ cooldownSeconds, canvasSize: next });
+        // Empty canvas: commit immediately. Server's updateSettings does
+        // a server-side clear (a no-op on already-empty pixels) and
+        // broadcasts CanvasCleared with the new dimensions. Local
+        // canvasSize updates automatically via the broadcast →
+        // CanvasContext.width path.
+        save.mutate({ kind: "size", canvasSize: next });
       }
     },
-    [selectedSize, isEmpty, cooldownSeconds, save],
+    [selectedSize, isEmpty, save],
   );
 
-  // Drop a stale pending selection back to the actual canvasSize the
-  // moment the canvas becomes empty. Without this, an admin could line up
-  // a populated-mode reset to 48×48, then someone else clears the canvas
-  // externally, and the section would transition to empty mode with a
-  // stale `selectedSize=48` lingering — the size-button highlight would
-  // imply 48 is current when the actual canvas is still the previous size.
+  // Mirror canvasSize into selectedSize in two cases:
+  //   - Initial seed: selectedSize === 0 means we haven't initialized
+  //     yet (useState(0) placeholder; CanvasContext's getCanvas
+  //     roundtrip may not have hydrated by mount, so we can't
+  //     initialize directly).
+  //   - Snap-back on empty: when the canvas transitions populated →
+  //     empty (someone else clears externally, or our own Reset
+  //     committed), drop any stale pending selection so the size-button
+  //     highlight reflects the actual canvas dimension and not whatever
+  //     the admin had clicked moments before.
+  // In populated mode with selectedSize already set, we leave selectedSize
+  // alone — the gap between selectedSize and canvasSize IS the user's
+  // pending Reset choice, and we don't want to clobber it.
+  //
+  // Functional setter + deps that DON'T include selectedSize: in empty
+  // mode a size click runs handleSizeClick → setSelectedSize(N) +
+  // save.mutate, and the broadcast that catches canvasSize up to N
+  // arrives 250-400ms later. If selectedSize were a dep, this effect
+  // would fire IMMEDIATELY after the click (selectedSize=N, canvasSize=
+  // old), see `isEmpty && N !== oldCanvasSize`, and snap selectedSize
+  // back to oldCanvasSize — bouncing the highlight off the user's
+  // click for the duration of the broadcast roundtrip. Reading
+  // selectedSize through the functional setter (via curr) lets us see
+  // its latest value at update time without taking the dep.
   useEffect(() => {
-    if (isEmpty && selectedSize !== canvasSize) {
-      setSelectedSize(canvasSize);
-    }
-  }, [isEmpty, canvasSize, selectedSize]);
+    if (canvasSize === 0) return;
+    setSelectedSize((curr) => {
+      if (curr === 0 || (isEmpty && curr !== canvasSize)) {
+        return canvasSize;
+      }
+      return curr;
+    });
+  }, [isEmpty, canvasSize]);
 
   const sizeChanged = selectedSize !== canvasSize;
   // Strict equality against the literal phrase — same shape leveling-
@@ -189,52 +297,84 @@ const SettingsInner: React.FC = () => {
 
   const handleReset = useCallback(async () => {
     if (!canConfirm) return;
+    // Force-blur the active element so any in-progress NumberInput edit
+    // commits via its onBlur handler before we read cooldownIntentRef.
+    // On desktop the standard mousedown→focus-shift→blur→click order
+    // already triggers NumberInput's blur handler (which clamps + calls
+    // onChange → updateCooldown → cooldownIntentRef.current = clamped)
+    // before this handler runs. On iOS Safari the touch→click sequence
+    // can fire WITHOUT a focus shift, so the previously-focused
+    // NumberInput never blurs and a typed-but-out-of-range value (or a
+    // value mid-debounce) doesn't make it into the ref. Result: Reset
+    // would commit a stale cooldown alongside the resize. Calling
+    // blur() here synchronously fires the input's blur event in time
+    // for the read below. Guarded by HTMLElement check because
+    // document.activeElement can be the document body or null in some
+    // states.
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
     setResetting(true);
     setResetError(undefined);
     try {
-      // Cancel BEFORE the await on the size-changed path. The queued
-      // cooldown auto-save (if any) carries the canvasSize that was
-      // current when updateCooldown ran — a stale closure value
-      // relative to the size we're about to commit. Letting it fire
-      // would re-send the OLD size, which the server reads as a
-      // sizeChanged request and would re-clear/resize the canvas back
-      // to its prior dimension, undoing this reset.
-      //
-      // The cancel must happen before `await updateSettings(...)` to
-      // close the in-flight race too: if the debounce timer fires
-      // during the await, the auto-save's mutation runs in parallel
-      // with our reset and `cancel()` afterward only drops the queued
-      // *timer*, not the in-flight RPC.
-      //
-      // In the !sizeChanged branch (same-size clear), the queued
-      // payload's canvasSize already matches the server, so letting
-      // the auto-save fire is harmless — and it's the only path that
-      // actually commits the user's typed cooldown change. Cancelling
-      // here would silently drop the cooldown edit they just made.
-      if (sizeChanged) save.cancel();
+      // Read the user's latest cooldown intent. If they've typed a new
+      // value that hasn't auto-saved yet, that's what we want to commit
+      // — NOT ctx.cooldownSeconds (which is the stale broadcast-confirmed
+      // value). Falls back to live ctx when no user-edit is pending.
+      const cooldownToCommit =
+        cooldownIntentRef.current ?? ctxCooldownRef.current;
       if (sizeChanged) {
+        // Resize is destructive. Three scenarios for a queued/in-flight
+        // cooldown auto-save:
+        //   1. Queued (timer set, RPC not yet fired): cancel() drops it.
+        //   2. Already in flight when handleReset starts: the cooldown
+        //      RPC carries a closure-captured canvasSize from before
+        //      our resize. If the server processes it AFTER our reset
+        //      (HTTP/2 stream interleaving makes ordering non-
+        //      deterministic across concurrent requests), the server
+        //      sees previous=NEW, request=OLD → sizeChanged=true →
+        //      resizes back, undoing our reset. flush() awaits the
+        //      in-flight RPC so the cooldown lands FIRST, then we send
+        //      the reset on top of a known server state.
+        //   3. Fires AFTER we cancel + flush + reset: mutationFn reads
+        //      canvasSizeRef.current at fire time, which by then
+        //      reflects our new size. Server-side no-op for
+        //      sizeChanged.
+        // cancel() before flush() so we don't accidentally fire the
+        // queued debounce as part of the flush — we don't want it sent
+        // at all in the size-changed path.
+        save.cancel();
+        await save.flush();
         // Resize implicitly clears server-side. Single RPC.
         await withClientRetry(() =>
           pixelCanvasServiceClient.updateSettings({
-            cooldownSeconds,
+            cooldownSeconds: cooldownToCommit,
             canvasSize: selectedSize,
           }),
         );
+        // Clear any pending intent — our explicit write committed the
+        // user's typed value alongside the resize, so the auto-save
+        // queue has nothing left to do for it.
+        cooldownIntentRef.current = undefined;
         // Refresh the auto-save's retry target with current state so a
         // user clicking Retry on a still-visible AutoSaveStatus error
-        // pill (from a prior failed cooldown auto-save) can't replay the
-        // stale pre-resize canvasSize and undo this resize. Pair with
-        // clearError() below to also dismiss the pill — pill-dismiss is
-        // the primary defense (no Retry button = no replay), the
-        // refreshed snapshot is belt-and-suspenders for any fork that
-        // exposes retry through another path.
-        save.cancel({ cooldownSeconds, canvasSize: selectedSize });
+        // pill (from a prior failed cooldown auto-save) can't replay
+        // the stale pre-resize canvasSize and undo this resize. Pair
+        // with clearError() to also dismiss the pill.
+        save.cancel({ kind: "cooldown", cooldownSeconds: cooldownToCommit });
         save.clearError();
       } else {
-        // Same size — clearCanvas is the dedicated RPC for "clear without
-        // resize". updateSettings only clears as a side effect of size
-        // change (see server's pixelCanvasService.updateSettings), so we
-        // can't substitute it here.
+        // Same size — clearCanvas is the dedicated RPC for "clear
+        // without resize". updateSettings only clears as a side effect
+        // of size change (see server's pixelCanvasService.updateSettings),
+        // so we can't substitute it here.
+        //
+        // Don't cancel the queued cooldown auto-save in this branch:
+        // its payload carries the user's typed cooldown (the same value
+        // we'd want to commit) and the size mutation reads canvasSize
+        // live, so letting it fire is harmless — and it's the only
+        // path that actually persists the user's typing if they clicked
+        // Clear before the debounce fired.
         await withClientRetry(() =>
           pixelCanvasServiceClient.clearCanvas({}),
         );
@@ -247,16 +387,20 @@ const SettingsInner: React.FC = () => {
     } finally {
       setResetting(false);
     }
-  }, [canConfirm, sizeChanged, cooldownSeconds, selectedSize, save]);
+  }, [canConfirm, sizeChanged, selectedSize, save]);
 
   if (loading) return <Loader />;
-  if (error) return <QueryError message={error.message} onRetry={reload} />;
-  // Wait for both GetSettings (limits) AND CanvasContext (canvasSize via
-  // ctx.width) before rendering the form. Without the canvasSize > 0
-  // gate, an unhydrated ctx would briefly render with `canvasSize=0`
-  // which doesn't match any allowed size, and the snap-back useEffect
-  // below would chase selectedSize back to 0 — flicker visible to the
-  // admin during normal navigation into Settings.
+  if (error) return <QueryError message={error.message} onRetry={() => void reload()} />;
+  // Defensive: in practice CanvasContext's reload sets `limits`,
+  // `width`/`canvasSize`, and `loading=false` in the same React commit,
+  // so reaching here with `!limits || canvasSize === 0` shouldn't be
+  // possible. The guard exists for the would-be-startling case where
+  // a future refactor splits those setters — without it, the form
+  // would briefly render with `canvasSize=0` matching no allowed size
+  // and the snap-back useEffect would chase selectedSize to 0,
+  // flickering the active highlight. Keeping the guard is cheap;
+  // delete only if you're certain the setter ordering invariant
+  // can't drift.
   if (!limits || canvasSize === 0) return <Loader />;
 
   return (
@@ -265,7 +409,15 @@ const SettingsInner: React.FC = () => {
           this view, so a duplicate page title here would just stack the
           same words on top of each other. AutoSaveStatus renders null
           when there's no error, so dropping the wrapper row leaves no
-          empty slot in the layout. */}
+          empty slot in the layout.
+
+          Subhead notes "Cooldown auto-saves" but the size-changed Reset
+          path also rides along the user's latest typed cooldown via
+          handleReset's flush-then-commit. That's by design — if the
+          user types a new cooldown and clicks Reset before the 150ms
+          debounce fires, dropping the cooldown along with the queued
+          save would silently lose their typing. Don't "fix" this by
+          stripping cooldownSeconds from the resize payload. */}
       <p className={styles.subhead}>
         Cooldown auto-saves. Resetting the canvas (clearing pixels and
         optionally resizing) lives below.

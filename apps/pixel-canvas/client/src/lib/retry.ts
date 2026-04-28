@@ -16,14 +16,17 @@ import { RootServerException } from "@rootsdk/client-app";
 // GetSettings / ReportClientError trivially so (no side effects), and
 // UpdateSettings / ClearCanvas converge to the same target state on
 // repeat application. PlacePixel is the lone exception: its cooldown
-// side effect means a retry-after-lost-response hits COOLDOWN_NOT_ELAPSED
-// for a placement that already landed. PlacePixel deliberately calls the
-// service client DIRECTLY (no withClientRetry) — see HomeView's
-// handlePlace; on a transient network error the user retries manually,
-// and the PixelPlaced broadcast still updates own-cooldown state via
-// CanvasContext so the clock starts correctly even when the response was
-// lost. Agents adding new non-idempotent RPCs should follow that pattern
-// (skip the wrapper) or add an idempotency token to the request.
+// side effect means a retry-after-lost-response would hit
+// COOLDOWN_NOT_ELAPSED for a placement that already landed.
+//
+// Defense: PlacePixel deliberately calls the service client DIRECTLY
+// (no withClientRetry — see HomeView's handlePlace). On a transient
+// network error the user retries manually. The PixelPlaced broadcast
+// is the active recovery path: it still delivers the placedAt to all
+// clients including the placer, so CanvasContext updates own-cooldown
+// state even when the direct response was lost. Agents adding new
+// non-idempotent RPCs should follow that pattern (skip the wrapper)
+// or add an idempotency token to the request.
 // ============================================================================
 
 export interface RetryOptions {

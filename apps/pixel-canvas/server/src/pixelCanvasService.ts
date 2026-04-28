@@ -6,10 +6,10 @@ import {
 import {
   GetCanvasRequest,
   GetCanvasResponse,
+  GetAmIAdminRequest,
+  GetAmIAdminResponse,
   PlacePixelRequest,
   PlacePixelResponse,
-  GetSettingsRequest,
-  GetSettingsResponse,
   UpdateSettingsRequest,
   UpdateSettingsResponse,
   ClearCanvasRequest,
@@ -40,18 +40,21 @@ import { log } from "./lib/log";
 // PixelCanvasService — the RPC surface.
 //
 // Auth gates:
-//   - GetCanvas, PlacePixel, ReportClientError: any authenticated client.
-//   - GetSettings, UpdateSettings, ClearCanvas: admin-only.
+//   - GetCanvas, GetAmIAdmin, PlacePixel, ReportClientError: any
+//     authenticated client.
+//   - UpdateSettings, ClearCanvas: admin-only.
 //
-// Broadcasts (all "all" audience):
-//   - PixelPlaced: per-placement, no coalescing. The fundamental "shared
-//     canvas" feel depends on every client seeing every other client's
-//     placement immediately. Per-user cooldown caps the global rate.
-//   - CanvasCleared: paired with size changes (which always clear), or
-//     standalone via the admin Clear action.
-//   - SettingsChanged: cooldown / size payload, public to all.
-//   - AdminsChanged: empty signal mirroring the convention in
-//     leveling-leaderboard / self-roles.
+// Broadcasts:
+//   - PixelPlaced: "all" with except: client (placer). The placer
+//     already has authoritative state from PlacePixel's response and
+//     applied locally; echoing back to them is dead weight on the wire.
+//     Per-user cooldown caps the global rate; no coalescing — every
+//     other client sees every placement immediately.
+//   - CanvasCleared: "all". Paired with size changes (which always
+//     clear), or standalone via the admin Clear action.
+//   - SettingsChanged: "all". Cooldown / size payload, public.
+//   - AdminsChanged: "all". Empty signal — clients respond with a
+//     lightweight GetAmIAdmin RPC instead of a full GetCanvas reload.
 // ============================================================================
 
 // Limits — server is single source of truth. Shipped to the client via
@@ -68,31 +71,25 @@ const ALLOWED_CANVAS_SIZES = [32, 48, 64];
 // edit this array; the client receives it via GetCanvas.palette and has
 // no hardcoded list of its own.
 //
-// Color comparison is CASE-INSENSITIVE (see canonicalizeColor below).
-// CSS-roundtripped values (e.g. via getComputedStyle) come out lowercase,
-// so a fork that derives picker entries from rendered styles wouldn't
-// otherwise match against this uppercase list — that mismatch would
-// surface as INVALID_COLOR errors with no obvious cause. Canonicalizing
-// to uppercase on both ingest and storage keeps wire and KV uniform.
+// Index stability: clients address pixels by index into this array on
+// the wire (PixelData.palette_index, PlacePixelRequest.palette_index,
+// PixelPlacedEvent.palette_index). Storage in KV is canonical hex
+// (insulated from index drift), but live wire fields ARE indexed.
+// Reordering this array post-deploy changes the meaning of in-flight
+// indexes mid-session; appending is safe.
 const PALETTE: readonly string[] = [
   "#FFFFFF", "#E4E4E4", "#888888", "#222222",
   "#FFA7D1", "#E50000", "#E59500", "#A06A42",
   "#E5D900", "#94E044", "#02BE01", "#00D3DD",
   "#0083C7", "#0000EA", "#CF6EE4", "#820080",
 ];
-const PALETTE_SET = new Set(PALETTE);
 
-// Returns the canonical (uppercase) form of `color` if it's in the palette,
-// or undefined if the input doesn't match any palette entry. The canonical
-// form should be used for storage + broadcasts so all stored pixels share
-// one casing — readers (clients) just paint the string straight into a
-// CSS background-color, where casing is irrelevant, but a uniform case
-// keeps debug output readable and makes any future color-equality check
-// trivial.
-function canonicalizeColor(color: string): string | undefined {
-  const upper = color.toUpperCase();
-  return PALETTE_SET.has(upper) ? upper : undefined;
-}
+// Reverse index for hex → palette_index lookup at the wire boundary.
+// Built once at module init; keys are uppercase hex (the storage form).
+// Read-only after init.
+const PALETTE_INDEX_BY_HEX: ReadonlyMap<string, number> = new Map(
+  PALETTE.map((hex, i) => [hex, i] as const),
+);
 
 // Caps on client error report payloads (see truncate() and the rate-limit
 // bucket below). Same shape as leveling-leaderboard / self-roles.
@@ -109,23 +106,54 @@ export class PixelCanvasService extends PixelCanvasServiceBase {
     client: Client,
   ): Promise<GetCanvasResponse> {
     const canvas = readCanvas();
-    const settings = await loadSettings();
-    const amIAdmin = await isAdmin(client.userId);
+    // loadSettings() (KV read on cold cache) and isAdmin() (admins-group
+    // .isMember check) are independent — Promise.all halves the wall
+    // clock on the cold-cache path. Once cache is warm both resolve
+    // synchronously so the parallelism is free.
+    const [settings, amIAdmin] = await Promise.all([
+      loadSettings(),
+      isAdmin(client.userId),
+    ]);
 
-    const pixels: PixelEntry[] = Object.entries(canvas.pixels).map(
-      ([k, data]) => {
-        const [xs, ys] = k.split(",");
-        return {
-          x: Number(xs),
-          y: Number(ys),
-          data: {
-            color: data.color,
-            userId: data.userId,
-            placedAt: BigInt(data.placedAt),
-          },
-        };
-      },
-    );
+    // Encode stored hex colors as palette indexes for the wire. Pixels
+    // whose stored hex isn't in the current palette (orphaned by a
+    // post-deploy palette reorder, or a hand-edited KV blob) are
+    // dropped from the response — symmetric with the client's
+    // skip-on-undefined policy in entriesToMap. A drifted cell renders
+    // empty instead of as a misleading fake-white pixel with the
+    // original placer's name; the orphan is logged so operators see
+    // the drift, and users can re-paint the now-empty cell.
+    //
+    // Logged at the response level (count) rather than per-cell to
+    // avoid a 4096-line burst on a paletteshift that orphans the
+    // whole canvas. The log fires once per GetCanvas response; an
+    // operator seeing "orphaned: 12" knows there's drift to
+    // investigate without drowning in per-cell entries.
+    const pixels: PixelEntry[] = [];
+    let orphanedCount = 0;
+    for (const [k, data] of Object.entries(canvas.pixels)) {
+      const paletteIndex = PALETTE_INDEX_BY_HEX.get(data.color);
+      if (paletteIndex === undefined) {
+        orphanedCount++;
+        continue;
+      }
+      const [xs, ys] = k.split(",");
+      pixels.push({
+        x: Number(xs),
+        y: Number(ys),
+        data: {
+          paletteIndex,
+          userId: data.userId,
+          placedAt: BigInt(data.placedAt),
+        },
+      });
+    }
+    if (orphanedCount > 0) {
+      log("warn", "GetCanvas dropped pixels with palette-orphaned colors", {
+        orphanedCount,
+        totalPixels: Object.keys(canvas.pixels).length,
+      });
+    }
 
     return {
       width: canvas.width,
@@ -143,6 +171,24 @@ export class PixelCanvasService extends PixelCanvasServiceBase {
     };
   }
 
+  // Lightweight per-caller admin check. The client subscribes to
+  // AdminsChanged broadcasts and calls this on each event instead of
+  // refetching the whole GetCanvas snapshot — a ~200KB pixels blob
+  // would otherwise cross the wire for every connected client every
+  // time globalSettings.general.admins flapped. Response is one bool.
+  //
+  // We still ship amIAdmin in GetCanvasResponse for the mount path
+  // (one round trip populates everything); GetAmIAdmin is the
+  // delta-refresh shape for the broadcast-driven path. The two are
+  // intentionally redundant — neither call is wasted because they
+  // serve different lifecycle moments.
+  async getAmIAdmin(
+    _request: GetAmIAdminRequest,
+    client: Client,
+  ): Promise<GetAmIAdminResponse> {
+    return { amIAdmin: await isAdmin(client.userId) };
+  }
+
   async placePixel(
     request: PlacePixelRequest,
     client: Client,
@@ -152,7 +198,24 @@ export class PixelCanvasService extends PixelCanvasServiceBase {
 
     // Validate coordinates against the CURRENT canvas (caller may be
     // stale — admin shrunk the canvas after the client cached its size).
+    // Number.isInteger guards belt-and-suspenders against fractional /
+    // NaN inputs (proto3 int32 strips them on the wire today, but a
+    // future transport change shouldn't silently accept e.g. 5.5 as a
+    // grid coordinate). Same shape as the cooldown/canvasSize integer
+    // guards on UpdateSettings.
+    //
+    // This check is a fast-fail BEFORE we claim the cooldown slot in
+    // canvasStore — placePixelIfCooldownElapsed re-validates inside the
+    // serialization queue (the canvas may have been resized between
+    // here and the queued work running). Both checks are intentional:
+    // the outer one avoids burning the cooldown slot for a doomed
+    // placement; the inner one defends against the resize-during-queue
+    // window. A future cleanup that "removes the redundant outer check"
+    // would regress the UX (legitimate users would lose a cooldown
+    // window to admin-driven resize timing).
     if (
+      !Number.isInteger(request.x) ||
+      !Number.isInteger(request.y) ||
       request.x < 0 ||
       request.x >= canvas.width ||
       request.y < 0 ||
@@ -164,17 +227,25 @@ export class PixelCanvasService extends PixelCanvasServiceBase {
       );
     }
 
-    // Validate color against the palette (case-insensitive — see
-    // canonicalizeColor's comment for why). The canonical (uppercase)
-    // form is what we actually persist + broadcast, so wire-format and
-    // KV stay uniform regardless of how the client cased the input.
-    const canonicalColor = canonicalizeColor(request.color);
-    if (canonicalColor === undefined) {
+    // Validate the palette index. Wire is indexed (see proto comments)
+    // so this is a simple integer bounds check — no hex-string
+    // canonicalization, no "did the client lowercase it" hazard.
+    // Number.isInteger guards belt-and-suspenders against fractional /
+    // NaN inputs the same way the coordinate validation above does.
+    if (
+      !Number.isInteger(request.paletteIndex) ||
+      request.paletteIndex < 0 ||
+      request.paletteIndex >= PALETTE.length
+    ) {
       throw new RootServerException(
         PixelCanvasError.INVALID_COLOR,
-        `Color ${request.color} is not in the palette`,
+        `Palette index ${request.paletteIndex} is out of range (0..${PALETTE.length - 1})`,
       );
     }
+    // Resolve to the canonical hex for storage. The KV blob format
+    // stays as hex strings (insulated from palette reordering); only
+    // the wire is indexed.
+    const canonicalColor = PALETTE[request.paletteIndex];
 
     const cooldownMs = settings.cooldownSeconds * 1000;
     // `now` is captured BEFORE the placePixelIfCooldownElapsed call (which
@@ -211,18 +282,29 @@ export class PixelCanvasService extends PixelCanvasServiceBase {
       );
     }
 
-    // Broadcast the placement to everyone. Per-pixel events at "all" —
-    // see DESIGN.md "Broadcasts" for the rate analysis.
+    // Broadcast the placement to everyone EXCEPT the placer. They
+    // already have authoritative state from the direct PlacePixel
+    // response (placedAt below) and applied locally via
+    // applyOwnPlacement on the client; an echo back to them is dead
+    // weight on the wire. The trade-off: if the direct response is
+    // lost mid-flight, the placer no longer has the broadcast as a
+    // recovery path — they'd manually retry, hit COOLDOWN_NOT_ELAPSED,
+    // and wait out the (already-counting-down) cooldown. Tail case
+    // for a real network blip; documented in DESIGN.md "Broadcasts".
+    //
+    // palette_index is forwarded directly from the request — we
+    // already bounds-checked it above, so no re-lookup needed.
     await safeBroadcast("PixelPlaced", () =>
       this.broadcastPixelPlaced(
         {
           x: request.x,
           y: request.y,
-          color: canonicalColor,
+          paletteIndex: request.paletteIndex,
           userId: client.userId,
           placedAt: BigInt(outcome.placedAt),
         },
         "all",
+        client,
       ),
     );
 
@@ -231,22 +313,10 @@ export class PixelCanvasService extends PixelCanvasServiceBase {
 
   // --- Admin RPCs ----------------------------------------------------------
 
-  async getSettings(
-    _request: GetSettingsRequest,
-    client: Client,
-  ): Promise<GetSettingsResponse> {
-    await this.requireAdmin(client);
-    const settings = await loadSettings();
-    return {
-      cooldownSeconds: settings.cooldownSeconds,
-      canvasSize: settings.canvasSize,
-      limits: {
-        cooldownSecondsMin: COOLDOWN_SECONDS_MIN,
-        cooldownSecondsMax: COOLDOWN_SECONDS_MAX,
-        allowedCanvasSizes: [...ALLOWED_CANVAS_SIZES],
-      },
-    };
-  }
+  // No GetSettings RPC: the client (Settings.tsx) reads cooldownSeconds
+  // / canvasSize / limits directly from CanvasContext, which is fed by
+  // GetCanvas + the SettingsChanged broadcast. A separate GetSettings
+  // would be a redundant fetch over data the context already has.
 
   async updateSettings(
     request: UpdateSettingsRequest,
@@ -318,15 +388,23 @@ export class PixelCanvasService extends PixelCanvasServiceBase {
       canvasSize: request.canvasSize,
     });
 
-    await safeBroadcast("SettingsChanged", () =>
-      this.broadcastSettingsChanged(
-        {
-          cooldownSeconds: request.cooldownSeconds,
-          canvasSize: request.canvasSize,
-        },
-        "all",
-      ),
-    );
+    // Only broadcast when the saved settings actually changed something.
+    // A duplicate save (e.g. an idempotent retry that re-sent the same
+    // values) would otherwise emit a no-op SettingsChanged to every
+    // connected client.
+    const cooldownChanged =
+      request.cooldownSeconds !== previous.cooldownSeconds;
+    if (cooldownChanged || sizeChanged) {
+      await safeBroadcast("SettingsChanged", () =>
+        this.broadcastSettingsChanged(
+          {
+            cooldownSeconds: request.cooldownSeconds,
+            canvasSize: request.canvasSize,
+          },
+          "all",
+        ),
+      );
+    }
 
     log("info", "settings updated", {
       by: client.userId,
@@ -361,6 +439,29 @@ export class PixelCanvasService extends PixelCanvasServiceBase {
     client: Client,
   ): Promise<ReportClientErrorResponse> {
     if (!checkErrorReportRate(client.userId)) {
+      return {};
+    }
+    // Defensive size cap on each field BEFORE we touch it. truncate()
+    // narrows the logged value but the proto-deserialized request
+    // strings are already in memory at full wire size — a hostile or
+    // buggy client could send multi-MB stacks. Reject anything 10× past
+    // the truncate limit so the per-request memory footprint is
+    // bounded; the rate limit caps frequency, this caps individual
+    // size. Drop silently (return {}) so a noisy client doesn't get a
+    // useful "you're rejected" signal it could exploit.
+    if (
+      request.label.length > LIMIT_ERROR_LABEL_CHARS * 10 ||
+      request.message.length > LIMIT_ERROR_MESSAGE_CHARS * 10 ||
+      request.stack.length > LIMIT_ERROR_STACK_CHARS * 10 ||
+      request.userAgent.length > LIMIT_ERROR_USER_AGENT_CHARS * 10
+    ) {
+      log("warn", "client error report dropped: oversized field", {
+        userId: client.userId,
+        labelLen: request.label.length,
+        messageLen: request.message.length,
+        stackLen: request.stack.length,
+        userAgentLen: request.userAgent.length,
+      });
       return {};
     }
     log("error", "client error reported", {

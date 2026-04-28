@@ -82,6 +82,18 @@ Complete, runnable bot examples in `bots/`. Server-only — no client UI.
 | `role-assignment` | Assign roles to members | Role and member-role APIs | Moderate |
 | `role-list` | List community roles | Role querying | Minimal |
 
+## Recipes
+
+Composition tasks in `recipes/`. Each recipe synthesizes multiple api-samples into a working answer for a real developer goal. Recipes sit between api-samples (per-method primitives) and apps (full architectural exemplars). Use a recipe when the lesson is "how do I compose X and Y to accomplish Z?"
+
+Folder names are category-prefixed: `ui-`, `data-`, `realtime-`, `auth-`, `assets-`, `external-`, `app-` (lifecycle, errors, observability).
+
+### UI
+
+| Folder | Question | Composes | Exemplified by |
+|---|---|---|---|
+| `ui-feature-by-role` | How do I enable/disable UI features based on the current user's roles? | `client-app-users`, `server-roles`, `server-member-roles`, `server-global-settings`, `networking-app-services` | `apps/leveling-leaderboard` |
+
 ## API Samples Index
 
 Focused samples in `api-samples/`, one per SDK domain. Each is a standalone bot with working code covering every method. Files are self-contained: one file = one complete answer, with behavioral nuances inline as comments. Server-side code is identical between apps and bots except for the import path and lifecycle, so these api-sample bots double as server-side references for apps. Client code is app-only.

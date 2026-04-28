@@ -27,7 +27,7 @@ re-fetch → re-render
 
 **This recipe gates UI visibility ONLY.** A determined user can edit the DOM, intercept network traffic, or call the service client directly to bypass the UI. Any action that *requires* elevated privileges must ALSO be enforced server-side.
 
-For the full client-gating + server-enforcement story, see **recipe #20: "How do I gate a client action behind a permission AND enforce it server-side?"** This recipe is recipe #20's visibility half — useful on its own (you don't always want to show what users can't do), and a foundation for #20.
+Visibility and server-side action enforcement are decoupled by design — they're separate lessons. This recipe scopes itself to the visibility half (useful on its own: you don't always want to show what users can't do, and visibility-without-enforcement is appropriate for low-stakes UX where the worst case is a confused user, not a security gap). Action enforcement is a distinct concern with its own composition.
 
 ## Composes
 
@@ -92,16 +92,11 @@ The render is plain conditional JSX:
 
 | Concern | Lives in |
 |---|---|
-| Server-side **enforcement** of role-gated actions | Recipe #20 (gate a client action behind a permission AND enforce it server-side). This recipe is the *visibility* half. |
+| Server-side **enforcement** of role-gated actions | A separate lesson — visibility and enforcement are decoupled by design. |
 | **Reading raw role IDs** for a user (advanced cases that need to inspect the role list directly) | [`api-samples/server-member-roles`](../../api-samples/server-member-roles) |
 | **Role mutation** (assigning/removing roles programmatically) | [`api-samples/server-member-roles`](../../api-samples/server-member-roles) |
-| **Mounting/unmounting subscriptions cleanly** in larger components (e.g., scoped per route) | Recipe #46 (subscribe to server events only while a component is mounted) |
+| **Mounting/unmounting subscriptions cleanly** in larger components (e.g., scoped per route) | A general client-lifecycle concern with its own composition. |
 | **Per-user targeted broadcasts** instead of `"all"` audience | Larger-scale optimization; out of recipe scope. See leveling-leaderboard's broadcast section for the tradeoff narration. |
-
-## Cross-tier links
-
-- **Sibling recipes:** #20 (gate a client action behind permission AND enforce server-side) — recipe #19's natural successor.
-- **Exemplar apps:** [`apps/leveling-leaderboard`](../../apps/leveling-leaderboard) — uses the same `globalSettings.general.admins` + `ReadOnlyMemberGroup.isMember()` pattern with an `am_i_admin` flag in its `GetLeaderboard` response. Production-grade scale-up of this recipe.
 
 ## Build and run
 

@@ -33,14 +33,13 @@
   filter: brightness(1.15);
 }
 
-.placed {
-  /* No additional styling beyond the inline backgroundColor — but we tag
-     the class so a future fork could add a hover treatment specific to
-     placed cells (e.g. show last-placer chip on hover at desktop sizes). */
-}
-
-.empty {
-  /* Same — tagged for forks. */
+/* The global :focus-visible style in globals.css uses outline-offset: 2px
+   for keyboard focus, which works for normal-sized buttons but visually
+   overlaps adjacent cells at small canvas-cell sizes (cells can be ~9px
+   on a 320px phone with a 32×32 canvas). Inset the outline at the cell
+   level so the focus ring draws inside the cell regardless of cell size. */
+.cell:focus-visible {
+  outline-offset: -2px;
 }
 
 /* Selected cell: brand-primary inset ring drawn via box-shadow. Inset

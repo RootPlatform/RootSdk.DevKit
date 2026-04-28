@@ -3,7 +3,11 @@
 //
 // One JSON object per line. Consumable by any log aggregator. Prefer this
 // over ad-hoc console.log/console.error so log entries carry structured
-// context (errorCode, userId, channelId, etc.) rather than free-form strings.
+// context (errorCode, userId, etc.) rather than free-form strings.
+//
+// Copy verbatim across DevKit samples — same shape in leveling-leaderboard
+// and self-roles. Forks should keep the helper unchanged and add their own
+// per-domain context fields at the call sites.
 // ============================================================================
 
 export type LogLevel = "debug" | "info" | "warn" | "error";

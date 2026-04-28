@@ -1,5 +1,12 @@
-const fs = require("fs");
-const path = require("path");
+import { rmSync, readdirSync } from "node:fs";
+import { join } from "node:path";
+
+// Anchor CWD to the script's directory so the relative paths below
+// always resolve to the workspace root, regardless of where the user
+// invoked `node clean.mjs` from. Without this, running from a sibling
+// directory would rmSync the wrong node_modules. import.meta.dirname
+// requires Node 22+ (matches the engines pin in package.json).
+process.chdir(import.meta.dirname);
 
 // Static paths to delete recursively. Generated dirs, lockfiles, build
 // caches — anything reproducible from source.
@@ -33,7 +40,7 @@ function clean() {
   for (const p of pathsToDelete) {
     try {
       console.log(`Clean: deleting ${p}`);
-      fs.rmSync(p, { recursive: true, force: true });
+      rmSync(p, { recursive: true, force: true });
     } catch (error) {
       console.error(`Clean: failed to delete ${p}:`, error);
     }
@@ -41,17 +48,17 @@ function clean() {
 
   let rootEntries;
   try {
-    rootEntries = fs.readdirSync(".");
+    rootEntries = readdirSync(".");
   } catch (error) {
     console.error("Clean: failed to read workspace root:", error);
     return;
   }
   for (const entry of rootEntries) {
     if (!rootFilePatterns.some((re) => re.test(entry))) continue;
-    const full = path.join(".", entry);
+    const full = join(".", entry);
     try {
       console.log(`Clean: deleting ${full}`);
-      fs.rmSync(full, { force: true });
+      rmSync(full, { force: true });
     } catch (error) {
       console.error(`Clean: failed to delete ${full}:`, error);
     }

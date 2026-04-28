@@ -13,6 +13,7 @@ RootSdk.DevKit/
 ├── apps/
 ├── bots/
 ├── api-samples/
+├── recipes/
 ├── docs/
 ├── templates/
 └── schemas/
@@ -25,6 +26,8 @@ RootSdk.DevKit/
 **`bots/`** — same role as apps, server-side only. Complete, runnable bot samples for server-only automation patterns.
 
 **`api-samples/`** — the agent's API reference in working code. ~30 standalone modules, one per SDK domain (messages, channels, roles, files, database, jobs, etc.). When an agent needs to implement a specific capability, it reads the matching module and gets copy-ready code with every method demonstrated and behavioral nuances as inline comments. One file = one complete answer. No synthesis required.
+
+**`recipes/`** — the agent's composition reference. Working code answers to "how do I do X?" tasks that synthesize multiple api-samples (gate UI by role, paginate a list with live updates, upload an image and display it). One recipe per task, with a README walking through the synthesis. Sit between api-samples (per-method primitives) and apps (full architectural exemplars).
 
 **`docs/`** — the agent's deep knowledge base. LLM-friendly versions of the full Root developer documentation, split by audience and type so agents load only what they need — a bot agent loads ~200K tokens instead of ~470K.
 

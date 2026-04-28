@@ -97,6 +97,20 @@ message GetLeaderboardResponse {
   bool am_i_admin = 2;
 }
 
+// --- Admin refresh ----------------------------------------------------------
+
+// Lightweight per-caller refresh of just the admin flag. Client fires
+// this on AdminsChanged broadcasts instead of refetching the full
+// GetLeaderboard snapshot — refetching a top-N leaderboard payload to
+// update one boolean every time globalSettings.general.admins flaps
+// was the dominant wire-efficiency miss before this RPC existed.
+// Response is 1 byte; bounded thundering herd on each broadcast (every
+// connected client fires one) is fine because each call is tiny.
+message GetAmIAdminRequest {}
+message GetAmIAdminResponse {
+  bool am_i_admin = 1;
+}
+
 // --- My Stats ---------------------------------------------------------------
 
 message GetMyStatsRequest {}
@@ -249,6 +263,7 @@ message AdminsChangedEvent {}
 service LeaderboardService {
   // Any authenticated client.
   rpc GetLeaderboard(GetLeaderboardRequest) returns (GetLeaderboardResponse);
+  rpc GetAmIAdmin(GetAmIAdminRequest) returns (GetAmIAdminResponse);
   rpc GetMyStats(GetMyStatsRequest) returns (GetMyStatsResponse);
 
   // Admin-only. Server throws RootServerException(NOT_ADMIN) otherwise.

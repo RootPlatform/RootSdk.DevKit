@@ -52,7 +52,11 @@ export const AppHeader: React.FC<Props> = ({ mode, onOpenSettings, onBack }) => 
           onClick={onOpenSettings}
           aria-label="Open settings"
         >
-          <Icon name="Settings" size={20} title="Settings" />
+          {/* Decorative inside a labeled button — the parent's
+              aria-label="Open settings" is what AT announces. Adding a
+              `title` would make the icon also expose role="img"
+              aria-label="Settings", causing AT to read both. */}
+          <Icon name="Settings" size={20} />
         </button>
       )}
     </header>

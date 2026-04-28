@@ -10,6 +10,8 @@ import {
 import {
   GetLeaderboardRequest,
   GetLeaderboardResponse,
+  GetAmIAdminRequest,
+  GetAmIAdminResponse,
   GetMyStatsRequest,
   GetMyStatsResponse,
   GetSettingsRequest,
@@ -138,6 +140,24 @@ export class LeaderboardService extends LeaderboardServiceBase {
       totalXp: row.totalXp,
     }));
     return { entries, amIAdmin };
+  }
+
+  // Lightweight per-caller admin check. The client subscribes to
+  // AdminsChanged broadcasts and calls this on each event instead of
+  // refetching the whole GetLeaderboard snapshot — refetching the
+  // entire top-N every time globalSettings.general.admins flapped
+  // was the dominant wire-efficiency miss. Response is one bool.
+  //
+  // We still ship amIAdmin in GetLeaderboardResponse for the mount
+  // path (one round trip populates everything); GetAmIAdmin is the
+  // delta-refresh shape for the broadcast-driven path. The two are
+  // intentionally redundant — neither call is wasted because they
+  // serve different lifecycle moments.
+  async getAmIAdmin(
+    _request: GetAmIAdminRequest,
+    client: Client,
+  ): Promise<GetAmIAdminResponse> {
+    return { amIAdmin: await isAdmin(client.userId) };
   }
 
   async getMyStats(
@@ -408,6 +428,27 @@ export class LeaderboardService extends LeaderboardServiceBase {
     request: ReportClientErrorRequest,
     client: Client,
   ): Promise<ReportClientErrorResponse> {
+    // Defensive size cap on each field BEFORE we touch it. truncate()
+    // narrows the logged value but the proto-deserialized request
+    // strings are already in memory at full wire size — a hostile or
+    // buggy client could send multi-MB stacks. Reject anything 10×
+    // past the truncate limit so the per-request memory footprint is
+    // bounded.
+    if (
+      request.label.length > LIMIT_ERROR_LABEL_CHARS * 10 ||
+      request.message.length > LIMIT_ERROR_MESSAGE_CHARS * 10 ||
+      request.stack.length > LIMIT_ERROR_STACK_CHARS * 10 ||
+      request.userAgent.length > LIMIT_ERROR_USER_AGENT_CHARS * 10
+    ) {
+      log("warn", "client error report dropped: oversized field", {
+        userId: client.userId,
+        labelLen: request.label.length,
+        messageLen: request.message.length,
+        stackLen: request.stack.length,
+        userAgentLen: request.userAgent.length,
+      });
+      return {};
+    }
     log("error", "client error reported", {
       userId: client.userId,
       label: truncate(request.label, LIMIT_ERROR_LABEL_CHARS),

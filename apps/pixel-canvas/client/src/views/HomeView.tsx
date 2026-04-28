@@ -64,7 +64,7 @@ export const HomeView: React.FC = () => {
     loading,
     error,
     reload,
-    setMyLastPlacedAt,
+    applyOwnPlacement,
   } = useCanvas();
 
   const { request: requestProfiles } = useProfiles();
@@ -135,25 +135,49 @@ export const HomeView: React.FC = () => {
     const cooldownMs = cooldownSeconds * 1000;
     if (cooldownMs - (Date.now() - myLastPlacedAt) <= 0) return;
     const id = window.setInterval(() => {
-      // Clear the interval first when cooldown has elapsed; only bump
-      // the tick if we're still ticking. Bumping after clear was a
-      // wasted state set on the boundary tick.
+      // Always bump the tick before deciding whether to clear. The
+      // boundary tick (the one that sees cooldownMs elapsed) is exactly
+      // when the action panel needs to repaint from "Wait 1s" to
+      // "Place" / "Tap a cell" — without forcing a re-render here, the
+      // last paint stays at "Wait 1s" until something else triggers a
+      // render (a peer placement broadcast, a tap, etc.). On an idle
+      // canvas the user could see the stale state indefinitely.
+      setClockTick((t) => t + 1);
       if (Date.now() - myLastPlacedAt >= cooldownMs) {
         window.clearInterval(id);
-        return;
       }
-      setClockTick((t) => t + 1);
     }, 250);
     return () => window.clearInterval(id);
   }, [myLastPlacedAt, cooldownSeconds]);
 
   const cooldownMs = cooldownSeconds * 1000;
+  // Date.now() in render is non-deterministic by design here — see
+  // DESIGN.md "Cooldown clock". The 250ms tick effect above forces
+  // re-renders so this stays current; the click handler may read a
+  // value a few ms older than what was used to compute the disabled
+  // state of the Place button, but the server is the source of truth
+  // for cooldown, so the worst case is a brief COOLDOWN_NOT_ELAPSED
+  // surfaced to the user instead of a silent denial.
   const cooldownRemainingMs = Math.max(0, cooldownMs - (Date.now() - myLastPlacedAt));
 
   const handleCellClick = useCallback((x: number, y: number) => {
     setSelected({ x, y });
     setPlaceError(undefined);
   }, []);
+
+  // Clear stale selection when the canvas resizes such that the selected
+  // cell no longer exists. Without this, an admin shrinking 64→32 while
+  // a member has (50, 50) selected would leave the action panel showing
+  // "(50, 50) — Place" with no corresponding cell on screen; clicking
+  // Place would round-trip to INVALID_COORDINATES from the server. Also
+  // clears any stale place-error banner that referenced the prior
+  // dimensions.
+  useEffect(() => {
+    if (selected && (selected.x >= width || selected.y >= height)) {
+      setSelected(undefined);
+      setPlaceError(undefined);
+    }
+  }, [width, height, selected]);
 
   const handlePlace = useCallback(async () => {
     if (!selected || !selectedColor) return;
@@ -162,6 +186,17 @@ export const HomeView: React.FC = () => {
     // cell while the place RPC is in flight, their explicit re-tap wins
     // and we leave the new selection alone instead of silently wiping it.
     const placingAt = { x: selected.x, y: selected.y };
+    // Encode the chosen color as a palette index for the wire (proto
+    // PlacePixelRequest.palette_index — see proto comments for the
+    // wire-efficiency rationale). The selectedColor-in-palette guard
+    // above keeps this in sync; -1 here would mean a fork mutated the
+    // palette out from under the selection between the guard's render
+    // and this click — fail loudly rather than send 0 (white) silently.
+    const paletteIndex = palette.indexOf(selectedColor);
+    if (paletteIndex < 0) {
+      setPlaceError("Selected color is no longer in the palette");
+      return;
+    }
     setPlacing(true);
     setPlaceError(undefined);
     try {
@@ -170,16 +205,27 @@ export const HomeView: React.FC = () => {
       // COOLDOWN_NOT_ELAPSED (positive code, surfaced as an error to the
       // user) even though the original placement landed. Single attempt
       // here; on a real network blip the user retries manually. The
-      // PixelPlaced broadcast handler in CanvasContext picks up the
-      // placedAt for own placements regardless of whether the response
-      // delivered, so the cooldown clock starts correctly even when this
-      // call rejects with a transient error.
+      // server broadcasts PixelPlaced with `except: client`, so the
+      // placer never receives their own placement over the network —
+      // applyOwnPlacement below is the SOLE local-state source for
+      // their own pixels (no broadcast-recovery path).
       const r = await pixelCanvasServiceClient.placePixel({
         x: placingAt.x,
         y: placingAt.y,
-        color: selectedColor,
+        paletteIndex,
       });
-      setMyLastPlacedAt(Number(r.placedAt));
+      // Apply locally on success — load-bearing now that the broadcast
+      // excludes the placer. Without this, the placer's own client
+      // would never see their pixel land or their cooldown start. The
+      // synthesized event is idempotent against any (non-existent here)
+      // duplicate apply: setPixels writes the same entry, the
+      // Math.max-guarded cooldown setter is a no-op on identical state.
+      applyOwnPlacement(
+        placingAt.x,
+        placingAt.y,
+        paletteIndex,
+        Number(r.placedAt),
+      );
       setSelected((curr) =>
         curr && curr.x === placingAt.x && curr.y === placingAt.y
           ? undefined
@@ -199,7 +245,7 @@ export const HomeView: React.FC = () => {
     } finally {
       setPlacing(false);
     }
-  }, [selected, selectedColor, setMyLastPlacedAt]);
+  }, [selected, selectedColor, palette, applyOwnPlacement]);
 
   // Request the placer's profile when a cell with an existing pixel is
   // selected, so ActionPanel can render "placed by @nickname". The

@@ -10,79 +10,37 @@ import { log } from "./lib/log";
 // ============================================================================
 // canvasStore — pixel state + per-user cooldown.
 //
-// Two stores in this module:
+// Two stores:
 //
 //   1. CANVAS state (KV) — a sparse map of placed pixels keyed by "x,y".
-//      Stored at KV key "canvas". Sparse format means cleared/never-
-//      placed cells are absent from the map; the client renders absent
-//      cells as a neutral background. A maxed-out 64×64 fully painted
-//      canvas is ~320 KB serialized — comfortably within KV's small-
-//      blob zone, but at the larger end.
+//      Stored at KV key "canvas". Sparse format means absent cells render
+//      as a neutral background on the client. ~320 KB serialized at max
+//      canvas + full paint — within KV's small-blob zone.
 //
 //   2. PER-USER COOLDOWN map (in-memory only) — userId → lastPlacedAtMs.
-//      The atomic-style check-then-place pattern in placePixelIfCooldownElapsed
-//      is the source of truth; this map is a perf optimization that lets
-//      us short-circuit cooldown checks without hitting the KV. Same shape
-//      as leveling-leaderboard's lastAwardByUser. Lost on restart, which
-//      is acceptable: at restart everyone gets one "free" placement before
-//      their cooldown re-establishes.
+//      Lost on restart; everyone gets one "free" placement before
+//      cooldown re-establishes. Acceptable trade-off for a sample.
 //
 // In-memory cache for the canvas state itself: hydrated at initialize, kept
 // in sync after every successful write. readCanvas() returns the live
 // reference (not a clone) — callers must treat it as immutable.
 //
-// CONCURRENCY MODEL — two distinct races to defend against:
+// Concurrency, atomicity, and commit-but-reported-failure recovery are
+// the meat of this file. The why-this-shape rationale (TOCTOU on
+// cooldown, blob race between placements, the recovery model when the
+// SDK reports failure on a write that actually committed) lives in
+// DESIGN.md "Cooldown: in-memory map + atomic check-then-place" and
+// the surrounding sections — keeping it there means a fork that swaps
+// the data model (KV → SQLite, blob → per-row, etc.) doesn't carry
+// stale "race A vs B" prose into a file where the races no longer
+// apply. The per-function comments below cover the LOCAL invariants:
+// what each defense does and what would break if a future cleanup
+// dropped it.
 //
-//   (a) Same-user TOCTOU on cooldown:
-//       Without care, an `await` between the cooldown READ and the cooldown
-//       UPDATE lets a second concurrent request from the same user pass the
-//       check before the first one's update lands. Fan-out N parallel
-//       PlacePixel RPCs from one client and you'd bypass cooldown entirely.
-//       Fix: claim the cooldown slot SYNCHRONOUSLY (cooldown.set before any
-//       await) with rollback on KV failure.
-//
-//   (b) Different-user blob race:
-//       Two PlacePixels for distinct users each read `cache = C0`, build
-//       different `next` values that BOTH derive from C0 (so each excludes
-//       the other's pixel), and write them sequentially to KV. Last-write-
-//       wins drops one pixel from KV — even though both placers (and all
-//       connected clients) saw the broadcast and updated locally. The
-//       missing pixel reappears as "vanished" on the next refresh / server
-//       restart.
-//       Fix: serialize all canvas KV writes through a single in-process
-//       Promise chain (`canvasWriteLock`). The work runs under the lock
-//       reads the LATEST `cache` (post-prior-commit) before building
-//       `next`, so each placement / clear composes with everything that
-//       landed before it.
-//
-// JS's single-threaded event loop is what makes the synchronous claim in
-// (a) possible — but it does NOT serialize across `await` boundaries. The
-// queue in (b) provides that explicit serialization for KV writes.
-//
-// Commit-but-reported-failure recovery: writeValue can complete the
-// storage commit and have the SDK report failure on the response
-// (timeout after commit). In that case KV holds the new state but our
-// in-memory `cache` still holds the pre-write state. Without
-// intervention, the next serialized write would compose against the
-// stale `cache` and overwrite KV with the older snapshot. Defense:
-// `refreshCacheFromKv` runs inside the failure path of every serialized
-// write so subsequent queued work picks up authoritative state.
-//
-// The placement-side path also uses the refreshed cache to detect
-// whether ITS write committed — checking for the exact (color, userId,
-// placedAt) triple — and if so, returns success rather than rolling
-// back. This avoids the prior "user gets a generic error AND the pixel
-// is invisible to others until their next GetCanvas" failure mode.
-//
-// If refresh itself exhausts retries, `cacheNeedsRefresh` is set; the
-// next queued write retries the refresh once more and aborts the
-// operation if it still can't recover. Better to fail one placement
-// loudly than to silently corrupt KV by writing back stale state.
-//
-// Single-process assumption: this whole scheme works because there's exactly
-// one server instance. README "Known limits" makes that explicit. A multi-
-// process deployment would need a real distributed lock (or the KV layer
-// would need optimistic-concurrency / CAS primitives we don't currently use).
+// Single-process assumption: this whole scheme works because there's
+// exactly one server instance. README "Known limits" makes that
+// explicit. A multi-process deployment would need a real distributed
+// lock (or KV-level CAS primitives).
 // ============================================================================
 
 const KV_KEY_CANVAS = "canvas";
@@ -156,20 +114,72 @@ function key(x: number, y: number): string {
   return `${x},${y}`;
 }
 
+// Canonicalize stored pixel colors to uppercase hex. New writes go through
+// pixelCanvasService.canonicalizeColor which already uppercases, but
+// snapshots from a prior version (or hand-edited KV state during
+// migration) may contain lowercase entries. Canonicalize-on-hydrate
+// keeps the cache uniform so the (color, userId, placedAt) commit-
+// detection triple in placePixelIfCooldownElapsed compares apples-to-
+// apples regardless of historical KV state. Cheap: a one-pass
+// re-walk on hydrate or refresh, no per-write cost.
+function canonicalizeStored(state: CanvasState): CanvasState {
+  let needs = false;
+  for (const k in state.pixels) {
+    const c = state.pixels[k]?.color;
+    if (c && c !== c.toUpperCase()) {
+      needs = true;
+      break;
+    }
+  }
+  if (!needs) return state;
+  const pixels: Record<string, PixelData> = {};
+  for (const [k, v] of Object.entries(state.pixels)) {
+    pixels[k] = v.color === v.color.toUpperCase()
+      ? v
+      : { ...v, color: v.color.toUpperCase() };
+  }
+  return { width: state.width, height: state.height, pixels };
+}
+
 export async function initializeCanvasStore(initialSize: number): Promise<void> {
   const stored = await withRetry("canvasStore.get", () =>
     rootServer.dataStore.appData.get<CanvasState>(KV_KEY_CANVAS),
   );
   if (stored && stored.width > 0 && stored.height > 0) {
-    cache = stored;
+    cache = canonicalizeStored(stored);
   } else {
     // First-run path: write an empty canvas of the configured initial size.
+    // This write deliberately does NOT go through serializeCanvasWrite —
+    // initializeCanvasStore runs in onStarting before addService, so there
+    // are no concurrent writers yet (no RPCs are dispatched). A future
+    // "let's serialize ALL writes for symmetry" cleanup would be wrong:
+    // the queue is for runtime contention, not initialization.
     const initial: CanvasState = { width: initialSize, height: initialSize, pixels: {} };
     await writeValue(initial);
     cache = initial;
     log("info", "canvas initialized", { width: initialSize, height: initialSize });
   }
 }
+
+// Background retry for cacheNeedsRefresh. When refreshCacheFromKv exhausts
+// retries, the flag stays set; the next QUEUED write will retry inside
+// the lock — but on an idle server (no placements, no clears), the flag
+// can stay set forever and readCanvas() keeps returning stale pixels to
+// every connecting client. This timer wakes periodically and tries to
+// recover the cache through the serialization queue so the read path
+// catches up without needing a write to fire first. unref() so the
+// process can exit cleanly when no other handles are pending.
+const REFRESH_RETRY_INTERVAL_MS = 30_000;
+setInterval(() => {
+  if (!cacheNeedsRefresh) return;
+  void serializeCanvasWrite(async () => {
+    if (cacheNeedsRefresh) await refreshCacheFromKv();
+  }).catch(() => {
+    // refreshCacheFromKv already logs on its own failure path; the outer
+    // catch is just to swallow the rejection so it doesn't surface as
+    // an unhandled promise rejection.
+  });
+}, REFRESH_RETRY_INTERVAL_MS).unref();
 
 // Write a specific snapshot of canvas state to KV. The caller passes the
 // value explicitly (rather than reading the live `cache` ref) so a retry
@@ -310,6 +320,28 @@ export async function placePixelIfCooldownElapsed(
         // KV, then check whether our exact placement is in there. If yes,
         // the write succeeded — treat as success. If no, propagate the
         // error so the outer catch rolls back the cooldown.
+        //
+        // The (color, userId, placedAt) triple is unique per placement
+        // here: the synchronous cooldown claim above means no two
+        // requests from the same user can both be in this code path
+        // within the same cooldown window, so two same-user placements
+        // can't share a placedAt. Two DIFFERENT users with the same
+        // millisecond would be distinguished by userId. A peer placement
+        // landing on the same cell after our refresh would have a
+        // different placedAt (its own request's `now`) and thus not
+        // match.
+        //
+        // Both-fail (writeValue threw AND refresh fails): refreshCacheFromKv
+        // catches its own error and sets cacheNeedsRefresh = true without
+        // rethrowing, so we still reach the triple-match — but `cache`
+        // hasn't been replaced, so it's whatever it was BEFORE this
+        // attempt (we only assign `cache = next` after writeValue
+        // succeeds). Triple-match against that pre-state either finds
+        // no entry or a different prior placedAt, so it fails closed
+        // and we throw writeErr → outer catch rolls back the cooldown.
+        // cacheNeedsRefresh stays set so the next queued write (or the
+        // 30s background timer) retries the refresh before composing
+        // against the stale cache.
         await refreshCacheFromKv();
         if (cache) {
           const after = cache.pixels[k];
@@ -326,8 +358,21 @@ export async function placePixelIfCooldownElapsed(
       }
     });
   } catch (err) {
-    if (previousCooldown === undefined) cooldown.delete(userId);
-    else cooldown.set(userId, previousCooldown);
+    // Only roll back if the cooldown still equals OUR claim. Under
+    // sustained KV slowness, A's serialized write can sit in the queue
+    // for longer than cooldownMs, after which a same-user request B
+    // legitimately passes the cooldown check (because A's claim is now
+    // older than cooldownMs) and sets cooldown to its own `now`. If
+    // B's write commits before A's catch runs, the cooldown map holds
+    // B's valid claim. Unconditionally rolling back here would clobber
+    // B's claim, letting the user place again immediately and bypass
+    // the cooldown they should be on. Compare against `now` (the value
+    // A wrote) so the rollback only fires when no concurrent claim
+    // has overwritten it.
+    if (cooldown.get(userId) === now) {
+      if (previousCooldown === undefined) cooldown.delete(userId);
+      else cooldown.set(userId, previousCooldown);
+    }
     throw err;
   }
 }
@@ -346,6 +391,18 @@ export async function placePixelIfCooldownElapsed(
 // bounds). Inside the lock we re-read `cache` for the same reason.
 export async function clearCanvas(newSize?: number): Promise<CanvasState> {
   return serializeCanvasWrite(async () => {
+    // Same cacheNeedsRefresh guard as placePixelIfCooldownElapsed:
+    // without this, a no-resize clear (newSize undefined) would read
+    // `cache.width` from a known-stale cache and write the wrong
+    // dimensions back to KV. Try to refresh once; abort if still stale.
+    if (cacheNeedsRefresh) {
+      await refreshCacheFromKv();
+      if (cacheNeedsRefresh) {
+        throw new Error(
+          "canvasStore cache is stale and refresh failed — clear aborted",
+        );
+      }
+    }
     if (!cache) throw new Error("canvasStore not initialized");
     const size = newSize ?? cache.width;
     const next: CanvasState = { width: size, height: size, pixels: {} };
@@ -354,11 +411,26 @@ export async function clearCanvas(newSize?: number): Promise<CanvasState> {
       cache = next;
       return cache;
     } catch (err) {
-      // Same defensive cache refresh as placePixelIfCooldownElapsed —
-      // see that function's comment for rationale. A clear that
-      // committed-but-reported-failure followed by a placement composing
-      // against a stale `cache` would bring back pixels we just wiped.
+      // Symmetric with placePixelIfCooldownElapsed: writeValue may have
+      // committed at the storage layer but reported failure on the
+      // response (timeout post-commit). Refresh from KV; if the
+      // refreshed state matches what we tried to write (same dims,
+      // empty pixels), the clear DID land — return success so the
+      // caller can broadcast CanvasCleared. Without this, an admin's
+      // clear that quietly committed would still throw to the RPC,
+      // suppress the broadcast, and leave every connected client
+      // showing stale pixels until their next refresh. If the
+      // refreshed state doesn't match, propagate the error and let
+      // the caller's retry path try again.
       await refreshCacheFromKv();
+      if (
+        cache &&
+        cache.width === next.width &&
+        cache.height === next.height &&
+        Object.keys(cache.pixels).length === 0
+      ) {
+        return cache;
+      }
       throw err;
     }
   });
@@ -382,9 +454,34 @@ async function refreshCacheFromKv(): Promise<void> {
       rootServer.dataStore.appData.get<CanvasState>(KV_KEY_CANVAS),
     );
     if (refreshed && refreshed.width > 0 && refreshed.height > 0) {
-      cache = refreshed;
+      // Same canonicalize-on-hydrate as initializeCanvasStore — see
+      // canonicalizeStored's comment for rationale.
+      cache = canonicalizeStored(refreshed);
+      // Only clear the stale flag when we actually replaced the cache
+      // with a valid blob. If KV legitimately returned nothing (which
+      // shouldn't happen post-init but is defended against above),
+      // leaving the flag set means the next queued write will retry
+      // the refresh — exactly the silent-corruption case the flag was
+      // added to prevent.
+      cacheNeedsRefresh = false;
+    } else {
+      // KV returned null or invalid dimensions. Shouldn't happen
+      // post-initializeCanvasStore — that path always writes a valid
+      // initial blob and subsequent writes preserve dimensions — but
+      // log if it does so the impossible-but-possible case surfaces.
+      // Set cacheNeedsRefresh explicitly so the next queued write or
+      // the background retry timer tries again. The earlier comment
+      // here said "leave the flag set" but the else-branch also runs
+      // on a successful read with valid-but-unexpected data shape, so
+      // we'd otherwise inherit whatever pre-state the flag had —
+      // which could be false on a retry-after-success path.
+      cacheNeedsRefresh = true;
+      log("warn", "canvasStore.refreshCacheFromKv: KV returned no valid blob; marking cache stale", {
+        hasResult: !!refreshed,
+        width: refreshed?.width,
+        height: refreshed?.height,
+      });
     }
-    cacheNeedsRefresh = false;
   } catch (err) {
     cacheNeedsRefresh = true;
     log("error", "canvasStore.refreshCacheFromKv failed; cache marked stale", {
