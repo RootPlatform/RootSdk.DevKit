@@ -9,7 +9,8 @@ export class VoteService extends VoteServiceBase {
   async get(request: VoteGetRequest, client: Client): Promise<VoteGetResponse> {
     const tally: Tally = { a: this.tallyA, b: this.tallyB };
 
-    return { tally };
+    const response: VoteGetResponse = { tally: tally };
+    return response;
   }
 
   async add(request: VoteAddRequest, client: Client): Promise<VoteAddResponse> {
@@ -22,10 +23,11 @@ export class VoteService extends VoteServiceBase {
 
     const tally: Tally = { a: this.tallyA, b: this.tallyB };
 
-    const event: VoteAddedEvent = { tally };
+    const event: VoteAddedEvent = { tally: tally };
     this.broadcastVoteAdded(event, "all", client);
 
-    return { tally };
+    const response: VoteAddResponse = { tally: tally };
+    return response;
   }
 }
 
