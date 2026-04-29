@@ -1,0 +1,33 @@
+{
+  "name": "@githubreleasewatcher/app",
+  "author": "Root Communications, Inc.",
+  "description": "GitHub Release Watcher — DevKit sample app",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@rootsdk/client-app": "0.17.1-alpha.6",
+    "@rootsdk/client-app-ui": "0.17.1-alpha.6",
+    "@rootsdk/server-app": "0.17.1-alpha.6",
+    "@githubreleasewatcher/gen-client": "file:./networking/gen/client",
+    "@githubreleasewatcher/gen-server": "file:./networking/gen/server",
+    "@githubreleasewatcher/gen-shared": "file:./networking/gen/shared"
+  },
+  "devDependencies": {
+    "@rootsdk/dev-tools": "0.17.1-alpha.6",
+    "typescript": "^5.8.2"
+  },
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "clean": "node clean.mjs"
+  },
+  "workspaces": {
+    "packages": [
+      "./networking",
+      "./server",
+      "./client"
+    ]
+  }
+}

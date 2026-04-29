@@ -31,10 +31,26 @@ import {
   MessageType,
   CommunityGuid,
   UserGuid,
+  RootServerException,
 } from "@rootsdk/server-app";
 import { viewerService } from "./viewer-service";
 
 const COMMAND = "/test-ui-feature-by-role";
+
+// Test-driver internal-error sentinel. Positive (matching the proto's
+// "negative values reserved for built-in SDK errors" convention) and well
+// outside the recipe's ViewerError enum range so it can never collide with a
+// real authorization code. Test-only — recipe forks delete this whole file.
+const TEST_DRIVER_ERROR = 999;
+
+/**
+ * Per-user invocation result. Either a successful response (rendered as
+ * `✓ key=value` lines by the harness adaptor) or a typed RootServerException
+ * with a numeric `error_code` the harness can match on via `expectedError`.
+ */
+type Outcome =
+  | { kind: "ok"; fields: Record<string, string | number | boolean> }
+  | { kind: "err"; code: number; message: string };
 
 let capturedCommunityId: CommunityGuid | undefined;
 
@@ -47,15 +63,27 @@ export function initializeTestDriver(communityId: CommunityGuid): void {
 }
 
 /**
- * Command shape:  /test-ui-feature-by-role <userId1>,<userId2>,...
+ * Command shape:  /test-ui-feature-by-role <method> <userId1>,<userId2>,...
  *
- * For each userId, build a synthetic Client and call
- * viewerService.getViewerContext. Post one result block per user with the
- * returned flags as ✓ lines the harness can parse:
+ * For each userId, build a synthetic Client and call the named method on
+ * viewerService. Per user, emit either:
  *
- *   ✓ user_id=<id>
- *   ✓ is_owner=<bool>
- *   ✓ is_moderator=<bool>
+ *   ✓ user_id=<id>           ← success block start
+ *   ✓ <key>=<value>          ← response fields, snake_case
+ *
+ * or:
+ *
+ *   ✓ user_id=<id>           ← always start the block as ✓ so the harness
+ *                              can group by user, even on failures
+ *   ✗ error_code=<numeric>   ← typed RootServerException; matches recipe's
+ *                              proto enum value
+ *   ✗ error_message=<text>
+ *
+ * Method dispatch is by name so the harness can exercise multiple RPCs from
+ * the same recipe. Unknown methods produce a driver-level error message that
+ * doesn't match the per-user format, so the harness reports a generic
+ * "no response found" — which is the correct signal that the recipe and
+ * the harness disagree on what's available.
  */
 async function onTestCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
   if (evt.messageType === MessageType.System) return;
@@ -66,16 +94,29 @@ async function onTestCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
   const channelId = evt.channelId;
 
   try {
-    const args = content.slice(COMMAND.length).trim();
-    if (!args) {
+    const argString = content.slice(COMMAND.length).trim();
+    if (!argString) {
       await messages.create({
         channelId,
-        content: `✗ test driver: missing userIds argument. Usage: ${COMMAND} id1,id2,id3`,
+        content: `✗ test driver: missing arguments. Usage: ${COMMAND} <method> id1,id2,id3`,
       });
       return;
     }
 
-    const userIds = args.split(",").map((s) => s.trim()).filter((s) => s.length > 0);
+    // First whitespace-separated token is the method name; the rest is the
+    // comma-separated user list.
+    const firstSpace = argString.indexOf(" ");
+    if (firstSpace === -1) {
+      await messages.create({
+        channelId,
+        content: `✗ test driver: missing userIds. Usage: ${COMMAND} <method> id1,id2,id3`,
+      });
+      return;
+    }
+    const method = argString.slice(0, firstSpace).trim();
+    const userIdArg = argString.slice(firstSpace + 1).trim();
+
+    const userIds = userIdArg.split(",").map((s) => s.trim()).filter((s) => s.length > 0);
     if (!capturedCommunityId) {
       await messages.create({
         channelId,
@@ -94,15 +135,72 @@ async function onTestCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
         communityId: capturedCommunityId,
         deviceIds: [],
       };
-      const response = await viewerService.getViewerContext({}, client);
-      lines.push(`✓ user_id=${response.userId}`);
-      lines.push(`✓ is_owner=${response.isOwner}`);
-      lines.push(`✓ is_moderator=${response.isModerator}`);
+
+      const outcome = await invoke(method, client);
+      // Always open the block with a ✓ user_id line so the harness's parser
+      // can group by user — even when the rest of the block is failures.
+      lines.push(`✓ user_id=${rawUserId}`);
+      if (outcome.kind === "ok") {
+        for (const [k, v] of Object.entries(outcome.fields)) {
+          lines.push(`✓ ${k}=${v}`);
+        }
+      } else {
+        lines.push(`✗ error_code=${outcome.code}`);
+        lines.push(`✗ error_message=${outcome.message}`);
+      }
     }
 
     await messages.create({ channelId, content: lines.join("\n") });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     await messages.create({ channelId, content: `✗ test driver error: ${msg}` });
+  }
+}
+
+/**
+ * Dispatch one RPC by name and translate the result into an Outcome. Catches
+ * RootServerException so the harness sees typed failures as success-shaped
+ * blocks with `error_code` lines (not as a driver crash).
+ */
+async function invoke(method: string, client: Client): Promise<Outcome> {
+  try {
+    switch (method) {
+      case "getViewerContext": {
+        const r = await viewerService.getViewerContext({}, client);
+        return {
+          kind: "ok",
+          fields: {
+            is_owner: r.isOwner,
+            is_moderator: r.isModerator,
+          },
+        };
+      }
+      case "getModeratorReport": {
+        const r = await viewerService.getModeratorReport({}, client);
+        return { kind: "ok", fields: { data: r.data } };
+      }
+      default:
+        return {
+          kind: "err",
+          code: TEST_DRIVER_ERROR,
+          message: `unknown method "${method}"`,
+        };
+    }
+  } catch (err: unknown) {
+    if (err instanceof RootServerException) {
+      return {
+        kind: "err",
+        code: err.code,
+        message: err.message ?? "",
+      };
+    }
+    // Unexpected non-typed exception. Surface it under the test-driver
+    // sentinel so the harness sees a failure (and won't accidentally match
+    // a real ViewerError code).
+    return {
+      kind: "err",
+      code: TEST_DRIVER_ERROR,
+      message: err instanceof Error ? err.message : String(err),
+    };
   }
 }

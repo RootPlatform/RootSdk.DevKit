@@ -2,7 +2,7 @@
   "name": "@levelingleaderboard/app",
   "author": "Root Communications, Inc.",
   "description": "Leveling Leaderboard — DevKit sample app",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "engines": {
     "node": ">=22"

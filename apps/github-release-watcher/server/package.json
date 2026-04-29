@@ -1,0 +1,15 @@
+{
+  "name": "@githubreleasewatcher/server",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "@types/sqlite3": "^3.1.11"
+  },
+  "scripts": {
+    "build": "tsc",
+    "server": "rootsdk start devhost --project-folder=../"
+  }
+}

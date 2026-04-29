@@ -1,0 +1,307 @@
+syntax = "proto3";
+
+import "rootsdk/types.proto";
+
+// ============================================================================
+// ReleaseWatcherService
+//
+// See DESIGN.md for the behavior contract and client/server interaction shape.
+// All admin-only RPCs are gated server-side via an isAdmin check that tests
+// (callerUserId == community.ownerUserId) || globalSettings.general.admins
+// includes the caller.
+// ============================================================================
+
+// --- Core types -------------------------------------------------------------
+
+// One release from a watched repository. Wire shape for both archive entries
+// and TestRepo previews. Forks should keep `id` as the dedupe cursor — GitHub's
+// numeric release id is monotonically increasing and immutable across release-
+// note edits, while published_at can be backdated. See DESIGN.md → How dedupe
+// works.
+message Release {
+  int64 id = 1;
+  string owner = 2;
+  string name = 3;
+  string tag_name = 4;
+  // GitHub's release "name" field (often blank; many repos use only tag_name).
+  // The card renders this as the heading and falls back to tag_name when blank.
+  string release_name = 5;
+  // Release notes body (markdown). Capped to a reasonable size on archive
+  // insert; the card renders ~6 lines with mask-fade overflow.
+  string body = 6;
+  string html_url = 7;
+  // Unix milliseconds. NOT used as the dedupe cursor — see DESIGN.md.
+  int64 published_at = 8;
+  bool prerelease = 9;
+  // Unix milliseconds when the watcher first archived this release. Drives
+  // feed ordering (`ORDER BY added_at DESC, id DESC`). Backfill on add inserts
+  // three releases with near-identical added_at; id breaks the tie.
+  int64 added_at = 10;
+}
+
+// Status of the most recent poll for a watched repo. `UNSPECIFIED` covers
+// "never polled yet" — fresh rows appear with this value until the first
+// scheduled poll fires.
+enum PollStatus {
+  POLL_STATUS_UNSPECIFIED = 0;
+  POLL_STATUS_OK = 1;
+  POLL_STATUS_ERROR = 2;
+}
+
+// One watched repository. Per-row state (`last_poll_*`, `last_error_message`)
+// drives the RepoRow subtitle and the home view's "last poll" header.
+message Repo {
+  string owner = 1;
+  string name = 2;
+  int32 poll_interval_minutes = 3;
+  bool include_prereleases = 4;
+  // Unix milliseconds when the row was added (post-validation).
+  int64 added_at = 5;
+  // Unix milliseconds; 0 when no successful poll has happened yet.
+  int64 last_poll_at = 6;
+  PollStatus last_poll_status = 7;
+  // Empty when status is OK or unspecified. When status is ERROR, this is
+  // the human-readable error message rendered in the RepoRow subtitle and
+  // surfaced (only) via the admin-only RepoListChanged broadcast.
+  string last_error_message = 8;
+}
+
+// --- Errors -----------------------------------------------------------------
+// Positive values only. Negative values are reserved for built-in SDK errors.
+
+// Member names are prefixed with the enum name per protobuf convention; the
+// TypeScript generator strips the matching prefix, so call sites read
+// `ReleaseWatcherError.NOT_ADMIN`, not `ReleaseWatcherError.RELEASE_WATCHER_ERROR_NOT_ADMIN`.
+enum ReleaseWatcherError {
+  RELEASE_WATCHER_ERROR_UNSPECIFIED = 0;
+
+  // Any admin-gated RPC when called by a non-admin.
+  RELEASE_WATCHER_ERROR_NOT_ADMIN = 1;
+
+  // AddRepo: URL didn't parse as `https://github.com/owner/name`.
+  RELEASE_WATCHER_ERROR_INVALID_URL = 2;
+
+  // AddRepo: GitHub returned 404 during validation. Nothing is persisted.
+  RELEASE_WATCHER_ERROR_REPO_NOT_FOUND = 3;
+
+  // AddRepo: GitHub returned 403/429 during validation. Nothing is persisted.
+  // Treat as transient — admin can retry shortly.
+  RELEASE_WATCHER_ERROR_GITHUB_RATE_LIMITED = 4;
+
+  // AddRepo: 5xx or network failure during validation. Nothing is persisted.
+  RELEASE_WATCHER_ERROR_GITHUB_UNREACHABLE = 5;
+
+  // AddRepo: the community is already at the maximum (10) watched repos.
+  RELEASE_WATCHER_ERROR_MAX_REPOS_REACHED = 6;
+
+  // AddRepo: a row for this (owner, name) already exists.
+  RELEASE_WATCHER_ERROR_REPO_ALREADY_WATCHED = 7;
+
+  // UpdateRepoInterval: proposed interval is below the 15-minute floor.
+  RELEASE_WATCHER_ERROR_INTERVAL_TOO_LOW = 8;
+
+  // UpdateRepoInterval / UpdateRepoPrerelease / RemoveRepo / TestRepo:
+  // the named (owner, name) is not in watched_repos.
+  RELEASE_WATCHER_ERROR_REPO_NOT_TRACKED = 9;
+
+  // UpdateRepoInterval: proposed interval is above the 1-day ceiling. The
+  // client's NumberInput already caps at this value; server-side enforcement
+  // is defense-in-depth against hostile/buggy callers (a scripted client
+  // sending Number.MAX_SAFE_INTEGER would saturate the next-poll Date math).
+  RELEASE_WATCHER_ERROR_INTERVAL_TOO_HIGH = 10;
+}
+
+// --- Feed -------------------------------------------------------------------
+
+message GetFeedRequest {}
+
+message GetFeedResponse {
+  // The most recent ~50 releases across all watched repos, ordered
+  // `added_at DESC, id DESC`. See DESIGN.md → Release feed.
+  repeated Release releases = 1;
+
+  // True when the caller is an app admin (community owner or in the admins
+  // MemberGroup sourced from globalSettings.general.admins). Client uses
+  // this flag to conditionally render the Settings gear and gate the
+  // Settings push-view.
+  bool am_i_admin = 2;
+
+  // Unix milliseconds of the most recent successful poll across any repo
+  // (`MAX(last_poll_at) WHERE last_poll_status = 'ok'`). Drives the home
+  // view header's "{relative}" timestamp — a liveness indicator that the
+  // watcher is alive and reaching GitHub. 0 when no repo has ever polled
+  // successfully (the header drops the timestamp). See DESIGN.md →
+  // Release feed.
+  int64 most_recent_successful_poll_at = 3;
+
+  // The number of currently-watched repos, used by the home view header's
+  // `Watching {N} repos` count line. Equivalent to a separate `count(*)`
+  // query but shipped here so the home view doesn't need a second RPC.
+  int32 watched_repo_count = 4;
+}
+
+// --- Settings ---------------------------------------------------------------
+
+message GetSettingsRequest {}
+
+message GetSettingsResponse {
+  // The full list of watched repos with their per-row state. Admin-only;
+  // the response carries last_poll_* and last_error_message.
+  repeated Repo repos = 1;
+}
+
+// AddRepo persists the row only on validation success. On any error, nothing
+// is written and the client surfaces an inline error on the add-input.
+message AddRepoRequest {
+  // URL the admin entered (e.g., `https://github.com/vercel/next.js`).
+  // Server parses to (owner, name) before calling GitHub.
+  string url = 1;
+}
+
+message AddRepoResponse {
+  Repo repo = 1;
+}
+
+message UpdateRepoIntervalRequest {
+  string owner = 1;
+  string name = 2;
+  int32 poll_interval_minutes = 3;
+}
+
+message UpdateRepoIntervalResponse {}
+
+message UpdateRepoPrereleaseRequest {
+  string owner = 1;
+  string name = 2;
+  bool include_prereleases = 3;
+  // Toggling include_prereleases does NOT reset the dedupe cursor. If an
+  // admin disables the toggle, the prereleases that fire while disabled
+  // will not appear retroactively when the toggle is re-enabled — their
+  // ids are below the current cursor (MAX(id) FROM releases WHERE owner=?
+  // AND name=?). This matches the rest of the dedupe story ("the archive
+  // IS the cursor; we never replay") but is worth knowing if a fork wants
+  // different replay semantics on toggle changes.
+}
+
+message UpdateRepoPrereleaseResponse {}
+
+message RemoveRepoRequest {
+  string owner = 1;
+  string name = 2;
+}
+
+message RemoveRepoResponse {}
+
+// --- Test preview -----------------------------------------------------------
+//
+// TestRepo fetches the latest release for the named repo and returns it to
+// the calling client only — no archive write, no broadcast. The branch on
+// `include_prereleases` matters: GitHub's /releases/latest endpoint excludes
+// prereleases, so prerelease-tracking repos need /releases?per_page=1 instead.
+// See DESIGN.md → Test preview.
+
+message TestRepoRequest {
+  string owner = 1;
+  string name = 2;
+}
+
+message TestRepoResponse {
+  // The latest release. When the repo has zero releases, this field is left
+  // unset (default-constructed `Release` with id=0); clients should check
+  // `release.id !== 0` before rendering.
+  Release release = 1;
+}
+
+// --- Client telemetry -------------------------------------------------------
+//
+// Funnels client-side render errors caught by ErrorBoundary into the server's
+// structured log so production crashes are visible in your aggregator (vs.
+// stuck in browser consoles the user already closed). The handler validates
+// nothing beyond shape and writes a single log("error") line; size caps and
+// rate limits stay simple — replace this with a Sentry/Datadog client if your
+// app needs stack-frame mapping or grouping.
+
+message ReportClientErrorRequest {
+  // Free-form label identifying the boundary (e.g., "App", "HomeView",
+  // "Settings"). Helps disambiguate stack traces from different views.
+  string label = 1;
+  string message = 2;
+  // Stack trace as captured by the browser. Empty when unavailable.
+  string stack = 3;
+  // Browser/platform string from navigator.userAgent. Empty when omitted.
+  string user_agent = 4;
+}
+
+message ReportClientErrorResponse {}
+
+// --- Broadcasts -------------------------------------------------------------
+//
+// Five event types with distinct audiences, per DESIGN.md → Broadcasts:
+//   - ReleaseAdded    → "all" audience
+//   - RepoAdded       → "all" audience (public companion to RepoListChanged)
+//   - RepoRemoved     → "all" audience (public companion to RepoListChanged)
+//   - RepoListChanged → admin audience only (carries last_poll_*, last_error_message)
+//   - AdminsChanged   → "all" audience (empty payload)
+
+message ReleaseAddedEvent {
+  Release release = 1;
+}
+
+// Public companion to RepoListChanged for the add path. Lets every client
+// (admin or not) bump its watched-repo count immediately so the home view
+// can leave the "No repositories yet" empty state without waiting for the
+// first ReleaseAdded broadcast (which may be ~1 minute away, or never if
+// the repo's first poll fails).
+message RepoAddedEvent {
+  string owner = 1;
+  string name = 2;
+}
+
+message RepoRemovedEvent {
+  string owner = 1;
+  string name = 2;
+}
+
+// Admin-only: carries per-row state (last_poll_*, last_error_message) that's
+// only useful inside the admin-gated Settings view and could leak external-
+// service detail to non-admin members. Audience must match the gate on
+// GetSettings — otherwise non-admins receive via push what GetSettings refuses
+// to serve them.
+message RepoListChangedEvent {
+  repeated Repo repos = 1;
+}
+
+// Public: fires when globalSettings.general.admins changes. Empty payload —
+// every client re-fetches GetFeed to refresh its am_i_admin flag (demoted
+// admins need this to hide the gear; promoted members need it to show it).
+message AdminsChangedEvent {}
+
+// --- Service ----------------------------------------------------------------
+
+service ReleaseWatcherService {
+  // Any authenticated client.
+  rpc GetFeed(GetFeedRequest) returns (GetFeedResponse);
+
+  // Admin-only. Server throws RootServerException(NOT_ADMIN) otherwise.
+  rpc GetSettings(GetSettingsRequest) returns (GetSettingsResponse);
+  rpc AddRepo(AddRepoRequest) returns (AddRepoResponse);
+  rpc UpdateRepoInterval(UpdateRepoIntervalRequest) returns (UpdateRepoIntervalResponse);
+  rpc UpdateRepoPrerelease(UpdateRepoPrereleaseRequest) returns (UpdateRepoPrereleaseResponse);
+  rpc RemoveRepo(RemoveRepoRequest) returns (RemoveRepoResponse);
+  rpc TestRepo(TestRepoRequest) returns (TestRepoResponse);
+
+  // Any authenticated client.
+  rpc ReportClientError(ReportClientErrorRequest) returns (ReportClientErrorResponse);
+
+  // Broadcasts. See DESIGN.md → Broadcasts for audiences.
+  //   BroadcastReleaseAdded    → "all" audience
+  //   BroadcastRepoAdded       → "all" audience (public companion)
+  //   BroadcastRepoRemoved     → "all" audience (public companion)
+  //   BroadcastRepoListChanged → admin audience only
+  //   BroadcastAdminsChanged   → "all" audience (public, empty payload)
+  rpc BroadcastReleaseAdded(ReleaseAddedEvent) returns (rootsdk.Void);
+  rpc BroadcastRepoAdded(RepoAddedEvent) returns (rootsdk.Void);
+  rpc BroadcastRepoRemoved(RepoRemovedEvent) returns (rootsdk.Void);
+  rpc BroadcastRepoListChanged(RepoListChangedEvent) returns (rootsdk.Void);
+  rpc BroadcastAdminsChanged(AdminsChangedEvent) returns (rootsdk.Void);
+}

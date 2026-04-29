@@ -92,7 +92,16 @@ Folder names are category-prefixed: `ui-`, `data-`, `realtime-`, `auth-`, `asset
 
 | Folder | Question | Composes | Exemplified by |
 |---|---|---|---|
-| `ui-feature-by-role` | How do I enable/disable UI features based on the current user's roles? | `client-app-users`, `server-roles`, `server-member-roles`, `server-global-settings`, `networking-app-services` | `apps/leveling-leaderboard` |
+| `ui-feature-by-role` | How do I gate UI features by role and enforce the same gate server-side on privileged actions? | `client-app-users`, `server-roles`, `server-member-roles`, `server-global-settings`, `networking-app-services`, `server-rpc-errors` | `apps/leveling-leaderboard` |
+| `data-paginated-list` | How do I paginate a server-side list with cursor-based queries and accumulate pages on the client? | `server-app-data-store`, `networking-app-services`, `client-app-services` | `apps/leveling-leaderboard` |
+| `app-settings-flat-values` | How do I let app admins tune flat config values at runtime via an in-app Settings page, persisted in KV with admin-gated writes? | `server-app-data-store`, `server-global-settings`, `server-member-roles`, `networking-app-services`, `client-app-services` | `apps/leveling-leaderboard` |
+| `app-settings-list-values` | How do I persist a list-shaped setting (collection of items, add/remove individually) in SQLite with admin-gated mutations? | `server-app-data-store`, `server-global-settings`, `server-member-roles`, `networking-app-services`, `client-app-services` | `apps/leveling-leaderboard` (excluded_channels) |
+| `app-settings-per-context` | How do I let admins configure my app's behavior per-context — per-channel, per-repo, per-thing — with multi-field rows keyed by the entity? | `server-app-data-store`, `server-global-settings`, `server-member-roles`, `networking-app-services`, `client-app-services` | future github-release-watcher per-repo config |
+| `data-batch-prefetch` | How do I batch-prefetch related data (e.g. 50 user profiles for a list of activities) in one call instead of N+1 from the client? | `server-app-data-store`, `networking-app-services`, `client-app-services` | any list-with-references UX |
+| `chat-trigger-respond` | How do I make my app respond to user chat messages? | `server-channel-messages` | `apps/leveling-leaderboard` (messageHandler) |
+| `external-http-fetch` | How do I call an external HTTP API from my server with timeouts and typed error handling? | `networking-app-services`, `client-app-services` | `apps/github-release-watcher` (githubClient) |
+| `per-user-cooldown` | How do I rate-limit a per-user action so it can only happen once per N seconds, atomically? | `server-app-data-store`, `networking-app-services` | `apps/leveling-leaderboard` (xp-per-message cooldown) |
+| `audio-bundled-sfx` | How do I ship and play short sound effects from my client, dealing with the autoplay policy and Vite asset bundling? | (client-only — no Root SDK API surface) | any app with notification/feedback sounds |
 
 ## API Samples Index
 

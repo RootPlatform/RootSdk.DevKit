@@ -1,0 +1,183 @@
+.row {
+  background-color: var(--rootsdk-background-secondary);
+  border-radius: 8px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.topLine {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  /* The repo path can be long (long org names, long repo names); allow
+     it to take whatever room the controls don't need. */
+}
+
+.repoPath {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--rootsdk-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  /* 12px outer gap so the input + "min" pair (which uses a tight 4px inner
+     gap from NumberInput.module.css) reads as one labeled control, with
+     clear separation before the next sibling. */
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+/* Preview disclosure — its own row, with chevron + "Preview" label.
+   Click toggles the preview content below. Content-width (not full-row)
+   so it doesn't read as a section header; align-self at the start so it
+   sits flush with the row's left edge. */
+.previewToggle {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 4px 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--rootsdk-text-secondary);
+  cursor: pointer;
+  border-radius: 6px;
+  align-self: flex-start;
+  transition: color 150ms, background-color 150ms;
+}
+
+.previewToggle:hover {
+  color: var(--rootsdk-text-primary);
+  background-color: var(--rootsdk-highlight-light);
+}
+
+.previewToggle:disabled {
+  cursor: wait;
+}
+
+.previewStatus {
+  color: var(--rootsdk-text-tertiary);
+  font-weight: 400;
+}
+
+.previewContent {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.toggleLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.toggleText {
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  color: var(--rootsdk-text-secondary);
+}
+
+/* Trash always reads as a destructive action: error red at rest (not
+   grey-then-red on hover) so the destructive intent is visible before
+   the user commits to it. Hover deepens the tinted background but keeps
+   the icon color the same — no flicker on the consequential color. */
+.removeButton {
+  appearance: none;
+  background: none;
+  border: none;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: var(--rootsdk-error);
+  cursor: pointer;
+  transition: background-color 150ms;
+}
+
+.removeButton:hover {
+  background-color: color-mix(in srgb, var(--rootsdk-error) 12%, transparent);
+}
+
+/* Subtitles: an Icon + label. Padding and gap match `.previewToggle` so
+   the leading icon aligns horizontally with the chevron below — all
+   three subtitle/disclosure rows have an Icon-then-text shape with the
+   same container metrics, so the icons' left edges line up. */
+.subtitleOk {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--rootsdk-brand-secondary);
+  padding: 0 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.subtitleError {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--rootsdk-error);
+  padding: 0 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.testError {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--rootsdk-error);
+  padding: 0 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Inline confirm — replaces the row's controls with a prompt + Cancel/Remove.
+   Layout: prompt stretches (flex 1), buttons sit at the right. Wraps on
+   narrow viewports so the prompt isn't squashed. See DESIGN.md →
+   Destructive confirmations. */
+.confirmRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.confirmPrompt {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  color: var(--rootsdk-text-primary);
+}
+
+@media (max-width: 639.98px) {
+  /* On mobile, top line wraps so interval input + prerelease toggle
+     can drop to a second line beneath the repo path (DESIGN.md → Responsive). */
+  .topLine {
+    flex-wrap: wrap;
+  }
+  .repoPath {
+    flex: 1 1 100%;
+  }
+  .controls {
+    flex: 1 1 100%;
+    justify-content: flex-start;
+  }
+}

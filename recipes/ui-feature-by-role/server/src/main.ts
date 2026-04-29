@@ -43,6 +43,7 @@ async function onStarting(state: RootAppStartState): Promise<void> {
   // Broadcast on settings change. The configured moderator role may have
   // moved or been cleared, so every client's `is_moderator` flag is
   // potentially stale.
+  // TODO(SDK): GlobalSettingsEvent enum unreleased — swap "update" → GlobalSettingsEvent.Update once it ships
   state.globalSettings?.on("update", onSettingsChanged);
 
   // Broadcast on role-membership changes. When a user is added to or removed

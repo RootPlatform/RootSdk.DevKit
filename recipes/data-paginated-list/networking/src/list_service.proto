@@ -1,0 +1,55 @@
+syntax = "proto3";
+package datapaginatedlist;
+
+// ============================================================================
+// ListService — cursor-based pagination over a server-side list of records.
+//
+// This recipe composes server-app-data-store (the SQLite-backed records),
+// networking-app-services (the RPC plumbing), and client-app-services (the
+// gen-client invocation). The client accumulates pages by calling
+// ListRecords repeatedly with the previous response's next_cursor.
+// ============================================================================
+
+// Page request. Both fields optional.
+//
+// page_size — the maximum number of records the server should return in
+// this page. Server caps to a sensible upper bound regardless of what the
+// client asks for; clients can't ask for "everything" by sending a huge
+// page_size and skipping pagination entirely. 0 means "use the server's
+// default" (which the server picks; the recipe uses 20).
+//
+// cursor — opaque pagination cursor returned by the previous call's
+// next_cursor field. Empty string means "first page". Clients never
+// inspect or construct cursors — they round-trip the value the server
+// gave them. Server owns the encoding (this recipe uses base64-encoded
+// JSON of the last seen id), and is free to change it without breaking
+// clients.
+message ListRecordsRequest {
+  uint32 page_size = 1;
+  string cursor = 2;
+}
+
+// Page response.
+//
+// records — up to page_size items, ordered newest first (highest id first).
+// next_cursor — opaque cursor for the NEXT call. Empty string when there
+// are no more pages. Empty-string-means-end is simpler than a separate
+// has_more boolean: one field, one branch in the client state machine.
+message ListRecordsResponse {
+  repeated Record records = 1;
+  string next_cursor = 2;
+}
+
+// One record. The label is placeholder data — fork the recipe and replace
+// `Record` (and the seed in db.ts) with whatever your real list shape is:
+// audit-log entries, posts, items in a queue, etc. The pagination mechanic
+// is independent of the row contents.
+message Record {
+  uint64 id = 1;
+  string created_at = 2;  // ISO 8601 timestamp
+  string label = 3;
+}
+
+service ListService {
+  rpc ListRecords(ListRecordsRequest) returns (ListRecordsResponse);
+}

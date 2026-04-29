@@ -6,6 +6,7 @@ Complete, runnable Root app examples. Each app has a client (React/TypeScript), 
 |--------|-------------|-------------|------------|
 | `hello-world` | Minimal echo service | Client-server protobuf round-trip | Minimal |
 | `data-storage` | Task list with persistence | SQLite database, CRUD operations | Moderate |
+| `github-release-watcher` | Watches GitHub repos for new releases | Chained `OneTime` polling jobs, external API + retry, admin-gated settings, public/admin broadcast split | Complex |
 | `protobuf-service` | Voting between two options | Custom RPC services, broadcast updates | Moderate |
 | `suggestion-box` | Community suggestion board | Multiple services, voting, error handling, client state management | Complex |
 | `themes` | UI theming showcase | Root design tokens, CSS variables, icons — no networking | Minimal (UI) |

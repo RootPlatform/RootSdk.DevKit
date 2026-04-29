@@ -1,0 +1,63 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 48px;
+  padding: 0 16px;
+  background-color: var(--rootsdk-background-primary);
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--rootsdk-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gearButton {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 6px;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: var(--rootsdk-text-secondary);
+  cursor: pointer;
+  transition: color 150ms, background-color 150ms;
+}
+
+.gearButton:hover {
+  color: var(--rootsdk-text-primary);
+  background-color: var(--rootsdk-highlight-light);
+}
+
+.backButton {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 6px 8px 6px 4px;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 6px;
+  color: var(--rootsdk-text-primary);
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 150ms;
+}
+
+.backButton:hover {
+  background-color: var(--rootsdk-highlight-light);
+}
+
+.backLabel {
+  line-height: 1;
+}

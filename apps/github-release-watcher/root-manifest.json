@@ -1,0 +1,40 @@
+{
+  "id": "AC53qhsDiwm9SJFEf8KCMQ",
+  "version": "1.0.17",
+  "package": {
+    "client": {
+      "deploy": "client/dist"
+    },
+    "server": {
+      "launch": "server/dist/main.js",
+      "deploy": [
+        "server/dist",
+        "networking/gen/server"
+      ],
+      "nodeModules": [
+        "node_modules"
+      ]
+    }
+  },
+  "settings": {
+    "groups": [
+      {
+        "key": "general",
+        "title": "General",
+        "items": [
+          {
+            "key": "admins",
+            "title": "App admins",
+            "description": "Roles and members who can access Settings in this app.",
+            "required": true,
+            "confirmation": "Save",
+            "roleOrMember": {
+              "selectBehavior": "roleMultiAndUserMulti"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {}
+}

@@ -1,0 +1,37 @@
+syntax = "proto3";
+package perusercooldown;
+
+// ============================================================================
+// CooldownService — claim a per-user "thing" no more than once per cooldown.
+//
+// The toy "claim" is a placeholder. Fork the recipe and wire the cooldown
+// check into your real action: award XP per message, place a pixel, claim
+// a daily reward, redeem a code. The mechanic — a single SQL statement
+// that atomically checks-and-updates the per-user timestamp — carries
+// forward to any "limited frequency per user" feature.
+// ============================================================================
+
+message ClaimRequest {}
+
+message ClaimResponse {
+  string claimed_at = 1;        // ISO 8601 timestamp of the successful claim
+  string cooldown_ends_at = 2;  // ISO 8601 — when the same user may claim again
+}
+
+// --- Errors -----------------------------------------------------------------
+// Positive values only — negative values are reserved for built-in SDK errors.
+
+enum CooldownError {
+  COOLDOWN_ERROR_UNSPECIFIED = 0;
+  // Caller has claimed within the cooldown window. The error message
+  // includes the seconds remaining; structured fields are intentionally
+  // not in the proto here — clients that need a precise countdown should
+  // either parse the message or call the (future) GetCooldownStatus RPC.
+  COOLDOWN_ERROR_NOT_ELAPSED = 1;
+}
+
+// --- Service ---------------------------------------------------------------
+
+service CooldownService {
+  rpc Claim(ClaimRequest) returns (ClaimResponse);
+}

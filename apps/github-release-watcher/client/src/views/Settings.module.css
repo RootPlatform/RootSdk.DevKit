@@ -1,0 +1,81 @@
+.column {
+  /* Same column constraint as HomeView. See DESIGN.md → Content. */
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.header {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--rootsdk-text-secondary);
+  padding: 0 4px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.addRow {
+  background-color: var(--rootsdk-background-secondary);
+  border-radius: 8px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Horizontal: input grows, then Cancel + Add buttons. Single row by
+   default; wraps on narrow viewports. */
+.addInputRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.addInputRow > label {
+  /* TextInput renders a wrapping <label>; let it grow to fill the row. */
+  flex: 1;
+  min-width: 0;
+}
+
+.addError {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--rootsdk-error);
+  padding: 0 2px;
+}
+
+/* "+ Add repository" button — looks like a row in the list but acts as a
+   button. Dashed border keeps it visibly distinct from real RepoRows so
+   it reads as an affordance rather than another watched repo. */
+.addButton {
+  appearance: none;
+  background: none;
+  border: 1px dashed var(--rootsdk-border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--rootsdk-text-secondary);
+  cursor: pointer;
+  transition: background-color 150ms, color 150ms, border-color 150ms;
+  min-height: 44px;
+}
+
+.addButton:hover {
+  background-color: var(--rootsdk-highlight-light);
+  color: var(--rootsdk-text-primary);
+  border-color: var(--rootsdk-text-tertiary);
+}

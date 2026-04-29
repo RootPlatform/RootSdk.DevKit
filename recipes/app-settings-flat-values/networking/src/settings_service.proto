@@ -1,0 +1,97 @@
+syntax = "proto3";
+package appsettingsflatvalues;
+
+import "rootsdk/types.proto";
+
+// ============================================================================
+// SettingsService — read + write app-internal flat configuration values.
+//
+// The app stores three example settings (one of each primitive shape) in
+// rootServer.dataStore.appData under a single key. App admins — defined by
+// globalSettings.general.admins (a roleOrMember picker) — can update them
+// at runtime. All callers can read.
+//
+// On every successful write the server broadcasts SettingsChanged so that
+// clients (and any sibling app instances) re-fetch. The KV API itself emits
+// no change events, so the broadcast is the recipe's mechanism for
+// propagating changes.
+//
+// This recipe is APP-ONLY. Bots configure exclusively through globalSettings
+// because they have no UI surface to render a Settings page. See the bot
+// configuration explanation for that path.
+// ============================================================================
+
+// --- Settings value shape ---------------------------------------------------
+
+// One example of each primitive shape an app might tune. Real recipes
+// replace these fields with the actual settings their app needs (cooldown
+// seconds, feature toggles, default copy, etc.). The KV mechanic is
+// independent of the field set — change the proto, change the defaults,
+// and the rest of the recipe carries forward.
+message SettingsValues {
+  string welcome_message = 1;
+  uint32 max_items = 2;
+  bool show_timestamps = 3;
+}
+
+// --- Read --------------------------------------------------------------------
+
+message GetSettingsRequest {}
+
+message GetSettingsResponse {
+  SettingsValues values = 1;
+  // Whether the calling user is permitted to call UpdateSettings. Computed
+  // against globalSettings.general.admins (roles + members) plus the
+  // community owner (always elevated). Carried on the read response so a
+  // client can render the Settings form in editable vs read-only mode in a
+  // single round trip — no separate "amIAdmin" RPC.
+  bool is_admin = 2;
+}
+
+// --- Write -------------------------------------------------------------------
+
+// Partial update. Each field is `optional` (proto3); fields the caller
+// doesn't supply keep their current stored value. A "merge" PATCH semantic,
+// not a "replace" PUT — clients can edit one knob without resending all
+// three.
+message UpdateSettingsRequest {
+  optional string welcome_message = 1;
+  optional uint32 max_items = 2;
+  optional bool show_timestamps = 3;
+}
+
+// Returns the merged values so the client can apply optimistic UI updates
+// against the authoritative result without a second GetSettings round trip.
+message UpdateSettingsResponse {
+  SettingsValues values = 1;
+}
+
+// --- Broadcast ---------------------------------------------------------------
+
+// Empty payload — clients re-fetch on receipt. Same idiom as ui-feature-by-
+// role's RolesChanged: no delta, just a "go ask again" signal. Sized
+// trivially so wide-fanout broadcasts cost nothing.
+message SettingsChangedEvent {}
+
+// --- Errors ------------------------------------------------------------------
+// Positive values only — negative values are reserved for built-in SDK errors.
+
+enum SettingsError {
+  SETTINGS_ERROR_UNSPECIFIED = 0;
+  // UpdateSettings caller is not an app admin. Mirrors the convention from
+  // other DevKit apps (LeaderboardError.NOT_ADMIN, RolePickerError.NOT_ADMIN
+  // — the proto-side names are prefixed; the protobuf-ts compiler strips
+  // the prefix on the TS side, so client code reads
+  // `SettingsError.NOT_ADMIN`).
+  SETTINGS_ERROR_NOT_ADMIN = 1;
+}
+
+// --- Service -----------------------------------------------------------------
+
+service SettingsService {
+  rpc GetSettings(GetSettingsRequest) returns (GetSettingsResponse);
+  // Admin-only. Server throws SettingsError.NOT_ADMIN otherwise.
+  rpc UpdateSettings(UpdateSettingsRequest) returns (UpdateSettingsResponse);
+
+  rpc BroadcastSettingsChanged(SettingsChangedEvent) returns (rootsdk.Void);
+}

@@ -1,0 +1,32 @@
+{
+  "name": "@rootsdk-recipe/app-settings-list-values",
+  "author": "Root Communications, Inc.",
+  "description": "Recipe: persist a list-shaped app-internal setting in SQLite with admin-gated add/remove and reactive client refresh. App-only — bots configure via globalSettings only. Second recipe in the settings series.",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@rootsdk/server-app": "0.17.1-alpha.6",
+    "@rootsdk/client-app": "0.17.1-alpha.6",
+    "@appsettingslistvalues/gen-client": "file:./networking/gen/client",
+    "@appsettingslistvalues/gen-server": "file:./networking/gen/server",
+    "@appsettingslistvalues/gen-shared": "file:./networking/gen/shared"
+  },
+  "devDependencies": {
+    "@rootsdk/dev-tools": "0.17.1-alpha.6",
+    "typescript": "^5.8.2"
+  },
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "clean": "node clean.js"
+  },
+  "workspaces": {
+    "packages": [
+      "./networking",
+      "./server",
+      "./client"
+    ]
+  }
+}

@@ -4,16 +4,26 @@ package uifeaturebyrole;
 import "rootsdk/types.proto";
 
 // ============================================================================
-// ViewerService — answers "what UI features can the calling user see?"
+// ViewerService — answers "what UI features can the calling user see?" AND
+// enforces server-side authorization on moderator-only actions.
 //
 // This recipe composes server-global-settings (read the configured moderator
-// role), server-member-roles (check whether the caller is in it), and
-// networking-app-services (the RPC + broadcast plumbing).
+// role), server-member-roles (check whether the caller is in it),
+// networking-app-services (the RPC + broadcast plumbing), and
+// server-rpc-errors (typed authorization rejection).
 //
-// The server is the source of truth. The client uses the returned flags to
-// gate UI visibility ONLY — never to gate actions. Action gating must be
-// enforced server-side (see recipe #20: gate a client action behind a
-// permission AND enforce it server-side).
+// Two layers of role gating are demonstrated:
+//
+//   1. UI visibility — `getViewerContext` returns is_owner / is_moderator
+//      flags. The client uses them to hide moderator-only UI affordances.
+//      This is UX, not security.
+//
+//   2. Action enforcement — `getModeratorReport` is a moderator-only RPC.
+//      The server independently checks the caller's role and throws
+//      RootServerException(NOT_MODERATOR) if they're not authorized. This
+//      is the security boundary; client-side hiding is just polish on top.
+//
+// Always do both. Never trust the client-side gate alone.
 // ============================================================================
 
 message GetViewerContextRequest {}
@@ -43,8 +53,33 @@ message GetViewerContextResponse {
 // may have changed even if settings didn't).
 message RolesChangedEvent {}
 
+// --- Errors -----------------------------------------------------------------
+// Positive values only — negative values are reserved for built-in SDK errors.
+
+enum ViewerError {
+  VIEWER_ERROR_UNSPECIFIED = 0;
+  // Caller is neither the community owner nor a member of the configured
+  // moderator role. Thrown from any moderator-only RPC.
+  VIEWER_ERROR_NOT_MODERATOR = 1;
+}
+
+// --- Moderator-only action --------------------------------------------------
+
+message GetModeratorReportRequest {}
+
+message GetModeratorReportResponse {
+  // Toy payload — the recipe is teaching the enforcement mechanic, not a
+  // real moderation feature. In production this might be e.g. a list of
+  // reported messages. Real recipes should put the actual data here.
+  string data = 1;
+}
+
 service ViewerService {
   rpc GetViewerContext(GetViewerContextRequest) returns (GetViewerContextResponse);
 
   rpc BroadcastRolesChanged(RolesChangedEvent) returns (rootsdk.Void);
+
+  // Moderator-only. Server throws ViewerError.NOT_MODERATOR for callers
+  // who aren't owner or in the configured moderator role.
+  rpc GetModeratorReport(GetModeratorReportRequest) returns (GetModeratorReportResponse);
 }

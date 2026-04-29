@@ -80,9 +80,9 @@ message ChannelGroup {
 
 enum LeaderboardError {
   LEADERBOARD_ERROR_UNSPECIFIED = 0;
-  NOT_ADMIN = 1;
-  INVALID_SETTINGS = 2;
-  MEMBER_NOT_FOUND = 3;
+  LEADERBOARD_ERROR_NOT_ADMIN = 1;
+  LEADERBOARD_ERROR_INVALID_SETTINGS = 2;
+  LEADERBOARD_ERROR_MEMBER_NOT_FOUND = 3;
 }
 
 // --- Leaderboard ------------------------------------------------------------

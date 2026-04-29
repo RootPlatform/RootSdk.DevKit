@@ -1,0 +1,108 @@
+syntax = "proto3";
+package appsettingslistvalues;
+
+import "rootsdk/types.proto";
+
+// ============================================================================
+// BlockedTermsService — manage a list-shaped app-internal setting (the
+// "blocked terms" list) with admin-gated add and remove operations.
+//
+// The toy data — a list of strings — is intentionally generic. Fork the
+// recipe and replace BlockedTerm + the schema with whatever your real
+// list-shaped setting holds: excluded channels, allow-list domains, alert
+// recipients, custom emoji shortcodes. The mechanic (SQLite table, idempotent
+// insert, per-row delete, full-list response) is independent of the row
+// shape. The canonical real-world exemplar in DevKit is leveling-leaderboard's
+// `excluded_channels` table.
+//
+// This recipe is APP-ONLY. Bots configure exclusively through globalSettings
+// because they have no UI surface to render an admin-managed list. See the
+// bot configuration explanation for that path.
+// ============================================================================
+
+// --- Row shape --------------------------------------------------------------
+
+message BlockedTerm {
+  uint64 id = 1;          // server-assigned, stable per-row identity
+  string term = 2;
+  string added_at = 3;    // ISO 8601 timestamp
+}
+
+// --- Read -------------------------------------------------------------------
+
+message ListBlockedTermsRequest {}
+
+message ListBlockedTermsResponse {
+  // Sorted newest-first (added_at DESC). Stable across calls absent
+  // mutations.
+  repeated BlockedTerm terms = 1;
+
+  // Whether the caller may call AddBlockedTerm / RemoveBlockedTerm. Carried
+  // on the read response so a client can render the list with or without
+  // edit affordances in a single round trip — same pattern as
+  // app-settings-flat-values.
+  bool is_admin = 2;
+}
+
+// --- Mutations --------------------------------------------------------------
+
+// Add a term. The server validates non-empty, length-capped (after trim);
+// duplicates are no-ops courtesy of the table's UNIQUE constraint and
+// INSERT OR IGNORE. Returns the full updated list so the client can apply
+// the result without a second round trip.
+message AddBlockedTermRequest {
+  string term = 1;
+}
+
+message AddBlockedTermResponse {
+  repeated BlockedTerm terms = 1;
+}
+
+// Remove a term by its row id. Idempotent: removing an id that no longer
+// exists succeeds and returns the unchanged list. Returns the full updated
+// list for the same reason as AddBlockedTermResponse.
+message RemoveBlockedTermRequest {
+  uint64 id = 1;
+}
+
+message RemoveBlockedTermResponse {
+  repeated BlockedTerm terms = 1;
+}
+
+// --- Broadcast --------------------------------------------------------------
+
+// Empty payload — clients re-fetch the list on receipt. Same idiom as the
+// other recipes in this series. Fires after every successful mutation and
+// when the admins picker changes (which flips is_admin for affected
+// callers without changing the underlying list).
+message BlockedTermsChangedEvent {}
+
+// --- Errors -----------------------------------------------------------------
+// Positive values only — negative values are reserved for built-in SDK errors.
+
+enum BlockedTermsError {
+  BLOCKED_TERMS_ERROR_UNSPECIFIED = 0;
+  // Caller is not an admin. The protobuf-ts compiler strips the type prefix
+  // on the TS side, so client code reads `BlockedTermsError.NOT_ADMIN`.
+  BLOCKED_TERMS_ERROR_NOT_ADMIN = 1;
+  // Add term failed validation: empty after trim, exceeds the length cap,
+  // or otherwise unacceptable. The server-side validator is intentionally
+  // permissive — fork the recipe and tighten as your domain requires
+  // (URL allow-lists may want shorter; emoji shortcodes shorter still).
+  BLOCKED_TERMS_ERROR_INVALID_TERM = 2;
+}
+
+// --- Service ----------------------------------------------------------------
+
+service BlockedTermsService {
+  rpc ListBlockedTerms(ListBlockedTermsRequest) returns (ListBlockedTermsResponse);
+
+  // Admin-only. Server throws BlockedTermsError.NOT_ADMIN otherwise, or
+  // BlockedTermsError.INVALID_TERM if validation fails.
+  rpc AddBlockedTerm(AddBlockedTermRequest) returns (AddBlockedTermResponse);
+
+  // Admin-only. Server throws BlockedTermsError.NOT_ADMIN otherwise.
+  rpc RemoveBlockedTerm(RemoveBlockedTermRequest) returns (RemoveBlockedTermResponse);
+
+  rpc BroadcastBlockedTermsChanged(BlockedTermsChangedEvent) returns (rootsdk.Void);
+}

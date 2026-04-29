@@ -1,0 +1,27 @@
+.column {
+  /* DESIGN.md → Content. Centered column max 640px, 16px side padding,
+     24px vertical padding. Inherits scroll from the parent .content
+     container in App.module.css. */
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Status line above the feed. Plain meta text — not a banner, not a card. */
+.status {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--rootsdk-text-secondary);
+  padding: 0 4px;
+}
+
+.feed {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}

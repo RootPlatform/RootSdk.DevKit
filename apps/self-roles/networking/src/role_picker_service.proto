@@ -74,14 +74,14 @@ message PickerLimits {
 
 enum RolePickerError {
   ROLE_PICKER_ERROR_UNSPECIFIED = 0;
-  NOT_ADMIN = 1;
+  ROLE_PICKER_ERROR_NOT_ADMIN = 1;
   // ToggleRole referenced a role not currently in the picker config. Could
   // mean the caller's view is stale (admin just removed it) or the caller
   // crafted the request manually. Either way: refetch and try again.
-  ROLE_NOT_IN_PICKER = 2;
+  ROLE_PICKER_ERROR_ROLE_NOT_IN_PICKER = 2;
   // UpdateGroups payload violated a field-length / count limit, structural
   // shape (duplicate IDs, etc.), or referenced a role the bot can't assign.
-  INVALID_CONFIG = 3;
+  ROLE_PICKER_ERROR_INVALID_CONFIG = 3;
   // The toggle target is configured in the picker, but the platform
   // refused the mutation. Used for BOTH directions of ToggleRole:
   //   - Add path: NoPermissionToAdd (subset-of-permissions check failed —
@@ -92,7 +92,7 @@ enum RolePickerError {
   // refusal of a role-assignment mutation. The server-side error logger
   // distinguishes add vs remove for admin diagnostics; the client just
   // displays the per-direction message and locks the row for the session.
-  ROLE_NOT_ASSIGNABLE = 4;
+  ROLE_PICKER_ERROR_ROLE_NOT_ASSIGNABLE = 4;
 }
 
 // --- Member-facing RPCs -----------------------------------------------------

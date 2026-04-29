@@ -1,0 +1,73 @@
+syntax = "proto3";
+package databatchprefetch;
+
+// ============================================================================
+// ActivityService — list-of-items + batch-fetch-related-entities pattern.
+//
+// The shape this recipe teaches is universal: a list of items where each
+// item carries a foreign-key-shaped reference to a related entity, and the
+// client needs to display details from BOTH (e.g., activity feed where each
+// row needs the actor's display name and avatar). The naive client makes
+// one RPC per item; the batched client deduplicates references and fetches
+// them all in a single RPC.
+//
+// The toy data — activities + owners — is placeholder. Fork the recipe and
+// substitute whichever shape matches your domain:
+//   - messages-with-author
+//   - posts-with-poster
+//   - audit-log-entries-with-actor
+//   - orders-with-product
+// The mechanic (server batch query + client dedup) is independent of what
+// the rows actually are.
+// ============================================================================
+
+// --- Domain shapes ----------------------------------------------------------
+
+message Activity {
+  uint64 id = 1;
+  string action = 2;          // "joined", "posted", "edited", etc.
+  string actor_id = 3;        // foreign-key-shaped reference into owners
+  string occurred_at = 4;     // ISO 8601 timestamp
+}
+
+message OwnerInfo {
+  string id = 1;
+  string display_name = 2;
+  string color = 3;           // hex string, e.g. "#3B82F6" — for UI rendering
+}
+
+// --- Read endpoints ---------------------------------------------------------
+
+message ListActivitiesRequest {}
+
+message ListActivitiesResponse {
+  // Sorted newest-first by occurred_at. The recipe seeds 10 activities at
+  // install; pagination is out of scope (see data-paginated-list for that
+  // pattern).
+  repeated Activity activities = 1;
+}
+
+// Batch entry point. Sender deduplicates ids client-side before sending
+// (see client/src/App.tsx); server runs one parameterized SQL query and
+// returns a map keyed by id. Missing ids are silently omitted from the
+// response — clients render "(unknown)" for unresolved references rather
+// than treating absence as an error. This keeps the contract simple and
+// lets list rendering survive owner deletions or stale activity references.
+message BatchGetOwnersRequest {
+  repeated string owner_ids = 1;
+}
+
+message BatchGetOwnersResponse {
+  // proto3 `map<>` lands on the TS side as an index-signature object:
+  //   owners: { [key: string]: OwnerInfo }
+  // Iterate with Object.keys/Object.entries; lookup with `owners[id]`.
+  // Missing keys are simply absent from the object.
+  map<string, OwnerInfo> owners = 1;
+}
+
+// --- Service ----------------------------------------------------------------
+
+service ActivityService {
+  rpc ListActivities(ListActivitiesRequest) returns (ListActivitiesResponse);
+  rpc BatchGetOwners(BatchGetOwnersRequest) returns (BatchGetOwnersResponse);
+}

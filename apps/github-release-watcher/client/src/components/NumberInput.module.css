@@ -1,0 +1,87 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* In compact mode the input + unit-hint pair sits inline with sibling
+   controls. Use a tight 4px gap inside this wrapper so the unit reads as
+   part of the input (e.g., "30 min"), with a clear 8px gap (the parent
+   .controls gap) separating the pair from the next control. Without this
+   asymmetry, the unit label floats ambiguously between the input and the
+   next sibling. */
+.compact {
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+}
+
+.label {
+  font-size: 12px;
+  color: var(--rootsdk-text-secondary);
+  font-weight: 500;
+}
+
+.input {
+  min-height: 44px;
+  padding: 10px 16px;
+  background-color: var(--rootsdk-input);
+  border: 1px solid var(--rootsdk-border);
+  border-radius: 12px;
+  color: var(--rootsdk-text-primary);
+  font-size: 14px;
+  line-height: 20px;
+  transition: border-color 150ms;
+  /* Default sizing for wide inputs in vertical layouts. The compact form
+     overrides this below so the inline interval picker is narrow. */
+  width: 100%;
+}
+
+/* Compact: narrower input, no auto-grow. Used inline in RepoRow alongside
+   the prerelease toggle, Test, and Remove controls. Right-aligned because
+   the number sits next to its unit suffix ("minutes") — flush-right makes
+   the digits read directly against the unit, the way "30 minutes" would
+   read in prose, instead of leaving a gap between the number and the unit. */
+.compact .input {
+  width: 88px;
+  min-height: 40px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  text-align: right;
+}
+
+/* Insert a gap between the digits and the native up/down spinner.
+   Padding-right on the input would push the whole spinner outward (toward
+   the input's right edge) instead of separating the digits from it; a
+   left margin on the spinner pseudo-element is what actually wedges space
+   between the two. WebKit-only selector — Firefox renders the spinner
+   differently and this rule is harmlessly ignored there. */
+.compact .input::-webkit-inner-spin-button {
+  margin-left: 8px;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--rootsdk-brand-primary);
+}
+
+.input::placeholder {
+  color: var(--rootsdk-text-tertiary);
+}
+
+/* Sibling-of-input unit label. Explicit font-family + weight so it matches
+   other inline labels (e.g., the "pre-release" toggle text in RepoRow);
+   without explicit values, sibling spans can pick up subtly different
+   metrics from the adjacent <input> control's UA styling. */
+.hint {
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  color: var(--rootsdk-text-secondary);
+}
+
+.rangeHint {
+  font-size: 11px;
+  color: var(--rootsdk-text-tertiary);
+}

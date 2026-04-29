@@ -1,0 +1,32 @@
+{
+  "name": "@rootsdk-recipe/app-settings-flat-values",
+  "author": "Root Communications, Inc.",
+  "description": "Recipe: persist flat app-internal settings in KV with admin-gated writes, cache + invalidate on change. App-only — bots configure via globalSettings only.",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@rootsdk/server-app": "0.17.1-alpha.6",
+    "@rootsdk/client-app": "0.17.1-alpha.6",
+    "@appsettingsflatvalues/gen-client": "file:./networking/gen/client",
+    "@appsettingsflatvalues/gen-server": "file:./networking/gen/server",
+    "@appsettingsflatvalues/gen-shared": "file:./networking/gen/shared"
+  },
+  "devDependencies": {
+    "@rootsdk/dev-tools": "0.17.1-alpha.6",
+    "typescript": "^5.8.2"
+  },
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "clean": "node clean.js"
+  },
+  "workspaces": {
+    "packages": [
+      "./networking",
+      "./server",
+      "./client"
+    ]
+  }
+}

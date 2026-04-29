@@ -1,0 +1,20 @@
+{
+  "id": "xxxxxxxxxxxxxxxxxxxxxx",
+  "version": "1.0.0",
+  "package": {
+    "server": {
+      "launch": "server/dist/main.js",
+      "deploy": [
+        "server/dist"
+      ],
+      "nodeModules": [
+        "node_modules"
+      ]
+    }
+  },
+  "permissions": {
+    "channel": {
+      "createMessage": true
+    }
+  }
+}

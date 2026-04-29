@@ -1,0 +1,66 @@
+syntax = "proto3";
+package externalhttpfetch;
+
+// ============================================================================
+// UuidFetchService — call an external HTTP API and return the result.
+//
+// The toy endpoint (`https://httpbin.org/uuid`) is a placeholder. Fork the
+// recipe and substitute whatever upstream you actually call — the structure
+// (one RPC, four typed failure modes, one parse-and-validate step) carries
+// forward to any HTTP integration.
+//
+// Four failure modes are typed and reported back to the client:
+//   - TIMEOUT: the request didn't return within the deadline (headers OR
+//     body). Retryable.
+//   - NETWORK: DNS, connection refused, TLS — couldn't reach the upstream
+//     at all. Retryable.
+//   - UPSTREAM_UNAVAILABLE: reached the upstream but it returned 5xx or
+//     429. Retryable (often after a backoff or Retry-After delay).
+//   - BAD_RESPONSE: reached the upstream and got a 4xx, malformed JSON,
+//     or a body missing required fields. NOT retryable — same call gets
+//     the same answer.
+// Clients match on the numeric code and render the appropriate UX —
+// production-grade integrations always distinguish these because the
+// retry decision depends on which one fired.
+// ============================================================================
+
+message FetchUuidRequest {}
+
+message FetchUuidResponse {
+  // The UUID returned by the upstream. Whatever the recipe's fork is
+  // calling will substitute its own response shape here — the wire format
+  // and the validation step (see server/src/uuid-fetch-service.ts) walk
+  // together.
+  string uuid = 1;
+  // Server-side timestamp at which the upstream responded, ISO 8601.
+  // Useful for clients to display freshness ("last updated 3s ago").
+  string fetched_at = 2;
+}
+
+// --- Errors -----------------------------------------------------------------
+// Positive values only — negative values are reserved for built-in SDK errors.
+
+enum UuidFetchError {
+  UUID_FETCH_ERROR_UNSPECIFIED = 0;
+  // Headers OR body didn't complete within the configured timeout.
+  // AbortController signaled the fetch to cancel; the same signal also
+  // covers the body read. Retryable.
+  UUID_FETCH_ERROR_TIMEOUT = 1;
+  // DNS / connection / TLS / transport-layer failure. fetch() threw
+  // before a response was received. Retryable.
+  UUID_FETCH_ERROR_NETWORK = 2;
+  // Reached the upstream, but it returned 5xx or 429. The request was
+  // well-formed; the upstream is unhappy. Retryable (often after a
+  // backoff or Retry-After delay).
+  UUID_FETCH_ERROR_UPSTREAM_UNAVAILABLE = 3;
+  // Reached the upstream and got a 4xx (other than 429), malformed JSON,
+  // or a body missing required fields. Don't retry on this — the
+  // contract is broken and retry won't fix it.
+  UUID_FETCH_ERROR_BAD_RESPONSE = 4;
+}
+
+// --- Service ---------------------------------------------------------------
+
+service UuidFetchService {
+  rpc FetchUuid(FetchUuidRequest) returns (FetchUuidResponse);
+}

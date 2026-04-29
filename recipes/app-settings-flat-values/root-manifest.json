@@ -1,0 +1,44 @@
+{
+  "id": "xxxxxxxxxxxxxxxxxxxxxx",
+  "version": "1.0.0",
+  "package": {
+    "client": {
+      "deploy": "client/dist"
+    },
+    "server": {
+      "launch": "server/dist/main.js",
+      "deploy": [
+        "server/dist",
+        "networking/gen/server"
+      ],
+      "nodeModules": [
+        "node_modules"
+      ]
+    }
+  },
+  "settings": {
+    "groups": [
+      {
+        "key": "general",
+        "title": "General",
+        "items": [
+          {
+            "key": "admins",
+            "title": "App admins",
+            "description": "Roles and members who can edit this app's Settings page. The community owner is always elevated regardless of this setting.",
+            "required": false,
+            "confirmation": "Save",
+            "roleOrMember": {
+              "selectBehavior": "roleMultiAndUserMulti"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "channel": {
+      "createMessage": true
+    }
+  }
+}

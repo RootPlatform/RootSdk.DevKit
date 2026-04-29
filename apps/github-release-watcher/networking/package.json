@@ -1,0 +1,6 @@
+{
+  "name": "@githubreleasewatcher/networking",
+  "scripts": {
+    "build": "rootsdk build proto"
+  }
+}

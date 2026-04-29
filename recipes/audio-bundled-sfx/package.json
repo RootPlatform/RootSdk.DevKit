@@ -1,0 +1,27 @@
+{
+  "name": "@rootsdk-recipe/audio-bundled-sfx",
+  "author": "Root Communications, Inc.",
+  "description": "Recipe: bundle short WAV files with the client and play them on user interaction. Covers Vite asset import, AudioContext lazy-init under the autoplay policy, and decode-once buffer caching.",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@rootsdk/server-app": "0.17.1-alpha.6"
+  },
+  "devDependencies": {
+    "@rootsdk/dev-tools": "0.17.1-alpha.6",
+    "typescript": "^5.8.2"
+  },
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "clean": "node clean.js"
+  },
+  "workspaces": {
+    "packages": [
+      "./server",
+      "./client"
+    ]
+  }
+}

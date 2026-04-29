@@ -1,0 +1,86 @@
+.button {
+  min-height: 44px;
+  border-radius: 9999px;
+  padding: 8px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  transition: opacity 200ms;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  /* Never shrink the button or wrap its text. In a flex parent next to
+     a wider sibling, the default flex-shrink: 1 + default whitespace
+     handling lets the button squeeze and stack its label across two
+     lines. Both rules together guarantee the button preserves its
+     natural content size; the sibling is the one that should give up
+     width. */
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* High-contrast neutral pill — text-primary as bg + background-tertiary as
+   text. The two tokens sit on opposite ends of the contrast scale and swap
+   with the theme, so a single recipe gives you a white-on-dark pill in
+   dark mode and a black-on-light pill in light mode automatically. Matches
+   Root's native UI. See design-system-reference.md "button-primary". */
+.primary {
+  background-color: var(--rootsdk-text-primary);
+  color: var(--rootsdk-background-tertiary);
+}
+
+.outline {
+  background-color: transparent;
+  color: var(--rootsdk-text-primary);
+  border: 1px solid var(--rootsdk-text-tertiary);
+}
+
+.danger {
+  background-color: var(--rootsdk-error);
+  color: var(--rootsdk-text-white);
+}
+
+.text {
+  background-color: transparent;
+  color: var(--rootsdk-text-primary);
+  padding: 8px 12px;
+}
+
+/* Quiet variant: smaller, flat, tinted-bg pill for inline secondary actions.
+   Overrides the shared .button geometry (full-pill 44px tall) with a more
+   compact 8px-radius 32px-tall shape. Hover/active use bg-color shifts
+   instead of opacity (see :hover/:active overrides below) because the
+   near-transparent quiet bg makes the opacity-fade other variants use
+   look weak. */
+.quiet {
+  min-height: 32px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background-color: var(--rootsdk-highlight-light);
+  color: var(--rootsdk-text-primary);
+}
+
+.button:hover {
+  opacity: 0.7;
+}
+
+.quiet:hover {
+  opacity: 1;
+  background-color: var(--rootsdk-highlight-normal);
+}
+
+.button:active {
+  opacity: 0.5;
+  transform: scale(0.98);
+}
+
+.quiet:active {
+  opacity: 1;
+  background-color: var(--rootsdk-highlight-strong);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

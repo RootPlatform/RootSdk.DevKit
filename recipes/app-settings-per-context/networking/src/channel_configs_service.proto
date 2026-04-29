@@ -1,0 +1,123 @@
+syntax = "proto3";
+package appsettingspercontext;
+
+import "rootsdk/types.proto";
+
+// ============================================================================
+// ChannelConfigsService — admin-managed configuration **per channel**.
+//
+// Each row in the channel_configs table belongs to exactly one channel
+// (its primary key). Channels not in the table have no row at all — the
+// app's runtime code treats that as "use the app-wide defaults." This is
+// the per-context shape the canonical use case (github-release-watcher's per-repo
+// config, where a row exists only for repos the app is watching) follows.
+//
+// The toy fields below — `enabled` + `priority` — are placeholders. Fork the
+// recipe and swap them for whatever your real per-context settings need:
+//   - per-channel cooldown_seconds (rate-limit feature per channel)
+//   - per-repo branch_filter + auto_close (github-release-watcher style)
+//   - per-user notification_preferences (per-actor style)
+// The mechanic is the entity-keyed table + upsert/delete idiom; the
+// fields are domain-specific.
+//
+// This recipe is APP-ONLY. Bots configure exclusively through
+// globalSettings because they have no UI surface to render a per-context
+// editor. See the bot configuration explanation for that path.
+// ============================================================================
+
+// --- Row shape -------------------------------------------------------------
+
+message ChannelConfig {
+  // Primary key — the platform channel id this row configures.
+  string channel_id = 1;
+  bool enabled = 2;
+  uint32 priority = 3;     // 0–100; admin-tunable importance/weight
+  string updated_at = 4;   // ISO 8601 timestamp of the last write
+}
+
+// --- Read ------------------------------------------------------------------
+
+message ListChannelConfigsRequest {}
+
+message ListChannelConfigsResponse {
+  // Sorted newest-first by updated_at (stable across reads thanks to the
+  // composite (updated_at DESC, channel_id DESC) index in db.ts).
+  repeated ChannelConfig configs = 1;
+
+  // Whether the caller may call Upsert / Delete. Carried on the read so
+  // a client renders edit affordances in a single round trip — same
+  // pattern as the prior recipes in the settings series.
+  bool is_admin = 2;
+}
+
+// --- Mutations -------------------------------------------------------------
+
+// Upsert: insert if no row exists for channel_id, or fully replace if one
+// does. Full-replace semantics — the caller sends the whole record every
+// time. This biases toward simpler SQL (`INSERT … ON CONFLICT DO UPDATE`,
+// one statement) at the cost of partial-update convenience. See
+// app-settings-flat-values for the partial-merge alternative (KV-backed,
+// where partial is the natural shape).
+//
+// Write-touches-updated-at: every successful upsert bumps updated_at to
+// "now", even when the supplied values are identical to the stored ones.
+// The list is sorted by updated_at DESC, so a no-op save jumps the row to
+// the top. The reference client gates Save by dirty-state so this isn't
+// observable from its UI, but a fork building a slash-command admin or a
+// programmatic admin loop should know that "write = touch". If you need
+// idempotent no-ops, compare the request to the stored row server-side and
+// skip the write when they match.
+message UpsertChannelConfigRequest {
+  string channel_id = 1;
+  bool enabled = 2;
+  uint32 priority = 3;
+}
+
+message UpsertChannelConfigResponse {
+  ChannelConfig config = 1;
+}
+
+// Delete: remove the row (channel reverts to using the app-wide defaults).
+// Idempotent — deleting a channel_id that has no row succeeds.
+message DeleteChannelConfigRequest {
+  string channel_id = 1;
+}
+
+message DeleteChannelConfigResponse {}
+
+// --- Broadcast -------------------------------------------------------------
+
+// Empty payload — clients re-fetch the full list on receipt. Fires after
+// every successful mutation and when the admins picker changes (which
+// flips is_admin without changing the underlying configs).
+message ChannelConfigsChangedEvent {}
+
+// --- Errors ----------------------------------------------------------------
+// Positive values only — negative values are reserved for built-in SDK errors.
+
+enum ChannelConfigsError {
+  CHANNEL_CONFIGS_ERROR_UNSPECIFIED = 0;
+  // Caller is not an app admin.
+  CHANNEL_CONFIGS_ERROR_NOT_ADMIN = 1;
+  // channel_id was empty/whitespace. (We don't validate that the id
+  // refers to an actual platform channel — that's a UX concern; the
+  // table accepts any non-empty string. Real apps may want stricter
+  // validation that calls into the platform's channel lookup.)
+  CHANNEL_CONFIGS_ERROR_INVALID_CHANNEL_ID = 2;
+  // priority outside the allowed 0–100 range. Tune in your fork.
+  CHANNEL_CONFIGS_ERROR_INVALID_PRIORITY = 3;
+}
+
+// --- Service ---------------------------------------------------------------
+
+service ChannelConfigsService {
+  rpc ListChannelConfigs(ListChannelConfigsRequest) returns (ListChannelConfigsResponse);
+
+  // Admin-only.
+  rpc UpsertChannelConfig(UpsertChannelConfigRequest) returns (UpsertChannelConfigResponse);
+
+  // Admin-only.
+  rpc DeleteChannelConfig(DeleteChannelConfigRequest) returns (DeleteChannelConfigResponse);
+
+  rpc BroadcastChannelConfigsChanged(ChannelConfigsChangedEvent) returns (rootsdk.Void);
+}

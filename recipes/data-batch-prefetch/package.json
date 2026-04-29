@@ -1,0 +1,32 @@
+{
+  "name": "@rootsdk-recipe/data-batch-prefetch",
+  "author": "Root Communications, Inc.",
+  "description": "Recipe: avoid N+1 lookups when a list of items references related entities — server batch RPC with map response + client-side ID deduplication.",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@rootsdk/server-app": "0.17.1-alpha.6",
+    "@rootsdk/client-app": "0.17.1-alpha.6",
+    "@databatchprefetch/gen-client": "file:./networking/gen/client",
+    "@databatchprefetch/gen-server": "file:./networking/gen/server",
+    "@databatchprefetch/gen-shared": "file:./networking/gen/shared"
+  },
+  "devDependencies": {
+    "@rootsdk/dev-tools": "0.17.1-alpha.6",
+    "typescript": "^5.8.2"
+  },
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "clean": "node clean.js"
+  },
+  "workspaces": {
+    "packages": [
+      "./networking",
+      "./server",
+      "./client"
+    ]
+  }
+}

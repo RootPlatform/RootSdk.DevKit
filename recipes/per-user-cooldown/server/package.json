@@ -1,0 +1,16 @@
+{
+  "name": "@rootsdk-recipe/per-user-cooldown-server",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/sqlite3": "^3.1.11"
+  },
+  "scripts": {
+    "build": "tsc",
+    "server": "rootsdk start devhost --project-folder=../"
+  }
+}

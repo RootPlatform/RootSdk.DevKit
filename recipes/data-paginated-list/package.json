@@ -1,0 +1,32 @@
+{
+  "name": "@rootsdk-recipe/data-paginated-list",
+  "author": "Root Communications, Inc.",
+  "description": "Recipe: paginate a SQLite-backed list with cursor-based queries and accumulate pages on the client. Composes server-app-data-store + networking-app-services + client-app-services.",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@rootsdk/server-app": "0.17.1-alpha.6",
+    "@rootsdk/client-app": "0.17.1-alpha.6",
+    "@datapaginatedlist/gen-client": "file:./networking/gen/client",
+    "@datapaginatedlist/gen-server": "file:./networking/gen/server",
+    "@datapaginatedlist/gen-shared": "file:./networking/gen/shared"
+  },
+  "devDependencies": {
+    "@rootsdk/dev-tools": "0.17.1-alpha.6",
+    "typescript": "^5.8.2"
+  },
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "clean": "node clean.js"
+  },
+  "workspaces": {
+    "packages": [
+      "./networking",
+      "./server",
+      "./client"
+    ]
+  }
+}

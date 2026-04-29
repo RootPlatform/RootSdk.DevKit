@@ -1,0 +1,8 @@
+{
+  "source": ["./**/*.proto"],
+  "protoPaths": ["./src"],
+  "outputFolder": "./gen",
+  "scope": "@peruser-cooldown",
+  "serverPackageName": "gen-server",
+  "sharedPackageName": "gen-shared"
+}

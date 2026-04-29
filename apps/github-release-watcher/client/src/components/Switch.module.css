@@ -1,0 +1,36 @@
+.switch {
+  appearance: none;
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background-color: var(--rootsdk-highlight-normal);
+  border: none;
+  border-radius: 9999px;
+  padding: 0;
+  cursor: pointer;
+  transition: background-color 150ms;
+  flex-shrink: 0;
+}
+
+.switch[data-state="checked"] {
+  background-color: var(--rootsdk-brand-primary);
+}
+
+.switch:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.thumb {
+  display: block;
+  width: 20px;
+  height: 20px;
+  background-color: var(--rootsdk-text-primary);
+  border-radius: 50%;
+  transition: transform 150ms;
+  transform: translateX(2px);
+}
+
+.switch[data-state="checked"] .thumb {
+  transform: translateX(22px);
+}

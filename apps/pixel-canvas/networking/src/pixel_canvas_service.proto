@@ -78,22 +78,22 @@ message CanvasLimits {
 
 enum PixelCanvasError {
   PIXEL_CANVAS_ERROR_UNSPECIFIED = 0;
-  NOT_ADMIN = 1;
+  PIXEL_CANVAS_ERROR_NOT_ADMIN = 1;
   // PlacePixel attempted before the caller's cooldown elapsed. Client
   // should surface this as "wait Ns" in the action panel — though under
   // normal use the client's countdown blocks the call before it ever
   // reaches the server.
-  COOLDOWN_NOT_ELAPSED = 2;
+  PIXEL_CANVAS_ERROR_COOLDOWN_NOT_ELAPSED = 2;
   // PlacePixel x/y is outside the current canvas bounds. Stale client
   // (admin shrunk the canvas mid-session) or hostile request.
-  INVALID_COORDINATES = 3;
+  PIXEL_CANVAS_ERROR_INVALID_COORDINATES = 3;
   // PlacePixel palette_index is out of bounds for the server's palette
   // (PALETTE.length). Wire is indexed (see PixelData.palette_index)
   // so this is a simple integer bounds check, not a hex-string
   // membership test.
-  INVALID_COLOR = 4;
+  PIXEL_CANVAS_ERROR_INVALID_COLOR = 4;
   // UpdateSettings cooldown_seconds or canvas_size out of allowed range.
-  INVALID_SETTINGS = 5;
+  PIXEL_CANVAS_ERROR_INVALID_SETTINGS = 5;
 }
 
 // --- Member-facing RPCs -----------------------------------------------------
