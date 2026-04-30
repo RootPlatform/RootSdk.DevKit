@@ -1,0 +1,32 @@
+/* Shell — single-column on mobile, two-column on desktop. The Sidebar
+   handles its own desktop-only `display` rule, so the grid degenerates
+   to one column whenever Sidebar collapses. */
+
+.shell {
+  display: grid;
+  grid-template-columns: 1fr;
+  min-height: 100dvh;
+}
+
+@media (min-width: 960px) {
+  .shell {
+    grid-template-columns: 240px 1fr;
+  }
+}
+
+.contentColumn {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.content {
+  flex: 1;
+  padding: 16px;
+}
+
+@media (min-width: 640px) {
+  .content {
+    padding: 24px;
+  }
+}

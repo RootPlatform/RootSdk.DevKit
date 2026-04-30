@@ -72,11 +72,11 @@ Here, you'll implement the `add` method in your existing service class.
 	```ts
 	async add(request: VoteAddRequest, client: Client): Promise<VoteAddResponse> {
 	  if (request.choice === "A")
-	    VoteService.tallyA++;
+	    this.tallyA++;
 	  else if (request.choice === "B")
-	    VoteService.tallyB++;
+	    this.tallyB++;
 
-	  const tally: Tally = { a: VoteService.tallyA, b: VoteService.tallyB };
+	  const tally: Tally = { a: this.tallyA, b: this.tallyB };
 
 	  const response: VoteAddResponse = { tally: tally };
 	  return response;
@@ -86,7 +86,7 @@ Here, you'll implement the `add` method in your existing service class.
 
 ## Client
 
-On the client, you'll need to add two buttons with click event handlers. When a member clicks either button, you'll send that vote to the server and use the returned `VoteResponse` object to update both vote counts in your UI.
+On the client, you'll need to add two buttons with click event handlers. When a member clicks either button, you'll send that vote to the server and use the returned `VoteAddResponse` object to update both vote counts in your UI.
 
 1. Open `client/src/App.tsx`.
 

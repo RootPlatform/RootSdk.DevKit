@@ -1,0 +1,41 @@
+/* SubTabs — underline-style tab strip used by Settings sub-tabs and the
+   Analytics range picker. Single horizontal scroll on overflow keeps it
+   usable on narrow viewports. */
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--rootsdk-border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--rootsdk-text-secondary);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 150ms, border-color 150ms;
+  /* 44px touch target via padding + line-height. */
+  min-height: 44px;
+}
+
+.tab:hover {
+  color: var(--rootsdk-text-primary);
+}
+
+.tabActive {
+  color: var(--rootsdk-text-primary);
+  border-bottom-color: var(--rootsdk-brand-primary);
+}

@@ -129,7 +129,6 @@ On the server, your job is to code a class that inherits from `VoteServiceBase` 
 	**Show code**
 
 	```ts
-	import { VoteResponse } from "@showdown/gen-shared";
 	import { Tally, VoteGetRequest, VoteGetResponse } from "@showdown/gen-shared";
 	import { VoteServiceBase } from "@showdown/gen-server";
 	```
@@ -141,8 +140,8 @@ On the server, your job is to code a class that inherits from `VoteServiceBase` 
 	import { Client } from "@rootsdk/server-app";
 	
 	export class VoteService extends VoteServiceBase {
-	  private static tallyA = 0;
-	  private static tallyB = 0;
+	  private tallyA = 0;
+	  private tallyB = 0;
 
 	  async get(request: VoteGetRequest, client: Client): Promise<VoteGetResponse> {
 	    // Create a Tally object
@@ -163,11 +162,11 @@ On the server, your job is to code a class that inherits from `VoteServiceBase` 
 	import { VoteServiceBase } from "@showdown/gen-server";
 
 	export class VoteService extends VoteServiceBase {
-	  private static tallyA = 0;
-	  private static tallyB = 0;
+	  private tallyA = 0;
+	  private tallyB = 0;
 
 	  async get(request: VoteGetRequest, client: Client): Promise<VoteGetResponse> {
-	    const tally: Tally = { a: VoteService.tallyA, b: VoteService.tallyB };
+	    const tally: Tally = { a: this.tallyA, b: this.tallyB };
 
 	    const response: VoteGetResponse = { tally: tally };
 
@@ -216,19 +215,19 @@ You don't need to register the client side of the service, Root automatically ge
 	import { Tally, VoteGetRequest, VoteGetResponse } from "@showdown/gen-shared";
 
 	const App: React.FC = () => {
-	const [tally, setTally] = useState<Tally>({ a: 0, b: 0 });
+	  const [tally, setTally] = useState<Tally>({ a: 0, b: 0 });
 
-	useEffect(() => {
-	  const initialize = async () => {
-	    const request: VoteGetRequest = {};
+	  useEffect(() => {
+	    const initialize = async () => {
+	      const request: VoteGetRequest = {};
 
-	    const response: VoteGetResponse = // TODO: call the get method on the voteServiceClient object
+	      const response: VoteGetResponse = // TODO: call the get method on the voteServiceClient object
 
-	    setTally(response.tally!);
-	  };
+	      setTally(response.tally!);
+	    };
 
-	  initialize();
-	}, []);
+	    initialize();
+	  }, []);
 
 	  return (
 	    <div>

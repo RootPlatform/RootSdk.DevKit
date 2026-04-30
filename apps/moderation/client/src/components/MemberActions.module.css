@@ -1,0 +1,34 @@
+.actions {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.button {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: var(--rootsdk-text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: color 150ms, background-color 150ms;
+}
+
+.button:hover {
+  color: var(--rootsdk-error);
+  background-color: var(--rootsdk-highlight-light);
+}
+
+.confirmWrap {
+  /* When confirming, expand inline so the prompt has room to read. */
+  display: block;
+  min-width: 280px;
+}
+
+.error {
+  font-size: 11px;
+  color: var(--rootsdk-error);
+  margin-top: 4px;
+}

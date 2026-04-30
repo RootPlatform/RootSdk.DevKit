@@ -1,0 +1,101 @@
+/* Sidebar — desktop-only static left column. Hidden below the desktop
+   breakpoint via `display: none` so the parent grid collapses to one
+   column and the MobileHeader takes over. */
+
+.sidebar {
+  display: none;
+}
+
+@media (min-width: 960px) {
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    width: 240px;
+    height: 100dvh;
+    position: sticky;
+    top: 0;
+    border-right: 1px solid var(--rootsdk-border);
+    background: var(--rootsdk-background-secondary);
+    overflow-y: auto;
+  }
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid var(--rootsdk-border);
+}
+
+.identityText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.identityTitle {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--rootsdk-text-primary);
+  line-height: 1.2;
+}
+
+.identitySubtitle {
+  margin: 0;
+  font-size: 12px;
+  color: var(--rootsdk-text-tertiary);
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 8px;
+  flex: 1;
+}
+
+.navItem {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--rootsdk-text-secondary);
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 150ms, color 150ms;
+  min-height: 44px;
+}
+
+.navItem:hover {
+  background: var(--rootsdk-highlight-light);
+  color: var(--rootsdk-text-primary);
+}
+
+.navItemActive {
+  background: var(--rootsdk-highlight-normal);
+  color: var(--rootsdk-text-primary);
+}
+
+.navItemActive:hover {
+  background: var(--rootsdk-highlight-normal);
+}
+
+.navIcon {
+  flex-shrink: 0;
+  color: inherit;
+}
+
+.footer {
+  padding: 12px 16px;
+  border-top: 1px solid var(--rootsdk-border);
+  font-size: 11px;
+  color: var(--rootsdk-text-tertiary);
+}

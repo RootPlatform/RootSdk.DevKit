@@ -11,7 +11,7 @@ import { QueryError } from "../components/QueryError";
 import { AdminOnly } from "../components/AdminOnly";
 import { Button } from "../components/Button";
 import { TextInput } from "../components/TextInput";
-import { Icon } from "../components/Icon";
+import { ChevronDown, ChevronUp, Pencil, X } from "lucide-react";
 import { AutoSaveStatus } from "../components/AutoSaveStatus";
 import { useDebouncedMutation } from "../lib/useDebouncedMutation";
 import { withClientRetry } from "../lib/retry";
@@ -429,8 +429,7 @@ const GroupCard: React.FC<GroupCardProps> = ({
             aria-label={`Edit ${group.title} group title`}
           >
             <span className={styles.groupTitleText}>{group.title}</span>
-            <Icon
-              name="Pencil"
+            <Pencil
               size={14}
               className={styles.groupTitleEditHint}
             />
@@ -445,7 +444,7 @@ const GroupCard: React.FC<GroupCardProps> = ({
             aria-label="Move group up"
             title="Move up"
           >
-            <Icon name="ChevronUp" size={16} />
+            <ChevronUp size={16} />
           </button>
           <button
             type="button"
@@ -455,7 +454,7 @@ const GroupCard: React.FC<GroupCardProps> = ({
             aria-label="Move group down"
             title="Move down"
           >
-            <Icon name="ChevronDown" size={16} />
+            <ChevronDown size={16} />
           </button>
           <button
             type="button"
@@ -464,7 +463,7 @@ const GroupCard: React.FC<GroupCardProps> = ({
             aria-label="Delete group"
             title="Delete group"
           >
-            <Icon name="Close" size={16} />
+            <X size={16} />
           </button>
         </div>
       </div>
@@ -510,7 +509,7 @@ const GroupCard: React.FC<GroupCardProps> = ({
                     aria-label={`Remove ${role.name}`}
                     title="Remove from group"
                   >
-                    <Icon name="Close" size={14} />
+                    <X size={14} />
                   </button>
                 </div>
                 <TextInput
@@ -696,7 +695,7 @@ const RolePickerModal: React.FC<ModalProps> = ({
             onClick={onClose}
             aria-label="Close"
           >
-            <Icon name="Close" size={16} />
+            <X size={16} />
           </button>
         </div>
         {!roles && !fetchError ? (

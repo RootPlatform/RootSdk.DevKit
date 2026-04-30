@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Trophy } from "lucide-react";
 import { rootClient } from "@rootsdk/client-app";
 import {
   leaderboardServiceClient,
@@ -197,7 +198,7 @@ export const HomeView: React.FC = () => {
   if (entries.length === 0 && (!myStats || myStats.totalXp === 0)) {
     return (
       <EmptyState
-        iconName="Trophy"
+        icon={<Trophy size={48} />}
         title="No activity yet"
         body="Post in eligible channels to start earning XP."
       />

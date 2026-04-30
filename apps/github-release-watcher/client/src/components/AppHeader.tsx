@@ -1,6 +1,6 @@
 import React from "react";
+import { ChevronLeft, Settings } from "lucide-react";
 import styles from "./AppHeader.module.css";
-import { Icon } from "./Icon";
 import { useFeed } from "../contexts/FeedContext";
 
 // ============================================================================
@@ -35,7 +35,7 @@ export const AppHeader: React.FC<Props> = ({ mode, onOpenSettings, onBack }) => 
           onClick={onBack}
           aria-label="Back"
         >
-          <Icon name="ChevronLeft" size={20} />
+          <ChevronLeft size={20} />
           <span className={styles.backLabel}>Settings</span>
         </button>
       </header>
@@ -54,7 +54,7 @@ export const AppHeader: React.FC<Props> = ({ mode, onOpenSettings, onBack }) => 
         >
           {/* Decorative inside a labeled button — the parent's
               aria-label="Open settings" is what AT announces. */}
-          <Icon name="Settings" size={20} />
+          <Settings size={20} />
         </button>
       )}
     </header>

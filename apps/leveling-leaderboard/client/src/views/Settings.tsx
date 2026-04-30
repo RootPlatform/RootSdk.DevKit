@@ -12,8 +12,8 @@ import styles from "./Settings.module.css";
 import { AdminOnly } from "../components/AdminOnly";
 import { Loader } from "../components/Loader";
 import { QueryError } from "../components/QueryError";
+import { Info } from "lucide-react";
 import { Button } from "../components/Button";
-import { Icon } from "../components/Icon";
 import { SettingsTabs, type SettingsTabKey } from "../components/SettingsTabs";
 import { ScoringTab } from "./settings/ScoringTab";
 import { ChannelsTab } from "./settings/ChannelsTab";
@@ -111,7 +111,7 @@ export const Settings: React.FC = () => {
           <div className={styles.topInner}>
             {staleNotice && (
               <div className={styles.staleNotice} role="status">
-                <Icon name="Info" size={16} />
+                <Info size={16} />
                 <span className={styles.staleNoticeText}>
                   Settings were changed by another admin.
                 </span>

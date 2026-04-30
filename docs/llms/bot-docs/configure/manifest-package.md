@@ -25,7 +25,7 @@ Bots are server-only, so the manifest declares a single `server` section:
       "deploy": [
         "dist"
       ],
-      "node_modules": [
+      "nodeModules": [
         "node_modules"
       ]
     }
@@ -39,14 +39,14 @@ Bots are server-only, so the manifest declares a single `server` section:
 | -------- | ---- | -------- | ----------- |
 | `launch` | `string` | Yes | Path to the JavaScript entry point that Root executes to start your server (e.g., `dist/main.js`). Must be a `.js` file. |
 | `deploy` | `string[]` | Yes | Directories to include in the server package, relative to the project root. Typically your compiled output (e.g., `["dist"]`). |
-| `node_modules` | `string[]` | Yes | `node_modules` directories to bundle with your server. These are your production dependencies (e.g., `["node_modules"]`). |
+| `nodeModules` | `string[]` | Yes | `node_modules` directories to bundle with your server. These are your production dependencies (e.g., `["node_modules"]`). |
 
 ## How packaging works
 
 When you push, the CLI:
 
 1. Reads the paths from your manifest.
-2. Creates `server.tar.gz` from the `deploy` and `node_modules` directories.
+2. Creates `server.tar.gz` from the `deploy` and `nodeModules` directories.
 3. Bundles it into a `.pkg` file along with your `root-manifest.json`.
 
 The `deploy` array can include multiple directories if your compiled output spans more than one folder.

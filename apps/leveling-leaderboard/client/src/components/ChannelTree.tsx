@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
+import { ChevronRight } from "lucide-react";
 import styles from "./ChannelTree.module.css";
-import { Icon } from "./Icon";
 
 // ============================================================================
 // ChannelTree — expandable groups + channel toggles for Settings → Channels.
@@ -71,7 +71,7 @@ export const ChannelTree: React.FC<Props> = ({ groups, onToggle }) => {
               onClick={() => toggleGroup(group.channelGroupId)}
             >
               <span className={[styles.chevron, isOpen ? styles.chevronOpen : ""].join(" ")}>
-                <Icon name="ChevronRight" size={14} />
+                <ChevronRight size={14} />
               </span>
               <span className={styles.groupName}>{group.name}</span>
               <span className={styles.badge}>

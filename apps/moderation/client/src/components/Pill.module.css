@@ -1,0 +1,30 @@
+/* Pill — small inline chip used for `# channel-name` references and
+   inline matched-term display. Distinct from Badge: Pills are content
+   markers, Badges are status indicators. */
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.4;
+  border-radius: 4px;
+  background: var(--rootsdk-background-tertiary);
+  color: var(--rootsdk-text-primary);
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tone-info {
+  background: color-mix(in srgb, var(--rootsdk-info) 12%, transparent);
+  color: var(--rootsdk-info);
+}
+
+.prefix {
+  color: var(--rootsdk-text-tertiary);
+  font-weight: 500;
+}

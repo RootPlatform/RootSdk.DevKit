@@ -1,0 +1,59 @@
+/* Panel — the canonical Root header+body container. Maps to the `panel`
+   componentPattern in apps/themes/.../design-tokens.json:
+     background: --rootsdk-background-secondary
+     border-radius: 12px
+     padding: 16px
+     min-height: 80px (we don't enforce — content drives height)
+   The optional bordered header row separates a title strip from the body. */
+
+.panel {
+  background: var(--rootsdk-background-secondary);
+  border: 1px solid var(--rootsdk-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--rootsdk-border);
+}
+
+.headerText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--rootsdk-text-primary);
+}
+
+.description {
+  margin: 0;
+  font-size: 13px;
+  color: var(--rootsdk-text-secondary);
+}
+
+.action {
+  flex-shrink: 0;
+}
+
+.body {
+  padding: 20px;
+}
+
+.bodyTight {
+  padding: 12px 20px;
+}
+
+.bodyFlush {
+  padding: 0;
+}

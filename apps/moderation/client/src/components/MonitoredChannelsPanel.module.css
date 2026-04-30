@@ -1,0 +1,50 @@
+/* MonitoredChannelsPanel — Panel wrapper around a responsive grid of
+   channel pills. The grid auto-fills with min 160px columns, so a 320px
+   viewport gets one column, ~640px gets three, ~1024px gets five+.
+   Mirrors the first-party app's "Monitored Channels" panel.
+
+   Empty/all-channels state shows a single italicized hint row instead of
+   the grid, since "the empty list means all" is meaningful and shouldn't
+   feel like the panel forgot to render. */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 8px;
+}
+
+.pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  background: var(--rootsdk-background-tertiary);
+  border-radius: 6px;
+  font-size: 13px;
+  min-width: 0;
+}
+
+.pillName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--rootsdk-text-primary);
+}
+
+.pillPrefix {
+  color: var(--rootsdk-text-tertiary);
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.allHint {
+  font-size: 13px;
+  color: var(--rootsdk-text-secondary);
+  font-style: italic;
+}
+
+.footer {
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--rootsdk-text-tertiary);
+}

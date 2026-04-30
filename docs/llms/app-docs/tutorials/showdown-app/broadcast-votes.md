@@ -84,11 +84,11 @@ On your server, you need to call the new broadcast method whenever the vote coun
 	```ts
 	async add(request: VoteAddRequest, client: Client): Promise<VoteAddResponse> {
 	  if (request.choice === "A")
-	    VoteService.tallyA++;
+	    this.tallyA++;
 	  else if (request.choice === "B")
-	    VoteService.tallyB++;
+	    this.tallyB++;
 
-	  const tally: Tally = { a: VoteService.tallyA, b: VoteService.tallyB };
+	  const tally: Tally = { a: this.tallyA, b: this.tallyB };
 
 	  const event: VoteAddedEvent = { tally: tally };
 	  this.broadcastVoteAdded(event, "all", client); // send the updated values everyone except the client that called us

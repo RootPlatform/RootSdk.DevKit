@@ -1,7 +1,7 @@
 import React from "react";
+import { AlertCircle } from "lucide-react";
 import styles from "./QueryError.module.css";
 import { Button } from "./Button";
-import { Icon } from "./Icon";
 
 // Consistent error state with a Retry button. See DESIGN.md View states.
 
@@ -14,7 +14,7 @@ export const QueryError: React.FC<Props> = ({ message, onRetry }) => {
   return (
     <div className={styles.error} role="alert">
       <span className={styles.icon}>
-        <Icon name="Error" size={32} />
+        <AlertCircle size={32} />
       </span>
       <p className={styles.message}>
         {message ?? "Something went wrong."}

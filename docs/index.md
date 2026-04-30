@@ -28,7 +28,6 @@ Cross-cutting behaviours, resolution rules, and lifecycle semantics. Load the li
 - **How packaging works**: When you push, the CLI: → [Manifest `package`](llms/app-docs/configure/manifest-package.md)
 - **How the developer log works**: When your server writes to stdout or stderr, Root captures the output and makes it visible in the Developer Portal. → [Developer log](llms/app-docs/debug/logging-developer.md)
 - **How Root’s client-server model works**: Root Apps have three main parts that you'll code: → [Plan your App's client-server networking API](llms/app-docs/design/client-server-networking.md)
-- **How do Global Settings work?**: You handle some parts. → [Choose your Global Settings](llms/app-docs/design/global-settings.md)
 - **How do permissions work?**: As a developer, you declare the permissions you need, and Root grants them to your code at runtime. → [Choose your permissions](llms/app-docs/design/permissions.md)
 - **What is the client lifecycle?**: The *client lifecycle* is the set of states your App's client moves through while running inside the Root native client. → [Client lifecycle](llms/app-docs/develop/client/client-lifecycle.md)
 - **How it works**: When a RootServerException is thrown by you or by the Root infrastructure, Root serializes it and sends it across the network to your client. → [Exception handling](llms/app-docs/develop/networking/handle-exceptions.md)
@@ -183,10 +182,10 @@ Individual articles covering configuration, design, development, and tutorials. 
 - [Manifest `version`](llms/app-docs/configure/manifest-version.md) **[guide]**: Semantic version string for your release. Required.
 - [Developer mode](llms/app-docs/debug/developer-mode.md) **[guide]**: Copy entity IDs from the Root client for use in API calls and debugging.
 - [Developer log](llms/app-docs/debug/logging-developer.md) **[guide]**: Debug your deployed server code by viewing console output in the Developer Portal.
+- [Choose your settings](llms/app-docs/design/app-settings.md) **[guide]**: Decide what your app lets people configure, who can change each thing, and where each value lives.
 - [Choose your UI framework](llms/app-docs/design/choose-ui-framework.md) **[guide]**: The client side of a Root App is a regular web app. It runs inside a Chromium-based container and starts by loading your `index.html` file.
 - [Plan your App's client-server networking API](llms/app-docs/design/client-server-networking.md) **[guide]**: Root Apps follow a **client-server model** with a **thin client**. Your server does most of the work and is the source of truth for all data.
 - [Define your App's features](llms/app-docs/design/define-your-features.md) **[guide]**: Before you write code, take some time to plan. This article walks through standard planning steps, tailored for Root.
-- [Choose your Global Settings](llms/app-docs/design/global-settings.md) **[guide]**: _Global Settings_ let community members with the `Manage Apps` permission configure how your code behaves, either during installation or later.
 - [Handle failures in a real-time environment](llms/app-docs/design/handle-real-time-failures.md) **[guide]**: Real-time software, by its nature, involves rapid data changes and constant synchronization. Networking failures and disconnects will happen.
 - [Integrate with the Root platform](llms/app-docs/design/integrate-with-platform.md) **[guide]**: Your App runs inside Root—it should feel like part of Root. That means using the same tools and patterns the platform uses to interact with community...
 - [Is your App right for Root?](llms/app-docs/design/is-your-app-right-for-root.md) **[guide]**: **Root Apps** are multi-user applications with real-time updates that are installed into a community.
@@ -260,8 +259,8 @@ Individual articles covering configuration, design, development, and tutorials. 
 - [Manifest `version`](llms/bot-docs/configure/manifest-version.md) **[guide]**: Semantic version string for your release. Required.
 - [Developer mode](llms/bot-docs/debug/developer-mode.md) **[guide]**: Copy entity IDs from the Root client for use in API calls and debugging.
 - [Developer log](llms/bot-docs/debug/logging-developer.md) **[guide]**: Debug your deployed server code by viewing console output in the Developer Portal.
+- [Choose your settings](llms/bot-docs/design/bot-settings.md) **[guide]**: Decide what your bot lets a community configure and who can configure it.
 - [Define your Bot's features](llms/bot-docs/design/define-your-features.md) **[guide]**: Before you write code, take time to plan. This article covers key planning steps tailored for Root Bots.
-- [Choose your Global Settings](llms/bot-docs/design/global-settings.md) **[guide]**: _Global Settings_ let community members with the `Manage Apps` permission configure how your code behaves, either during installation or later.
 - [Is Your Bot Right for Root?](llms/bot-docs/design/is-your-bot-right-for-root.md) **[guide]**: Root Bots let you add community features without building a GUI. Bots rely entirely on Root's built-in UI and API for user interaction.
 - [Choose your permissions](llms/bot-docs/design/permissions.md) **[guide]**: Permissions control which parts of the Root Community API your code can use.
 - [Plan your Bot’s communication with the community](llms/bot-docs/design/plan-community-communication.md) **[guide]**: Even without a user interface, your Bot needs a clear communication plan. That includes deciding what to say, who to say it to, and how to send it.

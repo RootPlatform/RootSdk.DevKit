@@ -1,0 +1,54 @@
+.button {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--rootsdk-border);
+  background: var(--rootsdk-background-tertiary);
+  color: var(--rootsdk-text-primary);
+  font-weight: 500;
+  font-size: 14px;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.button:hover:not(:disabled) {
+  background: var(--rootsdk-highlight-light);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.primary {
+  background: var(--rootsdk-brand-primary);
+  border-color: var(--rootsdk-brand-primary);
+  color: var(--rootsdk-text-white);
+}
+
+.primary:hover:not(:disabled) {
+  filter: brightness(1.05);
+  background: var(--rootsdk-brand-primary);
+}
+
+.danger {
+  background: transparent;
+  border-color: var(--rootsdk-error);
+  color: var(--rootsdk-error);
+}
+
+.danger:hover:not(:disabled) {
+  background: var(--rootsdk-error);
+  color: var(--rootsdk-text-white);
+}
+
+.iconDanger {
+  background: transparent;
+  border: 0;
+  color: var(--rootsdk-error);
+  padding: 4px 8px;
+  font-size: 14px;
+}
+
+.iconDanger:hover:not(:disabled) {
+  color: var(--rootsdk-error);
+  filter: brightness(1.2);
+}

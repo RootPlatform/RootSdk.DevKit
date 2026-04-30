@@ -1,0 +1,38 @@
+/* Badge — small status pill. Five variants share one shape via a `--tone`
+   custom property; status variants pull background/border tints from the
+   tone via color-mix, so every status badge derives from a single Root
+   token (warning/error/info/brand-secondary). */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  border-radius: 4px;
+  border: 1px solid;
+  white-space: nowrap;
+}
+
+.default {
+  background: var(--rootsdk-background-tertiary);
+  color: var(--rootsdk-text-secondary);
+  border-color: var(--rootsdk-border);
+}
+
+/* Status variants — only the --tone changes; every other rule shares. */
+.info    { --tone: var(--rootsdk-info); }
+.warning { --tone: var(--rootsdk-warning); }
+.error   { --tone: var(--rootsdk-error); }
+.success { --tone: var(--rootsdk-brand-secondary); }
+
+.info,
+.warning,
+.error,
+.success {
+  background: color-mix(in srgb, var(--tone) 12%, transparent);
+  color: var(--tone);
+  border-color: color-mix(in srgb, var(--tone) 20%, transparent);
+}

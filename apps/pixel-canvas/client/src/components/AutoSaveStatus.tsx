@@ -1,6 +1,6 @@
 import React from "react";
+import { AlertCircle, X } from "lucide-react";
 import styles from "./AutoSaveStatus.module.css";
-import { Icon } from "./Icon";
 
 // ============================================================================
 // AutoSaveStatus — inline error pill for auto-save failures.
@@ -26,7 +26,7 @@ export const AutoSaveStatus: React.FC<Props> = ({
   if (!error) return null;
   return (
     <div className={`${styles.status} ${styles.errorState}`} role="alert">
-      <Icon name="Error" size={14} />
+      <AlertCircle size={14} />
       <span className={styles.text}>
         Couldn't save — {error.message || "something went wrong"}.
       </span>
@@ -39,7 +39,7 @@ export const AutoSaveStatus: React.FC<Props> = ({
         onClick={onDismissError}
         aria-label="Dismiss"
       >
-        <Icon name="Close" size={12} />
+        <X size={12} />
       </button>
     </div>
   );

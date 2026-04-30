@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { rootClient } from "@rootsdk/client-app";
+import { rootClient, ImageUriResolution } from "@rootsdk/client-app";
 import styles from "./Avatar.module.css";
 
 // ============================================================================
@@ -17,7 +17,7 @@ interface Props {
 export const Avatar: React.FC<Props> = ({ profilePictureUri, nickname, size = 40 }) => {
   const initial = nickname.trim()[0]?.toUpperCase() ?? "?";
   const src = profilePictureUri
-    ? rootClient.assets.toImageUrl(profilePictureUri, "small")
+    ? rootClient.assets.toImageUrl(profilePictureUri, ImageUriResolution.Small)
     : undefined;
 
   // Fall back to the initial if the image ever fails to load. Reset the flag

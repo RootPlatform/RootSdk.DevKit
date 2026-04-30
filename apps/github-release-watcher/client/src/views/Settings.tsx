@@ -11,7 +11,7 @@ import { Loader } from "../components/Loader";
 import { QueryError } from "../components/QueryError";
 import { RepoRow } from "../components/RepoRow";
 import { TextInput } from "../components/TextInput";
-import { Icon } from "../components/Icon";
+import { Plus } from "lucide-react";
 import { RepoProvider, useRepos } from "../contexts/RepoContext";
 import { MAX_REPOS } from "../lib/limits";
 
@@ -189,7 +189,7 @@ const SettingsBody: React.FC = () => {
             className={styles.addButton}
             onClick={handleStartAdd}
           >
-            <Icon name="Plus" size={16} />
+            <Plus size={16} />
             <span>Add repository</span>
           </button>
         )}

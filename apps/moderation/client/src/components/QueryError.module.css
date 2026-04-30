@@ -1,0 +1,16 @@
+.error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 32px;
+  color: var(--rootsdk-text-secondary);
+  text-align: center;
+}
+
+.message {
+  margin: 0;
+  font-size: 14px;
+  color: var(--rootsdk-text-primary);
+}

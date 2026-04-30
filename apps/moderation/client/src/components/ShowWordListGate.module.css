@@ -1,0 +1,47 @@
+/* ShowWordListGate — wraps a sensitive word list (slurs, profanity)
+   behind an explicit reveal button. Default-hidden because moderation
+   word lists can carry offensive content; admins should opt in to
+   seeing them.
+
+   The gate also closes accidental "everyone in the room can see admin's
+   screen with slurs in plain view" by default. */
+
+.gate {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toggleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.button {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  min-height: 44px;
+  background: var(--rootsdk-background-tertiary);
+  color: var(--rootsdk-text-primary);
+  border: 1px solid var(--rootsdk-border);
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 150ms;
+}
+
+.button:hover {
+  background: var(--rootsdk-highlight-light);
+}
+
+.help {
+  font-size: 12px;
+  color: var(--rootsdk-text-tertiary);
+  max-width: 60ch;
+  line-height: 1.5;
+}

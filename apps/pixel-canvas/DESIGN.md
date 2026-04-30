@@ -14,7 +14,7 @@ The sample teaches a different SDK shape than [`leveling-leaderboard`](../leveli
 |---|---|
 | `server/src/lib/{log,retry,safeBroadcast}.ts` | Structured log helper, `withRetry()`, broadcast error wrapper |
 | `server/src/adminCheck.ts` | Admin gating against `globalSettings.general.admins` + community owner |
-| `client/src/components/{Loader,QueryError,Button,TextInput,NumberInput,Icon,AutoSaveStatus}.tsx` | Generic UI primitives. No SDK or app-specific imports. |
+| `client/src/components/{Loader,QueryError,Button,TextInput,NumberInput,AutoSaveStatus}.tsx` | Generic UI primitives. No SDK or app-specific imports. Icons come from `lucide-react` per-import (`import { ChevronLeft, Settings } from "lucide-react"`); see [Icons](#icons). |
 | `client/src/components/{ErrorBoundary,AdminOnly,AppHeader}.tsx` | App-agnostic by design — they take SDK-bound values (telemetry hook, `isAdmin`, app title) as props. Verbatim-copyable; only the wiring in `App.tsx` needs to be redone. |
 | `client/src/lib/{retry,rootColorScheme,useDebouncedMutation}.ts` | Client-side retry, theme→`color-scheme` bridge, debounced auto-save hook |
 | `client/src/lib/relativeTime.ts` | Tiny "3 min ago" formatter — useful in any sample that surfaces timestamps |
@@ -127,6 +127,14 @@ All four broadcasts use the `"all"` audience because nothing in the payload is a
 Same shape as `leveling-leaderboard` and `self-roles`: a top-level `ErrorBoundary` in `App.tsx` catches React render errors and POSTs them through the `ReportClientError` RPC, which logs structured fields (label, message, stack, userAgent) on the server. Per-caller rate limit (30 reports per 60s window) prevents a render-error storm from flooding the log; once a user hits the cap, further drops are noted with a single `loggedDrop` warning until their window resets.
 
 The point of shipping this in a sample is to set the expectation that production Root apps log client crashes somewhere centralized — `console.error` alone is invisible to the operator. A fork would replace the structured-log sink with whatever observability backend the team uses (Sentry, Datadog, etc.) but should keep the rate-limited boundary.
+
+### Icons
+
+Icons come from `lucide-react` — one library, ~1500 glyphs, tree-shaken per-import. Components render lucide icons directly: `import { Settings } from "lucide-react"; <Settings size={20} />`. No central `Icon` wrapper, no `icons.json` snapshot.
+
+`apps/themes` remains the canonical "look like native Root chrome" reference for anyone who wants strict identity with Root's own UI surfaces. Sample apps standardize on `lucide-react` for breadth (lucide covers app-shell vocabulary like `LayoutDashboard`, `BarChart3`, `Shield` that the curated DevKit set was never designed for) and a single icon API across the family.
+
+When forking, swap `import { X } from "lucide-react"` per call site and pass the JSX element to any consuming component (`EmptyState`, `QueryError`) — those keep an `icon: ReactNode` prop so a fork that prefers a different library only changes the imports.
 
 ### Background sweep timers
 

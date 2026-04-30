@@ -1,0 +1,42 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.label {
+  font-size: 12px;
+  color: var(--rootsdk-text-secondary);
+  font-weight: 500;
+}
+
+.input {
+  min-height: 44px;
+  padding: 10px 16px;
+  background-color: var(--rootsdk-input);
+  border: 1px solid var(--rootsdk-border);
+  border-radius: 12px;
+  color: var(--rootsdk-text-primary);
+  font-size: 14px;
+  line-height: 20px;
+  transition: border-color 150ms;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--rootsdk-brand-primary);
+}
+
+.input::placeholder {
+  color: var(--rootsdk-text-tertiary);
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--rootsdk-text-tertiary);
+}
+
+.rangeHint {
+  font-size: 11px;
+  color: var(--rootsdk-text-tertiary);
+}

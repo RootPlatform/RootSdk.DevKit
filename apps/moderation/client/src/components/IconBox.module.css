@@ -1,0 +1,29 @@
+/* IconBox — tinted square containing an icon. Same `--tone` indirection
+   as Badge: a single CSS rule renders any accent variant by swapping the
+   token. The 12% background is the canonical "tinted icon box" recipe
+   used across the first-party Root apps. */
+
+.box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--tone) 12%, transparent);
+  color: var(--tone);
+}
+
+.brand    { --tone: var(--rootsdk-brand-primary); }
+.warning  { --tone: var(--rootsdk-warning); }
+.error    { --tone: var(--rootsdk-error); }
+.info     { --tone: var(--rootsdk-info); }
+.success  { --tone: var(--rootsdk-brand-secondary); }
+.neutral  {
+  /* Neutral can't lean on a status token. Use highlight-light for the
+     subtle bg + text-secondary for the icon. */
+  background: var(--rootsdk-highlight-light);
+  color: var(--rootsdk-text-secondary);
+}
+
+.size32 { width: 32px; height: 32px; }
+.size40 { width: 40px; height: 40px; }

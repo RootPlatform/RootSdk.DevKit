@@ -1,6 +1,6 @@
 import React from "react";
+import { ChevronLeft, Settings } from "lucide-react";
 import styles from "./AppHeader.module.css";
-import { Icon } from "./Icon";
 import { useLeaderboard } from "../contexts/LeaderboardContext";
 
 // ============================================================================
@@ -35,7 +35,7 @@ export const AppHeader: React.FC<Props> = ({ mode, onOpenSettings, onBack }) => 
           onClick={onBack}
           aria-label="Back"
         >
-          <Icon name="ChevronLeft" size={20} />
+          <ChevronLeft size={20} />
           <span className={styles.backLabel}>Settings</span>
         </button>
       </header>
@@ -53,10 +53,8 @@ export const AppHeader: React.FC<Props> = ({ mode, onOpenSettings, onBack }) => 
           aria-label="Open settings"
         >
           {/* Decorative inside a labeled button — the parent's
-              aria-label="Open settings" is what AT announces. Adding a
-              `title` would make the icon also expose role="img"
-              aria-label="Settings", causing AT to read both. */}
-          <Icon name="Settings" size={20} />
+              aria-label="Open settings" is what AT announces. */}
+          <Settings size={20} />
         </button>
       )}
     </header>

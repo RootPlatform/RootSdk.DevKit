@@ -5,10 +5,16 @@ import {
 import type { Repo, Release } from "@githubreleasewatcher/gen-shared";
 import { PollStatus } from "@githubreleasewatcher/gen-shared";
 import styles from "./RepoRow.module.css";
+import {
+  AlertCircle,
+  Check,
+  ChevronDown,
+  ChevronRight,
+  Trash2,
+} from "lucide-react";
 import { Button } from "./Button";
 import { NumberInput } from "./NumberInput";
 import { Switch } from "./Switch";
-import { Icon } from "./Icon";
 import { ReleaseCard } from "./ReleaseCard";
 import { AutoSaveStatus } from "./AutoSaveStatus";
 import { useDebouncedMutation } from "../lib/useDebouncedMutation";
@@ -220,14 +226,14 @@ export const RepoRow: React.FC<Props> = ({ repo, onRemove }) => {
     // identical span containers, so left-edges are mechanically equal.
     subtitleNode = (
       <div className={styles.subtitleOk}>
-        <Icon name="Checkmark" size={16} />
+        <Check size={16} />
         <span>Last polled {formatRelativeTime(Number(repo.lastPollAt))}</span>
       </div>
     );
   } else if (repo.lastPollStatus === PollStatus.ERROR) {
     subtitleNode = (
       <div className={styles.subtitleError}>
-        <Icon name="Error" size={16} />
+        <AlertCircle size={16} />
         <span>{repo.lastErrorMessage || "Could not reach GitHub."}</span>
       </div>
     );
@@ -277,7 +283,7 @@ export const RepoRow: React.FC<Props> = ({ repo, onRemove }) => {
                 onClick={handleRemoveClick}
                 aria-label={`Remove ${repo.owner}/${repo.name}`}
               >
-                <Icon name="Delete" size={24} />
+                <Trash2 size={24} />
               </button>
             </div>
           </div>
@@ -309,10 +315,7 @@ export const RepoRow: React.FC<Props> = ({ repo, onRemove }) => {
             disabled={testLoading}
             aria-expanded={previewOpen}
           >
-            <Icon
-              name={previewOpen ? "ChevronDown" : "ChevronRight"}
-              size={16}
-            />
+            {previewOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
             <span>Preview</span>
             {testLoading && (
               <span className={styles.previewStatus}>· loading…</span>
@@ -322,7 +325,7 @@ export const RepoRow: React.FC<Props> = ({ repo, onRemove }) => {
             <div className={styles.previewContent}>
               {testError && (
                 <div className={styles.testError} role="alert">
-                  <Icon name="Error" size={16} />
+                  <AlertCircle size={16} />
                   <span>{testError.message}</span>
                 </div>
               )}

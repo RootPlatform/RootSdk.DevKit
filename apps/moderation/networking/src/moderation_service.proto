@@ -1,0 +1,497 @@
+syntax = "proto3";
+package moderation;
+
+import "rootsdk/types.proto";
+
+// ============================================================================
+// ModerationService
+//
+// Public RPCs (any authenticated client):
+//   GetDashboard      — 24h activity summary + recent events. Read-only.
+//   GetAnalytics      — totals + per-day/per-rule/per-channel breakdown.
+//   GetAmIAdmin       — lightweight admin-flag refresh on AdminsChanged.
+//
+// Admin-only RPCs (caller must be community owner OR in
+// globalSettings.general.admins; server enforces via requireAdmin and throws
+// ModerationError.NOT_ADMIN otherwise):
+//   GetSettings              — full snapshot for the Settings page.
+//   UpdateContentFilter      — toggle filter + categories + warning.
+//   UpdateSpamControl        — threshold, window, scope, warning.
+//   UpdateRateLimit          — enable + max + window.
+//   UpdateGeneral            — analytics retention days.
+//   UpdateMonitoredChannels  — full replace of monitored channel set.
+//   ListWords                — paginated word list (custom or allowed).
+//   AddWord / SetWordEnabled / RemoveWord — custom + allowed word mutations.
+//   ListAuditLog             — paginated audit log with filters.
+//   DeleteMessageManual      — manual deletion (records audit entry).
+//   KickMember               — removes the member; records audit entry.
+//   BanMember                — bans the member; records audit entry.
+//
+// Broadcasts:
+//   SettingsChanged   — admins-only (carries snapshot). Settings views refetch.
+//   AuditLogAppended  — admins-only. Tells dashboard/audit views to refetch.
+//   AdminsChanged     — public, empty payload. Triggers GetAmIAdmin refresh.
+// ============================================================================
+
+// --- Enums ------------------------------------------------------------------
+// Positive values only. Negative values are reserved for built-in SDK errors.
+// Every enum member is prefixed with the enum name so the protobuf-ts
+// generator strips it consistently and TS code reads the bare member.
+
+enum ModerationError {
+  MODERATION_ERROR_UNSPECIFIED = 0;
+  MODERATION_ERROR_NOT_ADMIN = 1;
+  MODERATION_ERROR_INVALID_SETTINGS = 2;
+  MODERATION_ERROR_INVALID_WORD = 3;
+  MODERATION_ERROR_NOT_FOUND = 4;
+  MODERATION_ERROR_INVALID_TARGET = 5;
+}
+
+// Why an action was taken. Stored on every audit entry so dashboard and
+// analytics queries can group by it without joining.
+enum RuleType {
+  RULE_TYPE_UNSPECIFIED = 0;
+  RULE_TYPE_CONTENT_FILTER = 1;
+  RULE_TYPE_SPAM_DETECTION = 2;
+  RULE_TYPE_RATE_LIMIT = 3;
+  RULE_TYPE_MANUAL = 4;
+}
+
+// What was done. The first three are taken automatically by the message
+// handler; the last three are admin-initiated through the Audit Log /
+// dashboard.
+enum ActionType {
+  ACTION_TYPE_UNSPECIFIED = 0;
+  ACTION_TYPE_DELETE_MESSAGE = 1;
+  ACTION_TYPE_KICK = 2;
+  ACTION_TYPE_BAN = 3;
+}
+
+// Which built-in word list a custom-words category entry belongs to. Allowed
+// words live in their own list (separate enum value below) to keep the two
+// concerns split — allowed never filters; categories always do (when their
+// toggle is on).
+enum WordCategory {
+  WORD_CATEGORY_UNSPECIFIED = 0;
+  WORD_CATEGORY_CUSTOM = 1;
+  WORD_CATEGORY_ALLOWED = 2;
+}
+
+// How spam detection scopes its "identical message" lookups.
+enum SpamScope {
+  SPAM_SCOPE_UNSPECIFIED = 0;
+  SPAM_SCOPE_PER_CHANNEL = 1;
+  SPAM_SCOPE_SERVER_WIDE = 2;
+}
+
+// --- Settings shapes --------------------------------------------------------
+
+message ContentFilterSettings {
+  bool enabled = 1;
+  bool filter_slurs = 2;
+  bool filter_profanity = 3;
+  bool filter_custom_words = 4;
+  bool warn_users = 5;
+}
+
+message SpamControlSettings {
+  bool enabled = 1;
+  // Number of identical messages required to trigger the rule. Range 2–100.
+  int32 threshold = 2;
+  // Lookback window in minutes. Range 1–1440.
+  int32 window_minutes = 3;
+  SpamScope scope = 4;
+  bool warn_users = 5;
+}
+
+message RateLimitSettings {
+  bool enabled = 1;
+  // Max messages allowed in the window. Range 3–50.
+  int32 max_messages = 2;
+  // Window in seconds. Range 5–120.
+  int32 window_seconds = 3;
+}
+
+message GeneralSettings {
+  // Days to retain audit log entries. Range 7–365.
+  int32 retention_days = 1;
+}
+
+// Server-side validation bounds. The client renders form min/max from these
+// so the bounds stay in lockstep with server-side validation — no constant
+// duplication. Mirrors the leveling-leaderboard pattern.
+message SettingsLimits {
+  int32 spam_threshold_min = 1;
+  int32 spam_threshold_max = 2;
+  int32 spam_window_minutes_min = 3;
+  int32 spam_window_minutes_max = 4;
+  int32 rate_limit_max_messages_min = 5;
+  int32 rate_limit_max_messages_max = 6;
+  int32 rate_limit_window_seconds_min = 7;
+  int32 rate_limit_window_seconds_max = 8;
+  int32 retention_days_min = 9;
+  int32 retention_days_max = 10;
+  int32 word_max_length = 11;
+}
+
+// --- Audit log entry --------------------------------------------------------
+
+message AuditEntry {
+  // DB-assigned auto-increment id. Stable across the entry's lifetime; used
+  // as the React key on the client.
+  int64 id = 1;
+  // Milliseconds since Unix epoch.
+  int64 timestamp = 2;
+  ActionType action = 3;
+  RuleType rule = 4;
+  // The user the action targeted.
+  string target_user_id = 5;
+  // Channel where the offending message was posted, if applicable. Empty for
+  // a kick/ban that wasn't tied to a specific message.
+  string channel_id = 6;
+  string channel_name = 7;
+  // Cached at write time so the audit log doesn't need a member lookup per
+  // row at read time. Empty when unknown.
+  string target_username = 8;
+  // The text that triggered the rule, truncated server-side.
+  string message_excerpt = 9;
+  // The word/term that matched (content filter only).
+  string matched_term = 10;
+  // True when an admin took the action; false when automated.
+  bool manual = 11;
+  // Admin user who took the action. Empty for automated entries.
+  string actor_user_id = 12;
+}
+
+// --- Dashboard --------------------------------------------------------------
+
+message GetDashboardRequest {}
+
+message DashboardSummary {
+  int32 total_actions_24h = 1;
+  int32 content_filtered_24h = 2;
+  int32 manual_actions_24h = 3;
+}
+
+message GetDashboardResponse {
+  DashboardSummary summary = 1;
+  // Most recent entries (any rule type), newest first.
+  repeated AuditEntry recent = 2;
+  // Caller's admin flag — same flag as GetSettings.is_admin / GetAmIAdmin.
+  // Bundled here so the dashboard can render admin-only chrome (gear,
+  // manual-action menus on rows) without a second round trip.
+  bool am_i_admin = 3;
+  // Channel display names currently in the monitored set. Empty when the
+  // app is monitoring everything (see monitoring_all). Resolved from the
+  // server-side channelNameCache so the client doesn't N+1 lookup names.
+  repeated string monitored_channel_names = 4;
+  // True when the monitored set is empty, which by design.md means
+  // "monitor every channel this app has access to" — the at-a-glance
+  // affordance the dashboard surfaces alongside the activity counters.
+  bool monitoring_all = 5;
+}
+
+// --- Analytics --------------------------------------------------------------
+
+enum AnalyticsRange {
+  ANALYTICS_RANGE_UNSPECIFIED = 0;
+  ANALYTICS_RANGE_LAST_24H = 1;
+  ANALYTICS_RANGE_LAST_7D = 2;
+  ANALYTICS_RANGE_LAST_30D = 3;
+}
+
+message GetAnalyticsRequest {
+  AnalyticsRange range = 1;
+}
+
+// One bucket of the stacked-bar chart. Buckets are hour-sized for 24h, day-
+// sized for 7d / 30d. Aligned to UTC midnight for day buckets.
+message AnalyticsBucket {
+  int64 timestamp = 1;
+  int32 content_filter = 2;
+  int32 spam = 3;
+  int32 rate_limit = 4;
+  int32 manual = 5;
+}
+
+message ChannelActivity {
+  string channel_id = 1;
+  string channel_name = 2;
+  int32 count = 3;
+}
+
+message GetAnalyticsResponse {
+  int32 total = 1;
+  int32 content_filter_total = 2;
+  int32 spam_total = 3;
+  int32 rate_limit_total = 4;
+  int32 manual_total = 5;
+  repeated AnalyticsBucket buckets = 6;
+  repeated ChannelActivity top_channels = 7;
+}
+
+// --- Audit log query --------------------------------------------------------
+
+message ListAuditLogRequest {
+  // Opaque cursor — round-trip whatever the server returned. Empty = first
+  // page. Encoding is server-internal (see auditLogStore.ts).
+  string cursor = 1;
+  int32 page_size = 2;
+
+  // All filters are AND-combined. Empty/zero = "no filter on that axis".
+  string username_filter = 3;
+  ActionType action_filter = 4;
+  RuleType rule_filter = 5;
+  // Inclusive UTC ms-epoch lower bound. 0 = no lower bound.
+  int64 from_timestamp = 6;
+  // Exclusive UTC ms-epoch upper bound. 0 = no upper bound.
+  int64 to_timestamp = 7;
+}
+
+message ListAuditLogResponse {
+  repeated AuditEntry entries = 1;
+  // Empty when there are no more pages.
+  string next_cursor = 2;
+  // Total matching the filters across the entire log. Useful for "Showing 1-20
+  // of N" affordances; computed once per call (not cached).
+  int32 total_matches = 3;
+}
+
+// --- Word lists -------------------------------------------------------------
+
+message Word {
+  int64 id = 1;
+  string text = 2;
+  WordCategory category = 3;
+  bool enabled = 4;
+}
+
+message ListWordsRequest {
+  WordCategory category = 1;
+  // Substring match against the word text. Case-insensitive.
+  string search = 2;
+  string cursor = 3;
+  int32 page_size = 4;
+}
+
+message ListWordsResponse {
+  repeated Word words = 1;
+  string next_cursor = 2;
+  int32 total_matches = 3;
+}
+
+message AddWordRequest {
+  WordCategory category = 1;
+  string text = 2;
+}
+
+message AddWordResponse {
+  Word word = 1;
+}
+
+message SetWordEnabledRequest {
+  int64 id = 1;
+  bool enabled = 2;
+}
+
+message SetWordEnabledResponse {}
+
+message RemoveWordRequest {
+  int64 id = 1;
+}
+
+message RemoveWordResponse {}
+
+// --- Settings ---------------------------------------------------------------
+
+message MonitoredChannels {
+  // Channels the app monitors. Empty list means "all channels are monitored"
+  // (per design.md "Monitored channels"). Server enforces the empty-means-all
+  // semantic.
+  repeated string channel_ids = 1;
+}
+
+message Channel {
+  string channel_id = 1;
+  string name = 2;
+  bool monitored = 3;
+}
+
+message ChannelGroup {
+  string channel_group_id = 1;
+  string name = 2;
+  repeated Channel channels = 3;
+}
+
+message GetSettingsRequest {}
+
+message GetSettingsResponse {
+  ContentFilterSettings content_filter = 1;
+  SpamControlSettings spam_control = 2;
+  RateLimitSettings rate_limit = 3;
+  GeneralSettings general = 4;
+  MonitoredChannels monitored = 5;
+  SettingsLimits limits = 6;
+  // Channel tree for the monitored-channels picker. Bundled here so the
+  // Settings view doesn't need a second RPC just to render the tree.
+  repeated ChannelGroup channel_tree = 7;
+  // Word counts so the Settings tab can show "120 custom words" without
+  // loading every word.
+  int32 custom_word_count = 8;
+  int32 allowed_word_count = 9;
+}
+
+// Per-field setters. Each Settings tab's editable fields each get their own
+// RPC so concurrent admin edits to different fields don't coalesce into a
+// payload that re-stomps unrelated fields. Mirrors github-release-watcher's
+// per-row, per-field RPC shape. Server uses dataStore.appData.update() for
+// atomic per-field merges.
+
+message SetContentFilterEnabledRequest { bool enabled = 1; }
+message SetFilterSlursRequest { bool enabled = 1; }
+message SetFilterProfanityRequest { bool enabled = 1; }
+message SetFilterCustomWordsRequest { bool enabled = 1; }
+message SetContentFilterWarnUsersRequest { bool enabled = 1; }
+
+message SetSpamEnabledRequest { bool enabled = 1; }
+message SetSpamThresholdRequest { int32 threshold = 1; }
+message SetSpamWindowRequest { int32 window_minutes = 1; }
+message SetSpamScopeRequest { SpamScope scope = 1; }
+message SetSpamWarnUsersRequest { bool enabled = 1; }
+
+message SetRateLimitEnabledRequest { bool enabled = 1; }
+message SetRateLimitMaxRequest { int32 max_messages = 1; }
+message SetRateLimitWindowRequest { int32 window_seconds = 1; }
+
+message SetRetentionDaysRequest { int32 days = 1; }
+
+// Empty response shared by every per-field setter — the success of the RPC
+// itself is the only signal needed; updated state arrives via the
+// SettingsChanged broadcast.
+message SetSettingsFieldResponse {}
+
+message UpdateMonitoredChannelsRequest {
+  repeated string channel_ids = 1;
+}
+message UpdateMonitoredChannelsResponse {}
+
+// --- Client error telemetry ------------------------------------------------
+//
+// Funnels client-side render errors caught by ErrorBoundary into the
+// server's structured log so production crashes are visible to operators
+// instead of stuck in browser consoles. Server caps each field, drops
+// oversized requests outright, and rate-limits per caller so a render-loop
+// boundary can't flood the log pipeline.
+
+message ReportClientErrorRequest {
+  // Free-form label identifying the boundary (e.g., "App", "Dashboard",
+  // "Settings"). Helps disambiguate traces from different views.
+  string label = 1;
+  string message = 2;
+  // Stack trace as captured by the browser. Empty when unavailable.
+  string stack = 3;
+  // navigator.userAgent. Empty when omitted.
+  string user_agent = 4;
+}
+
+message ReportClientErrorResponse {}
+
+// --- Admin flag refresh -----------------------------------------------------
+
+message GetAmIAdminRequest {}
+message GetAmIAdminResponse {
+  bool am_i_admin = 1;
+}
+
+// --- Manual actions ---------------------------------------------------------
+
+message DeleteMessageManualRequest {
+  string channel_id = 1;
+  string message_id = 2;
+  // Optional admin-supplied note recorded on the audit entry.
+  string note = 3;
+}
+message DeleteMessageManualResponse {}
+
+message KickMemberRequest {
+  string user_id = 1;
+  string note = 2;
+}
+message KickMemberResponse {}
+
+message BanMemberRequest {
+  string user_id = 1;
+  string reason = 2;
+}
+message BanMemberResponse {}
+
+// --- Broadcasts -------------------------------------------------------------
+
+// Fires after any settings, word-list, or monitored-channels mutation.
+// Admin-only audience because the client uses the snapshot to refresh views
+// that themselves are admin-gated. Carries no payload — receivers re-fetch.
+message SettingsChangedEvent {}
+
+// Fires whenever a new audit entry is written (automated or manual). All
+// connected clients receive it; non-admin clients use it to refresh their
+// dashboard counters and recent-events list. Carries no payload — receivers
+// re-fetch the slice they care about.
+message AuditLogAppendedEvent {}
+
+// Public; fires when globalSettings.general.admins changes. Receivers fire
+// GetAmIAdmin to refresh their flag.
+message AdminsChangedEvent {}
+
+// --- Service ----------------------------------------------------------------
+
+service ModerationService {
+  // Public.
+  rpc GetDashboard(GetDashboardRequest) returns (GetDashboardResponse);
+  rpc GetAnalytics(GetAnalyticsRequest) returns (GetAnalyticsResponse);
+  rpc GetAmIAdmin(GetAmIAdminRequest) returns (GetAmIAdminResponse);
+
+  // Public — error telemetry funnel. Truncated + rate-limited server-side
+  // so a render-loop ErrorBoundary can't flood the log pipeline.
+  rpc ReportClientError(ReportClientErrorRequest) returns (ReportClientErrorResponse);
+
+  // Admin-only. Server throws ModerationError.NOT_ADMIN otherwise.
+  rpc GetSettings(GetSettingsRequest) returns (GetSettingsResponse);
+
+  // Per-field setters for each Settings tab (see request-message comments for
+  // the rationale).
+  rpc SetContentFilterEnabled(SetContentFilterEnabledRequest) returns (SetSettingsFieldResponse);
+  rpc SetFilterSlurs(SetFilterSlursRequest) returns (SetSettingsFieldResponse);
+  rpc SetFilterProfanity(SetFilterProfanityRequest) returns (SetSettingsFieldResponse);
+  rpc SetFilterCustomWords(SetFilterCustomWordsRequest) returns (SetSettingsFieldResponse);
+  rpc SetContentFilterWarnUsers(SetContentFilterWarnUsersRequest) returns (SetSettingsFieldResponse);
+
+  rpc SetSpamEnabled(SetSpamEnabledRequest) returns (SetSettingsFieldResponse);
+  rpc SetSpamThreshold(SetSpamThresholdRequest) returns (SetSettingsFieldResponse);
+  rpc SetSpamWindow(SetSpamWindowRequest) returns (SetSettingsFieldResponse);
+  rpc SetSpamScope(SetSpamScopeRequest) returns (SetSettingsFieldResponse);
+  rpc SetSpamWarnUsers(SetSpamWarnUsersRequest) returns (SetSettingsFieldResponse);
+
+  rpc SetRateLimitEnabled(SetRateLimitEnabledRequest) returns (SetSettingsFieldResponse);
+  rpc SetRateLimitMax(SetRateLimitMaxRequest) returns (SetSettingsFieldResponse);
+  rpc SetRateLimitWindow(SetRateLimitWindowRequest) returns (SetSettingsFieldResponse);
+
+  rpc SetRetentionDays(SetRetentionDaysRequest) returns (SetSettingsFieldResponse);
+
+  rpc UpdateMonitoredChannels(UpdateMonitoredChannelsRequest) returns (UpdateMonitoredChannelsResponse);
+
+  rpc ListWords(ListWordsRequest) returns (ListWordsResponse);
+  rpc AddWord(AddWordRequest) returns (AddWordResponse);
+  rpc SetWordEnabled(SetWordEnabledRequest) returns (SetWordEnabledResponse);
+  rpc RemoveWord(RemoveWordRequest) returns (RemoveWordResponse);
+
+  rpc ListAuditLog(ListAuditLogRequest) returns (ListAuditLogResponse);
+
+  rpc DeleteMessageManual(DeleteMessageManualRequest) returns (DeleteMessageManualResponse);
+  rpc KickMember(KickMemberRequest) returns (KickMemberResponse);
+  rpc BanMember(BanMemberRequest) returns (BanMemberResponse);
+
+  // Broadcasts.
+  rpc BroadcastSettingsChanged(SettingsChangedEvent) returns (rootsdk.Void);
+  rpc BroadcastAuditLogAppended(AuditLogAppendedEvent) returns (rootsdk.Void);
+  rpc BroadcastAdminsChanged(AdminsChangedEvent) returns (rootsdk.Void);
+}

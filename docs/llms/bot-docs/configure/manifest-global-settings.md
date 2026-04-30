@@ -13,9 +13,9 @@ Configurable global settings. They're declared in your manifest and set by commu
 
 ## Example
 
-Suppose your code needed to know which community members and roles should have moderation privileges. You'd declare a `roleAndMember` setting that gives the admin a picker to select them.
+Suppose your code needed to know which community members and roles should have moderation privileges. You'd declare a `roleOrMember` setting that gives the admin a picker to select them.
 
-Settings are organized into groups, and each group contains items. Each item has a `key` for runtime access, a `title` for the admin UI, and exactly one type key (like `roleAndMember`) that determines the input control and the value your server receives.
+Settings are organized into groups, and each group contains items. Each item has a `key` for runtime access, a `title` for the admin UI, and exactly one type key (like `roleOrMember`) that determines the input control and the value your server receives.
 
 ```json
 {
@@ -34,7 +34,8 @@ Settings are organized into groups, and each group contains items. Each item has
             "description": "Select the roles and members who can moderate.",
             "required": true,
             "confirmation": "Save",
-            "roleAndMember": {
+            "roleOrMember": {
+              "selectBehavior": "roleMultiAndUserMulti",
               "userIds": [],
               "communityRoleIds": []
             }
@@ -90,12 +91,13 @@ Each item in a group has common properties plus exactly one type key.
 
 Each item must include exactly one of the type keys below. The type key determines what UI the admin sees and what value your server receives.
 
-### `roleAndMember`
+### `roleOrMember`
 
-Combined selector for community roles and members. Your server receives a `ReadOnlyMemberGroup` that you can query for membership.
+Picker for community roles and members. The `selectBehavior` value shapes what the admin sees — a single user, multiple users, a single role, multiple roles, or both roles and users. Regardless of which behavior you choose, your server receives a `ReadOnlyMemberGroup` that you can query for membership.
 
 | Property | Type | Description |
 | -------- | ---- | ----------- |
+| `selectBehavior` | `string` | **Required.** Shapes the picker. One of `userSingle`, `userMulti`, `roleSingle`, `roleMulti`, `roleMultiAndUserMulti`. |
 | `userIds` | `string[]` | Default user IDs shown in the picker during installation. The admin can change them before saving. Typically left as an empty array. |
 | `communityRoleIds` | `string[]` | Default role IDs shown in the picker during installation. The admin can change them before saving. Typically left as an empty array. |
 
@@ -118,7 +120,8 @@ Combined selector for community roles and members. Your server receives a `ReadO
             "description": "Select the roles and members who can moderate.",
             "required": true,
             "confirmation": "Save",
-            "roleAndMember": {
+            "roleOrMember": {
+              "selectBehavior": "roleMultiAndUserMulti",
               "userIds": [],
               "communityRoleIds": []
             }
@@ -166,25 +169,6 @@ rootServer.globalSettings.on("update", (event: GlobalSettingsUpdateEvent) => {
 });
 ```
 
-### `member`
-
-Select one or more community members. Your server receives a `ReadOnlyMemberGroup`.
-
-| Property | Type | Description |
-| -------- | ---- | ----------- |
-| `multiSelect` | `boolean` | Allow multiple selections. |
-| `userIds` | `string[]` | Default user IDs shown in the picker during installation. Typically left as an empty array. |
-
-### `role`
-
-Select one or more community roles. Your server receives a `ReadOnlyMemberGroup`.
-
-| Property | Type | Description |
-| -------- | ---- | ----------- |
-| `multiSelect` | `boolean` | Allow multiple role selections. |
-| `communityRoleIds` | `string[]` | Default role IDs shown in the picker during installation. Typically left as an empty array. |
-
-> **Note:** `member`, `role`, and `roleAndMember` all produce a `ReadOnlyMemberGroup` on the server. Choose based on the UI you want the admin to see.
 ### `text`
 
 > **Note:** The Root clients don't yet show a UI for this type. Admins can't configure it until client support ships.

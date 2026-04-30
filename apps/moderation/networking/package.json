@@ -1,0 +1,6 @@
+{
+  "name": "@moderation/networking",
+  "scripts": {
+    "build": "rootsdk build proto"
+  }
+}

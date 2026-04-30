@@ -66,7 +66,7 @@ These are pure domain content for *this* app. Don't read them as guidance for ot
 | Styling | Plain CSS with CSS Modules (`*.module.css`), one file per component |
 | State | React state + Context for cross-component sharing |
 | Networking | Generated protobuf client from `networking/` |
-| Icons | [`apps/themes/client/src/generated/icons.json`](../themes/client/src/generated/icons.json) + copied `Icon.tsx` helper |
+| Icons | [`lucide-react`](https://lucide.dev) per-import (~1500 glyphs, tree-shaken). [`apps/themes`](../themes) keeps the canonical Root-aesthetic catalog for anyone wanting strict identity with native Root surfaces |
 | User / role picker | `UserRoleSelector` from `@rootsdk/client-app-ui` (Lit web component), wrapped in a thin React component |
 
 **No third-party UI stack.** No Tailwind, Radix, TanStack Query, framer-motion, or similar. First-party Root SDK packages (`@rootsdk/client-app`, `@rootsdk/client-app-ui`) are in scope — always prefer a platform-native primitive over reinventing one.
@@ -272,14 +272,18 @@ No animation library. No FLIP. No View Transitions API.
 
 ## Icons
 
-Copy [`apps/themes/client/src/components/Icon.tsx`](../themes/client/src/components/Icon.tsx) into this sample's `client/src/components/`. Use icons from [`icons.json`](../themes/client/src/generated/icons.json) (144 icons, 12 categories).
+Icons come from `lucide-react` — one library, ~1500 glyphs, tree-shaken per-import. Components render lucide icons directly: `import { Trophy } from "lucide-react"; <Trophy size={16} />`. No central `Icon` wrapper, no `icons.json` snapshot.
 
 ```tsx
-<Icon name="Trophy" size={16} />
-<Icon name="Settings" size={20} />
+import { Trophy, Settings } from "lucide-react";
+
+<Trophy size={16} />
+<Settings size={20} />
 ```
 
-If an icon is missing from the set, inline the SVG directly rather than adding a library.
+[`apps/themes`](../themes) remains the canonical "look like native Root chrome" reference for anyone who wants strict identity with Root's own UI surfaces. Sample apps standardize on `lucide-react` for breadth (lucide covers app-shell vocabulary like `Shield`, `BarChart3`, `LayoutDashboard` that the curated DevKit set was never designed for) and a single icon API across the family.
+
+When forking, swap `import { X } from "lucide-react"` per call site and pass the JSX element to any consuming component (`EmptyState` accepts `icon: ReactNode`).
 
 ## Components
 

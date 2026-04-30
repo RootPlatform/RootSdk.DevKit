@@ -1,0 +1,248 @@
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  /* Cap forms at a comfortable reading width on desktop. The other views
+     stretch with the content area, but Settings is the only view whose
+     natural width is the form column itself. */
+  max-width: 720px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--rootsdk-text-primary);
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: var(--rootsdk-text-secondary);
+}
+
+.tabBody {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.section {
+  background: var(--rootsdk-background-secondary);
+  border: 1px solid var(--rootsdk-border);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rowFlex {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  border-top: 1px solid var(--rootsdk-border);
+}
+
+.rowFlex:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.rowLabel {
+  font-weight: 500;
+  color: var(--rootsdk-text-primary);
+}
+
+.rowDescription {
+  font-size: 12px;
+  color: var(--rootsdk-text-secondary);
+  line-height: 1.5;
+}
+
+.input,
+.select {
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--rootsdk-border);
+  background: var(--rootsdk-input);
+  color: var(--rootsdk-text-primary);
+  font-size: 14px;
+  min-height: 44px;
+}
+
+.input:focus,
+.select:focus {
+  outline: none;
+  border-color: var(--rootsdk-brand-primary);
+}
+
+.numberInput {
+  width: 120px;
+}
+
+/* Canonical Switch — design-tokens.json `switch` componentPattern.
+   Track: 44x24, highlight-normal off / brand-primary on.
+   Thumb: 20x20 text-primary (always contrasts with track on either theme). */
+.toggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background-color: var(--rootsdk-highlight-normal);
+  border: 0;
+  padding: 0;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: background-color 150ms;
+  flex-shrink: 0;
+}
+
+.toggleOn {
+  background-color: var(--rootsdk-brand-primary);
+}
+
+.toggleKnob {
+  display: block;
+  width: 20px;
+  height: 20px;
+  background-color: var(--rootsdk-text-primary);
+  border-radius: 50%;
+  transition: transform 150ms;
+  transform: translateX(2px);
+}
+
+.toggleOnKnob {
+  transform: translateX(22px);
+}
+
+.error {
+  color: var(--rootsdk-error);
+}
+
+.wordRow {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 8px;
+  padding: 8px 0;
+  border-top: 1px solid var(--rootsdk-border);
+  align-items: center;
+}
+
+.wordRow:first-of-type {
+  border-top: 0;
+}
+
+.wordText {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.wordTextDisabled {
+  color: var(--rootsdk-text-secondary);
+  text-decoration: line-through;
+}
+
+.wordAddRow {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.wordList {
+  display: flex;
+  flex-direction: column;
+}
+
+.searchRow {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0;
+  flex-wrap: wrap;
+}
+
+.searchRow input,
+.searchRow select {
+  flex: 1 1 auto;
+  min-width: 160px;
+}
+
+.searchRowMeta {
+  align-self: center;
+  color: var(--rootsdk-text-secondary);
+  font-size: 13px;
+}
+
+.channelGroup {
+  margin-bottom: 16px;
+}
+
+.channelGroupTitle {
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: var(--rootsdk-text-primary);
+}
+
+.channelItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  min-height: 44px;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  padding: 12px 0;
+  border-top: 1px solid var(--rootsdk-border);
+}
+
+.formRow:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.formRowText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.formRowControl {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+  .formRowControl {
+    justify-self: start;
+  }
+}
+
+.help {
+  font-size: 12px;
+  color: var(--rootsdk-text-secondary);
+}

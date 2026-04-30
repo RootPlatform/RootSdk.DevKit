@@ -1,0 +1,57 @@
+/* StatCard — labelled metric tile with a tinted icon box on the right.
+   Background + border follow the canonical Panel shape; the layout is
+   tighter (16px padding, no header row). Used three-up on Dashboard and
+   Analytics. */
+
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  background: var(--rootsdk-background-secondary);
+  border: 1px solid var(--rootsdk-border);
+  border-radius: 12px;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--rootsdk-text-secondary);
+}
+
+.value {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--rootsdk-text-primary);
+}
+
+.trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.trendUp {
+  color: var(--rootsdk-brand-secondary);
+}
+
+.trendDown {
+  color: var(--rootsdk-error);
+}
+
+.subtle {
+  font-size: 12px;
+  color: var(--rootsdk-text-secondary);
+}
