@@ -1,7 +1,14 @@
 /* Select — native HTML <select> styled to match the canonical
    `native-select` componentPattern from apps/themes/.../design-tokens.json.
    Smaller padding than the reference (10px vs 14px) so it fits in dense
-   filter rows; same focus border behavior. */
+   filter rows; same focus border behavior.
+
+   Chevron: drawn via a mask-image + background-color pseudo-element on
+   .selectBox, NOT a hardcoded-stroke SVG inside background-image. The
+   reference pattern in design-tokens.json embeds a literal #9CA3AF
+   stroke colour in the SVG data URI, which doesn't track the user's
+   theme. We render the same chevron shape as a mask and paint it with
+   var(--rootsdk-text-secondary) so it tracks. */
 
 .wrapper {
   display: inline-flex;
@@ -18,12 +25,37 @@
   color: var(--rootsdk-text-secondary);
 }
 
+.selectWrapper {
+  position: relative;
+  display: inline-flex;
+  min-width: 0;
+}
+
+.selectWrapper::after {
+  content: "";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  margin-top: -6px;
+  background-color: var(--rootsdk-text-secondary);
+  /* SVG is the same chevron geometry as design-tokens.json's
+     native-select pattern, with the stroke attribute stripped (mask-image
+     uses alpha, so the stroke colour doesn't matter; we leave the
+     attribute off to avoid carrying a hardcoded hex). */
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M2.5 4.5L6 8L9.5 4.5' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M2.5 4.5L6 8L9.5 4.5' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 12px 12px;
+  mask-size: 12px 12px;
+  pointer-events: none;
+}
+
 .select {
   appearance: none;
   background-color: var(--rootsdk-input);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M2.5 4.5L6 8L9.5 4.5' stroke='%239CA3AF' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
   border: 1px solid var(--rootsdk-border);
   border-radius: 6px;
   padding: 10px 32px 10px 12px;
@@ -33,6 +65,7 @@
   cursor: pointer;
   outline: none;
   min-height: 44px;
+  width: 100%;
 }
 
 .select:focus {

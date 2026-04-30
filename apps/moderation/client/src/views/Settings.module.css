@@ -187,6 +187,71 @@
   font-size: 13px;
 }
 
+/* Bulk import disclosure — visually attached to the Add row above,
+   not the Search row below. Tight top margin (4px) reads as "this is
+   another way to do what the Add row does"; larger bottom margin
+   separates from Search. Closed state: a single text-button toggle.
+   Open state: textarea + Cancel/Import actions. Result text persists
+   after import so the
+   admin sees "Added N" and can dismiss by closing or by toggling the
+   disclosure again. */
+.importRow {
+  margin: 4px 0 16px;
+}
+
+.importToggle {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: var(--rootsdk-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 4px 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.importToggle:hover {
+  color: var(--rootsdk-text-primary);
+}
+
+.importPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.importTextarea {
+  appearance: none;
+  background: var(--rootsdk-background-primary);
+  border: 1px solid var(--rootsdk-border);
+  color: var(--rootsdk-text-primary);
+  font-size: 14px;
+  font-family: inherit;
+  padding: 8px 10px;
+  border-radius: 6px;
+  outline: none;
+  resize: vertical;
+  min-height: 80px;
+}
+
+.importTextarea:focus {
+  border-color: var(--rootsdk-brand-primary);
+}
+
+.importActions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.importResult {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--rootsdk-text-secondary);
+}
+
 .channelGroup {
   margin-bottom: 16px;
 }
@@ -243,6 +308,101 @@
 }
 
 .help {
+  font-size: 12px;
+  color: var(--rootsdk-text-secondary);
+}
+
+/* Empty-state message inside a list body (used by WordListPanel when
+   the list is empty / search has no matches). */
+.emptyMessage {
+  padding: 16px;
+  color: var(--rootsdk-text-secondary);
+}
+
+.exemptGroups {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.exemptHeading {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--rootsdk-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+
+.exemptPills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.exemptRoleSwatch {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 2px;
+  /* Subtle outline so a role colored very close to the Pill background
+     stays visible without relying purely on the fill. */
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--rootsdk-text-primary) 20%, transparent);
+}
+
+/* Danger zone — error-accent styling applied to Panel via className.
+   Doubled selector (`.x.x`) bumps specificity from (0,1,0) to (0,2,0)
+   so we deterministically override Panel's own .panel rule regardless
+   of CSS-module bundle order. The child error-tinted button +
+   TypeToConfirm card carry the rest of the visual weight. */
+.dangerZonePanel.dangerZonePanel {
+  border-color: color-mix(in srgb, var(--rootsdk-error) 35%, transparent);
+  background: color-mix(in srgb, var(--rootsdk-error) 4%, transparent);
+}
+
+.dangerRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.dangerActionTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--rootsdk-text-primary);
+  margin-bottom: 4px;
+}
+
+/* Destructive icon-button. Red at rest per the project's convention
+   (not grey-then-red on hover). Used for the Danger zone Clear-audit-
+   log trigger; the row's verbal label sits above so this carries only
+   the affordance, not a redundant copy of the action name. Larger hit-
+   area than the canonical icon-button pattern (8px padding) since
+   destructive actions deserve a more deliberate target. */
+.dangerIconButton {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--rootsdk-error);
+  transition: background-color 150ms;
+}
+
+.dangerIconButton:hover {
+  background-color: color-mix(in srgb, var(--rootsdk-error) 12%, transparent);
+}
+
+.dangerSuccess {
+  margin-top: 8px;
   font-size: 12px;
   color: var(--rootsdk-text-secondary);
 }

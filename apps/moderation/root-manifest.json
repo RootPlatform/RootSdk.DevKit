@@ -1,6 +1,6 @@
 {
   "id": "AC59nCbZgwmrnzsYa7vAXA",
-  "version": "1.0.3",
+  "version": "1.0.6",
   "package": {
     "client": {
       "deploy": "client/dist"
@@ -27,6 +27,16 @@
             "title": "Moderation admins",
             "description": "Roles and members who can configure moderation, view the audit log, and take manual actions. The community owner is always elevated regardless of this setting.",
             "required": true,
+            "confirmation": "Save",
+            "roleOrMember": {
+              "selectBehavior": "roleMultiAndUserMulti"
+            }
+          },
+          {
+            "key": "exempt",
+            "title": "Exempt members",
+            "description": "Roles and members exempt from automated content, spam, and rate-limit rules. Useful for moderators or trusted bots whose messages should never be filtered. Manual admin actions (kick, ban, delete) are unaffected.",
+            "required": false,
             "confirmation": "Save",
             "roleOrMember": {
               "selectBehavior": "roleMultiAndUserMulti"

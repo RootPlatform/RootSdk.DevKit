@@ -2,6 +2,7 @@ import {
   Client,
   UserGuid,
   ChannelGuid,
+  CommunityRole,
   RootGuidConverter,
   RootGuidType,
   RootServerException,
@@ -33,7 +34,19 @@ import {
   SetRateLimitMaxRequest,
   SetRateLimitWindowRequest,
   SetRetentionDaysRequest,
+  SetUsernameFilterEnabledRequest,
+  SetUrlFilterEnabledRequest,
+  SetUrlFilterModeRequest,
+  SetUrlFilterBlockRootInvitesRequest,
+  SetUrlFilterWarnUsersRequest,
+  SetNewMemberGateEnabledRequest,
+  SetNewMemberGateMinMinutesRequest,
+  SetNewMemberGateWarnUsersRequest,
+  SetMentionSpamEnabledRequest,
+  SetMentionSpamMaxMentionsRequest,
+  SetMentionSpamWarnUsersRequest,
   SetSettingsFieldResponse,
+  UrlFilterMode,
   UpdateMonitoredChannelsRequest,
   UpdateMonitoredChannelsResponse,
   ReportClientErrorRequest,
@@ -46,14 +59,24 @@ import {
   SetWordEnabledResponse,
   RemoveWordRequest,
   RemoveWordResponse,
+  ImportWordsRequest,
+  ImportWordsResponse,
   ListAuditLogRequest,
   ListAuditLogResponse,
+  GetMemberSummaryRequest,
+  GetMemberSummaryResponse,
   DeleteMessageManualRequest,
   DeleteMessageManualResponse,
   KickMemberRequest,
   KickMemberResponse,
   BanMemberRequest,
   BanMemberResponse,
+  UnbanMemberRequest,
+  UnbanMemberResponse,
+  ListBannedMembersRequest,
+  ListBannedMembersResponse,
+  ClearAuditLogRequest,
+  ClearAuditLogResponse,
   ModerationError,
   ActionType,
   RuleType,
@@ -85,6 +108,21 @@ import {
   setRateLimitWindow,
   getGeneral,
   setRetentionDays,
+  getUsernameFilter,
+  setUsernameFilterEnabled,
+  getUrlFilter,
+  setUrlFilterEnabled,
+  setUrlFilterMode,
+  setUrlFilterBlockRootInvites,
+  setUrlFilterWarnUsers,
+  getNewMemberGate,
+  setNewMemberGateEnabled,
+  setNewMemberGateMinMinutes,
+  setNewMemberGateWarnUsers,
+  getMentionSpam,
+  setMentionSpamEnabled,
+  setMentionSpamMaxMentions,
+  setMentionSpamWarnUsers,
 } from "./settingsStore";
 import {
   listMonitored,
@@ -95,6 +133,8 @@ import {
   setWordEnabled as storeSetWordEnabled,
   removeWord as storeRemoveWord,
   listWords as storeListWords,
+  importWords as storeImportWords,
+  ImportTooLargeError,
   countWords,
   totalCount,
 } from "./wordListStore";
@@ -107,13 +147,18 @@ import {
   topChannels as auditTopChannels,
   encodeCursor as encodeAuditCursor,
   decodeCursor as decodeAuditCursor,
+  deleteAll as deleteAllAudit,
+  memberSummary as auditMemberSummary,
   AuditEntryRow,
 } from "./auditLogStore";
 import { onAuditEntry } from "./auditDispatch";
 import { isAdmin, requireAdmin } from "./adminCheck";
 import { getAdminAudience } from "./adminAudience";
+import { readExemptSelection } from "./exemptMembers";
+import { resolveNickname } from "./memberCache";
+import { moderationSdkQueue } from "./lib/sdkQueue";
 import { getChannelName, getChannelTree } from "./channelNameCache";
-import { log } from "./lib/log";
+import { log, errFields } from "./lib/log";
 import { safeBroadcast } from "./lib/safeBroadcast";
 
 // ModerationService — RPC surface for the moderation app.
@@ -130,11 +175,42 @@ const RATE_WINDOW_SECONDS_MAX = 120;
 const RETENTION_DAYS_MIN = 7;
 const RETENTION_DAYS_MAX = 365;
 const WORD_MAX_LENGTH = 100;
+const NEW_MEMBER_GATE_MIN_MINUTES_MIN = 1;
+const NEW_MEMBER_GATE_MIN_MINUTES_MAX = 10080; // 7 days
+const MENTION_SPAM_MAX_MENTIONS_MIN = 1;
+const MENTION_SPAM_MAX_MENTIONS_MAX = 50;
+
+// Cap on admin-supplied reason text on manual actions (delete, kick,
+// ban, unban). 500 chars is generous for a moderation note while
+// keeping the audit excerpt column from accepting unbounded input.
+// Client UIs render a textarea with the same maxLength, but the server
+// validates regardless — defence against malformed or out-of-band
+// callers.
+const REASON_MAX_LENGTH = 500;
+// Per-import entry cap. Tested admins importing realistic moderation
+// lists (a few hundred words) fit well under this; pathological payloads
+// trying to overload the server with millions of entries get rejected.
+const IMPORT_MAX_ENTRIES = 1000;
+
+// Canonical phrase the user must type to confirm an audit-log clear. Match
+// is case-insensitive + trim — the UI lowercases its input pre-compare so
+// the server check is exact, but server-side normalization here defends
+// against a malformed or out-of-band caller.
+const CLEAR_AUDIT_LOG_PHRASE = "clear audit log";
 
 const DASHBOARD_RECENT_LIMIT = 20;
 const DEFAULT_PAGE_SIZE = 25;
 const MAX_PAGE_SIZE = 100;
 const TOP_CHANNELS_LIMIT = 5;
+
+// Per-admin rate limit on manual moderation actions (delete-message,
+// kick, ban). The platform enforces a per-app command quota (~5/s)
+// already; this layer mirrors that PER ADMIN so a single admin session
+// can't rapid-fire actions and starve other admins of their share. Same
+// rolling-window shape as the client-error report rate limiter below;
+// see checkManualActionRate.
+const LIMIT_MANUAL_ACTIONS_PER_MIN = 30;
+const MANUAL_ACTION_WINDOW_MS = 60_000;
 
 // Caps on client error report payloads. ErrorBoundary fires once per crash
 // so flooding is unlikely, but a render-loop boundary could otherwise log
@@ -330,20 +406,38 @@ export class ModerationService extends ModerationServiceBase {
       spam,
       rate,
       general,
+      usernameFilter,
+      urlFilter,
+      newMemberGate,
+      mentionSpam,
       monitored,
       customCount,
       allowedCount,
+      urlDomainCount,
     ] = await Promise.all([
       getContentFilter(),
       getSpamControl(),
       getRateLimit(),
       getGeneral(),
+      getUsernameFilter(),
+      getUrlFilter(),
+      getNewMemberGate(),
+      getMentionSpam(),
       listMonitored(db),
       totalCount(db, WordCategory.CUSTOM),
       totalCount(db, WordCategory.ALLOWED),
+      totalCount(db, WordCategory.URL_DOMAIN),
     ]);
     const tree = getChannelTree();
     const monitoredSet = new Set<string>(monitored);
+    const exemptSelection = readExemptSelection();
+    // Resolve role IDs → {id, name, colorHex} for the General tab Pills.
+    // Done inside GetSettings (an admin-only, low-frequency RPC) so the
+    // client doesn't need a separate roles lookup. .list() is one round
+    // trip and roles are bounded; cheaper than a parallel client RPC.
+    const exemptRoles = exemptSelection.communityRoleIds.length
+      ? await resolveRoleSummaries(exemptSelection.communityRoleIds)
+      : [];
     const channelTree: ChannelGroup[] = tree.map((g) => ({
       channelGroupId: g.channelGroupId,
       name: g.name,
@@ -373,10 +467,23 @@ export class ModerationService extends ModerationServiceBase {
         retentionDaysMin: RETENTION_DAYS_MIN,
         retentionDaysMax: RETENTION_DAYS_MAX,
         wordMaxLength: WORD_MAX_LENGTH,
+        newMemberGateMinMinutesMin: NEW_MEMBER_GATE_MIN_MINUTES_MIN,
+        newMemberGateMinMinutesMax: NEW_MEMBER_GATE_MIN_MINUTES_MAX,
+        mentionSpamMaxMentionsMin: MENTION_SPAM_MAX_MENTIONS_MIN,
+        mentionSpamMaxMentionsMax: MENTION_SPAM_MAX_MENTIONS_MAX,
       },
       channelTree,
       customWordCount: customCount,
       allowedWordCount: allowedCount,
+      exempt: {
+        userIds: [...exemptSelection.userIds],
+        roles: exemptRoles,
+      },
+      usernameFilter,
+      urlFilter,
+      urlDomainCount,
+      newMemberGate,
+      mentionSpam,
     };
   }
 
@@ -567,6 +674,137 @@ export class ModerationService extends ModerationServiceBase {
     return {};
   }
 
+  async setUsernameFilterEnabled(
+    request: SetUsernameFilterEnabledRequest,
+    client: Client,
+  ): Promise<SetSettingsFieldResponse> {
+    await requireAdmin(client);
+    await setUsernameFilterEnabled(!!request.enabled);
+    await this.notifySettingsChanged();
+    return {};
+  }
+
+  async setUrlFilterEnabled(
+    request: SetUrlFilterEnabledRequest,
+    client: Client,
+  ): Promise<SetSettingsFieldResponse> {
+    await requireAdmin(client);
+    await setUrlFilterEnabled(!!request.enabled);
+    await this.notifySettingsChanged();
+    return {};
+  }
+
+  async setUrlFilterMode(
+    request: SetUrlFilterModeRequest,
+    client: Client,
+  ): Promise<SetSettingsFieldResponse> {
+    await requireAdmin(client);
+    if (
+      request.mode !== UrlFilterMode.BLOCKLIST &&
+      request.mode !== UrlFilterMode.ALLOWLIST
+    ) {
+      throw new RootServerException(
+        ModerationError.INVALID_SETTINGS,
+        "Invalid URL filter mode",
+      );
+    }
+    await setUrlFilterMode(request.mode);
+    await this.notifySettingsChanged();
+    return {};
+  }
+
+  async setUrlFilterBlockRootInvites(
+    request: SetUrlFilterBlockRootInvitesRequest,
+    client: Client,
+  ): Promise<SetSettingsFieldResponse> {
+    await requireAdmin(client);
+    await setUrlFilterBlockRootInvites(!!request.enabled);
+    await this.notifySettingsChanged();
+    return {};
+  }
+
+  async setUrlFilterWarnUsers(
+    request: SetUrlFilterWarnUsersRequest,
+    client: Client,
+  ): Promise<SetSettingsFieldResponse> {
+    await requireAdmin(client);
+    await setUrlFilterWarnUsers(!!request.enabled);
+    await this.notifySettingsChanged();
+    return {};
+  }
+
+  async setNewMemberGateEnabled(
+    request: SetNewMemberGateEnabledRequest,
+    client: Client,
+  ): Promise<SetSettingsFieldResponse> {
+    await requireAdmin(client);
+    await setNewMemberGateEnabled(!!request.enabled);
+    await this.notifySettingsChanged();
+    return {};
+  }
+
+  async setNewMemberGateMinMinutes(
+    request: SetNewMemberGateMinMinutesRequest,
+    client: Client,
+  ): Promise<SetSettingsFieldResponse> {
+    await requireAdmin(client);
+    rangeError(
+      request.minMinutes,
+      NEW_MEMBER_GATE_MIN_MINUTES_MIN,
+      NEW_MEMBER_GATE_MIN_MINUTES_MAX,
+      `Min minutes must be ${NEW_MEMBER_GATE_MIN_MINUTES_MIN}-${NEW_MEMBER_GATE_MIN_MINUTES_MAX}`,
+    );
+    await setNewMemberGateMinMinutes(request.minMinutes);
+    await this.notifySettingsChanged();
+    return {};
+  }
+
+  async setNewMemberGateWarnUsers(
+    request: SetNewMemberGateWarnUsersRequest,
+    client: Client,
+  ): Promise<SetSettingsFieldResponse> {
+    await requireAdmin(client);
+    await setNewMemberGateWarnUsers(!!request.enabled);
+    await this.notifySettingsChanged();
+    return {};
+  }
+
+  async setMentionSpamEnabled(
+    request: SetMentionSpamEnabledRequest,
+    client: Client,
+  ): Promise<SetSettingsFieldResponse> {
+    await requireAdmin(client);
+    await setMentionSpamEnabled(!!request.enabled);
+    await this.notifySettingsChanged();
+    return {};
+  }
+
+  async setMentionSpamMaxMentions(
+    request: SetMentionSpamMaxMentionsRequest,
+    client: Client,
+  ): Promise<SetSettingsFieldResponse> {
+    await requireAdmin(client);
+    rangeError(
+      request.maxMentions,
+      MENTION_SPAM_MAX_MENTIONS_MIN,
+      MENTION_SPAM_MAX_MENTIONS_MAX,
+      `Max mentions must be ${MENTION_SPAM_MAX_MENTIONS_MIN}-${MENTION_SPAM_MAX_MENTIONS_MAX}`,
+    );
+    await setMentionSpamMaxMentions(request.maxMentions);
+    await this.notifySettingsChanged();
+    return {};
+  }
+
+  async setMentionSpamWarnUsers(
+    request: SetMentionSpamWarnUsersRequest,
+    client: Client,
+  ): Promise<SetSettingsFieldResponse> {
+    await requireAdmin(client);
+    await setMentionSpamWarnUsers(!!request.enabled);
+    await this.notifySettingsChanged();
+    return {};
+  }
+
   async updateMonitoredChannels(
     request: UpdateMonitoredChannelsRequest,
     client: Client,
@@ -594,7 +832,8 @@ export class ModerationService extends ModerationServiceBase {
     const category = request.category;
     if (
       category !== WordCategory.CUSTOM &&
-      category !== WordCategory.ALLOWED
+      category !== WordCategory.ALLOWED &&
+      category !== WordCategory.URL_DOMAIN
     ) {
       throw new RootServerException(
         ModerationError.INVALID_WORD,
@@ -637,7 +876,8 @@ export class ModerationService extends ModerationServiceBase {
     const category = request.category;
     if (
       category !== WordCategory.CUSTOM &&
-      category !== WordCategory.ALLOWED
+      category !== WordCategory.ALLOWED &&
+      category !== WordCategory.URL_DOMAIN
     ) {
       throw new RootServerException(
         ModerationError.INVALID_WORD,
@@ -704,6 +944,62 @@ export class ModerationService extends ModerationServiceBase {
     return {};
   }
 
+  async importWords(
+    request: ImportWordsRequest,
+    client: Client,
+  ): Promise<ImportWordsResponse> {
+    await requireAdmin(client);
+    const category = request.category;
+    if (
+      category !== WordCategory.CUSTOM &&
+      category !== WordCategory.ALLOWED &&
+      category !== WordCategory.URL_DOMAIN
+    ) {
+      throw new RootServerException(
+        ModerationError.INVALID_WORD,
+        "Invalid category",
+      );
+    }
+    // Cap the input array so a single RPC can't drag the server through
+    // an unbounded import. The cap is generous enough for any realistic
+    // hand-managed list — admins importing tens of thousands of words
+    // need a different ingestion path anyway.
+    if (request.texts.length > IMPORT_MAX_ENTRIES) {
+      throw new RootServerException(
+        ModerationError.INVALID_WORD,
+        `Too many entries (max ${IMPORT_MAX_ENTRIES} per import)`,
+      );
+    }
+    const db = getDb();
+    let result;
+    try {
+      result = await storeImportWords(
+        db,
+        category,
+        request.texts,
+        WORD_MAX_LENGTH,
+      );
+    } catch (err) {
+      // Post-split candidate count exceeded the store-side cap. Surfaces
+      // to the admin as a structured error rather than a generic 500.
+      if (err instanceof ImportTooLargeError) {
+        throw new RootServerException(
+          ModerationError.INVALID_WORD,
+          err.message,
+        );
+      }
+      throw err;
+    }
+    if (result.added > 0) {
+      await this.notifySettingsChanged();
+    }
+    return {
+      addedCount: result.added,
+      duplicateCount: result.duplicates,
+      invalidCount: result.invalid,
+    };
+  }
+
   // --- Audit log -----------------------------------------------------------
 
   async listAuditLog(
@@ -715,7 +1011,7 @@ export class ModerationService extends ModerationServiceBase {
     const cursorId = decodeAuditCursor(request.cursor);
     const pageSize = clampPageSize(request.pageSize);
     const filters = {
-      usernameFilter: request.usernameFilter ?? "",
+      nicknameFilter: request.nicknameFilter ?? "",
       actionFilter: request.actionFilter,
       ruleFilter: request.ruleFilter,
       fromTimestamp: Number(request.fromTimestamp),
@@ -739,6 +1035,28 @@ export class ModerationService extends ModerationServiceBase {
     };
   }
 
+  async getMemberSummary(
+    request: GetMemberSummaryRequest,
+    client: Client,
+  ): Promise<GetMemberSummaryResponse> {
+    await requireAdmin(client);
+    if (!request.userId) {
+      throw new RootServerException(
+        ModerationError.INVALID_TARGET,
+        "Missing userId",
+      );
+    }
+    const db = getDb();
+    const summary = await auditMemberSummary(db, request.userId as UserGuid);
+    return {
+      nickname: summary.nickname,
+      totalEvents: summary.totalEvents,
+      byRule: summary.byRule.map((r) => ({ rule: r.rule, count: r.count })),
+      firstEventAt: BigInt(summary.firstEventAt),
+      lastEventAt: BigInt(summary.lastEventAt),
+    };
+  }
+
   // --- Manual actions ------------------------------------------------------
 
   async deleteMessageManual(
@@ -746,6 +1064,17 @@ export class ModerationService extends ModerationServiceBase {
     client: Client,
   ): Promise<DeleteMessageManualResponse> {
     await requireAdmin(client);
+    requireManualActionAllowance(client.userId);
+    // Empty-ID guard: without it, an empty channelId / messageId reaches
+    // the SDK as a NotFound (which we treat as "already gone" downstream)
+    // and we end up writing an audit row with empty channelId — the row
+    // pollutes the log without describing any real action.
+    if (!request.channelId || !request.messageId) {
+      throw new RootServerException(
+        ModerationError.INVALID_TARGET,
+        "Missing channelId or messageId",
+      );
+    }
     const channelId = request.channelId as ChannelGuid;
     const messageId = request.messageId as unknown as MessageGuid;
     let messageContent = "";
@@ -771,10 +1100,12 @@ export class ModerationService extends ModerationServiceBase {
       }
     }
     try {
-      await rootServer.community.channelMessages.delete({
-        channelId,
-        id: messageId,
-      });
+      await moderationSdkQueue.enqueue(() =>
+        rootServer.community.channelMessages.delete({
+          channelId,
+          id: messageId,
+        }),
+      );
     } catch (err) {
       if (
         err instanceof RootApiException &&
@@ -789,16 +1120,28 @@ export class ModerationService extends ModerationServiceBase {
     }
 
     const db = getDb();
-    const note = (request.note ?? "").trim();
+    const reason = validateReason(request.reason);
+    // Resolve target + actor in parallel — both go through the same
+    // cache. For a self-moderation action (admin deleting their own
+    // message) the two userIds collide and the second resolve is a
+    // cache hit.
+    const [targetNickname, actorNickname] = await Promise.all([
+      targetUserId ? resolveNickname(targetUserId) : Promise.resolve(""),
+      resolveNickname(client.userId),
+    ]);
     await onAuditEntry(db, {
       timestamp: Date.now(),
       action: ActionType.DELETE_MESSAGE,
       rule: RuleType.MANUAL,
       targetUserId,
       channelId,
-      messageExcerpt: note ? `${messageContent}\n[note: ${note}]` : messageContent,
+      targetNickname,
+      messageExcerpt: reason
+        ? `${messageContent}\n[reason: ${reason}]`
+        : messageContent,
       manual: true,
       actorUserId: client.userId,
+      actorNickname,
     });
     log("info", "manual delete", {
       by: client.userId,
@@ -813,6 +1156,7 @@ export class ModerationService extends ModerationServiceBase {
     client: Client,
   ): Promise<KickMemberResponse> {
     await requireAdmin(client);
+    requireManualActionAllowance(client.userId);
     const userId = request.userId as UserGuid;
     if (RootGuidConverter.toRootGuidType(userId) !== RootGuidType.Person) {
       throw new RootServerException(
@@ -820,17 +1164,29 @@ export class ModerationService extends ModerationServiceBase {
         "Cannot kick this target",
       );
     }
-    await rootServer.community.communityMemberBans.kick({ userId });
+    // Resolve nicknames BEFORE the kick — once kicked, the target user
+    // is no longer a community member and communityMembers.get throws.
+    // Actor stays a member, but resolving in parallel keeps the audit
+    // path one round-trip wide instead of two sequential.
+    const [targetNickname, actorNickname] = await Promise.all([
+      resolveNickname(userId),
+      resolveNickname(client.userId),
+    ]);
+    await moderationSdkQueue.enqueue(() =>
+      rootServer.community.communityMemberBans.kick({ userId }),
+    );
     const db = getDb();
-    const note = (request.note ?? "").trim();
+    const reason = validateReason(request.reason);
     await onAuditEntry(db, {
       timestamp: Date.now(),
       action: ActionType.KICK,
       rule: RuleType.MANUAL,
       targetUserId: userId,
-      messageExcerpt: note,
+      targetNickname,
+      messageExcerpt: reason,
       manual: true,
       actorUserId: client.userId,
+      actorNickname,
     });
     log("info", "manual kick", { by: client.userId, userId });
     return {};
@@ -841,6 +1197,7 @@ export class ModerationService extends ModerationServiceBase {
     client: Client,
   ): Promise<BanMemberResponse> {
     await requireAdmin(client);
+    requireManualActionAllowance(client.userId);
     const userId = request.userId as UserGuid;
     if (RootGuidConverter.toRootGuidType(userId) !== RootGuidType.Person) {
       throw new RootServerException(
@@ -848,20 +1205,210 @@ export class ModerationService extends ModerationServiceBase {
         "Cannot ban this target",
       );
     }
-    const reason = (request.reason ?? "").trim() || undefined;
-    await rootServer.community.communityMemberBans.create({ userId, reason });
+    const reason = validateReason(request.reason) || undefined;
+    // expiresAt: 0 (or unset) = permanent. Anything non-zero must be in the
+    // future — a past timestamp is almost certainly client-clock skew or a
+    // mis-built request and would result in an instantly-lifted ban, which
+    // is a worse UX than failing fast with INVALID_SETTINGS.
+    const expiresAtMs = Number(request.expiresAt);
+    let expiresAtDate: Date | undefined;
+    if (expiresAtMs > 0) {
+      if (expiresAtMs <= Date.now()) {
+        throw new RootServerException(
+          ModerationError.INVALID_SETTINGS,
+          "Ban expiry must be in the future",
+        );
+      }
+      expiresAtDate = new Date(expiresAtMs);
+    }
+    // Resolve BEFORE the ban for the same reason as kick — banning
+    // detaches the member. Parallel with actor for one round-trip.
+    const [targetNickname, actorNickname] = await Promise.all([
+      resolveNickname(userId),
+      resolveNickname(client.userId),
+    ]);
+    await moderationSdkQueue.enqueue(() =>
+      rootServer.community.communityMemberBans.create({
+        userId,
+        reason,
+        ...(expiresAtDate ? { expiresAt: expiresAtDate } : {}),
+      }),
+    );
+    // Audit excerpt records the duration so it shows up in the log without
+    // a parallel column. Permanent bans omit the suffix to stay terse;
+    // reason and duration are joined with a single space when both present.
+    const excerptParts: string[] = [];
+    if (reason) excerptParts.push(reason);
+    if (expiresAtDate) {
+      excerptParts.push(`[expires ${expiresAtDate.toISOString()}]`);
+    }
     const db = getDb();
     await onAuditEntry(db, {
       timestamp: Date.now(),
       action: ActionType.BAN,
       rule: RuleType.MANUAL,
       targetUserId: userId,
-      messageExcerpt: reason ?? "",
+      targetNickname,
+      messageExcerpt: excerptParts.join(" "),
       manual: true,
       actorUserId: client.userId,
+      actorNickname,
     });
-    log("info", "manual ban", { by: client.userId, userId });
+    log("info", "manual ban", {
+      by: client.userId,
+      userId,
+      expiresAt: expiresAtDate?.toISOString(),
+    });
     return {};
+  }
+
+  async unbanMember(
+    request: UnbanMemberRequest,
+    client: Client,
+  ): Promise<UnbanMemberResponse> {
+    await requireAdmin(client);
+    requireManualActionAllowance(client.userId);
+    const userId = request.userId as UserGuid;
+    if (RootGuidConverter.toRootGuidType(userId) !== RootGuidType.Person) {
+      throw new RootServerException(
+        ModerationError.INVALID_TARGET,
+        "Cannot unban this target",
+      );
+    }
+    // Resolve actor nickname before the SDK call (target nickname comes
+    // from the existing ban record's frozen-at-time-of-ban value, which
+    // we look up through the cache for consistency with how BAN rows
+    // were written).
+    const [targetNickname, actorNickname] = await Promise.all([
+      resolveNickname(userId),
+      resolveNickname(client.userId),
+    ]);
+    try {
+      await moderationSdkQueue.enqueue(() =>
+        rootServer.community.communityMemberBans.delete({ userId }),
+      );
+    } catch (err) {
+      // NotFound = the user wasn't banned. Could happen via:
+      //   1. Race with an SDK-driven temp-ban auto-expiry
+      //   2. Another admin unbanning concurrently
+      //   3. Stale UI from before a refresh
+      // Surface as INVALID_TARGET so the client can render a friendly
+      // "not currently banned" notice; don't write an audit row.
+      if (err instanceof RootApiException) {
+        throw new RootServerException(
+          ModerationError.INVALID_TARGET,
+          "User is not currently banned",
+        );
+      }
+      throw err;
+    }
+    const db = getDb();
+    const reason = validateReason(request.reason);
+    await onAuditEntry(db, {
+      timestamp: Date.now(),
+      action: ActionType.UNBAN_MEMBER,
+      rule: RuleType.MANUAL,
+      targetUserId: userId,
+      targetNickname,
+      messageExcerpt: reason,
+      manual: true,
+      actorUserId: client.userId,
+      actorNickname,
+    });
+    log("info", "manual unban", { by: client.userId, userId });
+    return {};
+  }
+
+  async listBannedMembers(
+    _request: ListBannedMembersRequest,
+    client: Client,
+  ): Promise<ListBannedMembersResponse> {
+    await requireAdmin(client);
+    // The SDK list returns ALL bans the app has visibility into. For a
+    // moderately-sized community the list is small; for larger ones it
+    // can grow. We pay the round-trip per call (no caching) because
+    // ban state changes through OUR mutations and through the platform
+    // (auto-expiry) — a stale cache would routinely show lifted bans.
+    let bans;
+    try {
+      bans = await rootServer.community.communityMemberBans.list();
+    } catch (err) {
+      log("warn", "communityMemberBans.list failed", {
+        ...errFields(err),
+      });
+      return { members: [] };
+    }
+    // Resolve nicknames in parallel — same cache the audit-write path
+    // uses, so repeats from the audit log share cache hits.
+    const members = await Promise.all(
+      bans.map(async (ban) => {
+        const nickname = await resolveNickname(ban.userId);
+        return {
+          userId: ban.userId,
+          nickname,
+          reason: ban.reason ?? "",
+          expiresAt: ban.expiresAt
+            ? BigInt(ban.expiresAt.getTime())
+            : BigInt(0),
+        };
+      }),
+    );
+    return { members };
+  }
+
+  // --- Destructive bulk actions ------------------------------------------
+
+  // Type-to-confirm gated audit-log purge. The client renders a TypeToConfirm
+  // modal that disables its commit button until the user types the canonical
+  // phrase; the server *also* validates the phrase as defence in depth (a
+  // misbehaving client or a direct RPC call shouldn't be able to drop the
+  // table without the explicit confirmation).
+  //
+  // Why a separate RPC (vs. extending pruneOlderThan with cutoff=now): clear
+  // is a different intent — admins are explicitly purging history, not
+  // rolling retention forward. Distinct RPC = distinct audit/log line, no
+  // accidental "clear via aggressive retention" misuse.
+  async clearAuditLog(
+    request: ClearAuditLogRequest,
+    client: Client,
+  ): Promise<ClearAuditLogResponse> {
+    await requireAdmin(client);
+    const typed = (request.confirmationPhrase ?? "").trim().toLowerCase();
+    if (typed !== CLEAR_AUDIT_LOG_PHRASE) {
+      throw new RootServerException(
+        ModerationError.INVALID_SETTINGS,
+        `Type "${CLEAR_AUDIT_LOG_PHRASE}" exactly to confirm.`,
+      );
+    }
+    const db = getDb();
+    const rowsDeleted = await deleteAllAudit(db);
+    log("warn", "audit log cleared", {
+      by: client.userId,
+      rowsDeleted,
+    });
+    // Self-documenting trailer row: write the clear event into the now-
+    // empty log so admins reading the log later see WHO cleared it and
+    // WHEN, not just an unexplained zero-state. Preserves the "every
+    // state-modifying action goes through onAuditEntry" invariant for
+    // the one action that would otherwise erase its own evidence.
+    const actorNickname = await resolveNickname(client.userId);
+    await onAuditEntry(db, {
+      timestamp: Date.now(),
+      action: ActionType.CLEAR_AUDIT_LOG,
+      rule: RuleType.MANUAL,
+      targetUserId: "" as UserGuid,
+      messageExcerpt: `Cleared ${rowsDeleted} ${
+        rowsDeleted === 1 ? "entry" : "entries"
+      }`,
+      manual: true,
+      actorUserId: client.userId,
+      actorNickname,
+    });
+    // Audit-log changes broadcast to "all": dashboard counters, analytics,
+    // and the audit log view itself all need to refetch + render the empty
+    // state. The trailer entry above already calls notifyAuditLogAppended
+    // via onAuditEntry, so no second broadcast is needed here.
+    return { rowsDeleted };
   }
 
   // --- Internal broadcasts -------------------------------------------------
@@ -912,11 +1459,12 @@ function toAuditProto(r: AuditEntryRow): AuditEntry {
     targetUserId: r.targetUserId,
     channelId: r.channelId,
     channelName: r.channelId ? getChannelName(r.channelId as ChannelGuid) : "",
-    targetUsername: r.targetUsername,
+    targetNickname: r.targetNickname,
     messageExcerpt: r.messageExcerpt,
     matchedTerm: r.matchedTerm,
     manual: r.manual,
     actorUserId: r.actorUserId,
+    actorNickname: r.actorNickname,
   };
 }
 
@@ -952,6 +1500,21 @@ function rangeError(value: number, lo: number, hi: number, message: string): voi
   }
 }
 
+// Trim + length-cap an admin-supplied reason. Returns the trimmed
+// string. Throws INVALID_SETTINGS if over REASON_MAX_LENGTH so a
+// malformed or out-of-band caller can't shove unbounded text into the
+// audit log's messageExcerpt column.
+function validateReason(raw: string | undefined): string {
+  const trimmed = (raw ?? "").trim();
+  if (trimmed.length > REASON_MAX_LENGTH) {
+    throw new RootServerException(
+      ModerationError.INVALID_SETTINGS,
+      `Reason too long (max ${REASON_MAX_LENGTH} chars)`,
+    );
+  }
+  return trimmed;
+}
+
 // Per-caller rate limiter for reportClientError. Keeps a rolling timestamp
 // list per userId; admits a call only if fewer than LIMIT_REPORTS_PER_MIN
 // landed in the last REPORT_WINDOW_MS. The map grows with concurrent users
@@ -970,6 +1533,81 @@ function checkReportRate(userId: string): boolean {
   list.push(now);
   reportTimestamps.set(userId, list);
   return true;
+}
+
+// Per-admin rate limit on manual moderation actions. Same shape as
+// checkReportRate — rolling window of timestamps per admin userId; throws
+// MODERATION_ERROR_RATE_LIMITED when the admin exceeds
+// LIMIT_MANUAL_ACTIONS_PER_MIN within MANUAL_ACTION_WINDOW_MS. Mirrors the
+// platform's command quota at the app level so a single admin session
+// can't rapid-fire kicks/bans/deletes and starve other admins of their
+// share. Stored per-admin so a community with many admins each gets the
+// full quota independently.
+const manualActionTimestamps = new Map<string, number[]>();
+
+function requireManualActionAllowance(userId: string): void {
+  const now = Date.now();
+  const cutoff = now - MANUAL_ACTION_WINDOW_MS;
+  const list = (manualActionTimestamps.get(userId) ?? []).filter(
+    (t) => t >= cutoff,
+  );
+  if (list.length >= LIMIT_MANUAL_ACTIONS_PER_MIN) {
+    manualActionTimestamps.set(userId, list);
+    throw new RootServerException(
+      ModerationError.RATE_LIMITED,
+      `Too many manual actions — limit is ${LIMIT_MANUAL_ACTIONS_PER_MIN}/min per admin. Wait a moment and try again.`,
+    );
+  }
+  list.push(now);
+  manualActionTimestamps.set(userId, list);
+}
+
+// Resolve a set of role IDs to their {id, name, colorHex} summaries via
+// communityRoles.list(). Filters the full role list against the requested
+// IDs and preserves the picker's order. Missing roles (deleted between
+// picker save and now) get a placeholder so the UI can render a clear
+// "(deleted role)" pill instead of silently dropping the entry.
+async function resolveRoleSummaries(
+  ids: readonly string[],
+): Promise<{ id: string; name: string; colorHex: string }[]> {
+  try {
+    const all = await getCachedRoleList();
+    // Index by id-as-string so the picker's plain-string IDs can look up
+    // CommunityRole records (whose id is the branded `CommunityRoleGuid`)
+    // without a cross-type cast.
+    const byId = new Map<string, CommunityRole>(all.map((r) => [r.id, r]));
+    return ids.map((id) => {
+      const role = byId.get(id);
+      return {
+        id,
+        name: role?.name ?? "(deleted role)",
+        colorHex: role?.colorHex ?? "",
+      };
+    });
+  } catch (err) {
+    log("warn", "communityRoles.list failed; rendering exempt roles as raw IDs", {
+      error: err instanceof Error ? err.message : String(err),
+    });
+    return ids.map((id) => ({ id, name: "", colorHex: "" }));
+  }
+}
+
+// 5-minute TTL cache for the community role list. getSettings is admin-only
+// + low-frequency, so without this each Settings open is one extra SDK
+// round-trip; with it, a Settings session that opens the page repeatedly
+// is free after the first call. Roles are bounded (typically <50 per
+// community), so the cache is tiny.
+let cachedRoleList: { roles: CommunityRole[]; expiresAt: number } | undefined;
+const ROLE_LIST_TTL_MS = 5 * 60_000;
+
+async function getCachedRoleList(): Promise<CommunityRole[]> {
+  const now = Date.now();
+  if (cachedRoleList && cachedRoleList.expiresAt > now) {
+    return cachedRoleList.roles;
+  }
+  const roles = await rootServer.community.communityRoles.list();
+  cachedRoleList = { roles, expiresAt: now + ROLE_LIST_TTL_MS };
+  return roles;
 }
 
 // Cap a string to `max` code points, appending an ellipsis marker when

@@ -54,6 +54,20 @@ These are pure domain content for *this* app. Don't read them as guidance for ot
 | View-state specifics | [Appendix → View states](#view-states-this-sample). The components used (`Loader`, `QueryError`, `EmptyState`) transfer; the per-view conditions are domain. |
 | `community.fullControl` permission | Required because Settings → Channels enumerates the community channel tree. Apps that don't need this should request a narrower permission. |
 
+### First steps after fork
+
+Concrete sequence for an agent that's decided to fork this sample. Do these in order:
+
+1. **`npm run clean`** at the workspace root — wipes generated dirs (`node_modules`, `dist`, `networking/gen`, lockfiles, `*.pkg`).
+2. **Find-replace the package namespace.** `@levelingleaderboard/` → `@yourapp/` across `package.json` (root + workspaces), all source `import` statements, and `networking/root-protoc.json`.
+3. **Edit `root-manifest.json`** — new `id`, reset `version` to `1.0.0`, update the `settings` block if your admin-selection or member-eligibility shape differs. The `community.fullControl` permission can be narrowed if you're not enumerating channels.
+4. **Replace domain math** in `server/src/level.ts` (level curve, XP-per-level formula) and `server/src/messageHandler.ts` (cooldown semantics, eligibility rules, per-event award amount).
+5. **Replace the proto** (`networking/src/leaderboard_service.proto`) with your service definition. Keep the proto enum-prefix convention (`YOUR_ERROR_*` on every enum value), the public/admin broadcast split (admin-only `SettingsUpdated` for sensitive payloads vs `"all"`-with-client-filter for public events), the broadcast coalescer payload shape, and a `ReportClientError` RPC for the telemetry funnel.
+6. **Replace the stores** (`server/src/{xpStore,awardHistoryStore,xpEligibleGroup,appSettingsStore,excludedChannelsStore}.ts`) with your domain schema. Keep the atomic SQL with `WHERE`-clause race protection, the in-memory cache + invalidation-on-write shape, the composite-index pattern for top-N + per-user rank queries, and the `MemberGroup`-for-platform-managed-role-membership pattern.
+7. **Replace client view bodies** for your domain rendering. Keep the layout primitives (`AppHeader`, `Loader`, `QueryError`, `EmptyState`, `Tabs`, the auto-save chrome from `useDebouncedMutation` + `AutoSaveStatus`) verbatim — they're domain-neutral.
+8. **Update `DESIGN.md` and `README.md`.** Replace the appendix wholesale; align the Coverage scope bullets / Copy-verbatim table to match what your fork keeps and what it changes.
+9. **Verify the message-driven aggregation invariant holds** in your domain: every eligible event flows through the atomic SQL path with cooldown enforced server-side, and the broadcast coalescer keeps update rate bounded under load. Run the server through one full cycle (event fires → store write → coalesced broadcast → client re-renders) before considering the fork complete.
+
 ---
 
 ## Stack

@@ -86,17 +86,28 @@
   line-height: 1.5;
 }
 
+/* Right column of a recent-activity row. Stacks the timestamp on top
+   and the per-row member-action affordance below, both right-aligned.
+   The previous layout placed actions inside rowDetails (the read
+   column), where they read as a fourth paragraph of content rather
+   than as controls — actions on the right anchors them to a dedicated
+   meta-and-controls zone. The grid column auto-grows when the
+   MemberActions confirm panel renders, giving the panel the
+   horizontal space it needs while the row is in confirm mode. */
 .rowMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.rowTime {
   display: flex;
   align-items: center;
   gap: 6px;
   font-size: 12px;
   color: var(--rootsdk-text-tertiary);
-  flex-shrink: 0;
-}
-
-.rowActions {
-  margin-top: 8px;
 }
 
 .error {

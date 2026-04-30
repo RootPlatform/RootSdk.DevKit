@@ -3,21 +3,25 @@
   gap: 4px;
 }
 
+/* Destructive icon-only buttons render error red AT REST (matches the
+   shared Button.iconDanger pattern + the user's standing rule that
+   destructive affordances shouldn't camouflage themselves grey-then-
+   reveal-red on hover). Brightens on hover instead of changing color. */
 .button {
   appearance: none;
   background: transparent;
   border: 0;
-  color: var(--rootsdk-text-secondary);
+  color: var(--rootsdk-error);
   font-size: 12px;
   font-weight: 500;
   padding: 4px 8px;
   border-radius: 6px;
   cursor: pointer;
-  transition: color 150ms, background-color 150ms;
+  transition: filter 150ms, background-color 150ms;
 }
 
 .button:hover {
-  color: var(--rootsdk-error);
+  filter: brightness(1.2);
   background-color: var(--rootsdk-highlight-light);
 }
 
@@ -27,8 +31,61 @@
   min-width: 280px;
 }
 
+@media (max-width: 639px) {
+  /* Mobile: relax min-width so the confirm card doesn't overflow narrow
+     viewports (the audit-log row card it lives in caps at viewport
+     width minus its 12px padding on each side). */
+  .confirmWrap {
+    min-width: 0;
+  }
+  /* Bump tap targets to a usable size on touch devices. ~32px tall
+     here; below the 44px Apple HIG / 48px Material recommendation but
+     comfortable enough for an admin-only screen and matches the visual
+     weight of the other audit-row controls. */
+  .button {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+  .durationButton {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+}
+
 .error {
   font-size: 11px;
   color: var(--rootsdk-error);
   margin-top: 4px;
+}
+
+.durationPicker {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 8px;
+  padding: 4px;
+  background: var(--rootsdk-background-tertiary);
+  border-radius: 6px;
+}
+
+.durationButton {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: var(--rootsdk-text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: color 150ms, background-color 150ms;
+}
+
+.durationButton:hover {
+  color: var(--rootsdk-text-primary);
+}
+
+.durationButtonActive {
+  background: var(--rootsdk-background-primary);
+  color: var(--rootsdk-text-primary);
 }

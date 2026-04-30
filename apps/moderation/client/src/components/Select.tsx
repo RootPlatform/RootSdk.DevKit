@@ -30,22 +30,30 @@ export function Select<T extends string | number>({
   return (
     <label className={`${styles.wrapper} ${className}`}>
       {label && <span className={styles.label}>{label}</span>}
-      <select
-        className={styles.select}
-        value={value}
-        onChange={(e) => {
-          const next = isNumeric
-            ? (Number(e.target.value) as T)
-            : (e.target.value as T);
-          onChange(next);
-        }}
-      >
-        {options.map((opt) => (
-          <option key={String(opt.value)} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+      {/* selectWrapper positions the chevron pseudo-element. The <select>
+          can't host its own pseudo-elements (form controls don't
+          render ::before/::after in most browsers), so we wrap.
+          Class name matches the canonical native-select pattern in
+          apps/themes/.../design-tokens.json (camelCased per this
+          project's CSS-module convention). */}
+      <span className={styles.selectWrapper}>
+        <select
+          className={styles.select}
+          value={value}
+          onChange={(e) => {
+            const next = isNumeric
+              ? (Number(e.target.value) as T)
+              : (e.target.value as T);
+            onChange(next);
+          }}
+        >
+          {options.map((opt) => (
+            <option key={String(opt.value)} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+      </span>
     </label>
   );
 }

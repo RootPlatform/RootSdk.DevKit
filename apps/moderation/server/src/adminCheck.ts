@@ -5,6 +5,7 @@ import {
   UserGuid,
   Client,
   CommunityEvent,
+  GlobalSettingsEvent,
   RootServerException,
 } from "@rootsdk/server-app";
 import { ModerationError } from "@moderation/gen-shared";
@@ -63,9 +64,7 @@ export async function initializeAdminCheck(
     fireOnAdminsChanged("ownership transferred");
   });
 
-  // TODO(SDK): GlobalSettingsEvent enum unreleased — swap "update" →
-  // GlobalSettingsEvent.Update once it ships.
-  state.globalSettings?.on("update", (evt) => {
+  state.globalSettings?.on(GlobalSettingsEvent.Update, (evt) => {
     const prev = evt.previous?.general?.admins as
       | ReadOnlyMemberGroup
       | undefined;

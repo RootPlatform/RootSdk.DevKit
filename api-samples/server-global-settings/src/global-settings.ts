@@ -2,7 +2,7 @@
 // API Sample: Global Settings
 // SDK: rootServer.globalSettings, state.globalSettings
 // Permissions: channel.createMessage (to post results)
-// Events: GlobalSettingsUpdateEvent (settings.on('update', ...))
+// Events: GlobalSettingsUpdateEvent (settings.on(GlobalSettingsEvent.Update, ...))
 // Works in: Apps (@rootsdk/server-app) and Bots (@rootsdk/server-bot)
 //           All code except the import below is identical for both.
 // ============================================================================
@@ -47,6 +47,7 @@
 import {
   rootServer,
   RootBotStartState,
+  GlobalSettingsEvent,
   GlobalSettingsUpdateEvent,
   ReadOnlyMemberGroup,
   ChannelMessageEvent,
@@ -80,9 +81,7 @@ export function initializeGlobalSettings(state: RootBotStartState): void {
 
   // Subscribe to settings changes. The platform fires this event when a
   // community admin edits settings through the UI.
-  // TODO(SDK): GlobalSettingsEvent enum unreleased — swap "update" →
-  // GlobalSettingsEvent.Update once it ships (same value, enum-clean).
-  state.globalSettings?.on("update", onSettingsUpdate);
+  state.globalSettings?.on(GlobalSettingsEvent.Update, onSettingsUpdate);
 
   // Command trigger
   rootServer.community.channelMessages.on(

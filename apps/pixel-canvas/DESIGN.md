@@ -38,6 +38,19 @@ These are pure pixel-canvas concerns:
 - `networking/src/pixel_canvas_service.proto` (your proto)
 - `client/src/components/{PixelGrid,ColorPalette,ActionPanel}.tsx` (your interactive surface)
 
+### First steps after fork
+
+Concrete sequence for an agent that's decided to fork this sample. Do these in order:
+
+1. **`npm run clean`** at the workspace root — wipes generated dirs (`node_modules`, `dist`, `networking/gen`, lockfiles, `*.pkg`).
+2. **Find-replace the package namespace.** `@pixelcanvas/` → `@yourapp/` across `package.json` (root + workspaces), all source `import` statements, and `networking/root-protoc.json`.
+3. **Edit `root-manifest.json`** — new `id`, reset `version` to `1.0.0`, update the `settings` block if your admin-selection shape differs.
+4. **Replace the proto** (`networking/src/pixel_canvas_service.proto`) with your service definition. Keep the proto enum-prefix convention (`YOUR_ERROR_*` on every enum value), the per-action-broadcast pattern with `except: client`, and a `ReportClientError` RPC for the telemetry funnel. If your wire format has high-frequency repeated values (palette indices, enum tags), keep the varint-friendly `uint32` encoding pattern.
+5. **Replace the stores** (`server/src/{canvasStore,appSettingsStore}.ts`) with your domain schema. Keep the in-memory cache + KV blob + write-through pattern, the module-scoped Promise-chain serialization lock for multi-writer races, the synchronous-claim-then-rollback cooldown defense (no `await` between the cooldown check and the cooldown set), and the `refreshCacheFromKv` + commit-detection recovery pattern for post-commit RPC failures.
+6. **Replace client components** (`PixelGrid`, `ColorPalette`, `ActionPanel`) for your interactive surface. Keep the layout primitives (`AppHeader`, `Loader`, `QueryError`, `Button`, `TextInput`, `NumberInput`, `AutoSaveStatus`, `ErrorBoundary`, `AdminOnly`) verbatim — they're domain-neutral. Keep the action-panel-replaces-hover pattern, the two-step preview→confirm flow, and the cell-size-on-resize recompute.
+7. **Update `DESIGN.md` and `README.md`.** Replace the implementation-patterns body wholesale; align the Coverage scope bullets / Copy-verbatim table to match what your fork keeps and what it changes.
+8. **Verify the cooldown and serialization invariants hold** in your domain: fan out N parallel mutations from one user (cooldown blocks all but one) and from N distinct users (no state drops under contention). Run the server through one full cycle (mutate → broadcast → admin reset → cache-refresh recovery) before considering the fork complete.
+
 ---
 
 ## Implementation patterns

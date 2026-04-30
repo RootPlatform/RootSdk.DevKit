@@ -10,6 +10,7 @@ import {
 import {
   Activity,
   BarChart3,
+  Gauge,
   MessageSquareOff,
   Shield,
   UserX,
@@ -105,6 +106,10 @@ export const Analytics: React.FC = () => {
         ariaLabel="Time range"
       />
 
+      {/* One card per rule type so the percentage breakdowns sum to 100%
+          when actions exist. Without the Rate limit card, rate-limit
+          deletions would be invisible in the card strip and the other
+          three percentages wouldn't reconcile against Total. */}
       <div className={styles.cards}>
         <StatCard
           label="Total"
@@ -125,6 +130,13 @@ export const Analytics: React.FC = () => {
           subtle={pct(data.spamTotal, total)}
           accent="success"
           icon={<Activity size={20} />}
+        />
+        <StatCard
+          label="Rate limit"
+          value={data.rateLimitTotal}
+          subtle={pct(data.rateLimitTotal, total)}
+          accent="neutral"
+          icon={<Gauge size={20} />}
         />
         <StatCard
           label="Manual"

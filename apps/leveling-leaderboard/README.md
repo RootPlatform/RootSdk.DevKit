@@ -44,4 +44,4 @@ A few production concerns are intentionally not addressed here. They depend on c
 - **Cooldown cache TTL eviction window.** Stale entries are dropped every 5 minutes if older than `2 × cooldownSeconds`. For deployments with millions of users in a single community this is enough; for orders of magnitude beyond that, an LRU bound on the map is the next step.
 - **Telemetry sink.** `ReportClientError` writes to the server's structured log. Forks that want stack-frame mapping, grouping, or alerting should replace the log line with a Sentry/Datadog client.
 
-Use this sample as a shape reference for admin-gated app settings, live leaderboards, message-driven aggregation, and platform-managed member groups for dynamic role + user selections. Consult the listed api samples for concerns it doesn't cover.
+Use this sample as a shape reference for admin-gated app settings, live leaderboards, message-driven aggregation, and platform-managed member groups for dynamic role + user selections. See the listed api samples for concerns it doesn't cover, and [`apps/README.md`](../README.md) for the full sample-app catalog.

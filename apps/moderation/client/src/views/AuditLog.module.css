@@ -113,6 +113,104 @@
   overflow-x: auto;
 }
 
+/* Responsive split: the desktop table and mobile card list are both
+   rendered; CSS picks one based on viewport. <640px shows cards, ≥640px
+   shows the table. Two-rendering approach keeps the markup readable —
+   CSS-only "responsive table" tricks (transforming <td> into pseudo-
+   stacked rows) are clever but fragile when columns carry different
+   semantics like ours do. */
+.cardList {
+  display: none;
+}
+
+@media (max-width: 639px) {
+  .tableWrap {
+    display: none;
+  }
+  .cardList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+.card {
+  background: var(--rootsdk-background-tertiary);
+  border: 1px solid var(--rootsdk-border);
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cardTime {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--rootsdk-text-secondary);
+  white-space: nowrap;
+}
+
+.cardTarget {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 14px;
+  color: var(--rootsdk-text-primary);
+}
+
+.cardTarget strong {
+  font-weight: 600;
+}
+
+.cardBy {
+  color: var(--rootsdk-text-secondary);
+}
+
+.cardIn {
+  color: var(--rootsdk-text-secondary);
+  font-size: 13px;
+}
+
+.cardMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Manage-member section inside the expanded row drawer. The summary
+   content (event counts, per-rule chips, dates) renders above; this
+   block carries the destructive affordances (Kick / Ban) under a
+   labelled heading so an admin who opens any drawer learns where the
+   per-row controls live. Lives only inside the drawer — the main
+   table/card row no longer carries an Actions column. */
+.manageMember {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--rootsdk-border);
+}
+
+.manageMemberHeading {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--rootsdk-text-secondary);
+  margin-bottom: 8px;
+}
+
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -154,6 +252,108 @@
 .target strong {
   color: var(--rootsdk-text-primary);
   font-weight: 600;
+}
+
+/* Expand chevron column — narrow fixed width since it only holds an
+   icon button. Empty header cell at the same width keeps the table
+   alignment clean. */
+.expandCell {
+  width: 28px;
+  padding-left: 8px;
+  padding-right: 0;
+}
+
+.expandButton {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--rootsdk-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 150ms, color 150ms;
+}
+
+.expandButton:hover {
+  background-color: var(--rootsdk-highlight-light);
+  color: var(--rootsdk-text-primary);
+}
+
+/* Sub-row containing the per-user summary. Visually distinct from the
+   surrounding rows via a subtle background tint so the relationship
+   to its parent row is obvious. */
+.expandRow {
+  background-color: color-mix(
+    in srgb,
+    var(--rootsdk-background-tertiary) 50%,
+    transparent
+  );
+}
+
+.expandCellInner {
+  padding: 16px 20px !important;
+}
+
+/* Mobile card variant — summary appears below the existing card body.
+   Top border separates it from the meta row above. */
+.cardSummary {
+  border-top: 1px solid var(--rootsdk-border);
+  padding-top: 12px;
+  margin-top: 4px;
+}
+
+/* Summary content shared between table sub-row and card embed. */
+.summaryContent {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.summaryHeader {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.summaryHeader strong {
+  font-size: 14px;
+  color: var(--rootsdk-text-primary);
+}
+
+.summaryTotal {
+  font-size: 13px;
+  color: var(--rootsdk-text-secondary);
+}
+
+.summaryChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.summaryDates {
+  font-size: 12px;
+  color: var(--rootsdk-text-tertiary);
+}
+
+.summaryLoading {
+  font-size: 13px;
+  color: var(--rootsdk-text-secondary);
+}
+
+.summaryEmpty {
+  font-size: 13px;
+  color: var(--rootsdk-text-secondary);
+  font-style: italic;
+}
+
+.summaryError {
+  font-size: 13px;
+  color: var(--rootsdk-error);
 }
 
 .targetIn {

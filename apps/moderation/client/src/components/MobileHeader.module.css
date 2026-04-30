@@ -70,11 +70,14 @@
   background: var(--rootsdk-highlight-light);
 }
 
-/* Drawer overlay */
+/* Drawer overlay — uses the canonical --rootsdk-background-blur token
+   (the platform's "semi-transparent background for blur/overlay effects"
+   per the themes design-tokens source). Avoids hardcoded black, which
+   propagates into forks and breaks under non-default themes. */
 .scrim {
   position: fixed;
   inset: 0;
-  background: color-mix(in srgb, black 50%, transparent);
+  background: var(--rootsdk-background-blur);
   z-index: 100;
   display: none;
 }

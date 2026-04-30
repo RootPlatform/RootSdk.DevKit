@@ -17,7 +17,11 @@
 //
 // ============================================================================
 
-import { rootServer, RootAppStartState } from "@rootsdk/server-app";
+import {
+  rootServer,
+  RootAppStartState,
+  GlobalSettingsEvent,
+} from "@rootsdk/server-app";
 import { openDatabase, runSchemaMigrations } from "./db";
 import { blockedTermsService } from "./blocked-terms-service";
 import { initializeTestDriver } from "./test-driver";
@@ -40,9 +44,8 @@ async function onStarting(state: RootAppStartState): Promise<void> {
   // `previous` and `current` (full GlobalSettings snapshots) but not a
   // changed-key marker, so per-key narrowing means diffing the snapshots,
   // and ReadOnlyMemberGroup equality semantics aren't documented today.
-  // TODO(SDK): GlobalSettingsEvent enum unreleased — swap "update" → GlobalSettingsEvent.Update once it ships
   // TODO(SDK): per-key change filtering — narrow this handler to fire only when admins changed
-  state.globalSettings?.on("update", () => {
+  state.globalSettings?.on(GlobalSettingsEvent.Update, () => {
     blockedTermsService.broadcastBlockedTermsChanged({}, "all");
   });
 

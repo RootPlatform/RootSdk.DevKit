@@ -34,12 +34,12 @@ export class ErrorBoundary extends React.Component<Props, State> {
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo): void {
+    // Crash telemetry funnels through ReportClientError → server-side
+    // structured log. We deliberately don't `console.error` here — the
+    // server log is the source of truth for production crashes and a
+    // double-write only adds noise. A fork that wants devtools-visible
+    // output during development can re-add a guarded line.
     const label = this.props.label ?? "";
-    console.error(
-      `[ErrorBoundary${label ? `: ${label}` : ""}]`,
-      error,
-      info.componentStack,
-    );
     void moderationServiceClient
       .reportClientError({
         label,
@@ -51,6 +51,10 @@ export class ErrorBoundary extends React.Component<Props, State> {
         // Intentionally swallowed — no useful UI for "couldn't tell the
         // server we had an error" and we mustn't crash the boundary.
       });
+    // Silence "info is unused" — we deliberately don't relay
+    // componentStack to the server (might leak prop values via display
+    // names; not worth the surface for a sample).
+    void info;
   }
 
   handleRetry = (): void => {

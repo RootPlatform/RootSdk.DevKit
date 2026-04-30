@@ -1,0 +1,82 @@
+/* BannedMembersPanel — list rendering. The Panel itself supplies the
+   title/header chrome; this stylesheet only describes the row + meta
+   typography. */
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--rootsdk-border);
+}
+
+.row:last-child {
+  border-bottom: 0;
+}
+
+.rowText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.rowName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--rootsdk-text-primary);
+}
+
+.rowMeta {
+  font-size: 12px;
+  color: var(--rootsdk-text-secondary);
+}
+
+.rowReason {
+  font-size: 12px;
+  color: var(--rootsdk-text-tertiary);
+  font-style: italic;
+  /* Long reasons clip on narrow viewports — overflow rather than wrap
+     so the whole row stays single-line height predictable. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.unbanButton {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--rootsdk-border);
+  color: var(--rootsdk-text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 150ms;
+  flex-shrink: 0;
+}
+
+.unbanButton:hover {
+  background: var(--rootsdk-highlight-light);
+}
+
+@media (max-width: 639px) {
+  .unbanButton {
+    padding: 8px 14px;
+  }
+}
+
+.error {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--rootsdk-error);
+}

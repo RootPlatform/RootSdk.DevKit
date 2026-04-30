@@ -1,10 +1,10 @@
 # Design
 
-Implementation patterns for the moderation sample, plus an appendix at the end documenting this specific app's behavior. **If you're forking this sample, start with [Adopting this sample](#adopting-this-sample) to know what to copy verbatim, what to adapt, and what to replace.**
+Implementation patterns for the moderation sample, plus an appendix at the end documenting this specific app's behavior. **If you're forking this sample, start with [Adapting this sample](#adapting-this-sample) to know what to copy verbatim, what to adapt, and what to replace.**
 
 For Root-wide visual conventions (colors, spacing, radii, typography, shadows, transitions, base component patterns), follow [`apps/themes/client/src/generated/design-tokens.json`](../themes/client/src/generated/design-tokens.json) — this doc inherits all defaults from there and only calls out what's specific to this app. For shared infrastructure patterns (auto-save chrome, retry helpers, ErrorBoundary funnel), also read [`apps/leveling-leaderboard/DESIGN.md`](../leveling-leaderboard/DESIGN.md) and [`apps/github-release-watcher/DESIGN.md`](../github-release-watcher/DESIGN.md).
 
-## Adopting this sample
+## Adapting this sample
 
 This sample teaches three families of patterns: server-side moderation pipelines (rule order, audit dispatch funnel, retention), admin-gated app-managed config with per-field auto-save, and the canonical Root UI shell (Sidebar+drawer, Panel, StatCard, Badge variants, IconBox tints). Use this map before mining the rest:
 
@@ -56,7 +56,8 @@ Infrastructure-level patterns that should work unchanged for any app of similar 
 | `MasterSubToggleGroup` — master toggle row + indented sub-toggles connected by a 2px left border | `client/src/components/MasterSubToggleGroup.{tsx,module.css}` |
 | `ShowWordListGate` — Show/Hide gate around sensitive content (offensive word lists) so admin screens don't display the content by default | `client/src/components/ShowWordListGate.{tsx,module.css}` |
 | Inline two-step confirm for low-stakes destructive actions; destructive icon-buttons are red at rest | `client/src/components/InlineConfirm.{tsx,module.css}` (used by `WordListPanel` for word delete, `MemberActions` for kick/ban) |
-| `MemberActions` — Kick/Ban affordances scoped to a target user; gated through InlineConfirm | `client/src/components/MemberActions.{tsx,module.css}` |
+| Type-to-confirm pattern for irreversible bulk operations — disabled commit button until the user types the canonical phrase, server re-validates the phrase as defence in depth | `client/src/components/TypeToConfirm.{tsx,module.css}` (used by the General Settings → Danger zone "Clear audit log" action) |
+| `MemberActions` — Kick/Ban affordances scoped to a target user; ban surfaces a duration picker (Permanent / 1d / 7d / 30d) that drives `BanMemberRequest.expiresAt`; gated through InlineConfirm | `client/src/components/MemberActions.{tsx,module.css}` |
 | `AutoSaveStatus` — error-only inline pill (no "Saving…" indicator; transient pill flicker on every keystroke is worse than silence on success) | `client/src/components/AutoSaveStatus.{tsx,module.css}` |
 
 **Server-side patterns:**
@@ -120,6 +121,53 @@ This sample uses **KV for flat scalar settings** and **SQLite for relational/lis
 - **`globalSettings`** — admin role/member picker. Manifest-declared, platform-rendered. See [`api-samples/server-global-settings`](../../api-samples/server-global-settings).
 
 **Don't shoehorn flat scalars into SQLite.** A fork that adds a new "default cooldown" knob should add it to the appropriate KV settings group (and a new per-field `Set` RPC), not extend a SQLite table.
+
+**Schema migrations.** [`server/src/db.ts → runSchemaMigrations`](server/src/db.ts) shows the idempotent pattern for adding or renaming columns after first ship. Every startup runs `PRAGMA table_info(<table>)` once, builds a `Set` of existing column names, and applies each migration only when its prerequisite is true:
+
+```ts
+if (colNames.has("legacy_name") && !colNames.has("new_name")) {
+  await run(db, `ALTER TABLE t RENAME COLUMN legacy_name TO new_name`);
+}
+if (!colNames.has("added_column")) {
+  await run(db, `ALTER TABLE t ADD COLUMN added_column TEXT NOT NULL DEFAULT ''`);
+}
+```
+
+Why the `Set` + conditional shape: SQLite's `CREATE TABLE IF NOT EXISTS` is a no-op when the table exists, so changing the body of a `CREATE TABLE` statement doesn't migrate older databases — they stay on the original schema until an explicit `ALTER TABLE`. Forking agents who add columns post-ship should append migrations to this block, not edit the `CREATE TABLE`.
+
+---
+
+## Permissions scope
+
+[`root-manifest.json`](root-manifest.json) declares `community.fullControl: true`. **A fork should consciously decide whether to inherit that or scope down.**
+
+The app needs four distinct permissions:
+- `community.kick` (manual kick action)
+- `community.createBan` (manual ban + username-filter ban)
+- `channel.deleteMessageOther` (rule-pipeline + manual delete)
+- `channel.viewMessageHistory` (manual delete pre-fetches the message for the audit excerpt)
+
+Plus `channel.createMessage` for warning posts (already covered for app contexts but listed for completeness).
+
+**Why we ship `fullControl`** in the sample: a single declaration covers the surface and matches the typical bot/moderation app deployment pattern where one trusted app gets broad community access. It also keeps the sample's permission story compact — readers focus on the moderation pipeline, not on permission plumbing.
+
+**When to scope down**: a fork running in a less-trusted context, or a community with stricter app-permission policies, should swap to:
+
+```json
+{
+  "community": {
+    "kick": true,
+    "createBan": true
+  },
+  "channel": {
+    "deleteMessageOther": true,
+    "viewMessageHistory": true,
+    "createMessage": true
+  }
+}
+```
+
+Same functional surface, narrower blast radius. Both are correct shapes; the `fullControl` form is just shorter for a teaching sample. Forking agents should explicitly pick — don't copy the manifest verbatim without considering this.
 
 ---
 
@@ -236,7 +284,8 @@ Hand-rolled in `client/src/components/`. One `.tsx` + one `.module.css` per comp
 | `MonitoredChannelsPanel` | Wrapper Panel showing the monitored set as a Pill grid |
 | `AutoSaveStatus` | Error-only inline pill for auto-save failures |
 | `InlineConfirm` | Two-step confirm for low-stakes destructive actions |
-| `MemberActions` | Kick/Ban affordances for a target user; gated through InlineConfirm |
+| `TypeToConfirm` | High-friction phrase-typing confirm for irreversible bulk operations |
+| `MemberActions` | Kick/Ban affordances for a target user; ban includes a Permanent/1d/7d/30d duration picker driving `BanMemberRequest.expiresAt` |
 | `Button` | Variants: default, primary, danger, iconDanger |
 | `TextInput` / `NumberInput` | Labeled inputs (lifted from `apps/leveling-leaderboard`) |
 | `Loader` / `EmptyState` / `QueryError` | View-state primitives |
@@ -377,14 +426,187 @@ The app exists to teach the patterns of admin-managed app config, message-pipeli
 
 ## How rules fire
 
-Per-message moderation uses `ChannelMessageEvent.ChannelMessageCreated`. On every event:
+Per-message moderation subscribes to **two** events: `ChannelMessageEvent.ChannelMessageCreated` (full pipeline) and `ChannelMessageEvent.ChannelMessageEdited` (inline rules only — content filter, URL filter, mention spam — since spam-detection + rate-limit observations already counted on creation, so re-evaluating them would double-penalize). Without the edit listener a user can post a clean message and edit it to violating content as a bypass. Edit-time hits get a leading `[edited] ` marker on the audit excerpt so admins can distinguish post-time vs edit-time violations. On every event:
 
 1. **Skip system messages and non-Person senders.** `evt.messageType === MessageType.System` or `RootGuidConverter.toRootGuidType(evt.userId) !== RootGuidType.Person` → return early. This is the very first thing the handler does — without it, the moderation app would try to act on join/leave system messages and on other apps' broadcasts.
 2. **Skip unmonitored channels.** Empty monitored set means "monitor all"; otherwise `monitoredChannels.has(channelId)` gates the rest.
-3. **Run rules in order: content filter → spam detection → rate limit.** First rule that fires wins; the message is deleted and an audit entry is written via `onAuditEntry`. Running every rule on every message would double-count metrics and produce duplicate audit entries.
-4. **Optionally post a public warning** — content filter and spam detection support a `warnUsers` toggle that posts a generic "a message was removed" notice in the channel. Best-effort; failure to post the warning doesn't undo the deletion.
+3. **Run rules in order: new member gate → inline rules (content filter, URL filter, mention spam) → spam detection → rate limit.** First rule that fires wins; the message is deleted and an audit entry is written via `onAuditEntry`. Running every rule on every message would double-count metrics and produce duplicate audit entries. The content filter uses a **compiled-alternation regex** per word category (built once on word-list change in `wordListStore.getCompiledPattern`, cached alongside the row cache, invalidated on every mutation). Per-message content-filter cost is one `regex.exec()` per category — not a per-term loop. User-supplied custom words are escaped before compilation, so flat alternation has no regex-DoS surface. Content normalization runs **NFKC** before lowercasing + leet folding so full-width ("ｓｌｕｒ") and ligature ("ﬁ") evasions fold into their canonical equivalents — same path word-list entries take on add, so stored terms and message text agree. Homoglyph attacks across scripts (Cyrillic vs Latin) need a separate confusables map and are out of scope for the sample. (Forks upgrading from a pre-NFKC version: rows added before the change weren't NFKC'd; if your custom list contains compatibility characters, re-add them. ASCII entries — the typical case — are unaffected since NFKC is a no-op on plain ASCII.)
+4. **Optionally post a public warning** — content filter and spam detection support a `warnUsers` toggle that posts a generic "a message was removed" notice in the channel, addressed to the violating user via Root's user-mention markup (`[@nickname](root://user/<id>)`, per [api-samples/server-messages/src/mentions.ts](../../api-samples/server-messages/src/mentions.ts)) so the user gets a notification. Best-effort; failure to post the warning doesn't undo the deletion. Warning posts are debounced per `(userId, channelId)` pair via [`server/src/warningCooldown.ts`](server/src/warningCooldown.ts) (10-minute window) so one rapidly-violating user can't flood the channel with notices — the audit log still records every violation.
 
 Hot-path discipline: cached settings reads, in-memory channel name + word lists, the only SDK calls are the actual delete and (optionally) the warning post — both gated behind a rule match.
+
+### Audit log nicknames
+
+Every audit row freezes a `targetNickname` at write time — what the user was called in the community when this row was written. Resolution goes through [`server/src/memberCache.ts`](server/src/memberCache.ts) which wraps `rootServer.community.communityMembers.get({ userId }).nickname` (the canonical pattern, mirrored from [api-samples/server-members](../../api-samples/server-members) and [apps/tic-tac-toe/server/src/utilities.ts](../tic-tac-toe/server/src/utilities.ts) → `getNickname`). A 60-second TTL cache + `UserSetProfile`-event eviction collapses spam-burst lookups.
+
+**"Nickname is username."** In Root's product vocabulary, what users see in chat IS the username — even though the server SDK type calls it `CommunityMember.nickname` (the field is per-community customizable). The proto field, DB column, and resolver in code use `nickname` to teach the SDK API correctly; the user-facing UI copy says "Username" to match what admins recognize.
+
+**Why not the global username?** The SDK exposes the global username only via `UserSetProfileEvent` broadcasts — there is no `users.get` / `getUserByUsername` lookup, so an index built from those events would be incomplete on bootstrap (any user who hasn't triggered a profile event since app install wouldn't be in the index). Nickname is the SDK-supported, in-chat-visible name — it's the right resolver target for an audit log.
+
+**Frozen-at-write semantics.** A user later renaming themselves to "InnocentMember" still shows as "BadActor99" on historical rows, and a substring search for "BadActor99" finds those historical actions. This is the expected audit-log behavior: rows are evidence of what happened, including who-they-were-called at the time.
+
+**Filter shape.** [`auditLogStore.list`](server/src/auditLogStore.ts) filters via `lower(target_nickname) LIKE ?` against persisted nicknames. Case-insensitive substring; the trim happens server-side so a whitespace-only filter doesn't produce a useless `LIKE '%   %'` pattern. There's no index on `target_nickname` — at sample scale (low thousands of rows) the scan is fine; a forking deployment with tens of thousands of rows + frequent filter use should consider a SQLite FTS5 virtual table next to `audit_log` and route the LIKE through it.
+
+**Cold-start trade-off.** [`memberCache`](server/src/memberCache.ts) is lazy: the first audit write for each unique user pays an SDK round-trip after the message delete (the delete itself is unblocked). Priming via `communityMembers.listAll()` at startup would shift that cost to startup but make it potentially expensive for large communities. We pick lazy because moderation events are a minority of messages, the audit write isn't on the deletion critical path, and a lazy cache stays cheap to copy into a fork that doesn't need the priming step.
+
+**Memory-bounding.** The cache has an LRU cap (5,000 entries) and a periodic sweeper (5-minute interval) that drops expired entries. Without these a long-running app moderating many distinct users would accumulate entries forever — small but unbounded growth is an antipattern for forks.
+
+### Exempt members
+
+Between step 2 (channel gate) and step 3 (rule pipeline), the handler short-circuits if `await isExempt(evt.userId)` returns `true`. The exempt set is the `globalSettings.general.exempt` `roleOrMember` picker — a `ReadOnlyMemberGroup` resolved by the platform from the admin's selection of users + roles.
+
+Two design choices worth flagging for forks:
+
+- **Why a manifest picker, not an in-app setting.** Exemption is fundamentally a permissioning decision, and Root's native role/member picker is purpose-built for it (search, role mention chips, multi-select). Reimplementing one in-app would teach the wrong pattern.
+- **Why exemption sits before *every* rule, not per-rule.** A trusted moderator who happens to type a profanity-flagged word in a fast-moving discussion shouldn't have their message deleted *and* simultaneously be marked as the spam-detection trigger for a follow-up duplicate. Exemption is a single gate at the top of the pipeline; manual admin actions (kick/ban/delete-message) are unaffected since those run server-side from the audit log, not through the message handler.
+
+`exemptMembers.ts` is intentionally simpler than `adminAudience.ts`: there's no parallel managed `MemberGroup` because the exempt selection has only one source (the picker). The platform's `ReadOnlyMemberGroup` is already the materialization — `.isMember(userId)` is sub-ms in practice (membership cached locally on the runtime).
+
+The General Settings tab renders the current exempt selection as a read-only Pill list so admins don't have to context-switch to Root's native Settings to confirm what's configured. Editing still happens in the native picker.
+
+## Per-user infraction history
+
+Each audit-log row carrying a `targetUserId` has an expand chevron. Click → the row reveals a summary of *that user's* full audit history: total events, per-rule breakdown chips, first/last event dates. The pattern lets a mod triaging "is this a repeat offender?" pivot from any audit context without re-filtering.
+
+**State shape**: `Set<string>` of expanded row IDs (multi-expand allowed — admins occasionally compare two users' histories side by side).
+
+**Per-user cache**: `useRef<Map<userId, MemberSummary>>` so multiple rows for the same user share one fetch, and re-expanding the same user is instant. Cache is keyed on userId, not row ID — that's what makes the share-across-rows work. Cleared in the `AuditLogAppended` listener so a fresh moderation event invalidates any displayed counts.
+
+**Rendering**: table mode renders the summary as a separate `<tr>` with `colSpan` covering all columns; card mode (mobile) renders it inside the card below the existing content with a top-border separator. Same `MemberSummaryView` component for both — the layout differs but the data + chip rendering is shared.
+
+**Server query**: [`auditLogStore.memberSummary`](server/src/auditLogStore.ts) does one `GROUP BY rule` query plus one nickname lookup. Excludes `RuleType.UNSPECIFIED` rows so internal-failure noise doesn't inflate user infraction counts (same rule the dashboard `countSince` follows).
+
+**Edge cases**:
+- Rows without `targetUserId` (CLEAR_AUDIT_LOG, rule-pipeline-error rows where the user isn't the subject) get no chevron — nothing to drill into.
+- A user with no audit history (just attached but never moderated) gets a "No prior moderation events" empty state.
+- Admin-only — the AuditLog view is already gated on `amIAdmin`, so the per-user summary inherits that.
+
+## Banned members
+
+Bans are surfaced through two distinct surfaces — and the split is the lesson:
+
+- **Audit log**: event history. "User X was banned at T1, unbanned at T2, banned again at T3" → three rows, in time order.
+- **Banned members panel** ([`client/src/components/BannedMembersPanel.tsx`](client/src/components/BannedMembersPanel.tsx)): current state. "User X is banned right now, expires in 5 days."
+
+Two views, two mental models. An admin asking "what happened?" reaches for the audit log; an admin asking "who's currently banned, and should I lift any?" reaches for the panel. Mixing these — putting an Unban button on every audit-log row that mentions a target — looks lightweight at sample scale but breaks at production scale: most rows' target users aren't *currently* banned, so 95% of clicks would be no-ops, and three destructive-looking buttons per row creates visual noise on busy logs. State views complement event views; they don't replace them.
+
+The panel calls `rootServer.community.communityMemberBans.list()` per fetch (no caching) because ban state changes through both our mutations *and* the platform's auto-expiry of temp bans — a stale cache would routinely show lifted bans. Refresh fires on `AuditLogAppended` broadcasts (every kick/ban/unban writes an audit row, so that signal covers our mutations); SDK auto-expiry doesn't fire `AuditLogAppended`, so a temp ban that just expired might linger in the panel until the next manual refresh or unrelated audit event. Acceptable lag for a state-review surface.
+
+`UnbanMember` mirrors `BanMember`'s shape: `requireAdmin` → `requireManualActionAllowance` → `communityMemberBans.delete()` wrapped in `moderationSdkQueue` → audit row with `ActionType.UNBAN_MEMBER`. NotFound from the SDK (race with auto-expiry, or admin clicking a stale row) surfaces as `INVALID_TARGET` with a "not currently banned" message; no audit row is written for the no-op.
+
+## Reason field on manual actions
+
+Every manual moderation RPC (`DeleteMessageManual`, `KickMember`, `BanMember`, `UnbanMember`) accepts an optional `reason` string. Surfaced in the UI via [`InlineConfirm`](client/src/components/InlineConfirm.tsx)'s `collectReason` prop — when set, the confirm prompt grows a textarea between the message and the action buttons. The typed text flows into `onCommit`'s argument, which the caller passes to the RPC.
+
+**Optional, not required.** Most spam-troll bans are obvious from context; forcing text leads to "spam" / "x" / "no" placeholders that fill the field but add nothing. The textarea is prominent (it's the visual thing to do before clicking commit) but skippable. Admins who care about audit-log readability six months later will type; admins handling routine spam won't.
+
+**Storage**: the reason flows into the audit row's `messageExcerpt` column — the same field that carries content-filter matched content and clear-audit-log row counts. No new schema.
+
+**Validation**: server enforces a 500-char cap via `validateReason()` (helper in `moderationService.ts`). The client textarea has the same `maxLength`, but the server validates regardless — defence against malformed or out-of-band callers. Over-cap throws `INVALID_SETTINGS`.
+
+**Audit row excerpt format** varies by action:
+- `DeleteMessageManual`: `<message content>\n[reason: <text>]` when reason given; just message content otherwise.
+- `KickMember` / `UnbanMember`: bare reason text (or empty).
+- `BanMember`: reason + `[expires <iso>]` suffix when temp-ban; reason alone for permanent.
+
+The `InlineConfirm.collectReason` prop is opt-in so existing call sites that don't need it (e.g., `WordListPanel`'s remove-word confirm) stay simple. The handler signature accepts a `reason: string` argument; existing callers with no-arg handlers work unchanged because functions with fewer parameters are assignable to functions with more.
+
+## Confirmation tiers
+
+Two destructive-action confirmation patterns live in this sample, picked by consequence class:
+
+| Tier | Component | Use for | Examples in this app |
+|---|---|---|---|
+| Two-click inline | `InlineConfirm` | Well-bounded actions where the worst case is recoverable or scoped to a single item | Word delete, kick, single-message delete, ban (per-user, even with expiry) |
+| Type-the-phrase | `TypeToConfirm` | Irreversible bulk operations affecting many rows or users at once | "Clear audit log" in the General Settings Danger zone |
+
+The split matters because confirm fatigue is real: every action gated behind a heavy confirm trains users to dismiss confirms reflexively. Reserving `TypeToConfirm` for a small number of bulk-irreversible cases keeps the gate's weight meaningful. The server independently validates the typed phrase on the corresponding RPC (`ClearAuditLog` rejects non-matching `confirmation_phrase` with `INVALID_SETTINGS`), so a misbehaving client or a direct RPC caller can't bypass the gate.
+
+## Temp-banning members
+
+`BanMemberRequest.expires_at` (ms epoch) surfaces the SDK's `communityMemberBans.create({ expiresAt })` capability. The `MemberActions` ban flow exposes four canned durations — Permanent (default), 1 day, 7 days, 30 days — and computes the absolute timestamp client-side. Custom dates are deliberately deferred: a date picker would be a meaningful UI surface increase for a relatively rare admin choice.
+
+The SDK lifts the ban automatically when the timestamp passes — no app-side scheduled job. The audit entry records the absolute expiry time in the excerpt so admins reading the log later see how long the ban was for, not just that one was issued.
+
+Server-side validation rejects `expires_at` values in the past with `INVALID_SETTINGS` (almost certainly client-clock skew or a malformed request — would otherwise produce an instantly-lifted ban, worse UX than failing fast). The current four-option picker (1d / 7d / 30d) gives network latency multiple orders of magnitude of headroom, so the `expiresAtMs <= Date.now()` check is exact-now. A future custom-duration picker that allowed sub-minute bans should swap the check for a small grace window (e.g. `expiresAtMs <= Date.now() + 5_000`) to absorb round-trip latency.
+
+## New member gate
+
+The cheapest possible rule: integer compare against `CommunityMember.joinedAt` (community-join time, ms epoch). Off by default; when enabled, messages from members whose `joinedAt` is more recent than `minMinutes` ago are deleted before any content matching runs. Catches drive-by spam ("just joined and immediately spammed") without paying for content normalization or regex matching.
+
+**Pipeline order**: first rule check after the exempt short-circuit. Cheapest = runs first; spammers get stopped before we touch the matchers.
+
+**Edits don't re-check.** A member who posted within the gate window had their original message deleted; the edit event won't fire for a non-existent message. A member who posted *outside* the window and edits later is, by definition, older than the gate now — re-checking is busywork.
+
+**`joinedAt` is community-age, not Root-account-age.** The DevKit SDK doesn't expose Root account-creation time; it does expose `CommunityMember.joinedAt` via `communityMembers.get`. That's the more useful signal anyway: a fresh Root account that's been a trusted member of *this* community for a year shouldn't be gated; an established Root user who just joined to spam should be.
+
+**Cache strategy**: `joinedAt` joins `nickname` in the unified [`memberCache`](server/src/memberCache.ts). One SDK call per resolve populates both — a moderation-event burst that does both an age check and an audit-write nickname pulls one round-trip total. `joinedAt` is effectively immutable per-member-per-community, so the 60-second TTL doesn't matter for it (refetches return the same value); the TTL is sized for the nickname use case.
+
+**Fail-open on missing data.** If `communityMembers.get` doesn't return a `joinedAt` (the SDK type marks it optional) or the call fails, the gate skips — treat as "old enough." The alternative gates legitimate users on platform metadata gaps and produces false positives that are hard to debug.
+
+**Range**: 1–10080 minutes (1 minute to 7 days). Default 5 minutes — catches the most aggressive drive-by spam without a long-feeling delay for the legitimate just-joined case.
+
+## Mention spam
+
+Caps user + role mentions per message. Stateless — each message is judged on its own count, no per-user windowing. Catches `@everyone`-style pile-on spam without needing rate-limit state.
+
+**Counts come from `ChannelMessage.referenceMaps`**, not a regex over `messageContent`. The platform already resolves mention markup to a `users[]` + `roles[]` array on the event; we sum the two lengths and compare against the threshold. Two consequences worth noting for forks:
+
+- **Copy-paste of mention markup that doesn't resolve doesn't count.** A user pasting `[@someone](root://user/<id>)` text from another channel without a real underlying mention shows up in `messageContent` but not in `referenceMaps.users`. The rule matches what the chat client renders as a live mention, which is the right signal — unresolved markup doesn't notify anyone.
+- **`@everyone` and `@here` register as roles.** They land in `referenceMaps.roles` like any other role mention, so a single `@everyone` counts as one mention. Mention spam is a *quantity* rule; for "this community doesn't allow `@everyone` at all" use Root's native role permissions to gate the role itself.
+
+**Channel mentions are not counted.** They don't notify members and aren't a pile-on vector.
+
+**Pipeline placement**: inline rule alongside content filter and URL filter. Re-runs on edits — a clean message edited to add 30 mentions is the same evasion shape as a clean message edited to a slur.
+
+**Range**: 1–50 mentions. Default 10 — generous enough for legitimate "thanks @a @b @c..." rollups, tight enough that an `@everyone` + 10 specific users pile-on trips it.
+
+## URL filter
+
+Messages containing URLs get checked against an admin-managed domain list. Lives in [`server/src/urlFilter.ts`](server/src/urlFilter.ts) and slots into the rule pipeline between content filter and spam detection.
+
+**Two extraction sources, one matcher**:
+- `messageUris[]` — the platform's parsed URI list. Filtered to `http(s)` only so attachment URIs (asset:// etc.) don't get checked against domain rules they were never meant to cover.
+- `messageContent` text regex — catches plain-text URLs ("check out evil.com") that the platform didn't auto-detect. A real evasion vector if we relied only on `messageUris`.
+
+Both sources contribute candidates; we dedupe by URL string and run each through `new URL()` for canonical hostname extraction. Malformed candidates (the text regex sometimes pulls trailing punctuation) silently drop.
+
+**Hostname suffix matching**: a domain entry "evil.com" matches both "evil.com" and "*.evil.com" — admins expect entering the parent domain to cover the subtree. Implementation: `hostname === entry || hostname.endsWith("." + entry)`. Compared to compiled-alternation regex (used by content filter), this is a per-URL × per-entry walk; the lists are bounded enough that it's not worth the regex compile.
+
+**Two modes**:
+- BLOCKLIST — messages with any listed domain → deleted. Permissive default.
+- ALLOWLIST — messages with non-listed domains → deleted. The high-trust mode for serious deployments. An empty allowlist blocks every URL — that's the documented trade-off.
+
+**Root invite links** — independent toggle that fires whenever the URL points at `rootapp.gg/<code>` (single-path-segment shape). The DevKit SDK doesn't expose the community invite namespace, so we can't distinguish "this community's invite" from "another community's invite" — the toggle is binary "block all Root invite links." Useful for communities that don't want members posting links to *other* communities (a real spam vector); the trade-off is they can't repost their own invite either.
+
+**Storage shape**: domains live in the same `words` SQLite table as custom + allowed lists, distinguished by `WordCategory.URL_DOMAIN`. The admin-managed shape is identical (add / remove / toggle / search / paginate / bulk-import), so the existing `WordListPanel` component handles it directly. The matcher reads through `getEnabledWords(WordCategory.URL_DOMAIN)`. Per-category normalization differs: word categories use the content-filter `normalize()` (strips non-alphanum); URL_DOMAIN uses [`normalizeDomain()`](server/src/urlFilter.ts) (preserves dots + hyphens, strips protocol/path/leading-www, validates hostname shape).
+
+**Edits re-scan**: same logic as content filter — the URL filter runs again on `ChannelMessageEdited` because "post clean message, edit to evil link" is the same evasion shape.
+
+## Username filter
+
+Members whose nicknames match the same content-filter compiled regex (slurs / profanity / custom + allowed-words cancellation) get banned automatically. Lives in [`server/src/usernameFilter.ts`](server/src/usernameFilter.ts) and runs off two `CommunityMemberEvent` subscriptions:
+
+- **`UserSetProfile`** — fires when a global username changes; the per-community nickname often updates alongside, so we re-fetch + check.
+- **`CommunityMemberAttach`** — fires when a member opens the community; catches a violating nickname picked up at first attach (e.g. a newly-joined member with a slur as their nickname).
+
+The matcher reads `CommunityMember.nickname` via the same `memberCache.resolveNickname` the audit-write path uses — so the audit row's `targetNickname` matches what triggered the rule. The action is always BAN with an audit row `RuleType.USERNAME_FILTER`. Exempt members bypass via `isExempt(userId)` — exempt is a single trust boundary across all rules.
+
+The first-party Moderation app shipped a "ban or flag" configurable, but flag wasn't UI-surfaced. We keep the action surface narrow (ban only). A forking agent who wants an audit-only tier can extend `UsernameFilterSettings` and the action branch in `evaluateUser`.
+
+Off by default — banning members on a name match is high-impact and should be opted into deliberately. Especially relevant if the custom word list is broad: a curation pass before enabling is the canonical workflow.
+
+## Bulk word import
+
+Admins migrating a list from another moderation tool paste it into the textarea on each Word list panel; one RPC call inserts everything. [`server/src/wordListStore.ts → importWords`](server/src/wordListStore.ts) splits each input on commas + newlines (so pasting a CSV or a newline-list both work), normalizes, dedupes within the input, queries existing rows in one batched `IN (...)` SELECT, and INSERTs the new ones inside a single transaction so a partial failure rolls back. The compiled-regex pattern cache invalidates exactly once at the end — recompiling per-row would be wasteful for a 200-word import. Server-side bounds: max 1000 entries per call (rejected with `INVALID_WORD` if exceeded); per-entry max length comes from the same `WORD_MAX_LENGTH` constant the single-add path uses. Returns `{added, duplicates, invalid}` so the UI can surface "Added 47, 3 duplicates, 2 invalid".
+
+## SDK call rate-limit queue
+
+Every outbound SDK call that mutates platform state — `channelMessages.delete`, `channelMessages.create`, `communityMemberBans.{create,kick}` — routes through a shared token-bucket queue at [`server/src/lib/sdkQueue.ts`](server/src/lib/sdkQueue.ts). The Root SDK enforces a per-app command quota (~5/s for state-mutating calls); a spam burst from one user can drive 20+ deletions in seconds, which without backpressure would land faster than the SDK accepts and fail with throttling errors.
+
+The queue smooths bursts: capacity 5, refill 5/s. A token-bucket fills lazily on each enqueue (no background timer), so a quiet stretch refills the full burst capacity. When tokens are exhausted, calls queue with a Promise resolver and a short timer drains them as tokens become available. Bounded queue size (default 100) drops the oldest waiting call if a runaway producer somehow exceeds the cap — a safety valve, not a normal-operation path.
+
+**Why one shared queue, not per-call-type buckets**: a moderation event commonly fires delete + warning-post + (rarely) ban-create in rapid succession. Sharing the bucket means the burst throttles fairly across all three traffic types instead of each fighting for its own quota. The pattern is intentionally inline (~90 lines) rather than an opaque dependency — forks copy what they see, so the readable implementation is more transferable than the import.
 
 ## How retention works
 

@@ -12,8 +12,10 @@ import {
 import {
   Ban,
   Clock,
+  Eraser,
   Info,
   Lock,
+  LockOpen,
   MessageSquareOff,
   Shield,
   UserX,
@@ -31,6 +33,7 @@ import { EmptyState } from "../components/EmptyState";
 import { Loader } from "../components/Loader";
 import { QueryError } from "../components/QueryError";
 import { MonitoredChannelsPanel } from "../components/MonitoredChannelsPanel";
+import { BannedMembersPanel } from "../components/BannedMembersPanel";
 import { MemberActions } from "../components/MemberActions";
 import { useAdmin } from "../contexts/AdminContext";
 
@@ -117,6 +120,11 @@ export const Dashboard: React.FC = () => {
         monitoringAll={data.monitoringAll}
       />
 
+      {/* Admin-only: current-bans state view alongside the activity event
+          stream below. State pivot vs event log — see DESIGN.md →
+          "Banned members". */}
+      {amIAdmin && <BannedMembersPanel />}
+
       <Panel title="Recent activity" description="Latest moderation events">
         {data.recent.length === 0 ? (
           <EmptyState
@@ -165,7 +173,7 @@ const RecentActivityRow: React.FC<{
         </div>
         {entry.targetUserId ? (
           <>
-            <strong>{entry.targetUsername || shortId(entry.targetUserId)}</strong>
+            <strong>{entry.targetNickname || shortId(entry.targetUserId)}</strong>
             {entry.channelName && (
               <>
                 {" in "}
@@ -173,6 +181,11 @@ const RecentActivityRow: React.FC<{
               </>
             )}
           </>
+        ) : entry.actorUserId ? (
+          // System-actor events (e.g. CLEAR_AUDIT_LOG) have no target;
+          // surface the admin actor — frozen-at-write nickname with a
+          // short-id fallback so the row is self-explaining.
+          <span>By {entry.actorNickname || shortId(entry.actorUserId)}</span>
         ) : (
           <span>Target unknown</span>
         )}
@@ -188,20 +201,26 @@ const RecentActivityRow: React.FC<{
             {entry.messageExcerpt.length > 160 ? "…" : ""}”
           </p>
         )}
+      </div>
+      {/* Right column: timestamp + (admin-only) member action affordances.
+          Lifted out of rowDetails so destructive controls don't visually
+          mingle with the read content (chips, identity, message excerpt).
+          Auto-grow on the grid column means the confirm panel — which
+          renders inline when an admin clicks Kick or Ban — gets the
+          horizontal space it needs while the row is in confirm mode. */}
+      <div className={styles.rowMeta}>
+        <span className={styles.rowTime} title={formatAbsolute(ts)}>
+          <Clock size={12} />
+          {formatRelative(ts)}
+        </span>
         {amIAdmin && entry.targetUserId && (
-          <div className={styles.rowActions}>
-            <MemberActions
-              userId={entry.targetUserId}
-              username={entry.targetUsername}
-              onActed={onActed}
-            />
-          </div>
+          <MemberActions
+            userId={entry.targetUserId}
+            username={entry.targetNickname}
+            onActed={onActed}
+          />
         )}
       </div>
-      <span className={styles.rowMeta} title={formatAbsolute(ts)}>
-        <Clock size={12} />
-        {formatRelative(ts)}
-      </span>
     </div>
   );
 };
@@ -214,6 +233,10 @@ function actionLabel(a: ActionType): string {
       return "kick";
     case ActionType.BAN:
       return "ban";
+    case ActionType.UNBAN_MEMBER:
+      return "unban";
+    case ActionType.CLEAR_AUDIT_LOG:
+      return "clear audit log";
     default:
       return "—";
   }
@@ -226,6 +249,10 @@ function actionVariant(a: ActionType): BadgeVariant {
     case ActionType.KICK:
       return "warning";
     case ActionType.BAN:
+      return "error";
+    case ActionType.UNBAN_MEMBER:
+      return "success";
+    case ActionType.CLEAR_AUDIT_LOG:
       return "error";
     default:
       return "default";
@@ -243,6 +270,14 @@ function ruleAccent(r: RuleType): IconBoxAccent {
       return "warning";
     case RuleType.RATE_LIMIT:
       return "warning";
+    case RuleType.USERNAME_FILTER:
+      return "error";
+    case RuleType.URL_FILTER:
+      return "warning";
+    case RuleType.NEW_MEMBER_GATE:
+      return "warning";
+    case RuleType.MENTION_SPAM:
+      return "warning";
     case RuleType.MANUAL:
       return "info";
     default:
@@ -258,6 +293,10 @@ function actionIconFor(a: ActionType): LucideIcon {
       return UserX;
     case ActionType.BAN:
       return Lock;
+    case ActionType.UNBAN_MEMBER:
+      return LockOpen;
+    case ActionType.CLEAR_AUDIT_LOG:
+      return Eraser;
     default:
       return Info;
   }

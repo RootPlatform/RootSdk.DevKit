@@ -164,13 +164,45 @@ export async function runSchemaMigrations(db: Database): Promise<void> {
       rule INTEGER NOT NULL,
       target_user_id TEXT NOT NULL,
       channel_id TEXT NOT NULL DEFAULT '',
-      target_username TEXT NOT NULL DEFAULT '',
+      target_nickname TEXT NOT NULL DEFAULT '',
       message_excerpt TEXT NOT NULL DEFAULT '',
       matched_term TEXT NOT NULL DEFAULT '',
       manual INTEGER NOT NULL DEFAULT 0,
-      actor_user_id TEXT NOT NULL DEFAULT ''
+      actor_user_id TEXT NOT NULL DEFAULT '',
+      actor_nickname TEXT NOT NULL DEFAULT ''
     )
   `);
+  // Idempotent column-rename + add migrations. Pattern (transferable to
+  // any column added after first ship):
+  //   1. PRAGMA table_info(<table>) returns column rows.
+  //   2. Build a Set of existing column names.
+  //   3. For each desired column not present, ALTER TABLE ADD COLUMN.
+  //   4. For renames, ALTER TABLE RENAME COLUMN — only if the legacy
+  //      name still exists AND the new name doesn't.
+  // SQLite 3.25+ supports both ADD COLUMN and RENAME COLUMN safely.
+  const cols = await all<{ name: string }>(
+    db,
+    `PRAGMA table_info(audit_log)`,
+  );
+  const colNames = new Set(cols.map((c) => c.name));
+  // Rename: legacy `target_username` → `target_nickname`. The SDK
+  // exposes `nickname` (community-visible name) but no clean global-
+  // username lookup, so the app filters / displays nickname end to end
+  // — see DESIGN.md → "Audit log nicknames".
+  if (colNames.has("target_username") && !colNames.has("target_nickname")) {
+    await run(
+      db,
+      `ALTER TABLE audit_log RENAME COLUMN target_username TO target_nickname`,
+    );
+  }
+  // Add: `actor_nickname` so the audit log can render an admin's
+  // frozen-at-action nickname for manual rows (kick / ban / clear).
+  if (!colNames.has("actor_nickname")) {
+    await run(
+      db,
+      `ALTER TABLE audit_log ADD COLUMN actor_nickname TEXT NOT NULL DEFAULT ''`,
+    );
+  }
   // Listing newest first is the default; the cursor query also seeks on id.
   await run(db, `
     CREATE INDEX IF NOT EXISTS idx_audit_log_id_desc

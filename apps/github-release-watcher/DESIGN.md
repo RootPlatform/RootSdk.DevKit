@@ -95,7 +95,7 @@ These are pure domain content for *this* app. Don't read them as guidance for ot
 Concrete sequence for an agent that's decided to fork this sample. Do these in order:
 
 1. **`npm run clean`** at the workspace root — wipes generated dirs (`node_modules`, `dist`, `networking/gen`, lockfiles, `rootapp-*.pkg`). Starts you from a clean slate.
-2. **Find-replace the package namespace.** `@githubreleasewatcher/` → `@yourapp/` across `package.json` (root + workspaces), all source `import` statements, and `networking/buf.gen.yaml`. The packages are linked via `file:./networking/gen/{client,server,shared}` so the namespace must match.
+2. **Find-replace the package namespace.** `@githubreleasewatcher/` → `@yourapp/` across `package.json` (root + workspaces), all source `import` statements, and `networking/root-protoc.json`. The packages are linked via `file:./networking/gen/{client,server,shared}` so the namespace must match.
 3. **Edit `root-manifest.json`** — new `id` (use `rootsdk new id` or generate fresh), reset `version` to `1.0.0`, update the manifest `settings` block if your admin-selection shape differs.
 4. **Replace domain constants in `server/src/limits.ts`.** This is where the cap, floor, ceiling, and default cadence values live. Re-derive them per the rate-limit math against your external service's published quota.
 5. **Replace `server/src/githubClient.ts`** with your service's HTTP client. The shape transfers (URL parser, `fetchWithRetry` with status-code-aware retry, structured `*ClientError` with discriminated `kind`s); only the endpoints, request shapes, and parser change.

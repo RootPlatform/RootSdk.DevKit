@@ -1,9 +1,7 @@
 /* MasterSubToggleGroup — layout primitive for "master toggle + indented
    sub-toggles" pattern. The sub-toggles container is connected to the
    master row by a 2px left border in --rootsdk-highlight-normal, with
-   a subtle highlight-light background tint and rounded right corners.
-   Mirrors the first-party Moderation app's content-filter / spam-control
-   indent pattern. */
+   a subtle highlight-light background tint and rounded right corners. */
 
 .group {
   display: flex;

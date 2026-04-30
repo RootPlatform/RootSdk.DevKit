@@ -1,0 +1,88 @@
+/* TypeToConfirm — destructive bulk action with type-the-phrase confirm.
+   Visually mirrors InlineConfirm's error-tinted card so users recognize
+   the consequence-class at a glance, with an extra text input row to make
+   the type-out interaction obvious. */
+
+.confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: color-mix(in srgb, var(--rootsdk-error) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--rootsdk-error) 30%, transparent);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+
+.prompt {
+  font-size: 13px;
+  color: var(--rootsdk-text-primary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.input {
+  appearance: none;
+  background: var(--rootsdk-background-primary);
+  border: 1px solid var(--rootsdk-border);
+  color: var(--rootsdk-text-primary);
+  font-size: 14px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  padding: 8px 10px;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 150ms;
+}
+
+.input:focus {
+  border-color: var(--rootsdk-error);
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.cancel {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: var(--rootsdk-text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.cancel:hover {
+  background: var(--rootsdk-highlight-light);
+}
+
+.commit {
+  appearance: none;
+  background: var(--rootsdk-error);
+  color: var(--rootsdk-text-white);
+  border: 0;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 6px 14px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: opacity 200ms;
+}
+
+.commit:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.commit:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.error {
+  margin: 0;
+  font-size: 12px;
+  color: var(--rootsdk-error);
+}

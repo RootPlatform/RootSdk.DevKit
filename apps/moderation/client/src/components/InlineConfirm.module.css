@@ -57,3 +57,25 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* Optional reason textarea — surfaces between the prompt and the
+   action buttons when the InlineConfirm is configured to collect a
+   reason. Same outline + focus shape as TextInput; resizes vertically
+   only so the row keeps a predictable horizontal footprint. */
+.reasonInput {
+  appearance: none;
+  background: var(--rootsdk-background-primary);
+  border: 1px solid var(--rootsdk-border);
+  color: var(--rootsdk-text-primary);
+  font-size: 13px;
+  font-family: inherit;
+  padding: 6px 8px;
+  border-radius: 6px;
+  outline: none;
+  resize: vertical;
+  min-height: 36px;
+}
+
+.reasonInput:focus {
+  border-color: var(--rootsdk-brand-primary);
+}

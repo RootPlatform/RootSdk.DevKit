@@ -44,6 +44,20 @@ These are pure self-roles concerns — your domain replaces them entirely:
 - `client/src/components/RoleToggle.tsx` (your row component)
 - `client/src/views/Settings.tsx`'s `GroupCard` and `RolePickerModal` (your editor)
 
+### First steps after fork
+
+Concrete sequence for an agent that's decided to fork this sample. Do these in order:
+
+1. **`npm run clean`** at the workspace root — wipes generated dirs (`node_modules`, `dist`, `networking/gen`, lockfiles, `*.pkg`).
+2. **Find-replace the package namespace.** `@selfroles/` → `@yourapp/` across `package.json` (root + workspaces), all source `import` statements, and `networking/root-protoc.json`.
+3. **Edit `root-manifest.json`** — new `id`, reset `version` to `1.0.0`. Narrow `community.fullControl` to a tighter superset if your fork's picker contents are constrained in advance (see [README → Permissions](README.md#permissions) for the subset-of-permissions reasoning).
+4. **Replace the proto** (`networking/src/role_picker_service.proto`) with your service definition. Keep the proto enum-prefix convention (`YOUR_ERROR_*` on every enum value), the public-broadcast-when-payload-is-public-view pattern (`PickerConfigChanged` to `"all"`), the `AdminsChanged` empty-signal pattern, and a `ReportClientError` RPC for the telemetry funnel.
+5. **Replace the stores and platform-state sync** (`server/src/{pickerStore,communityRoleSync}.ts`). Keep the cache + `readConfig`/`writeConfig` separation in `pickerStore`, the storage-shape-vs-wire-shape split (don't store data the SDK already owns), and the *subscribe → mutate stored state → emit callback that triggers broadcast* pattern in `communityRoleSync`. Rewire its subscriptions to whichever platform events your stored state needs to track (channel deletes, member leaves, etc.).
+6. **Replace the service** (`server/src/rolePickerService.ts`) with your RPCs. Keep `requireAdmin` on admin-only endpoints, the broadcast helpers, the validation pass on writes, and the server-side enforcement of any "exclusive group"-style invariants (don't push exclusivity to the client).
+7. **Replace client components** (`RoleToggle`, `GroupCard`, `RolePickerModal`) for your domain rendering. Keep the layout primitives (`AppHeader`, `Loader`, `EmptyState`, `QueryError`, `Button`, `TextInput`, `Icon`, `AutoSaveStatus`, `ErrorBoundary`, `AdminOnly`) verbatim — they're domain-neutral. Keep the toggle-response-returns-full-state pattern (no client-side optimistic updates for multi-row server mutations).
+8. **Update `DESIGN.md` and `README.md`.** Replace the implementation-patterns body wholesale; align the Coverage scope bullets / Copy-verbatim table to match what your fork keeps and what it changes.
+9. **Verify the platform-state-consistency invariant holds** in your domain: every platform event your app stores derived state for has a defense (cull on delete, re-broadcast on edit, cheap pre-filter to avoid pointless writes). Run the server through one full cycle (admin curates → broadcast lands → platform-side delete → cull picks up → re-broadcast → connected clients re-render) before considering the fork complete.
+
 ---
 
 ## Implementation patterns

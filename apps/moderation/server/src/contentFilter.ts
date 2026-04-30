@@ -9,13 +9,20 @@
 //   "h@ck3r"          →  "hacker"
 //
 // The same normalization is applied to stored word-list entries (see
-// wordListStore.addWord), so matching becomes a simple substring check.
+// wordListStore.addWord) so matching becomes a substring check on
+// already-normalized text.
 //
-// match() returns the first term that matched, or undefined. Allowed-words
-// is checked against the SAME normalized input — if an allowed word
-// contains the matched bad word as a substring (e.g. "Scunthorpe" contains
-// a slur in casual matching, allowed-list entry "scunthorpe" overrides),
-// the message passes.
+// matchCompiled() runs a single compiled-regex match per category instead
+// of looping per term. The pattern is a flat alternation of escaped term
+// strings, compiled once on word-list change (see wordListStore for the
+// invalidation hook). Per-message work collapses from O(text × terms) to
+// one regex-engine pass — V8 handles flat alternation efficiently and the
+// escape step prevents any regex-DoS surface from user-supplied custom
+// words (no nested quantifiers possible).
+//
+// Allowed-words cancellation: an allowed match must envelope the bad
+// match's span. Otherwise "scunthorpe" wouldn't cancel a hit on "cunt"
+// inside "scunthorpe," which is the whole point of the allowed list.
 
 const LEET_MAP: Record<string, string> = {
   "0": "o",
@@ -37,11 +44,21 @@ const LEET_MAP: Record<string, string> = {
 // "banana." The allowed-words list is the canonical escape hatch for
 // false positives, mirroring how every word-list moderator handles the
 // classic Scunthorpe-style edge case.
+//
+// NFKC first folds Unicode compatibility characters into their canonical
+// equivalents before lowercasing. This catches a real evasion class: full-
+// width letters ("ｓｌｕｒ" → "slur"), ligatures ("ﬁle" → "file"), and
+// many compatibility-decomposable variants. It does NOT cover homoglyph
+// attacks across scripts (Cyrillic "а" vs Latin "a") — those need a
+// separate confusables map and are out of scope for the sample. Word-list
+// entries flow through the same normalize() path on add (see
+// wordListStore.addWord), so stored terms and message text agree.
 export function normalize(text: string): string {
   if (!text) return "";
+  const nfkc = text.normalize("NFKC");
   let out = "";
   let lastWasSpace = true;
-  for (const ch of text.toLowerCase()) {
+  for (const ch of nfkc.toLowerCase()) {
     const folded = LEET_MAP[ch] ?? ch;
     if (/[a-z0-9]/.test(folded)) {
       out += folded;
@@ -59,55 +76,62 @@ export interface MatchResult {
   matchedTerm: string;
 }
 
-// Iterate the rule list looking for a substring match in `normalizedText`.
-// Returns the first hit. allowedTerms cancel a hit when the matched bad
-// word is a substring of an allowed term that itself appears in the input.
-//
-// Allowed-term cancellation is computed inline: a matched bad word "ban"
-// at position p is cancelled iff some allowed term contains "ban" as a
-// substring AND that allowed term appears in the input around p.
-//
-// Cost: O(text * sum(rule lengths)). Word lists at community scale are
-// in the hundreds; substring scanning at this size is fine. Forks at
-// platform scale should swap this for an Aho-Corasick pass.
-export function match(
-  normalizedText: string,
-  ruleTerms: readonly string[],
-  allowedTerms: readonly string[],
-): MatchResult | undefined {
-  if (!normalizedText) return undefined;
-  for (const term of ruleTerms) {
-    if (!term) continue;
-    const idx = normalizedText.indexOf(term);
-    if (idx < 0) continue;
-    if (isAllowed(normalizedText, idx, term, allowedTerms)) continue;
-    return { matchedTerm: term };
-  }
-  return undefined;
+// Compile a flat alternation of escaped terms. Returns undefined for an
+// empty list so callers can skip the match call entirely. The escape pass
+// strips any user-supplied regex metacharacters — flat alternation has no
+// catastrophic-backtracking failure mode in V8's regex engine.
+export function compileAlternation(
+  terms: readonly string[],
+): RegExp | undefined {
+  const filtered = terms.filter((t) => t.length > 0);
+  if (filtered.length === 0) return undefined;
+  const escaped = filtered.map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  return new RegExp(escaped.join("|"));
 }
 
-function isAllowed(
+// Run a single compiled-regex match over `normalizedText`. Returns the
+// matched substring + its position, or undefined for no match. The caller
+// then runs the allowed-words cancellation check.
+export function matchCompiled(
+  normalizedText: string,
+  rulePattern: RegExp | undefined,
+  allowedPattern: RegExp | undefined,
+): MatchResult | undefined {
+  if (!rulePattern || !normalizedText) return undefined;
+  const m = rulePattern.exec(normalizedText);
+  if (!m) return undefined;
+  if (
+    allowedPattern &&
+    allowedCancels(allowedPattern, normalizedText, m.index, m[0])
+  ) {
+    return undefined;
+  }
+  return { matchedTerm: m[0] };
+}
+
+// Walk every allowed-pattern match in `text`. If any match span envelopes
+// the bad-match span [matchIdx, matchIdx+matchedTerm.length), cancel.
+//
+// We re-create the regex with the `g` flag so `exec` advances `lastIndex`
+// across the full text; the input `allowed` may have been compiled without
+// `g` (compileAlternation doesn't set it) so callers' reuse stays safe.
+function allowedCancels(
+  allowed: RegExp,
   text: string,
   matchIdx: number,
   matchedTerm: string,
-  allowedTerms: readonly string[],
 ): boolean {
-  for (const allowed of allowedTerms) {
-    if (!allowed) continue;
-    if (!allowed.includes(matchedTerm)) continue;
-    // The allowed term, if it exists in the input, must envelope the match
-    // for the cancellation to apply. Otherwise an allowed entry "scunthorpe"
-    // wouldn't cancel a hit on "cunt" inside "scunthorpe", which is the
-    // whole point of the list.
-    let searchFrom = 0;
-    while (searchFrom <= text.length) {
-      const allowedIdx = text.indexOf(allowed, searchFrom);
-      if (allowedIdx < 0) break;
-      if (allowedIdx <= matchIdx && allowedIdx + allowed.length >= matchIdx + matchedTerm.length) {
-        return true;
-      }
-      searchFrom = allowedIdx + 1;
+  const re = new RegExp(allowed.source, "g");
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text)) !== null) {
+    const start = m.index;
+    const end = start + m[0].length;
+    if (start <= matchIdx && end >= matchIdx + matchedTerm.length) {
+      return true;
     }
+    // Guard against zero-width matches (shouldn't happen with our shape,
+    // but cheap insurance against an infinite loop).
+    if (m[0].length === 0) re.lastIndex++;
   }
   return false;
 }

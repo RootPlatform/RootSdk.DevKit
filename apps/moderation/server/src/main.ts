@@ -10,7 +10,14 @@ import {
   initializeAdminAudience,
   syncAdminAudience,
 } from "./adminAudience";
+import {
+  initializeExemptWatcher,
+  onExemptChanged,
+} from "./exemptMembers";
 import { initializeChannelNameCache } from "./channelNameCache";
+import { initializeMemberCache } from "./memberCache";
+import { initializeWarningCooldown } from "./warningCooldown";
+import { initializeUsernameFilter } from "./usernameFilter";
 import { initializeMonitoredCache } from "./monitoredChannelsStore";
 import { initializeMessageHandler } from "./messageHandler";
 import { setAuditBroadcaster } from "./auditDispatch";
@@ -49,18 +56,38 @@ async function onStarting(state: RootAppStartState): Promise<void> {
   await runSchemaMigrations(db);
   log("info", "database opened, schema migrated");
 
+  // Initializers split into two shapes by intent (and signature):
+  //   - `await initializeX(...)` for hydration steps that need an SDK
+  //     round-trip before subsequent code can rely on their state
+  //     (admin check needs the community owner, channel cache needs
+  //     the channel list, etc.).
+  //   - `initializeX(...)` (sync) for steps that ONLY register event
+  //     listeners; nothing needs to await their completion because the
+  //     listener subscription is itself synchronous.
   await initializeAdminCheck(state);
   await initializeAdminAudience();
+  initializeExemptWatcher(state);
   await initializeChannelNameCache();
+  initializeMemberCache();
+  initializeWarningCooldown();
   await initializeMonitoredCache(db);
 
   setAuditBroadcaster(() => moderationService.notifyAuditLogAppended());
   initializeMessageHandler();
+  initializeUsernameFilter();
 
   onAdminsChanged(() => {
     // Re-sync the broadcast audience when admins or ownership shift.
     void syncAdminAudience();
     void moderationService.notifyAdminsChanged();
+  });
+
+  // The exempt picker is a globalSettings value, so app-internal mutations
+  // don't fire SettingsChanged on their own. Funnel exempt-selection
+  // changes through SettingsChanged so the in-app General tab refreshes
+  // its Pill list when an admin edits the picker in Root's native UI.
+  onExemptChanged(() => {
+    void moderationService.notifySettingsChanged();
   });
 
   await initializeCleanupJob();

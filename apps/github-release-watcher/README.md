@@ -4,7 +4,7 @@ Watches a curated list of GitHub repositories for new releases and surfaces them
 
 ## Coverage scope
 
-**Demonstrates** — for the full cross-referenced patterns library (with file paths and adapt/copy/replace guidance), see [DESIGN.md → Adapting this sample](DESIGN.md#adapting-this-sample) and [DESIGN.md → Copy verbatim](DESIGN.md#copy-verbatim). At a glance:
+**Demonstrates** — for the full cross-referenced patterns library (with file paths and adapt/copy/replace guidance), see [DESIGN.md](DESIGN.md). At a glance:
 
 *External-service integration*
 - **Chained `OneTime` polling jobs** for sub-daily cadence (`rootServer.jobScheduler` only offers `Daily`+); each watched repo owns at most one pending job, the handler polls and schedules the next firing.
@@ -37,8 +37,7 @@ Watches a curated list of GitHub repositories for new releases and surfaces them
 **Out of scope (this product shape doesn't need them):**
 - Channel posting / messaging — this app's product is the in-app feed; releases are surfaced as cards, not channel messages. See [`api-samples/server-messages`](../../api-samples/server-messages).
 - File or asset handling — see [`api-samples/client-app-assets`](../../api-samples/client-app-assets) and [`api-samples/server-files`](../../api-samples/server-files).
-- Multiple protobuf services in one app — see [`apps/suggestion-box`](../suggestion-box) for that shape.
-- Channel/group enumeration UI — see [`apps/leveling-leaderboard`](../leveling-leaderboard) and [`api-samples/server-channels`](../../api-samples/server-channels).
+- Channel/group enumeration UI — see [`api-samples/server-channels`](../../api-samples/server-channels).
 - Moderation actions (kick, ban, delete) — see [`api-samples/server-kick-ban`](../../api-samples/server-kick-ban).
 
 **Intentionally simplified for teaching (a fork may need them):**
@@ -73,4 +72,4 @@ A few production concerns are intentionally not addressed here. They depend on c
 - **`TestRepo` is not rate-limited per caller.** Preview clicks share the 20 req/hr headroom GitHub gives between the worst-case poll rate (40/hr) and its unauthenticated ceiling (60/hr). Realistically the disclosure UI + admin-gating keeps this well under budget, but a fork that raises `MAX_REPOS` or lowers `INTERVAL_FLOOR_MINUTES` should add a per-caller guard mirroring `checkReportRate` in `releaseWatcherService.ts`.
 - **Pre-existing mixed-case rows.** `parseGithubUrl` lowercases owner and name on parse so future adds are case-canonical, but rows persisted before this change retain their original casing. A one-time `UPDATE watched_repos SET owner = LOWER(owner), name = LOWER(name)` migration would canonicalize older installs; left out of the schema migrations because it's only relevant to deployments that pre-date the change.
 
-Use this sample as a shape reference for external-service polling with chained `OneTime` jobs, multi-layer reliability (replays + reconciliation + safety-net), validate-before-persist patterns, public/admin broadcast splits backed by a custom `MemberGroup`, and admin-gated in-app Settings. Consult the listed api samples for concerns it doesn't cover.
+Use this sample as a shape reference for external-service polling with chained `OneTime` jobs, multi-layer reliability (replays + reconciliation + safety-net), validate-before-persist patterns, public/admin broadcast splits backed by a custom `MemberGroup`, and admin-gated in-app Settings. See the listed api samples for concerns it doesn't cover, and [`apps/README.md`](../README.md) for the full sample-app catalog.

@@ -33,6 +33,13 @@ require community-level grants. Smaller permission footprint than
 or `self-roles` (which needs `fullControl` to assign arbitrary community
 roles).
 
+## Storage
+
+- **KV (`rootServer.dataStore.appData`)** — the canvas blob (`canvas/state`, sparse pixel map keyed by `"x,y"`) and admin settings (`settings/canvas`, cooldown + dimensions). Single-blob mutation through a module-scoped serialization lock (`canvasWriteLock`) so different-user placements compose against the latest state.
+- **In-memory only** — per-user cooldown (`Map<UserGuid, number>`). Lost on restart by design; the trade-off (one free placement per user post-restart) is documented as acceptable for a sample. A fork that wants persistence can write timestamps to KV at the cost of one extra write per placement.
+
+No SQLite. The canvas is community-wide singleton state, not a relational/list shape — see [DESIGN.md → Storage: KV with sparse pixel map](DESIGN.md) for the access-pattern reasoning.
+
 ## Known limits
 
 - **No reconnect-driven catch-up.** Same as the other DevKit samples. Broadcasts that fire during a brief outage are lost — the canvas stays stale until the next live placement or a manual refresh. When the SDK exposes a reconnect hook, wire `CanvasProvider.reload()` to it.
@@ -43,4 +50,4 @@ roles).
 - **No undo for cleared canvas.** Admin clear is irreversible. The type-name-to-confirm pattern guards against accidents but there's no recovery if the wrong canvas was cleared. Forks could write a "snapshot before clear" to a separate KV key for a one-step undo.
 - **Resize partial-failure window.** `UpdateSettings` writes the canvas blob first (clear-and-resize), then the settings blob. Two KV writes can't be a single transaction; if the second write fails in the gap, the canvas is at the new dimension while the settings KV still claims the old. The next admin Settings load reads the (still-old) settings, so the UI shows the prior size. The retry path self-heals — a subsequent UpdateSettings to either dimension will reach the canvas-clear branch via the live cache. Documented in `pixelCanvasService.updateSettings` for the why-this-order; surfaced here so an admin staring at "Settings UI shows old size, canvas already at new size" has somewhere to land. Forks can add an explicit "reconcile to canvas dimensions on read" step in `loadSettings` if the window matters at their scale.
 
-Use this sample as a shape reference for real-time collaborative state, per-action broadcasts, mobile-first interactive UI, and the action-panel-replaces-hover pattern. Reuse the lib helpers (`adminCheck`, `safeBroadcast`, `useDebouncedMutation`) verbatim where they fit.
+Use this sample as a shape reference for real-time collaborative state, per-action broadcasts, mobile-first interactive UI, and the action-panel-replaces-hover pattern. Reuse the lib helpers (`adminCheck`, `safeBroadcast`, `useDebouncedMutation`) verbatim where they fit. See [`apps/README.md`](../README.md) for the full sample-app catalog.

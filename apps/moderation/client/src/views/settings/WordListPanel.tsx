@@ -46,6 +46,14 @@ export const WordListPanel: React.FC<Props> = ({
   // ids currently in two-step-confirm mode. Keyed by stringified bigint id
   // so Set works.
   const [pendingRemove, setPendingRemove] = useState<Set<string>>(new Set());
+  // Bulk-import disclosure: collapsed by default since most admins
+  // never need it. Open via "Import" button; commit clears the textarea.
+  const [importOpen, setImportOpen] = useState(false);
+  const [importText, setImportText] = useState("");
+  const [importing, setImporting] = useState(false);
+  const [importResult, setImportResult] = useState<
+    { added: number; duplicates: number; invalid: number } | undefined
+  >(undefined);
   const seqRef = useRef(0);
 
   const fetchPage = useCallback(
@@ -127,6 +135,37 @@ export const WordListPanel: React.FC<Props> = ({
     }
   };
 
+  const onImport = async () => {
+    if (!importText.trim()) return;
+    setImporting(true);
+    setError(undefined);
+    try {
+      // Send the textarea content as a single entry — the server splits
+      // on commas + newlines internally. Lets us preserve any internal
+      // commas the admin intentionally typed in a single word (rare but
+      // possible) without us second-guessing.
+      const r = await withClientRetry(() =>
+        moderationServiceClient.importWords({
+          category,
+          texts: [importText],
+        }),
+      );
+      setImportResult({
+        added: r.addedCount,
+        duplicates: r.duplicateCount,
+        invalid: r.invalidCount,
+      });
+      setImportText("");
+      mountedRef.current = true;
+      await fetchPage("", true);
+      onChanged();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setImporting(false);
+    }
+  };
+
   const onRemove = async (word: Word) => {
     try {
       await withClientRetry(() =>
@@ -154,6 +193,7 @@ export const WordListPanel: React.FC<Props> = ({
           className={styles.input}
           type="text"
           placeholder="Add a word…"
+          aria-label={`Add a word to the ${title.toLowerCase()}`}
           maxLength={maxLength}
           value={newText}
           onChange={(e) => setNewText(e.target.value)}
@@ -171,11 +211,74 @@ export const WordListPanel: React.FC<Props> = ({
         </Button>
       </div>
       {error && <div className={styles.error}>{error}</div>}
+      {/* Bulk-import disclosure. Sits visually attached to the Add row
+          above (small top margin, larger bottom margin) so the "Or
+          paste a list…" copy reads as an alternative to typing one
+          word at a time, not as a bridge to the Search row below.
+          The "Or " prefix + "paste" verb telegraph the relationship +
+          the textarea-not-file-picker interaction; both were unclear
+          when the toggle just said "Import a list…". */}
+      <div className={styles.importRow}>
+        {!importOpen ? (
+          <button
+            type="button"
+            className={styles.importToggle}
+            onClick={() => {
+              setImportResult(undefined);
+              setImportOpen(true);
+            }}
+          >
+            Or paste a list…
+          </button>
+        ) : (
+          <div className={styles.importPanel}>
+            <textarea
+              className={styles.importTextarea}
+              placeholder="Paste words separated by commas or newlines…"
+              aria-label={`Bulk import to the ${title.toLowerCase()}`}
+              value={importText}
+              onChange={(e) => setImportText(e.target.value)}
+              disabled={importing}
+              rows={4}
+            />
+            <div className={styles.importActions}>
+              <Button
+                variant="default"
+                onClick={() => {
+                  setImportOpen(false);
+                  setImportText("");
+                }}
+                disabled={importing}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="primary"
+                onClick={() => void onImport()}
+                disabled={importing || !importText.trim()}
+              >
+                {importing ? "Importing…" : "Import"}
+              </Button>
+            </div>
+          </div>
+        )}
+        {importResult && (
+          <div className={styles.importResult} role="status">
+            Added {importResult.added}
+            {importResult.duplicates > 0 &&
+              `, ${importResult.duplicates} duplicate${importResult.duplicates === 1 ? "" : "s"}`}
+            {importResult.invalid > 0 &&
+              `, ${importResult.invalid} invalid`}
+            .
+          </div>
+        )}
+      </div>
       <div className={styles.searchRow}>
         <input
           className={styles.input}
           type="text"
           placeholder="Search words…"
+          aria-label={`Search ${title.toLowerCase()}`}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -187,7 +290,7 @@ export const WordListPanel: React.FC<Props> = ({
         {loading && words.length === 0 ? (
           <Loader />
         ) : words.length === 0 ? (
-          <div style={{ padding: 16, color: "var(--rootsdk-text-secondary)" }}>
+          <div className={styles.emptyMessage}>
             {search ? "No matches." : "No words yet. Add one above."}
           </div>
         ) : (

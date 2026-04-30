@@ -4,6 +4,10 @@ import {
   ChannelCreatedEvent,
   ChannelEditedEvent,
   ChannelDeletedEvent,
+  ChannelGroupEvent,
+  ChannelGroupCreatedEvent,
+  ChannelGroupEditedEvent,
+  ChannelGroupDeletedEvent,
   ChannelGuid,
   ChannelGroupGuid,
 } from "@rootsdk/server-app";
@@ -98,6 +102,39 @@ export async function initializeChannelNameCache(): Promise<void> {
   channelsApi.on(ChannelEvent.ChannelDeleted, (evt: ChannelDeletedEvent) => {
     applyOrBuffer(() => channels.delete(evt.id));
   });
+
+  // Channel group events. Without these the Settings monitored-channels
+  // tree would render stale group names + miss new groups entirely after
+  // a rename / new group / delete in Root's native admin UI.
+  channelGroupsApi.on(
+    ChannelGroupEvent.ChannelGroupCreated,
+    (evt: ChannelGroupCreatedEvent) => {
+      applyOrBuffer(() => groups.set(evt.id, { name: evt.name }));
+    },
+  );
+  channelGroupsApi.on(
+    ChannelGroupEvent.ChannelGroupEdited,
+    (evt: ChannelGroupEditedEvent) => {
+      applyOrBuffer(() => groups.set(evt.id, { name: evt.name }));
+    },
+  );
+  channelGroupsApi.on(
+    ChannelGroupEvent.ChannelGroupDeleted,
+    (evt: ChannelGroupDeletedEvent) => {
+      applyOrBuffer(() => {
+        groups.delete(evt.id);
+        // Cascade-delete child channels of the removed group. We do
+        // this unconditionally rather than relying on per-channel
+        // ChannelDeleted events to fire — if those events DO also fire
+        // for each child, the second delete is a no-op (Map.delete is
+        // idempotent); if they DON'T fire, this catches the cleanup.
+        // Either way the cache ends in the right state.
+        for (const [id, ch] of channels) {
+          if (ch.channelGroupId === evt.id) channels.delete(id);
+        }
+      });
+    },
+  );
 
   let groupList: Awaited<ReturnType<typeof channelGroupsApi.list>>;
   try {

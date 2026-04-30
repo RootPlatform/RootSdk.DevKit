@@ -4,6 +4,7 @@ import {
   ReadOnlyMemberGroup,
   UserGuid,
   CommunityEvent,
+  GlobalSettingsEvent,
 } from "@rootsdk/server-app";
 import { withRetry } from "./lib/retry";
 import { log } from "./lib/log";
@@ -114,9 +115,7 @@ export async function initializeAdminCheck(
 
   // Admins-selection changes. The event payload provides previous + current
   // snapshots, so we diff inside the handler — no held selection-key state.
-  // TODO(SDK): GlobalSettingsEvent enum unreleased — swap "update" →
-  // GlobalSettingsEvent.Update once it ships (same value, enum-clean).
-  state.globalSettings?.on("update", (evt) => {
+  state.globalSettings?.on(GlobalSettingsEvent.Update, (evt) => {
     const prev = evt.previous?.general?.admins as
       | ReadOnlyMemberGroup
       | undefined;

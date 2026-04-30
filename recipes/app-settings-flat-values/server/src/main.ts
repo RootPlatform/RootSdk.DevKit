@@ -16,7 +16,11 @@
 //
 // ============================================================================
 
-import { rootServer, RootAppStartState } from "@rootsdk/server-app";
+import {
+  rootServer,
+  RootAppStartState,
+  GlobalSettingsEvent,
+} from "@rootsdk/server-app";
 import { settingsService } from "./settings-service";
 import { initializeTestDriver } from "./test-driver";
 
@@ -32,9 +36,8 @@ async function onStarting(state: RootAppStartState): Promise<void> {
   // picker. If you fork this recipe and add another setting under the
   // same group, this handler will broadcast on every save of any of
   // them — readers refetch unnecessarily.
-  // TODO(SDK): GlobalSettingsEvent enum unreleased — swap "update" → GlobalSettingsEvent.Update once it ships
   // TODO(SDK): per-key change filtering — narrow this handler to fire only when admins changed
-  state.globalSettings?.on("update", () => {
+  state.globalSettings?.on(GlobalSettingsEvent.Update, () => {
     settingsService.broadcastSettingsChanged({}, "all");
   });
 

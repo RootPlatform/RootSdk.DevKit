@@ -29,7 +29,9 @@ import "rootsdk/types.proto";
 //
 // Broadcasts:
 //   SettingsChanged   — admins-only (carries snapshot). Settings views refetch.
-//   AuditLogAppended  — admins-only. Tells dashboard/audit views to refetch.
+//   AuditLogAppended  — public, empty payload. Tells dashboard/audit views to
+//                       refetch (non-admin clients use it for the public
+//                       dashboard counters).
 //   AdminsChanged     — public, empty payload. Triggers GetAmIAdmin refresh.
 // ============================================================================
 
@@ -45,6 +47,10 @@ enum ModerationError {
   MODERATION_ERROR_INVALID_WORD = 3;
   MODERATION_ERROR_NOT_FOUND = 4;
   MODERATION_ERROR_INVALID_TARGET = 5;
+  // Per-admin rate limit on manual moderation actions tripped. Mirrors
+  // the platform's command quota at the app level so a single admin
+  // session can't rapid-fire kicks/bans/deletes.
+  MODERATION_ERROR_RATE_LIMITED = 6;
 }
 
 // Why an action was taken. Stored on every audit entry so dashboard and
@@ -55,6 +61,25 @@ enum RuleType {
   RULE_TYPE_SPAM_DETECTION = 2;
   RULE_TYPE_RATE_LIMIT = 3;
   RULE_TYPE_MANUAL = 4;
+  // Fired when a member's nickname matches the same content-filter
+  // matchers (slurs / profanity / custom). Action is always BAN — see
+  // server/src/usernameFilter.ts.
+  RULE_TYPE_USERNAME_FILTER = 5;
+  // Fired when a message contains a URL whose hostname (a) matches the
+  // blocklist, (b) is missing from the allowlist (allowlist mode), or
+  // (c) is a Root community invite link when block-root-invites is on.
+  RULE_TYPE_URL_FILTER = 6;
+  // Fired when a member who joined the community less than the
+  // configured minimum-age threshold posts a message. Catches drive-by
+  // spam without explicit content matching — see
+  // server/src/messageHandler.ts and DESIGN.md → "New member gate".
+  RULE_TYPE_NEW_MEMBER_GATE = 7;
+  // Fired when a single message contains more user/role mentions than
+  // the configured threshold. Counts come from the platform-supplied
+  // referenceMaps so we don't re-parse mention markup. Catches "@here-
+  // style" pile-on spam without rate-limit state — see
+  // server/src/messageHandler.ts.
+  RULE_TYPE_MENTION_SPAM = 8;
 }
 
 // What was done. The first three are taken automatically by the message
@@ -65,6 +90,14 @@ enum ActionType {
   ACTION_TYPE_DELETE_MESSAGE = 1;
   ACTION_TYPE_KICK = 2;
   ACTION_TYPE_BAN = 3;
+  // Recorded immediately after the audit log is purged so the new log
+  // starts with a self-documenting "log was cleared by admin X" row,
+  // preserving the audit invariant for the action that wiped everything
+  // else. Carries actorUserId; targetUserId / channelId are empty.
+  ACTION_TYPE_CLEAR_AUDIT_LOG = 4;
+  // Inverse of BAN. Surfaces in the audit log so an admin reading later
+  // can see the full ban → unban arc. Carries targetUserId + actorUserId.
+  ACTION_TYPE_UNBAN_MEMBER = 5;
 }
 
 // Which built-in word list a custom-words category entry belongs to. Allowed
@@ -75,6 +108,21 @@ enum WordCategory {
   WORD_CATEGORY_UNSPECIFIED = 0;
   WORD_CATEGORY_CUSTOM = 1;
   WORD_CATEGORY_ALLOWED = 2;
+  // Domains for the URL filter. Stored in the same `words` table as
+  // custom + allowed lists since the admin-managed shape is identical
+  // (add, remove, toggle, search, paginate). Domain semantics differ
+  // from word substring semantics — matching uses suffix comparison
+  // against URL hostnames; see server/src/urlFilter.ts.
+  WORD_CATEGORY_URL_DOMAIN = 3;
+}
+
+// URL filter mode — see UrlFilterSettings + server/src/urlFilter.ts.
+//   BLOCKLIST: messages with any listed domain → deleted. Permissive default.
+//   ALLOWLIST: messages with non-listed domains → deleted. Restrictive.
+enum UrlFilterMode {
+  URL_FILTER_MODE_UNSPECIFIED = 0;
+  URL_FILTER_MODE_BLOCKLIST = 1;
+  URL_FILTER_MODE_ALLOWLIST = 2;
 }
 
 // How spam detection scopes its "identical message" lookups.
@@ -117,6 +165,63 @@ message GeneralSettings {
   int32 retention_days = 1;
 }
 
+// Username filter — matches member nicknames against the content filter's
+// compiled regex (slurs/profanity/custom + allowed-words cancellation).
+// On match, the member is banned via communityMemberBans.create. Triggers
+// on UserSetProfile (nickname change) and CommunityMemberAttach (catches
+// violating nicknames at first attach).
+message UsernameFilterSettings {
+  bool enabled = 1;
+}
+
+// URL filter — matches URLs in messages against an admin-managed domain
+// list. URLs are extracted from both messageUris[] (platform-detected
+// links + attachments) AND a regex pass over messageContent (catches
+// plain-text URLs that the platform didn't auto-detect).
+message UrlFilterSettings {
+  bool enabled = 1;
+  UrlFilterMode mode = 2;
+  // Block any URL that is a Root community invite link (rootapp.gg/<code>
+  // shape). Independent of the blocklist/allowlist mode — even on
+  // BLOCKLIST mode with an empty list, this gate still fires when on.
+  // Useful for communities that don't want members posting links to
+  // OTHER Root communities (a common spam vector).
+  bool block_root_invites = 3;
+  bool warn_users = 4;
+}
+
+// Mention spam — caps user+role mentions per message. Stateless: each
+// message is judged on its own mention count, no per-user windowing.
+// Counts come straight from the platform's referenceMaps (users + roles
+// arrays), so the rule sees what the chat client renders, not what the
+// raw text says — copy-paste of mention markup that doesn't resolve to
+// a real user/role doesn't count. Slot in evaluateInlineRules so the
+// check also runs on edits (a clean message edited to add 30 mentions
+// hits the same threshold).
+message MentionSpamSettings {
+  bool enabled = 1;
+  // Max mentions (users + roles, summed) allowed in a single message.
+  // Range 1–50. Defaults to 10 in DEFAULT_MENTION_SPAM — generous enough
+  // for legitimate "thanks @a @b @c @d @e" rollups, tight enough that
+  // an @everyone-style pile-on trips it.
+  int32 max_mentions_per_message = 2;
+  bool warn_users = 3;
+}
+
+// New member gate — short-circuits the rule pipeline for messages from
+// members who joined the community less than `min_minutes` ago. Catches
+// drive-by spam without content matching (the cheapest possible rule:
+// integer compare against `joinedAt`). Off by default — gating fresh
+// members has real false-positive cost (legitimate new joiners can't
+// post until the threshold passes).
+message NewMemberGateSettings {
+  bool enabled = 1;
+  // Minimum minutes since `joinedAt` before a member can post in
+  // monitored channels. Range 1–10080 (1 minute to 7 days).
+  int32 min_minutes = 2;
+  bool warn_users = 3;
+}
+
 // Server-side validation bounds. The client renders form min/max from these
 // so the bounds stay in lockstep with server-side validation — no constant
 // duplication. Mirrors the leveling-leaderboard pattern.
@@ -132,6 +237,10 @@ message SettingsLimits {
   int32 retention_days_min = 9;
   int32 retention_days_max = 10;
   int32 word_max_length = 11;
+  int32 new_member_gate_min_minutes_min = 12;
+  int32 new_member_gate_min_minutes_max = 13;
+  int32 mention_spam_max_mentions_min = 14;
+  int32 mention_spam_max_mentions_max = 15;
 }
 
 // --- Audit log entry --------------------------------------------------------
@@ -150,9 +259,13 @@ message AuditEntry {
   // a kick/ban that wasn't tied to a specific message.
   string channel_id = 6;
   string channel_name = 7;
-  // Cached at write time so the audit log doesn't need a member lookup per
-  // row at read time. Empty when unknown.
-  string target_username = 8;
+  // Persisted-at-time-of-action community nickname (the SDK's
+  // `CommunityMember.nickname` — what the user was called in chat when
+  // this row was written). The user-facing UI labels this "Username"
+  // since that's how Root admins refer to it; the proto field tracks
+  // the SDK term to teach the underlying API. See DESIGN.md →
+  // "Audit log nicknames" for why this isn't the global username.
+  string target_nickname = 8;
   // The text that triggered the rule, truncated server-side.
   string message_excerpt = 9;
   // The word/term that matched (content filter only).
@@ -161,6 +274,10 @@ message AuditEntry {
   bool manual = 11;
   // Admin user who took the action. Empty for automated entries.
   string actor_user_id = 12;
+  // Persisted-at-time-of-action nickname for the admin actor. Same
+  // resolver + frozen-at-write semantics as target_nickname. Empty for
+  // automated entries (rule pipeline) since there's no human actor.
+  string actor_nickname = 13;
 }
 
 // --- Dashboard --------------------------------------------------------------
@@ -239,7 +356,9 @@ message ListAuditLogRequest {
   int32 page_size = 2;
 
   // All filters are AND-combined. Empty/zero = "no filter on that axis".
-  string username_filter = 3;
+  // Substring match against the persisted target_nickname (the SDK's
+  // community nickname — see AuditEntry.target_nickname).
+  string nickname_filter = 3;
   ActionType action_filter = 4;
   RuleType rule_filter = 5;
   // Inclusive UTC ms-epoch lower bound. 0 = no lower bound.
@@ -255,6 +374,36 @@ message ListAuditLogResponse {
   // Total matching the filters across the entire log. Useful for "Showing 1-20
   // of N" affordances; computed once per call (not cached).
   int32 total_matches = 3;
+}
+
+// Per-user infraction history, derived from audit_log rows targeting a
+// single user. Returned by GetMemberSummary; fetched on-demand when an
+// admin expands an audit-log row's chevron to drill into "is this user
+// a repeat offender?" UNSPECIFIED-rule rows (rule-pipeline-failure
+// records) are excluded so internal-failure noise doesn't inflate the
+// counts — same exclusion as the dashboard totals.
+message GetMemberSummaryRequest {
+  string user_id = 1;
+}
+
+message MemberRuleCount {
+  RuleType rule = 1;
+  int32 count = 2;
+}
+
+message GetMemberSummaryResponse {
+  // Frozen nickname from the user's most recent audit row. Empty when
+  // they have no audit history (e.g., the row's targetUserId resolved
+  // to a member who's never been touched by another rule).
+  string nickname = 1;
+  int32 total_events = 2;
+  // Per-rule counts. Only includes rules that have at least one event;
+  // empty entries aren't returned. The client renders one chip per
+  // entry, sorted by count descending in the UI.
+  repeated MemberRuleCount by_rule = 3;
+  // ms epoch of earliest / latest event for this user. 0 when no events.
+  int64 first_event_at = 4;
+  int64 last_event_at = 5;
 }
 
 // --- Word lists -------------------------------------------------------------
@@ -302,6 +451,27 @@ message RemoveWordRequest {
 
 message RemoveWordResponse {}
 
+// Bulk import of word entries — paste a list rather than clicking Add
+// per word. Server splits each input on commas + newlines, normalizes,
+// deduplicates within the input, and skips entries already in the list.
+// Returns counts so the UI can surface "Added 47, 3 duplicates, 2 invalid".
+message ImportWordsRequest {
+  WordCategory category = 1;
+  // Raw input strings — typically each one is a single word, but the
+  // server tolerates internal commas and newlines so admins can paste
+  // a CSV or newline-separated list directly into one entry.
+  repeated string texts = 2;
+}
+
+message ImportWordsResponse {
+  // Successfully inserted + cache-invalidated.
+  int32 added_count = 1;
+  // Already in the list (matched on normalized text + category).
+  int32 duplicate_count = 2;
+  // Empty after normalization, or over the wordMaxLength cap.
+  int32 invalid_count = 3;
+}
+
 // --- Settings ---------------------------------------------------------------
 
 message MonitoredChannels {
@@ -325,6 +495,31 @@ message ChannelGroup {
 
 message GetSettingsRequest {}
 
+// Snapshot of the globalSettings.general.exempt picker. Read-only on the
+// client side (the picker itself lives in Root's native Settings UI).
+// Surfaced here so the General tab can show admins who's currently
+// exempt without an extra round trip.
+message ExemptSelection {
+  // Bare user IDs as picked. Resolving these to display names client-side
+  // would require a profiles fetch we skip here; the General tab renders
+  // them as raw IDs (a future enhancement could batch a profiles RPC).
+  repeated string user_ids = 1;
+  // Roles with display names + colors resolved server-side from
+  // communityRoles.list() during GetSettings. Done server-side because
+  // .list() is already a round-trip and roles are bounded — cheaper than
+  // a separate client RPC.
+  repeated ExemptRole roles = 2;
+}
+
+message ExemptRole {
+  string id = 1;
+  string name = 2;
+  // Hex color (e.g. "#7289DA") so the General tab can render role Pills
+  // with Root's role-mention color convention. Empty when the role has
+  // no color configured.
+  string color_hex = 3;
+}
+
 message GetSettingsResponse {
   ContentFilterSettings content_filter = 1;
   SpamControlSettings spam_control = 2;
@@ -339,6 +534,18 @@ message GetSettingsResponse {
   // loading every word.
   int32 custom_word_count = 8;
   int32 allowed_word_count = 9;
+  // Read-only snapshot of who's currently exempt from automated rules
+  // (per globalSettings.general.exempt). The picker itself is managed in
+  // Root's native Settings UI; the General tab shows this for visibility.
+  ExemptSelection exempt = 10;
+  UsernameFilterSettings username_filter = 11;
+  UrlFilterSettings url_filter = 12;
+  // Counts so the URL filter Settings panel can show "120 blocked
+  // domains" without loading every row. Same shape as custom_word_count
+  // and allowed_word_count above.
+  int32 url_domain_count = 13;
+  NewMemberGateSettings new_member_gate = 14;
+  MentionSpamSettings mention_spam = 15;
 }
 
 // Per-field setters. Each Settings tab's editable fields each get their own
@@ -364,6 +571,21 @@ message SetRateLimitMaxRequest { int32 max_messages = 1; }
 message SetRateLimitWindowRequest { int32 window_seconds = 1; }
 
 message SetRetentionDaysRequest { int32 days = 1; }
+
+message SetUsernameFilterEnabledRequest { bool enabled = 1; }
+
+message SetUrlFilterEnabledRequest { bool enabled = 1; }
+message SetUrlFilterModeRequest { UrlFilterMode mode = 1; }
+message SetUrlFilterBlockRootInvitesRequest { bool enabled = 1; }
+message SetUrlFilterWarnUsersRequest { bool enabled = 1; }
+
+message SetNewMemberGateEnabledRequest { bool enabled = 1; }
+message SetNewMemberGateMinMinutesRequest { int32 min_minutes = 1; }
+message SetNewMemberGateWarnUsersRequest { bool enabled = 1; }
+
+message SetMentionSpamEnabledRequest { bool enabled = 1; }
+message SetMentionSpamMaxMentionsRequest { int32 max_mentions = 1; }
+message SetMentionSpamWarnUsersRequest { bool enabled = 1; }
 
 // Empty response shared by every per-field setter — the success of the RPC
 // itself is the only signal needed; updated state arrives via the
@@ -408,22 +630,83 @@ message GetAmIAdminResponse {
 message DeleteMessageManualRequest {
   string channel_id = 1;
   string message_id = 2;
-  // Optional admin-supplied note recorded on the audit entry.
-  string note = 3;
+  // Optional admin-supplied reason recorded on the audit entry's
+  // messageExcerpt. Standardized across every manual-action RPC for
+  // consistency — same field name on Kick / Ban / Unban / Delete.
+  string reason = 3;
 }
 message DeleteMessageManualResponse {}
 
 message KickMemberRequest {
   string user_id = 1;
-  string note = 2;
+  // Optional admin-supplied reason recorded on the audit entry.
+  string reason = 2;
 }
 message KickMemberResponse {}
 
 message BanMemberRequest {
   string user_id = 1;
   string reason = 2;
+  // Optional ban expiry as ms-epoch. 0 (default) = permanent. Surfaces the
+  // SDK's `communityMemberBans.create({ expiresAt })` capability so admins
+  // can issue cool-off bans without scheduling their own un-ban; the SDK
+  // lifts the ban automatically when the timestamp passes.
+  int64 expires_at = 3;
 }
 message BanMemberResponse {}
+
+// Lift an existing ban. The SDK rejects the call if the user isn't
+// currently banned, so the server doesn't need to pre-check — it
+// surfaces the SDK's NotFound as INVALID_TARGET. The ban list view
+// only renders Unban for currently-banned users in the first place,
+// so this should be the rare race-only path.
+message UnbanMemberRequest {
+  string user_id = 1;
+  // Optional admin-supplied reason recorded on the audit entry.
+  // Useful for "I'm unbanning because we resolved this in moderation
+  // chat" so the log captures the human context.
+  string reason = 2;
+}
+message UnbanMemberResponse {}
+
+// State-pivot view of who's currently banned. Distinct from the audit
+// log (which is the event history): bans automatically expire (temp
+// bans), get lifted by admins, or get re-applied — the audit log shows
+// every event in that arc, but admins managing live bans want the
+// current state, not the history. See DESIGN.md → "Banned members".
+message ListBannedMembersRequest {}
+
+message ListBannedMembersResponse {
+  repeated BannedMember members = 1;
+}
+
+message BannedMember {
+  string user_id = 1;
+  // Frozen-at-time-of-ban nickname pulled via the same nicknameCache
+  // the audit-write path uses. Identical to the targetNickname recorded
+  // on the BAN audit row.
+  string nickname = 2;
+  // Reason recorded on the ban — admin-supplied free text. Empty when
+  // the ban was issued without a reason.
+  string reason = 3;
+  // ms-epoch UTC. 0 = permanent. Surfaced so the UI can render
+  // "expires in 2 days" affordances.
+  int64 expires_at = 4;
+}
+
+// Type-to-confirm gated audit-log purge. Server validates the typed phrase
+// matches the canonical "clear audit log" string (case-insensitive, trimmed)
+// before doing the DELETE — defence in depth against a malformed client or
+// a user who bypassed the in-app confirm UI by calling the RPC directly.
+message ClearAuditLogRequest {
+  string confirmation_phrase = 1;
+}
+message ClearAuditLogResponse {
+  // Reported back so the UI can surface "cleared N entries" — useful both
+  // as feedback and so the action's effect is explicit even when the audit
+  // log refresh broadcast hasn't landed yet.
+  int32 rows_deleted = 1;
+}
 
 // --- Broadcasts -------------------------------------------------------------
 
@@ -477,18 +760,39 @@ service ModerationService {
 
   rpc SetRetentionDays(SetRetentionDaysRequest) returns (SetSettingsFieldResponse);
 
+  rpc SetUsernameFilterEnabled(SetUsernameFilterEnabledRequest) returns (SetSettingsFieldResponse);
+
+  rpc SetUrlFilterEnabled(SetUrlFilterEnabledRequest) returns (SetSettingsFieldResponse);
+  rpc SetUrlFilterMode(SetUrlFilterModeRequest) returns (SetSettingsFieldResponse);
+  rpc SetUrlFilterBlockRootInvites(SetUrlFilterBlockRootInvitesRequest) returns (SetSettingsFieldResponse);
+  rpc SetUrlFilterWarnUsers(SetUrlFilterWarnUsersRequest) returns (SetSettingsFieldResponse);
+
+  rpc SetNewMemberGateEnabled(SetNewMemberGateEnabledRequest) returns (SetSettingsFieldResponse);
+  rpc SetNewMemberGateMinMinutes(SetNewMemberGateMinMinutesRequest) returns (SetSettingsFieldResponse);
+  rpc SetNewMemberGateWarnUsers(SetNewMemberGateWarnUsersRequest) returns (SetSettingsFieldResponse);
+
+  rpc SetMentionSpamEnabled(SetMentionSpamEnabledRequest) returns (SetSettingsFieldResponse);
+  rpc SetMentionSpamMaxMentions(SetMentionSpamMaxMentionsRequest) returns (SetSettingsFieldResponse);
+  rpc SetMentionSpamWarnUsers(SetMentionSpamWarnUsersRequest) returns (SetSettingsFieldResponse);
+
   rpc UpdateMonitoredChannels(UpdateMonitoredChannelsRequest) returns (UpdateMonitoredChannelsResponse);
 
   rpc ListWords(ListWordsRequest) returns (ListWordsResponse);
   rpc AddWord(AddWordRequest) returns (AddWordResponse);
   rpc SetWordEnabled(SetWordEnabledRequest) returns (SetWordEnabledResponse);
   rpc RemoveWord(RemoveWordRequest) returns (RemoveWordResponse);
+  rpc ImportWords(ImportWordsRequest) returns (ImportWordsResponse);
 
   rpc ListAuditLog(ListAuditLogRequest) returns (ListAuditLogResponse);
+  rpc GetMemberSummary(GetMemberSummaryRequest) returns (GetMemberSummaryResponse);
 
   rpc DeleteMessageManual(DeleteMessageManualRequest) returns (DeleteMessageManualResponse);
   rpc KickMember(KickMemberRequest) returns (KickMemberResponse);
   rpc BanMember(BanMemberRequest) returns (BanMemberResponse);
+  rpc UnbanMember(UnbanMemberRequest) returns (UnbanMemberResponse);
+  rpc ListBannedMembers(ListBannedMembersRequest) returns (ListBannedMembersResponse);
+
+  rpc ClearAuditLog(ClearAuditLogRequest) returns (ClearAuditLogResponse);
 
   // Broadcasts.
   rpc BroadcastSettingsChanged(SettingsChangedEvent) returns (rootsdk.Void);
