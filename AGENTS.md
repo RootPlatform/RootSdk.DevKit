@@ -1,59 +1,53 @@
 # RootSdk.DevKit — Agent Navigation Guide
 
-Developer toolkit for building apps and bots on the Root Platform. This guide helps you find the right resources for any task.
+Reference repository for AI agents (and humans) building apps and bots on the Root Platform. Apps have a React/TypeScript client UI plus a server. Bots are server-only automation. Server-side SDK code is identical between apps and bots except the import path.
+
+## How this DevKit is organized
+
+Content is structured along [Diátaxis](https://diataxis.fr/) lines. Walk to the category that matches your current question; don't pre-load everything.
+
+| Question | Category | Where |
+|---|---|---|
+| Concepts: how something works, why a feature exists, when to use it | Explanation | `docs/llms/{app,bot}-docs/` |
+| API reference: exact types, methods, parameters | Reference | `docs/llms/{app,bot}-api-reference/` |
+| API syntax: working code per SDK domain, every method demonstrated | Reference | `api-samples/` (one folder per SDK domain) |
+| How do I X? composing multiple SDK domains for a single goal | How-to | `recipes/` (folder names category-prefixed) |
+| Architecture: full working app or bot you can study end-to-end | Tutorial / worked example | `apps/` and `bots/` |
+
+The catalogs further down list every concrete item in `apps/`, `bots/`, `recipes/`, and `api-samples/`. The `Documentation` and `Schemas` sections at the end point at the rest.
 
 ## Quick Start
 
-**Building a bot** (server-only automation):
+**Building a bot** (server-only):
 1. Copy `templates/bot/` to your target location.
-2. Load `docs/index.md` (the docs router, ~12K tokens). Use it to find specific per-page chunks under `docs/llms/bot-docs/` (concept guides) and `docs/llms/bot-api-reference/` (API reference). Fetch only the pages relevant to your task — each chunk is small and self-contained.
-3. Reference `api-samples/` bots for working examples of each SDK domain.
-4. For complete SDK usage per domain, always check the matching `api-samples/` module — each one demonstrates every method. Sample bots only show targeted use cases.
+2. Load `docs/index.md` (the docs router) and fetch the per-page chunks you need.
+3. Reference `api-samples/` for SDK domain coverage; reference `bots/` for runnable end-to-end examples.
 
-**Building an app** (client UI + server):
-
-1. Load `docs/index.md` (the docs router, ~12K tokens). Use it to find per-page chunks under `docs/llms/app-docs/` (concept guides) and `docs/llms/app-api-reference/` (API reference). Don't pre-load all of the docs — fetch chunks as the task surfaces a need.
-2. Walk the concern checklist below. For each concern that applies to your app, load the matching api sample **before writing code for that concern** — don't defer until you hit a wall.
-
-   | Concern | API Sample | Triggers for |
-   |---|---|---|
-   | UI theming / dark mode | `api-samples/client-app-theme` | any client UI |
-   | User profiles / identity | `api-samples/client-app-users` | any UI showing user-scoped data |
-   | Client-server RPC | `api-samples/networking-app-services` | any call back to the server |
-   | Persistence | `api-samples/server-database` or `api-samples/server-key-value-store` | any stored state |
-   | Role/member permissions | `api-samples/server-global-settings`, `api-samples/server-access-rules` | any role-gated behavior |
-   | Scheduling | `api-samples/server-jobs` | timers, retries, delayed work |
-   | Retry / resilience | `api-samples/server-resilience` | any external call |
-
-3. Copy `templates/app/` for scaffolding. Read the template files — `server/src/main.ts`, `server/src/exampleService.ts`, `client/src/Example.tsx`, `networking/src/example.proto` — to understand the build layout.
-4. Consult `apps/*` for end-to-end shape. **Samples illustrate one possible shape — they do not cover every concern your app needs. Check each sample's `README.md` for its coverage scope before using it as a reference.**
-5. `api-samples/` bots double as server-side references for apps (server code is identical between apps and bots). For complete SDK usage per domain, always check the matching api sample module — each demonstrates every method; samples only show targeted use cases.
+**Building an app** (client + server + networking):
+1. Copy `templates/app/`.
+2. Load `docs/index.md` and fetch chunks as needed.
+3. Reference `api-samples/` (every SDK domain, every method) and `apps/` (end-to-end architecture). Each sample's `README.md` has a Coverage scope section stating what it does and does not demonstrate.
 
 **Not sure which to build?** Read `docs/llms/overview/choose-app-or-bot.md`.
 
+## Commands
+
+| Command | What it does |
+|---|---|
+| `npx create-root --app <Name>` or `--bot <Name>` | Scaffold a new project |
+| `npm run build` | Compile TypeScript |
+| `rootsdk build proto` | Generate TypeScript from `.proto` files (apps only) |
+| `rootsdk start devhost` | Run locally inside the Root DevHost |
+| `rootsdk build package` | Create a `.pkg` deployment archive |
+| `rootsdk upload package` | Deploy to Root cloud |
+
+Requires Node.js ≥ 22 and `@rootsdk/dev-tools` in `devDependencies`. A `DEV_TOKEN` from the [Root Developer Portal](https://dev.rootapp.com) goes in `.env` for `rootsdk start devhost`. Full details and edge cases in `api-samples/cli/`.
+
 ## Key Conventions
 
-- **Apps** import from `@rootsdk/server-app`. **Bots** import from `@rootsdk/server-bot`.
-- All server-side SDK code is identical between apps and bots except the import path.
+- **Apps** import from `@rootsdk/server-app`. **Bots** import from `@rootsdk/server-bot`. Server-side code is otherwise identical between the two.
 - The `rootServer` object is the SDK entry point. Everything hangs off `rootServer.community.*`, `rootServer.dataStore.*`, `rootServer.lifecycle.*`, etc.
-- **Set permissions** in `root-manifest.json` — each api-sample README lists the permissions its APIs require. `schemas/permissions-map.json` maps every SDK method to its required permission. For the conceptual model and full permission tables see `docs/llms/{app,bot}-docs/design/permissions.md` and `docs/llms/{app,bot}-docs/configure/manifest-permissions.md` (identical content under each audience). The `@everyone` role is auto-assigned to your app/bot but its grants are community-configurable, so the manifest is the only contract you can rely on.
-
-## Common Needs
-
-When your task requires one of these, go to the linked module — don't invent a solution from outside the DevKit.
-
-| Need | Where to look | Notes |
-|------|--------------|-------|
-| Make something configurable by community admins | `api-samples/server-global-settings` + `docs/llms/bot-docs/configure/manifest-global-settings.md` | Settings are declared in `root-manifest.json` and edited by admins through the Root UI. Some setting types are not yet available — check the docs for platform status before using one. |
-| Persist data between restarts | `api-samples/server-database` (SQLite) or `api-samples/server-key-value-store` | Don't use the filesystem or in-memory state for data that must survive restarts. |
-| Run code on a schedule or delay | `api-samples/server-jobs` | Don't use `setTimeout`/`setInterval` — jobs survive restarts, timers don't. |
-| Identify what type of entity a GUID represents | `api-samples/server-guid-utils` | Distinguishes users from bots/apps, extracts timestamps — no API call needed. |
-| Retry after rate limits or transient errors | `api-samples/server-resilience` | Wrap any SDK call in `withRetry()`. Retries TooManyRequests, ServerError, Timeout with exponential backoff + jitter. |
-| Set permissions for SDK calls | `docs/llms/{app,bot}-docs/design/permissions.md` (the model — what's a permission, least-privilege procedure), `docs/llms/{app,bot}-docs/configure/manifest-permissions.md` (declaration syntax + full community/channel permission tables + overlay & visibility behavior), `schemas/permissions-map.json` (per-method lookup) | Read in that order. The `@everyone` role is auto-assigned to your app/bot but communities can add/remove its permissions, so the manifest is your only contract — don't lean on `@everyone` for grants. |
-| Style a client UI to match Root (light/dark) | `api-samples/client-app-theme` + `apps/themes` | Use `var(--rootsdk-*)` CSS tokens; don't hardcode colors. Tokens switch automatically with the user's theme. |
-| Pick an icon for a UI element | `lucide-react` (npm) for any new client UI, `apps/themes` as the canonical "look like native Root chrome" reference | Sample apps standardize on `lucide-react` — one library, ~1500 glyphs, tree-shaken per import. `apps/themes` keeps the curated Root-aesthetic icon catalog for anyone wanting strict identity with native Root surfaces. Don't copy the `Icon.tsx`/`icons.json` snapshot from older samples into a new fork — `lucide-react` is the going-forward convention. |
-| Show a user's profile, nickname, or avatar | `api-samples/client-app-users` | Don't invent a user model — use `rootClient.users.*` and its profile-update events. |
-| Call the server from the client | `api-samples/networking-app-services` | Define protobuf services and use the generated client/server bases; don't hand-roll JSON fetch. |
+- Root-specific rules, gotchas, and decision frameworks live in the upstream docs surfaced via the Diátaxis routing above. This file does not preempt them — load the relevant concept doc when the question arises.
 
 ## Sample Apps
 
@@ -92,7 +86,7 @@ Complete, runnable bot examples in `bots/`. Server-only — no client UI.
 
 ## Recipes
 
-Composition tasks in `recipes/`. Each recipe synthesizes multiple api-samples into a working answer for a real developer goal. Recipes sit between api-samples (per-method primitives) and apps (full architectural exemplars). Use a recipe when the lesson is "how do I compose X and Y to accomplish Z?"
+Composition tasks in `recipes/`. Each recipe synthesizes multiple api-samples into a working answer for a real developer goal. Recipes sit between api-samples (per-method primitives) and apps (full architectural exemplars).
 
 Folder names are category-prefixed (e.g. `ui-`, `data-`, `app-settings-`, `chat-`, `external-`, `per-user-`).
 
@@ -176,24 +170,11 @@ Focused samples in `api-samples/`, one per SDK domain. Each is a standalone bot 
 
 ## Documentation
 
-Full developer docs in `docs/`. The DevKit ships them as a router (`docs/index.md`, ~12K tokens) plus per-topic markdown chunks under `docs/llms/`. Workflow:
-
-1. Read `docs/index.md` to find the chunks relevant to your task — it lists every page with a description.
-2. Fetch only the chunks you need. Each one is self-contained and small (usually 1–20 KB), so context stays free for actual work.
-
-### Bot docs
-
-- `docs/llms/bot-docs/` — concept guides (audience: bots).
-- `docs/llms/bot-api-reference/` — TypeScript API reference (audience: bots).
-
-### App docs
-
-- `docs/llms/app-docs/` — concept guides (audience: apps).
-- `docs/llms/app-api-reference/` — TypeScript API reference (audience: apps).
+Developer docs ship as a router (`docs/index.md`, ~12K tokens) plus per-topic markdown chunks under `docs/llms/`. Read `docs/index.md` to find the chunks relevant to your task; each chunk is small and self-contained. The Diátaxis mapping near the top of this file shows which subdirectory contains which kind of content.
 
 ## Schemas
 
 Machine-readable reference files in `schemas/`.
 
-- **`permissions-map.json`** — maps every SDK method to its required manifest permission. Use this when setting up `root-manifest.json`.
-- **`root-manifest.*.schema.json`** — JSON schemas for validating app and bot manifests.
+- **`permissions-map.json`** — maps every SDK method to its required manifest permission. Use when setting up `root-manifest.json`.
+- **`root-manifest.{app,bot}.schema.json`** — JSON schemas for validating manifests.

@@ -100,7 +100,7 @@ Your API results are filtered by what the community allows you to see. You can s
 
 When your code is installed, it's granted the **Everyone** role automatically. If the community has channels restricted to other roles, you won't see them until the community grants you access.
 
-The Everyone role's permissions are community-configurable — the community can add or remove permissions on it at any time. Always declare what your code needs in the manifest; never depend on Everyone's current permissions to grant you a capability.
+The Everyone role's permissions are community-configurable. The community can add or remove permissions on it at any time. Always declare what your code needs in the manifest, and never depend on Everyone's current permissions to grant you a capability.
 
 ## Channel permission overlays
 

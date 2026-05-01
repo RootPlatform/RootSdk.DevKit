@@ -15,8 +15,6 @@ The Root design system is a set of CSS custom properties (variables) prefixed wi
 
 The CSS variables hold the current theme's color values, allowing your App to automatically adapt when the user switches between light and dark mode. Root updates the variables automatically when the theme changes, so your App does not need to know the actual color values. Just reference the variables and they will adapt.
 
-> **Timing note.** Root sets these variables on `document.documentElement` after the App's iframe loads. CSS that references them via `var(--rootsdk-...)` resolves correctly at paint time. JavaScript that reads them via `getComputedStyle().getPropertyValue('--rootsdk-...')` may return empty strings if it runs before Root's first push — subscribe to `RootClientThemeEvent.ThemeUpdate` (see [Theme mode](theme-mode.md)) and read the variables from inside the handler if you need their string values from JS.
-
 If your App needs to perform additional logic when the theme changes (such as updating a canvas or third-party library), see [Theme mode](theme-mode.md).
 
 ## Colors
@@ -649,6 +647,30 @@ Square icon button.
 .icon-button:hover {
   background-color: var(--rootsdk-highlight-strong);
   color: var(--rootsdk-text-primary);
+}
+```
+
+### icon-button-danger
+
+Square icon button for destructive actions (delete, ban, kick, remove) where the trigger is icon-only with no accompanying label. The error color sits at rest, not on hover, so the destructive intent is visible before the user moves their cursor over the control. A neutral-at-rest icon that turns red on hover does not signal the action's blast radius, and members can trigger it by accident while exploring.
+
+Pair with a confirmation step (an inline confirm or a modal) so the click is not the action itself.
+
+```css
+.icon-button-danger {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4px;
+  border-radius: 6px;
+  aspect-ratio: 1;
+  cursor: pointer;
+  color: var(--rootsdk-error);
+  transition: background-color 150ms;
+}
+
+.icon-button-danger:hover {
+  background-color: color-mix(in srgb, var(--rootsdk-error) 12%, transparent);
 }
 ```
 

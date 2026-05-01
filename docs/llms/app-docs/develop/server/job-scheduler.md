@@ -54,3 +54,18 @@ It could happen that your server code isn't running at the scheduled time for a 
 The job scheduler handles this case by checking for missed events immediately when your server code starts. If it finds missed jobs, it raises the `JobScheduleEvent.JobMissed` event once for each missed job.
 
 The missed job feature is intended for short pauses in your server's availability. In the unlikely case that your server isn't available for an extended period, the missed jobs are likely to be auto-deleted from the database and the job scheduler won't raise `JobScheduleEvent.JobMissed` events for those jobs.
+
+## Reconcile on startup for long-running schedules
+
+`JobMissed` covers most outages but not all. Two failure modes get past it:
+
+- **Crashes during scheduling**, where your code writes its own state but the host process dies before calling `JobScheduler.create` for the corresponding job. The persisted state references a job the scheduler does not know about, so there is nothing for `JobMissed` to replay.
+- **Long outages**, where your code is offline for longer than the missed-job retention window. The scheduler garbage-collects expired jobs and stops raising `JobMissed` for them.
+
+For schedules that must remain consistent across these modes, reconcile on startup. Walk your persisted state, compare it to what the scheduler currently has, and create or remove jobs to bring them back into agreement. Run this pass inside your `lifecycle.start` handler, before the rest of the app begins serving requests.
+
+The reconciliation pass is idempotent. On a clean restart with no drift, it finds nothing to fix and exits quickly. On a recovery, it brings the scheduler back to the state your persisted records say it should be in.
+
+This pattern applies whenever the schedule has its own persisted truth that lives outside the scheduler. A canonical example is a chained `OneTime` polling pattern, where each job creates the next when it fires and a row in your database lists which sources need to be polled. If the chain breaks, the database has the answer for what should be running, and the reconciliation pass uses that answer to repair the chain.
+
+A daily safety-net job using `JobInterval.Daily` running alongside the reconciliation pass bounds the silent-stop failure mode to twenty-four hours regardless of restart cadence. The reconciliation pass and the safety-net job do the same work; they differ only in trigger.

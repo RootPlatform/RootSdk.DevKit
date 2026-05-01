@@ -1,36 +1,3 @@
 # RootSdk.DevKit
 
-> Developer toolkit for building apps and bots on the Root Platform. Designed for AI-agent-driven development.
-
-## Navigation
-
-- [Agent Guide](AGENTS.md): Full navigation — quick start, sample catalog, api-samples index, doc pointers, schema reference
-
-## Templates
-
-- [Bot Template](templates/bot/): Starting point for new bots (server-only)
-- [App Template](templates/app/): Starting point for new apps (client + server + networking)
-
-## Documentation
-
-- [Documentation Index](docs/index.md): Index of all developer documentation. Use this to find the per-page chunk you need under `docs/llms/`, then read just that file. Each chunk is small (usually 1–20 KB) and self-contained — fetching one keeps your context budget free for actual work.
-- [Concept guides](docs/llms/app-docs/) and [API reference](docs/llms/app-api-reference/): App-side per-page chunks.
-- [Concept guides](docs/llms/bot-docs/) and [API reference](docs/llms/bot-api-reference/): Bot-side per-page chunks.
-
-## Samples
-
-- [Sample Apps](apps/): Complete, runnable app examples (hello-world, data-storage, leveling-leaderboard, pixel-canvas, protobuf-service, self-roles, suggestion-box, themes, tic-tac-toe). See [AGENTS.md](AGENTS.md#sample-apps) for the catalogue.
-- [Sample Bots](bots/): Complete, runnable bot examples (hello-world, all-channel-broadcast, new-member-welcome, reset-channel-description, role-assignment, role-list).
-
-## Recipes
-
-- [Recipes](recipes/): Composition tasks — synthesize multiple api-samples into working answers for "how do I do X?" goals. Sit between api-samples (per-method primitives) and apps (full architectural exemplars). See [AGENTS.md](AGENTS.md#recipes) for the catalogue.
-
-## API Samples
-
-- [API Samples](api-samples/): Standalone bots, one per SDK domain. Every method covered with working code.
-
-## Schemas
-
-- [Permissions Map](schemas/permissions-map.json): Maps every SDK method to its required manifest permission
-- [Manifest Schemas](schemas/): JSON schemas for validating root-manifest.json
+> Agent guidance for this repo lives in [AGENTS.md](AGENTS.md) — the canonical, cross-tool source. It covers quick start, sample catalog, api-samples, docs, schemas, and Root SDK conventions.
