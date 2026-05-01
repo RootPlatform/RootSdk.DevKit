@@ -1,3 +1,18 @@
+---
+kind: sample-app
+description: Automatic content filter + spam detection + rate limiting with audit log, analytics, and admin Settings
+complexity: complex
+key_patterns:
+  - message-pipeline rule order with central audit dispatch funnel
+  - atomic per-field KV settings via `dataStore.appData.update()`
+  - custom `adminAudience` MemberGroup (owner ∪ admins)
+  - Sidebar + drawer responsive shell
+  - "`MasterSubToggleGroup` and `ShowWordListGate` UX primitives"
+  - "`lucide-react` icons"
+permissions:
+  - community.fullControl
+---
+
 # moderation
 
 Automatic content filter, spam detection, and rate limiting for a Root community, with a full audit log, analytics view, and admin Settings. Triggers run server-side on every channel message; admins can also take manual kick/ban/delete actions from the dashboard or audit log. Full behavior contract and implementation patterns in [DESIGN.md](DESIGN.md).

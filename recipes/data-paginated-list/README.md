@@ -1,3 +1,13 @@
+---
+kind: recipe
+category: data
+question: How do I paginate a server-side list with cursor-based queries and accumulate pages on the client?
+composes:
+  - server-database
+  - networking-app-services
+exemplified_by: leveling-leaderboard
+---
+
 # Recipe: Cursor-Based Pagination
 
 > *"How do I paginate a server-side list with cursor-based queries and accumulate pages on the client?"*
@@ -45,9 +55,8 @@ The server detects end-of-list precisely by querying `pageSize + 1` rows and tri
 
 | api-sample | What it teaches | What this recipe uses it for |
 |---|---|---|
-| [`api-samples/server-app-data-store`](../../api-samples/server-app-data-store) | SQLite via `rootServer.dataStore` | The `records` table, schema migration, and idempotent seeding |
+| [`api-samples/server-database`](../../api-samples/server-database) | SQLite via `rootServer.dataStore` | The `records` table, schema migration, and idempotent seeding |
 | [`api-samples/networking-app-services`](../../api-samples/networking-app-services) | Custom RPC services | The `ListService.listRecords` RPC |
-| [`api-samples/client-app-services`](../../api-samples/client-app-services) | Calling app services from the client | `listServiceClient.listRecords({ cursor })` |
 
 ## Walkthrough
 

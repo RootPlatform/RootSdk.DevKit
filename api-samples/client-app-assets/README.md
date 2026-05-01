@@ -1,3 +1,11 @@
+---
+kind: api-sample
+category: client-app
+description: File uploads, client-to-server upload flow, asset persistence, and image resolution handling
+domain: Client assets
+key_methods: [file picker, upload tokens]
+---
+
 # API Sample: Client Assets
 
 File uploads, the full client-to-server upload flow, asset persistence, and

@@ -1,3 +1,18 @@
+---
+kind: sample-app
+description: Member-driven self-assignable role picker (Discord "reaction-roles" equivalent)
+complexity: complex
+key_patterns:
+  - member-driven mutations
+  - role enumeration + assignment
+  - KV-backed config
+  - "`CommunityRoleDeleted/Edited` subscriptions"
+  - exclusive-group server-side enforcement
+  - public broadcast (vs admin-only)
+permissions:
+  - community.fullControl
+---
+
 # self-roles
 
 Members open the app and click toggles to add or remove "self-assignable" community roles from themselves (region, pronouns, notification opt-ins, color roles). Admins curate which roles are exposed and how they're grouped via an in-app Settings view. Full behavior contract and implementation patterns in [DESIGN.md](DESIGN.md).

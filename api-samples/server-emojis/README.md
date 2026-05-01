@@ -1,3 +1,11 @@
+---
+kind: api-sample
+category: server-community-api
+description: Get, list, and delete custom community emojis
+domain: Custom emojis
+key_methods: [get, list, delete]
+---
+
 # API Sample: Emojis
 
 Get, list, and delete custom community emojis.

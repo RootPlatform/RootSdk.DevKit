@@ -1,3 +1,11 @@
+---
+kind: api-sample
+category: server-community-api
+description: Create, edit, update (batch), get, delete, and list per-channel permission overrides for roles or members
+domain: Permission overrides
+key_methods: [set, remove, list access rules]
+---
+
 # API Sample: Access Rules
 
 Create, edit, update (batch), get, delete, and list access rules that grant or deny per-channel permissions to specific roles or members.

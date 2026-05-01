@@ -1,3 +1,11 @@
+---
+kind: recipe
+category: audio
+question: How do I ship and play short sound effects from my client, dealing with the autoplay policy and Vite asset bundling?
+composes: []
+exemplified_by: null
+---
+
 # Recipe: Audio Bundled SFX
 
 > *"How do I play a sound effect from my Root client when the user clicks something?"*

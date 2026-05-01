@@ -1,3 +1,11 @@
+---
+kind: api-sample
+category: server-lifecycle-utilities
+description: Track when members attach to your app — connect/disconnect events for users and devices
+domain: Client attachment
+key_methods: [list attached clients, send to specific clients]
+---
+
 # API Sample: Client Attachment
 
 Track when members attach to your app — connect/disconnect events for users and devices.

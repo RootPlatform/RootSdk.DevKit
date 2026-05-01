@@ -1,3 +1,12 @@
+---
+kind: recipe
+category: external
+question: How do I call an external HTTP API from my server with timeouts and typed error handling?
+composes:
+  - networking-app-services
+exemplified_by: github-release-watcher
+---
+
 # Recipe: External HTTP Fetch
 
 > *"How do I call an external HTTP API from my server, with timeouts and typed error handling, and surface the result to the client?"*
@@ -43,7 +52,6 @@ Why split `NETWORK` from `UPSTREAM_UNAVAILABLE` even though both retry? Because 
 | api-sample | What it teaches | What this recipe uses it for |
 |---|---|---|
 | [`api-samples/networking-app-services`](../../api-samples/networking-app-services) | Custom RPC services + typed errors | One callable RPC + three typed rejections (TIMEOUT, NETWORK, BAD_RESPONSE) |
-| [`api-samples/client-app-services`](../../api-samples/client-app-services) | Calling app services from the client | The fetch button + typed-error UX branch |
 
 External HTTP itself isn't an api-sample — api-samples cover Root APIs specifically. The `fetchJson` helper in this recipe (built on Node's global `fetch` + `AbortController`) is the canonical reference for outbound HTTP from a Root server until/unless an api-sample lands.
 

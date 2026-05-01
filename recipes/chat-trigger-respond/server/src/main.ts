@@ -1,6 +1,6 @@
 // ============================================================================
 // Recipe: Chat Trigger + Respond — Entry Point
-// Composes: server-channel-messages
+// Composes: server-messages
 // ============================================================================
 //
 // Smallest recipe shape we ship: server-only, no proto, no SQLite, no

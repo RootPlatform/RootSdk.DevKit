@@ -1,3 +1,11 @@
+---
+kind: api-sample
+category: server-lifecycle-utilities
+description: Retry transient failures (rate limits, server errors, timeouts) with exponential backoff and jitter
+domain: Retry & backoff
+key_methods: [withRetry() wrapper, retryable error classification, batch pacing]
+---
+
 # API Sample: Resilience — Retry & Backoff for Rate Limits
 
 Retry transient failures (rate limits, server errors, timeouts) with exponential backoff and jitter. Copy the `withRetry()` helper into any bot or app.

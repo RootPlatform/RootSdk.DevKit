@@ -1,6 +1,6 @@
 // ============================================================================
 // Recipe: App Settings (Flat Values) — Entry Point
-// Composes: server-app-data-store + server-global-settings + networking-app-services
+// Composes: server-key-value-store + server-global-settings + networking-app-services
 // ============================================================================
 //
 // Startup order:

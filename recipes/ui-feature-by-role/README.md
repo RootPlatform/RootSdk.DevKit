@@ -1,3 +1,16 @@
+---
+kind: recipe
+category: ui
+question: How do I gate UI features by role and enforce the same gate server-side on privileged actions?
+composes:
+  - client-app-users
+  - server-roles
+  - server-member-roles
+  - server-global-settings
+  - networking-app-services
+exemplified_by: leveling-leaderboard
+---
+
 # Recipe: UI Feature Gating by Role
 
 > *"How do I enable/disable UI features based on the current user's roles?"*

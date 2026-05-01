@@ -1,3 +1,11 @@
+---
+kind: api-sample
+category: server-community-api
+description: Create, get, list, edit, move, and delete community roles that define permission sets
+domain: Roles
+key_methods: [create, update, delete, list, reorder]
+---
+
 # API Sample: Roles
 
 Create, get, list, edit, move, and delete community roles that define permission sets.

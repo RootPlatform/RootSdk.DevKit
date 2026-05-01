@@ -1,6 +1,6 @@
 // ============================================================================
 // Recipe: Batch-Prefetch Related Data — Client
-// Composes: client-app-services + networking-app-services
+// Composes: networking-app-services
 // ============================================================================
 //
 // Two-stage render. The lesson is in handleFetch:

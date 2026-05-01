@@ -1,6 +1,6 @@
 // ============================================================================
 // Recipe: Audio Bundled SFX — Client
-// Composes: client-app-services (none, actually — this recipe is client-pure)
+// Composes: (none, actually — this recipe is client-pure)
 // ============================================================================
 //
 // Two buttons, each plays one of the bundled WAV files. A status line

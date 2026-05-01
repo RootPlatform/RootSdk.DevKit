@@ -1,3 +1,15 @@
+---
+kind: recipe
+category: app-settings
+question: "How do I let admins configure my app's behavior per-context — per-channel, per-repo, per-thing — with multi-field rows keyed by the entity?"
+composes:
+  - server-database
+  - server-global-settings
+  - server-member-roles
+  - networking-app-services
+exemplified_by: null
+---
+
 # Recipe: App Settings (Per-Context)
 
 > *"How do I let admins configure my app's behavior per-context — different settings for different channels, repos, or other entities — and persist those configs in SQLite keyed by the entity?"*
@@ -62,11 +74,10 @@ The decision tree: **flat record → KV; collection of single-field items → SQ
 
 | api-sample | What it teaches | What this recipe uses it for |
 |---|---|---|
-| [`api-samples/server-app-data-store`](../../api-samples/server-app-data-store) | SQLite via `rootServer.dataStore` | The `channel_configs` table, upsert via `INSERT … ON CONFLICT DO UPDATE`, per-row delete |
+| [`api-samples/server-database`](../../api-samples/server-database) | SQLite via `rootServer.dataStore` | The `channel_configs` table, upsert via `INSERT … ON CONFLICT DO UPDATE`, per-row delete |
 | [`api-samples/server-global-settings`](../../api-samples/server-global-settings) | The `globalSettings` manifest schema and runtime read | Declare the `admins` `roleOrMember` picker; resolve it to the admin check |
 | [`api-samples/server-member-roles`](../../api-samples/server-member-roles) | Membership in a role group | Implicit, via `ReadOnlyMemberGroup.isMember()` |
 | [`api-samples/networking-app-services`](../../api-samples/networking-app-services) | Custom RPC services, broadcasts, typed errors | Three callable RPCs + one broadcast (`ChannelConfigsChanged`) + three typed rejections (`NOT_ADMIN`, `INVALID_CHANNEL_ID`, `INVALID_PRIORITY`) |
-| [`api-samples/client-app-services`](../../api-samples/client-app-services) | Calling app services from the client + subscribing to broadcasts | Summary-detail editor: list + per-row edit + Add row + subscribe |
 
 ## Walkthrough
 

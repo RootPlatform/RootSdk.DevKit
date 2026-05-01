@@ -1,6 +1,6 @@
 // ============================================================================
 // Recipe: External HTTP Fetch — Client
-// Composes: client-app-services + networking-app-services
+// Composes: networking-app-services
 // ============================================================================
 //
 // A button that calls FetchUuid, shows the result on success, shows a

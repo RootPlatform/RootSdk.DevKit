@@ -1,3 +1,11 @@
+---
+kind: api-sample
+category: server-community-api
+description: Create and manage app-level user groups that combine direct users and role-based users into a single effective membership list
+domain: Member groups
+key_methods: [create, update, delete, list, add/remove members]
+---
+
 # API Sample: Member Groups
 
 Create and manage app-level user groups. Member groups combine direct users and role-based users into a single effective membership list. Unlike roles (which are platform-level), member groups are created and managed by your app/bot for its own purposes.

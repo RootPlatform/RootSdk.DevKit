@@ -4,10 +4,9 @@ package datapaginatedlist;
 // ============================================================================
 // ListService — cursor-based pagination over a server-side list of records.
 //
-// This recipe composes server-app-data-store (the SQLite-backed records),
-// networking-app-services (the RPC plumbing), and client-app-services (the
-// gen-client invocation). The client accumulates pages by calling
-// ListRecords repeatedly with the previous response's next_cursor.
+// This recipe composes server-database (the SQLite-backed records) and
+// networking-app-services (the RPC plumbing). The client accumulates pages
+// by calling ListRecords repeatedly with the previous response's next_cursor.
 // ============================================================================
 
 // Page request. Both fields optional.

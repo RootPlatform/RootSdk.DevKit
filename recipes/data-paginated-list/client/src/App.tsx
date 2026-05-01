@@ -1,6 +1,6 @@
 // ============================================================================
 // Recipe: Cursor-Based Pagination — Client
-// Composes: client-app-services + networking-app-services
+// Composes: networking-app-services
 // ============================================================================
 //
 // State machine for accumulating pages:

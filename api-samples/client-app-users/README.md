@@ -1,3 +1,11 @@
+---
+kind: api-sample
+category: client-app
+description: User profiles, presence status, profile pictures, and profile update events
+domain: User info
+key_methods: [current user, community members]
+---
+
 # API Sample: Client Users
 
 User profiles, presence status, profile pictures, and profile update events.

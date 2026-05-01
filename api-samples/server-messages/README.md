@@ -1,3 +1,11 @@
+---
+kind: api-sample
+category: server-community-api
+description: Send messages, add reactions, pin messages, mention users, and flag content in text channels
+domain: Channel messages
+key_methods: [send, reply, edit, delete, list, reactions, pins, mentions, flag]
+---
+
 # API Sample: Channel Messages
 
 How to send messages, add reactions, pin messages, mention users, and flag content in text channels.

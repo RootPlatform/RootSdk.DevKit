@@ -1,3 +1,11 @@
+---
+kind: api-sample
+category: server-community-api
+description: Get, list, and list all community members — read-only; members join via invites and leave via kick/ban
+domain: Members
+key_methods: [get, list, listAll]
+---
+
 # API Sample: Members
 
 Get, list, and list all community members. Read-only — members join via invites and leave via kick/ban.

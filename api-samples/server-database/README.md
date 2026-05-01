@@ -1,3 +1,11 @@
+---
+kind: api-sample
+category: server-persistence-scheduling
+description: Access the platform-provided SQLite database for persistent storage
+domain: SQLite database
+key_methods: [raw SQL, migrations, Knex, Prisma]
+---
+
 # API Sample: SQLite Database
 
 Access the platform-provided SQLite database for persistent storage.

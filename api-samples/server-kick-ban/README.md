@@ -1,3 +1,11 @@
+---
+kind: api-sample
+category: server-community-api
+description: Ban, unban, kick, and query banned community members
+domain: Moderation
+key_methods: [kick, ban, unban, list bans]
+---
+
 # API Sample: Kick & Ban
 
 Ban, unban, kick, and query banned community members.

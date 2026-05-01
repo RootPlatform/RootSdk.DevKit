@@ -1,6 +1,6 @@
 // ============================================================================
 // Recipe: App Settings (Flat Values) — Client
-// Composes: client-app-services + networking-app-services
+// Composes: networking-app-services
 // ============================================================================
 //
 // A Settings form for the app's three flat values:

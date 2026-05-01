@@ -26,13 +26,13 @@ import { stripMarkdownLite } from "../lib/markdownLite";
 // identity — what makes this card distinct is the version it represents,
 // so the version earns the color treatment.
 //
-// The release URL in the footer is a real anchor. Root's iframe hands
-// `target="_blank"` clicks off to the system browser — the canonical
-// pattern documented in the navigation playground. `rel="noopener
-// noreferrer"` is explicit (target=_blank already implies noopener in
-// modern browsers, but missing it has caused intermittent "links don't
-// work" reports). `user-select: all` on the URL text means a single
-// click still highlights the whole URL for keyboard/right-click copy.
+// The release URL in the footer is displayed as text, NOT as a link. Root
+// client apps run inside a sandboxed iframe that blocks external URL
+// navigation — anchors with `target="_blank"` appear functional but click
+// into nothing. The canonical substitute is click-to-copy: clicking the
+// URL copies it to the clipboard with a transient "Copied!" confirmation.
+// `user-select: all` keeps right-click → Copy working as a fallback when
+// the Clipboard API is unavailable.
 //
 // Live highlight: when `isNew` is true on first render, the card mounts
 // with the highlight class and the 300ms pulse fades the background back
@@ -47,12 +47,19 @@ interface Props {
 
 export const ReleaseCard: React.FC<Props> = ({ release, isNew }) => {
   const [pulsing, setPulsing] = useState(isNew ?? false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!pulsing) return;
     const t = setTimeout(() => setPulsing(false), 350);
     return () => clearTimeout(t);
   }, [pulsing]);
+
+  useEffect(() => {
+    if (!copied) return;
+    const t = setTimeout(() => setCopied(false), 1500);
+    return () => clearTimeout(t);
+  }, [copied]);
 
   const repoPath = `${release.owner}/${release.name}`;
   const heading = release.releaseName?.trim() || release.tagName;
@@ -70,6 +77,17 @@ export const ReleaseCard: React.FC<Props> = ({ release, isNew }) => {
   const cleanedBody = release.body ? stripMarkdownLite(release.body) : "";
 
   const cardClass = pulsing ? `${styles.card} ${styles.pulse}` : styles.card;
+
+  const handleCopyUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(release.htmlUrl);
+      setCopied(true);
+    } catch {
+      // Clipboard API unavailable (rare — typically non-secure contexts).
+      // The URL text has `user-select: all`, so right-click → Copy still
+      // works as a fallback.
+    }
+  };
 
   return (
     <article className={cardClass}>
@@ -92,17 +110,18 @@ export const ReleaseCard: React.FC<Props> = ({ release, isNew }) => {
           {repoPath}
           {relTs && <> · {relTs}</>}
         </span>
-        {/* External anchor — opens the release page in the system browser
-            via the iframe's target=_blank handoff. `user-select: all` keeps
-            the right-click "Copy URL" behavior available too. */}
-        <a
+        {/* URL is rendered as a click-to-copy button, not a link. Root's
+            client iframe blocks external navigation, so anchors with
+            target="_blank" don't work. user-select: all preserves
+            right-click → Copy as a fallback. */}
+        <button
+          type="button"
           className={styles.urlText}
-          href={release.htmlUrl}
-          target="_blank"
-          rel="noopener noreferrer"
+          onClick={handleCopyUrl}
+          aria-label={copied ? "URL copied to clipboard" : "Copy release URL to clipboard"}
         >
-          {release.htmlUrl}
-        </a>
+          {copied ? "Copied!" : release.htmlUrl}
+        </button>
       </footer>
     </article>
   );

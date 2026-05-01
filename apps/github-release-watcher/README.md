@@ -1,3 +1,16 @@
+---
+kind: sample-app
+description: Watches a curated list of GitHub repositories for new releases and surfaces them as an in-app feed
+complexity: complex
+key_patterns:
+  - external-service polling via chained `OneTime` jobs
+  - four-layer reliability (`withRetry` + `JobMissed` + startup reconcile + daily safety-net)
+  - validate-before-persist
+  - persist-then-best-effort-schedule
+  - custom `MemberGroup` for admin broadcast audience
+  - per-field auto-save with separate per-field RPCs
+---
+
 # github-release-watcher
 
 Watches a curated list of GitHub repositories for new releases and surfaces them as an in-app feed. Admins manage the watched repos in an in-app Settings view: add by URL, set per-repo polling interval, toggle prerelease inclusion, preview the latest release before committing, and remove. The home feed shows the most recent ~50 releases across all watched repos with a live highlight pulse on each new card. App admins themselves are configured via Root's native Global Settings UI for this app. Full behavior contract and implementation patterns in [DESIGN.md](DESIGN.md).
@@ -30,7 +43,7 @@ Watches a curated list of GitHub repositories for new releases and surfaces them
 - **Destructive icon-buttons red at rest** per Root convention — destructive intent visible *before* commit.
 
 *Foundation (every Root app)*
-- **Iframe-aware external links** — `<a target="_blank" rel="noopener noreferrer">` for the release URL; Root's iframe hands the click off to the system browser.
+- **URL display with click-to-copy** — Root's client iframe blocks external navigation, so the release URL is rendered as a click-to-copy button (Clipboard API + transient "Copied!" feedback + `user-select: all` fallback for right-click → Copy) rather than as an anchor.
 - **Root theme tokens** for all client styling; `--rootsdk-*` CSS custom properties. Bridge (`lib/rootColorScheme.ts`) keeps `color-scheme` in sync with `rootClient.theme` so native form chrome follows the theme.
 - **Client-error telemetry funnel** — `ErrorBoundary` fires `ReportClientError`; server handler logs structured `error` lines with per-caller rate limit + per-field size caps to bound log impact under misbehaving boundaries.
 

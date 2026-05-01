@@ -1,3 +1,15 @@
+---
+kind: sample-app
+description: r/place-style shared pixel grid every member paints on, one cell at a time
+complexity: complex
+key_patterns:
+  - real-time per-action broadcasts (no coalescing)
+  - shared mutable KV blob
+  - atomic check-then-place per-user cooldown
+  - mobile-first canvas with two-step tap flow
+  - adaptive-ceremony destructive action (type-to-confirm only when populated)
+---
+
 # pixel-canvas
 
 A shared pixel grid every member of the community paints on, one cell at a time. Members place colored pixels from a fixed palette, then wait a per-user cooldown before placing again. Other members see the placement appear in real time. Anyone can overwrite anyone (r/place model). Admins curate canvas size, cooldown, and can clear the canvas. Full behavior contract and implementation patterns in [DESIGN.md](DESIGN.md).

@@ -1,3 +1,11 @@
+---
+kind: api-sample
+category: server-lifecycle-utilities
+description: Convert upload tokens into permanent asset URIs and resolve asset metadata
+domain: Server assets
+key_methods: [convert upload tokens to permanent file refs]
+---
+
 # API Sample: Assets
 
 Convert upload tokens into permanent asset URIs and resolve asset metadata.

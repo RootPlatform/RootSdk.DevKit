@@ -1,3 +1,11 @@
+---
+kind: api-sample
+category: server-community-api
+description: Create, get, list, edit (rename), move, and delete directories that organize files in a hierarchical tree within channels
+domain: File directories
+key_methods: [create, update, delete, list]
+---
+
 # API Sample: Directories
 
 Create, get, list, edit (rename), move, and delete directories within channels. Directories organize files in a hierarchical tree.

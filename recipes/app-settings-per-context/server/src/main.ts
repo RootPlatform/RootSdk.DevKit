@@ -1,6 +1,6 @@
 // ============================================================================
 // Recipe: App Settings (Per-Context) — Entry Point
-// Composes: server-app-data-store + server-global-settings + networking-app-services
+// Composes: server-database + server-global-settings + networking-app-services
 // ============================================================================
 //
 // Startup order:

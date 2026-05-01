@@ -1,3 +1,11 @@
+---
+kind: api-sample
+category: server-community-api
+description: Get, list, and delete (revoke) community member invites
+domain: Invites
+key_methods: [get, list, delete]
+---
+
 # API Sample: Invites
 
 Get, list, and delete (revoke) community member invites.

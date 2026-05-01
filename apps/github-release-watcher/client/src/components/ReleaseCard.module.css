@@ -113,23 +113,36 @@
   color: var(--rootsdk-text-secondary);
 }
 
-/* Release URL anchor — opens the GitHub release page in the system browser
-   via the iframe's `target="_blank"` handoff. Styled as supporting metadata
-   (monospace, 11px, tertiary) so it doesn't dominate the card; underline on
-   hover only so the resting state stays text-like. `user-select: all` keeps
-   single-click-to-highlight working for right-click "Copy URL" alongside
-   the native click-to-open. */
+/* Release URL — rendered as a click-to-copy button, not an anchor. Root's
+   client iframe blocks external URL navigation, so anchors with
+   target="_blank" appear functional but click into nothing. The canonical
+   substitute is click-to-copy via the Clipboard API. user-select: all keeps
+   right-click → Copy working as a fallback if the Clipboard API is
+   unavailable. Styled as supporting metadata (monospace, 11px, tertiary)
+   so it doesn't dominate the card. */
 .urlText {
+  /* button reset */
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  cursor: pointer;
+  /* visual styling */
   font-size: 11px;
   line-height: 14px;
   color: var(--rootsdk-text-tertiary);
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
   user-select: all;
   word-break: break-all;
-  text-decoration: none;
 }
 
 .urlText:hover {
   color: var(--rootsdk-text-secondary);
-  text-decoration: underline;
+}
+
+.urlText:focus-visible {
+  outline: 2px solid var(--rootsdk-link);
+  outline-offset: 2px;
+  border-radius: 2px;
 }

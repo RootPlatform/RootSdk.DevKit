@@ -1,3 +1,15 @@
+---
+kind: recipe
+category: app-settings
+question: How do I let app admins tune flat config values at runtime via an in-app Settings page, persisted in KV with admin-gated writes?
+composes:
+  - server-key-value-store
+  - server-global-settings
+  - server-member-roles
+  - networking-app-services
+exemplified_by: leveling-leaderboard
+---
+
 # Recipe: App Settings (Flat Values)
 
 > *"How do I let app admins tune flat config values at runtime via an in-app Settings page, with the values persisted in KV and read efficiently by the rest of the app?"*
@@ -55,11 +67,10 @@ The two coexist: this recipe uses `globalSettings.general.admins` to decide *who
 
 | api-sample | What it teaches | What this recipe uses it for |
 |---|---|---|
-| [`api-samples/server-app-data-store`](../../api-samples/server-app-data-store) | KV reads/writes via `rootServer.dataStore.appData` | The settings store, including the `update()` atomic-merge pattern |
+| [`api-samples/server-key-value-store`](../../api-samples/server-key-value-store) | KV reads/writes via `rootServer.dataStore.appData` | The settings store, including the `update()` atomic-merge pattern |
 | [`api-samples/server-global-settings`](../../api-samples/server-global-settings) | The `globalSettings` manifest schema and runtime read | Declare the `admins` `roleOrMember` picker; resolve it to the admin check |
 | [`api-samples/server-member-roles`](../../api-samples/server-member-roles) | Membership in a role group | Implicit, via `ReadOnlyMemberGroup.isMember()` against the picker |
 | [`api-samples/networking-app-services`](../../api-samples/networking-app-services) | Custom RPC services, broadcasts, typed errors | Two callable RPCs + one broadcast (`SettingsChanged`) + the `NOT_ADMIN` typed rejection |
-| [`api-samples/client-app-services`](../../api-samples/client-app-services) | Calling app services from the client + subscribing to broadcasts | The form's fetch + save + subscribe |
 
 ## Walkthrough
 

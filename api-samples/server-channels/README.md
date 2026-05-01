@@ -1,3 +1,11 @@
+---
+kind: api-sample
+category: server-community-api
+description: Create, get, list, move, edit, and delete channels within channel groups
+domain: Channels
+key_methods: [create, update, delete, list, reorder]
+---
+
 # API Sample: Channels
 
 Create, get, list, move, edit, and delete channels within channel groups.

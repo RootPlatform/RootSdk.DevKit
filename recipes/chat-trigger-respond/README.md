@@ -1,3 +1,12 @@
+---
+kind: recipe
+category: chat
+question: How do I make my app respond to user chat messages?
+composes:
+  - server-messages
+exemplified_by: leveling-leaderboard
+---
+
 # Recipe: Chat Trigger + Respond
 
 > *"How do I make my app respond to user chat messages?"*

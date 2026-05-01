@@ -1,3 +1,11 @@
+---
+kind: api-sample
+category: server-persistence-scheduling
+description: Schedule recurring or one-time jobs using the platform's built-in job scheduler
+domain: Job scheduler
+key_methods: [schedule one-time and recurring jobs]
+---
+
 # API Sample: Job Scheduler
 
 Schedule recurring or one-time jobs using the platform's built-in job scheduler.

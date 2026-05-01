@@ -1,3 +1,12 @@
+---
+kind: sample-app
+description: Voting between two options
+complexity: moderate
+key_patterns:
+  - custom RPC services
+  - broadcast updates
+---
+
 # protobuf-service
 
 Simple voting app — clients pick between two options, the server tallies and broadcasts updates to all connected clients.

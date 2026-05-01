@@ -1,3 +1,11 @@
+---
+kind: api-sample
+category: server-persistence-scheduling
+description: Persist JSON data scoped to your app's community — get, set, update, delete, pattern queries, and expiration
+domain: Key-value store
+key_methods: [get, set, update, delete, deleteLike, select, selectValue]
+---
+
 # API Sample: Key-Value Store
 
 Persist JSON data scoped to your app's community — get, set, update, delete, pattern queries, and expiration.

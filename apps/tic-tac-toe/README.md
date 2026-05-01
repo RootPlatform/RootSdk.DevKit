@@ -1,3 +1,13 @@
+---
+kind: sample-app
+description: Real-time multiplayer game
+complexity: complex
+key_patterns:
+  - shared game state
+  - turn logic
+  - multiple services
+---
+
 # tic-tac-toe
 
 Real-time multiplayer game — two clients share a turn-based game state via broadcast events. The most architecturally complex sample.

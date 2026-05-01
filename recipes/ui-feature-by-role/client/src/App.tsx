@@ -1,6 +1,6 @@
 // ============================================================================
 // Recipe: UI Feature Gating by Role — Client
-// Composes: client-app-users + networking-app-services + server-rpc-errors
+// Composes: client-app-users + networking-app-services
 // ============================================================================
 //
 // Two layers, both demonstrated here:

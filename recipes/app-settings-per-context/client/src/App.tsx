@@ -1,6 +1,6 @@
 // ============================================================================
 // Recipe: App Settings (Per-Context) — Client
-// Composes: client-app-services + networking-app-services
+// Composes: networking-app-services
 // ============================================================================
 //
 // Summary-detail editor for per-channel configurations:

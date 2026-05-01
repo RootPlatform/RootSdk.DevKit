@@ -1,3 +1,18 @@
+---
+kind: sample-app
+description: XP from messages → live top-10 leaderboard with admin Settings
+complexity: complex
+key_patterns:
+  - admin gating via `globalSettings.general.admins`
+  - message-driven aggregation
+  - atomic SQL with cooldown
+  - coalesced "all" broadcast
+  - in-app debounced auto-save
+  - ErrorBoundary telemetry funnel
+permissions:
+  - community.fullControl
+---
+
 # leveling-leaderboard
 
 Real-time XP and leaderboard app. Members earn XP for messages. The main view shows the Top 10 leaderboard, a personal "you" card with progress to next level and an "+N XP to join Top 10" motivator, and a list of the caller's recent awards. App admins open an in-app Settings view via a gear icon in the header to configure scoring, channel exclusions, and XP-eligible members. App admins themselves are configured via Root's native Global Settings UI for this app. Full behavior contract and implementation patterns in [DESIGN.md](DESIGN.md).

@@ -1,3 +1,11 @@
+---
+kind: api-sample
+category: server-lifecycle-utilities
+description: Bot startup, shutdown, and start state inspection
+domain: Bot lifecycle
+key_methods: [start, stop, start state]
+---
+
 # API Sample: Lifecycle (Bot)
 
 Bot startup, shutdown, and start state inspection.

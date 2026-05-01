@@ -1,3 +1,14 @@
+---
+kind: sample-app
+description: Community suggestion board
+complexity: complex
+key_patterns:
+  - multiple services
+  - voting
+  - error handling
+  - client state management
+---
+
 # suggestion-box
 
 Community suggestion board — members post suggestions, upvote, and delete their own. The most complex end-to-end app sample.

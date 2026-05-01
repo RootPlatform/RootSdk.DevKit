@@ -1,3 +1,11 @@
+---
+kind: api-sample
+category: server-lifecycle-utilities
+description: App-specific lifecycle with channelId in start state
+domain: App lifecycle
+key_methods: [start, stop, addService, start state]
+---
+
 # API Sample: Lifecycle (App)
 
 App-specific lifecycle with channelId in start state.

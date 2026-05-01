@@ -1,7 +1,7 @@
 {
-  "name": "@rolebot/bot",
+  "name": "@rolelistbot/bot",
   "author": "Root Communications, Inc.",
-  "description": "Role Bot",
+  "description": "Role List Bot - Sample",
   "version": "1.0.0",
   "private": true,
   "engines": {

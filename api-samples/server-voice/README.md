@@ -1,3 +1,11 @@
+---
+kind: api-sample
+category: server-community-api
+description: Observe and moderate voice channel participants — list, server-mute/deafen, and kick (bots cannot join calls)
+domain: Voice channels
+key_methods: [list participants, mute, move, disconnect]
+---
+
 # API Sample: Voice (WebRTC)
 
 Observe and moderate voice channel participants. Bots/apps cannot join voice calls — these are moderation tools: list who's in the call, server-mute/deafen users, and kick them.

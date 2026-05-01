@@ -1,6 +1,6 @@
 // ============================================================================
 // Recipe: Batch-Prefetch Related Data — Entry Point
-// Composes: server-app-data-store + networking-app-services
+// Composes: server-database + networking-app-services
 // ============================================================================
 //
 // Startup order:

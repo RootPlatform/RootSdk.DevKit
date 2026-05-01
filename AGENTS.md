@@ -36,7 +36,7 @@ Developer toolkit for building apps and bots on the Root Platform. This guide he
 - **Apps** import from `@rootsdk/server-app`. **Bots** import from `@rootsdk/server-bot`.
 - All server-side SDK code is identical between apps and bots except the import path.
 - The `rootServer` object is the SDK entry point. Everything hangs off `rootServer.community.*`, `rootServer.dataStore.*`, `rootServer.lifecycle.*`, etc.
-- **Set permissions** in `root-manifest.json` — each api-sample README lists the permissions its APIs require. `schemas/permissions-map.json` maps every SDK method to its required permission.
+- **Set permissions** in `root-manifest.json` — each api-sample README lists the permissions its APIs require. `schemas/permissions-map.json` maps every SDK method to its required permission. For the conceptual model and full permission tables see `docs/llms/{app,bot}-docs/design/permissions.md` and `docs/llms/{app,bot}-docs/configure/manifest-permissions.md` (identical content under each audience). The `@everyone` role is auto-assigned to your app/bot but its grants are community-configurable, so the manifest is the only contract you can rely on.
 
 ## Common Needs
 
@@ -49,7 +49,7 @@ When your task requires one of these, go to the linked module — don't invent a
 | Run code on a schedule or delay | `api-samples/server-jobs` | Don't use `setTimeout`/`setInterval` — jobs survive restarts, timers don't. |
 | Identify what type of entity a GUID represents | `api-samples/server-guid-utils` | Distinguishes users from bots/apps, extracts timestamps — no API call needed. |
 | Retry after rate limits or transient errors | `api-samples/server-resilience` | Wrap any SDK call in `withRetry()`. Retries TooManyRequests, ServerError, Timeout with exponential backoff + jitter. |
-| Set permissions for SDK calls | `schemas/permissions-map.json` | Maps every SDK method to its required `root-manifest.json` permission. |
+| Set permissions for SDK calls | `docs/llms/{app,bot}-docs/design/permissions.md` (the model — what's a permission, least-privilege procedure), `docs/llms/{app,bot}-docs/configure/manifest-permissions.md` (declaration syntax + full community/channel permission tables + overlay & visibility behavior), `schemas/permissions-map.json` (per-method lookup) | Read in that order. The `@everyone` role is auto-assigned to your app/bot but communities can add/remove its permissions, so the manifest is your only contract — don't lean on `@everyone` for grants. |
 | Style a client UI to match Root (light/dark) | `api-samples/client-app-theme` + `apps/themes` | Use `var(--rootsdk-*)` CSS tokens; don't hardcode colors. Tokens switch automatically with the user's theme. |
 | Pick an icon for a UI element | `lucide-react` (npm) for any new client UI, `apps/themes` as the canonical "look like native Root chrome" reference | Sample apps standardize on `lucide-react` — one library, ~1500 glyphs, tree-shaken per import. `apps/themes` keeps the curated Root-aesthetic icon catalog for anyone wanting strict identity with native Root surfaces. Don't copy the `Icon.tsx`/`icons.json` snapshot from older samples into a new fork — `lucide-react` is the going-forward convention. |
 | Show a user's profile, nickname, or avatar | `api-samples/client-app-users` | Don't invent a user model — use `rootClient.users.*` and its profile-update events. |
@@ -59,96 +59,101 @@ When your task requires one of these, go to the linked module — don't invent a
 
 Complete, runnable app examples in `apps/`. Use these as end-to-end references for architecture and patterns.
 
+<!-- BEGIN: catalog/sample-apps -->
 | Folder | Description | Key Patterns | Complexity |
 |--------|-------------|-------------|------------|
 | `hello-world` | Minimal echo service | Client-server protobuf round-trip | Minimal |
+| `themes` | UI theming showcase + canonical Root-aesthetic icon catalog | Root design tokens, CSS variables, icon reference — no networking | Minimal |
 | `data-storage` | Task list with persistence | SQLite database, CRUD operations | Moderate |
 | `protobuf-service` | Voting between two options | Custom RPC services, broadcast updates | Moderate |
-| `suggestion-box` | Community suggestion board | Multiple services, voting, error handling, client state management | Complex |
-| `themes` | UI theming showcase + canonical Root-aesthetic icon catalog | Root design tokens, CSS variables, icon reference — no networking | Minimal (UI) |
-| `tic-tac-toe` | Real-time multiplayer game | Shared game state, turn logic, multiple services | Complex |
-| `leveling-leaderboard` | XP from messages → live top-10 leaderboard with admin Settings | Admin gating via `globalSettings.general.admins`, message-driven aggregation, atomic SQL with cooldown, coalesced "all" broadcast, in-app debounced auto-save, ErrorBoundary telemetry funnel | Complex |
-| `self-roles` | Member-driven self-assignable role picker (Discord "reaction-roles" equivalent) | Member-driven mutations, role enumeration + assignment, KV-backed config, `CommunityRoleDeleted/Edited` subscriptions, exclusive-group server-side enforcement, public broadcast (vs admin-only) | Complex |
 | `github-release-watcher` | Watches a curated list of GitHub repositories for new releases and surfaces them as an in-app feed | External-service polling via chained `OneTime` jobs, four-layer reliability (`withRetry` + `JobMissed` + startup reconcile + daily safety-net), validate-before-persist, persist-then-best-effort-schedule, custom `MemberGroup` for admin broadcast audience, per-field auto-save with separate per-field RPCs | Complex |
-| `pixel-canvas` | r/place-style shared pixel grid every member paints on, one cell at a time | Real-time per-action broadcasts (no coalescing), shared mutable KV blob, atomic check-then-place per-user cooldown, mobile-first canvas with two-step tap flow, adaptive-ceremony destructive action (type-to-confirm only when populated) | Complex |
+| `leveling-leaderboard` | XP from messages → live top-10 leaderboard with admin Settings | Admin gating via `globalSettings.general.admins`, message-driven aggregation, atomic SQL with cooldown, coalesced "all" broadcast, in-app debounced auto-save, ErrorBoundary telemetry funnel | Complex |
 | `moderation` | Automatic content filter + spam detection + rate limiting with audit log, analytics, and admin Settings | Message-pipeline rule order with central audit dispatch funnel, atomic per-field KV settings via `dataStore.appData.update()`, custom `adminAudience` MemberGroup (owner ∪ admins), Sidebar + drawer responsive shell, `MasterSubToggleGroup` and `ShowWordListGate` UX primitives, `lucide-react` icons | Complex |
+| `pixel-canvas` | r/place-style shared pixel grid every member paints on, one cell at a time | Real-time per-action broadcasts (no coalescing), shared mutable KV blob, atomic check-then-place per-user cooldown, mobile-first canvas with two-step tap flow, adaptive-ceremony destructive action (type-to-confirm only when populated) | Complex |
+| `self-roles` | Member-driven self-assignable role picker (Discord "reaction-roles" equivalent) | Member-driven mutations, role enumeration + assignment, KV-backed config, `CommunityRoleDeleted/Edited` subscriptions, exclusive-group server-side enforcement, public broadcast (vs admin-only) | Complex |
+| `suggestion-box` | Community suggestion board | Multiple services, voting, error handling, client state management | Complex |
+| `tic-tac-toe` | Real-time multiplayer game | Shared game state, turn logic, multiple services | Complex |
+<!-- END: catalog/sample-apps -->
 
 ## Sample Bots
 
 Complete, runnable bot examples in `bots/`. Server-only — no client UI.
 
+<!-- BEGIN: catalog/sample-bots -->
 | Folder | Description | Key Patterns | Complexity |
 |--------|-------------|-------------|------------|
 | `hello-world` | Echo/ping responder | Message event handling, basic reply | Minimal |
-| `all-channel-broadcast` | Broadcast to all channels | Channel listing, multi-channel messaging | Moderate |
 | `new-member-welcome` | Welcome new members | Member join event subscription | Minimal |
-| `reset-channel-description` | Channel property management | Channel updates | Minimal |
-| `role-assignment` | Assign roles to members | Role and member-role APIs | Moderate |
+| `reset-channel-description` | Channel property management | Channel updates, voice channel events | Minimal |
 | `role-list` | List community roles | Role querying | Minimal |
+| `all-channel-broadcast` | Broadcast to all channels | Channel listing, multi-channel messaging, global settings (member group), per-call error isolation | Moderate |
+| `role-assignment` | Assign roles to members | Role and member-role APIs, global settings (role picker), per-user counter via key-value store | Moderate |
+<!-- END: catalog/sample-bots -->
 
 ## Recipes
 
 Composition tasks in `recipes/`. Each recipe synthesizes multiple api-samples into a working answer for a real developer goal. Recipes sit between api-samples (per-method primitives) and apps (full architectural exemplars). Use a recipe when the lesson is "how do I compose X and Y to accomplish Z?"
 
-Folder names are category-prefixed: `ui-`, `data-`, `realtime-`, `auth-`, `assets-`, `external-`, `app-` (lifecycle, errors, observability).
+Folder names are category-prefixed (e.g. `ui-`, `data-`, `app-settings-`, `chat-`, `external-`, `per-user-`).
 
-### UI
-
+<!-- BEGIN: catalog/recipes -->
 | Folder | Question | Composes | Exemplified by |
-|---|---|---|---|
-| `ui-feature-by-role` | How do I gate UI features by role and enforce the same gate server-side on privileged actions? | `client-app-users`, `server-roles`, `server-member-roles`, `server-global-settings`, `networking-app-services`, `server-rpc-errors` | `apps/leveling-leaderboard` |
-| `data-paginated-list` | How do I paginate a server-side list with cursor-based queries and accumulate pages on the client? | `server-app-data-store`, `networking-app-services`, `client-app-services` | `apps/leveling-leaderboard` |
-| `app-settings-flat-values` | How do I let app admins tune flat config values at runtime via an in-app Settings page, persisted in KV with admin-gated writes? | `server-app-data-store`, `server-global-settings`, `server-member-roles`, `networking-app-services`, `client-app-services` | `apps/leveling-leaderboard` |
-| `app-settings-list-values` | How do I persist a list-shaped setting (collection of items, add/remove individually) in SQLite with admin-gated mutations? | `server-app-data-store`, `server-global-settings`, `server-member-roles`, `networking-app-services`, `client-app-services` | `apps/leveling-leaderboard` (excluded_channels) |
-| `app-settings-per-context` | How do I let admins configure my app's behavior per-context — per-channel, per-repo, per-thing — with multi-field rows keyed by the entity? | `server-app-data-store`, `server-global-settings`, `server-member-roles`, `networking-app-services`, `client-app-services` | future github-release-watcher per-repo config |
-| `data-batch-prefetch` | How do I batch-prefetch related data (e.g. 50 user profiles for a list of activities) in one call instead of N+1 from the client? | `server-app-data-store`, `networking-app-services`, `client-app-services` | any list-with-references UX |
-| `chat-trigger-respond` | How do I make my app respond to user chat messages? | `server-channel-messages` | `apps/leveling-leaderboard` (messageHandler) |
-| `external-http-fetch` | How do I call an external HTTP API from my server with timeouts and typed error handling? | `networking-app-services`, `client-app-services` | `apps/github-release-watcher` (githubClient) |
-| `per-user-cooldown` | How do I rate-limit a per-user action so it can only happen once per N seconds, atomically? | `server-app-data-store`, `networking-app-services` | `apps/leveling-leaderboard` (xp-per-message cooldown) |
-| `audio-bundled-sfx` | How do I ship and play short sound effects from my client, dealing with the autoplay policy and Vite asset bundling? | (client-only — no Root SDK API surface) | any app with notification/feedback sounds |
+|--------|----------|----------|----------------|
+| `app-settings-flat-values` | How do I let app admins tune flat config values at runtime via an in-app Settings page, persisted in KV with admin-gated writes? | `server-key-value-store`, `server-global-settings`, `server-member-roles`, `networking-app-services` | `apps/leveling-leaderboard` |
+| `app-settings-list-values` | How do I persist a list-shaped setting (collection of items, add/remove individually) in SQLite with admin-gated mutations? | `server-database`, `server-global-settings`, `server-member-roles`, `networking-app-services` | `apps/leveling-leaderboard` |
+| `app-settings-per-context` | How do I let admins configure my app's behavior per-context — per-channel, per-repo, per-thing — with multi-field rows keyed by the entity? | `server-database`, `server-global-settings`, `server-member-roles`, `networking-app-services` | — |
+| `audio-bundled-sfx` | How do I ship and play short sound effects from my client, dealing with the autoplay policy and Vite asset bundling? | — | — |
+| `chat-trigger-respond` | How do I make my app respond to user chat messages? | `server-messages` | `apps/leveling-leaderboard` |
+| `data-batch-prefetch` | How do I batch-prefetch related data (e.g. 50 user profiles for a list of activities) in one call instead of N+1 from the client? | `server-database`, `networking-app-services` | — |
+| `data-paginated-list` | How do I paginate a server-side list with cursor-based queries and accumulate pages on the client? | `server-database`, `networking-app-services` | `apps/leveling-leaderboard` |
+| `external-http-fetch` | How do I call an external HTTP API from my server with timeouts and typed error handling? | `networking-app-services` | `apps/github-release-watcher` |
+| `per-user-cooldown` | How do I rate-limit a per-user action so it can only happen once per N seconds, atomically? | `server-database`, `networking-app-services` | `apps/leveling-leaderboard` |
+| `ui-feature-by-role` | How do I gate UI features by role and enforce the same gate server-side on privileged actions? | `client-app-users`, `server-roles`, `server-member-roles`, `server-global-settings`, `networking-app-services` | `apps/leveling-leaderboard` |
+<!-- END: catalog/recipes -->
 
 ## API Samples Index
 
 Focused samples in `api-samples/`, one per SDK domain. Each is a standalone bot with working code covering every method. Files are self-contained: one file = one complete answer, with behavioral nuances inline as comments. Server-side code is identical between apps and bots except for the import path and lifecycle, so these api-sample bots double as server-side references for apps. Client code is app-only.
 
+<!-- BEGIN: catalog/api-samples -->
 ### Server — Community API
 
 | Folder | Domain | Key Methods |
 |--------|--------|-------------|
-| `server-messages` | Channel messages | send, reply, edit, delete, list, reactions, pins, mentions, flag |
-| `server-channels` | Channels | create, update, delete, list, reorder |
-| `server-channel-groups` | Channel groups | create, update, delete, list, reorder |
-| `server-members` | Members | get, list, search, update nickname |
-| `server-roles` | Roles | create, update, delete, list, reorder |
-| `server-member-roles` | Member roles | assign, remove, list roles for member |
-| `server-member-groups` | Member groups | create, update, delete, list, add/remove members |
-| `server-community` | Community info | get community details, update settings |
-| `server-emojis` | Custom emojis | create, update, delete, list |
-| `server-files` | Channel files | upload, get, list, delete |
-| `server-directories` | File directories | create, update, delete, list |
-| `server-invites` | Invites | create, list, delete |
-| `server-kick-ban` | Moderation | kick, ban, unban, list bans |
-| `server-voice` | Voice channels | list participants, mute, move, disconnect |
 | `server-access-rules` | Permission overrides | set, remove, list access rules |
+| `server-channel-groups` | Channel groups | create, update, delete, list, reorder |
+| `server-channels` | Channels | create, update, delete, list, reorder |
+| `server-community` | Community info | get community details, update settings |
 | `server-community-logs` | App logging | send diagnostic messages to community admins |
+| `server-directories` | File directories | create, update, delete, list |
+| `server-emojis` | Custom emojis | get, list, delete |
+| `server-files` | Channel files | upload, get, list, delete |
+| `server-invites` | Invites | get, list, delete |
+| `server-kick-ban` | Moderation | kick, ban, unban, list bans |
+| `server-member-groups` | Member groups | create, update, delete, list, add/remove members |
+| `server-member-roles` | Member roles | assign, remove, list roles for member |
+| `server-members` | Members | get, list, listAll |
+| `server-messages` | Channel messages | send, reply, edit, delete, list, reactions, pins, mentions, flag |
+| `server-roles` | Roles | create, update, delete, list, reorder |
+| `server-voice` | Voice channels | list participants, mute, move, disconnect |
 
 ### Server — Persistence & Scheduling
 
 | Folder | Domain | Key Methods |
 |--------|--------|-------------|
 | `server-database` | SQLite database | raw SQL, migrations, Knex, Prisma |
-| `server-key-value-store` | Key-value store | get, set, delete, list |
 | `server-jobs` | Job scheduler | schedule one-time and recurring jobs |
+| `server-key-value-store` | Key-value store | get, set, update, delete, deleteLike, select, selectValue |
 
 ### Server — Lifecycle & Utilities
 
 | Folder | Domain | Key Methods |
 |--------|--------|-------------|
+| `server-app-assets` | Server assets | convert upload tokens to permanent file refs |
+| `server-app-client-attachment` | Client attachment | list attached clients, send to specific clients |
 | `server-app-lifecycle` | App lifecycle | start, stop, addService, start state |
 | `server-bot-lifecycle` | Bot lifecycle | start, stop, start state |
-| `server-app-client-attachment` | Client attachment | list attached clients, send to specific clients |
-| `server-app-assets` | Server assets | convert upload tokens to permanent file refs |
-| `server-global-settings` | Global settings | read manifest-declared settings |
+| `server-global-settings` | Global settings | globalSettings, state.globalSettings, GlobalSettingsEvent.Update, ReadOnlyMemberGroup.isMember |
 | `server-guid-utils` | GUID utilities | parse, create, validate Root GUIDs |
 | `server-resilience` | Retry & backoff | withRetry() wrapper, retryable error classification, batch pacing |
 
@@ -162,11 +167,12 @@ Focused samples in `api-samples/`, one per SDK domain. Each is a standalone bot 
 
 | Folder | Domain | Key Methods |
 |--------|--------|-------------|
-| `client-app-lifecycle` | Client lifecycle | ready, theme changes, resize |
 | `client-app-assets` | Client assets | file picker, upload tokens |
-| `client-app-theme` | Theming | CSS tokens, dark/light mode |
+| `client-app-lifecycle` | Client lifecycle | restart |
+| `client-app-theme` | Theming | getTheme, on, off, ThemeUpdate |
 | `client-app-users` | User info | current user, community members |
 | `networking-app-services` | RPC services | protobuf service calls from client |
+<!-- END: catalog/api-samples -->
 
 ## Documentation
 

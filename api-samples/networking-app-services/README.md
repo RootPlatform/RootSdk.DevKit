@@ -1,3 +1,11 @@
+---
+kind: api-sample
+category: client-app
+description: Custom RPC services with protobuf definitions, broadcasts, and error handling — full client/server round-trip
+domain: RPC services
+key_methods: [protobuf service calls from client]
+---
+
 # API Sample: RPC Services
 
 Custom RPC services with protobuf definitions, broadcasts, and error handling. Full round-trip: server implementation + client usage.

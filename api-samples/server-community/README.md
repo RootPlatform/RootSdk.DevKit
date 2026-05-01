@@ -1,3 +1,11 @@
+---
+kind: api-sample
+category: server-community-api
+description: Get and edit the community — the top-level entity, one per app/bot installation
+domain: Community info
+key_methods: [get community details, update settings]
+---
+
 # API Sample: Community
 
 Get and edit the community. The community is the top-level entity — one per app/bot installation.

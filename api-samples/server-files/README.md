@@ -1,3 +1,11 @@
+---
+kind: api-sample
+category: server-community-api
+description: Create, get, list, edit (rename), move, delete, and search files within channel directories, including community-wide search
+domain: Channel files
+key_methods: [upload, get, list, delete]
+---
+
 # API Sample: Files
 
 Create, get, list, edit (rename), move, delete, search, and search across the community for files within channel directories.

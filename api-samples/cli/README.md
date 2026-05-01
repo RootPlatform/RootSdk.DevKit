@@ -1,3 +1,11 @@
+---
+kind: api-sample
+category: developer-tools
+description: Command-line tools for creating, testing, building, and deploying Root Apps and Bots
+domain: CLI commands
+key_methods: [create-root, start devhost, build proto, build package, upload package]
+---
+
 # API Sample: CLI Commands
 
 Command-line tools for creating, testing, building, and deploying Root Apps and Bots.

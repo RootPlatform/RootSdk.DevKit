@@ -1,3 +1,11 @@
+---
+kind: api-sample
+category: server-community-api
+description: Add, list, remove, and set primary roles on community members
+domain: Member roles
+key_methods: [assign, remove, list roles for member]
+---
+
 # API Sample: Member Roles
 
 Add, list, remove, and set primary roles on community members.

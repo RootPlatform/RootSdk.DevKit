@@ -1,3 +1,12 @@
+---
+kind: sample-app
+description: Task list with persistence
+complexity: moderate
+key_patterns:
+  - SQLite database
+  - CRUD operations
+---
+
 # data-storage
 
 Task list with persistence. Demonstrates three interchangeable storage backends (in-memory, Knex/SQLite, Prisma) behind a shared repository interface.

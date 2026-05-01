@@ -1,3 +1,15 @@
+---
+kind: recipe
+category: app-settings
+question: How do I persist a list-shaped setting (collection of items, add/remove individually) in SQLite with admin-gated mutations?
+composes:
+  - server-database
+  - server-global-settings
+  - server-member-roles
+  - networking-app-services
+exemplified_by: leveling-leaderboard
+---
+
 # Recipe: App Settings (List Values)
 
 > *"How do I persist a list-shaped setting (collection of items, add/remove individually) in SQLite with admin-gated mutations and reactive client refresh?"*
@@ -61,11 +73,10 @@ The decision tree: **flat record → KV; collection of rows → SQLite.**
 
 | api-sample | What it teaches | What this recipe uses it for |
 |---|---|---|
-| [`api-samples/server-app-data-store`](../../api-samples/server-app-data-store) | SQLite via `rootServer.dataStore` | The `blocked_terms` table, idempotent add via `INSERT OR IGNORE`, per-row delete |
+| [`api-samples/server-database`](../../api-samples/server-database) | SQLite via `rootServer.dataStore` | The `blocked_terms` table, idempotent add via `INSERT OR IGNORE`, per-row delete |
 | [`api-samples/server-global-settings`](../../api-samples/server-global-settings) | The `globalSettings` manifest schema and runtime read | Declare the `admins` `roleOrMember` picker; resolve it to the admin check |
 | [`api-samples/server-member-roles`](../../api-samples/server-member-roles) | Membership in a role group | Implicit, via `ReadOnlyMemberGroup.isMember()` |
 | [`api-samples/networking-app-services`](../../api-samples/networking-app-services) | Custom RPC services, broadcasts, typed errors | Three callable RPCs + one broadcast (`BlockedTermsChanged`) + the `NOT_ADMIN` and `INVALID_TERM` typed rejections |
-| [`api-samples/client-app-services`](../../api-samples/client-app-services) | Calling app services from the client + subscribing to broadcasts | List + add + remove + subscribe |
 
 The canonical real-world reference for list-shaped settings in DevKit is leveling-leaderboard's `excluded_channels` table — same shape, same operations, applied to channel IDs instead of arbitrary strings.
 

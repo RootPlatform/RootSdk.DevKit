@@ -1,3 +1,11 @@
+---
+kind: api-sample
+category: server-lifecycle-utilities
+description: Inspect, classify, and extract metadata from Root platform GUIDs without making API calls
+domain: GUID utilities
+key_methods: [parse, create, validate Root GUIDs]
+---
+
 # API Sample: GUID Utilities
 
 Inspect, classify, and extract metadata from Root platform GUIDs without making API calls.

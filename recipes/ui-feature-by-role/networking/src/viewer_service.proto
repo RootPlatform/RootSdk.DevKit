@@ -8,9 +8,8 @@ import "rootsdk/types.proto";
 // enforces server-side authorization on moderator-only actions.
 //
 // This recipe composes server-global-settings (read the configured moderator
-// role), server-member-roles (check whether the caller is in it),
-// networking-app-services (the RPC + broadcast plumbing), and
-// server-rpc-errors (typed authorization rejection).
+// role), server-member-roles (check whether the caller is in it), and
+// networking-app-services (the RPC + broadcast plumbing).
 //
 // Two layers of role gating are demonstrated:
 //

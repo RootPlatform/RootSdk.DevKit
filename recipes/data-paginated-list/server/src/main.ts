@@ -1,6 +1,6 @@
 // ============================================================================
 // Recipe: Cursor-Based Pagination — Entry Point
-// Composes: server-app-data-store + networking-app-services
+// Composes: server-database + networking-app-services
 // ============================================================================
 //
 // Startup order matters:

@@ -1,3 +1,13 @@
+---
+kind: sample-app
+description: UI theming showcase + canonical Root-aesthetic icon catalog
+complexity: minimal
+key_patterns:
+  - root design tokens
+  - CSS variables
+  - icon reference — no networking
+---
+
 # themes
 
 UI theming reference — a browsable inventory of every Root design token, common UI patterns, and the Root icon set. Client-only; the server is a stub.

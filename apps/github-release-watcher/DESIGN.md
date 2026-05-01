@@ -22,7 +22,7 @@ These are infrastructure-level patterns that should work unchanged for any app o
 | `withRetry` (server, SDK calls) / `withClientRetry` (client, RPC calls) helpers — both use bounded jitter (`base + Math.random() * (capped - base)`) so first-retry delays have a real minimum | `server/src/lib/retry.ts`, `client/src/lib/retry.ts` |
 | `useDebouncedMutation` auto-save hook | `client/src/lib/useDebouncedMutation.ts` |
 | `ErrorBoundary` + `ReportClientError` telemetry funnel (with per-caller rate limit + per-field size caps server-side) | `client/src/components/ErrorBoundary.tsx`, server handler in `releaseWatcherService.ts` |
-| Iframe-aware external links: `<a target="_blank" rel="noopener noreferrer">`. Root's iframe hands `target="_blank"` clicks off to the system browser. No `window.open`, no SDK primitive. | `client/src/components/ReleaseCard.tsx` (the URL anchor) |
+| URL display with click-to-copy. Root's client iframe blocks external navigation, so anchors with `target="_blank"` appear functional but click into nothing. Render URLs as text + Clipboard API + `user-select: all` fallback for right-click → Copy. | `client/src/components/ReleaseCard.tsx` (the URL button) |
 
 **Admin gating + admin broadcasts:**
 
@@ -205,7 +205,7 @@ The home view header reads `Watching {N} repos · {relative}`. The timestamp is 
 - Card header (one line): release tag in uppercase brand-primary as the card's category label on the left; optional `pre-release` pill (tinted-background, brand-secondary) on the right.
 - Optional heading: bold release name (16/24/600) below the header, rendered only when the release `name` is distinct from `tag_name`. Many repos use the tag as the name, so often this line is omitted.
 - Card body: up to ~6 lines of body excerpt in 14/20/400, mask-image fade overflow rather than truncating mid-character. Markdown-lite stripped server-side (bold markers, code fences) for readability without a parser dep.
-- Card footer (hairline-bordered, muted): `{owner}/{repo} · {relative}` metadata on top, full release URL on bottom as a real `<a target="_blank" rel="noopener noreferrer">` anchor (Root's iframe hands the click off to the system browser). The URL has `user-select: all` so right-click "Copy URL" still works alongside native click-to-open. See [external links memory rule for Root client apps](../../docs/llms/app-docs/develop/client/design-system-reference.md).
+- Card footer (hairline-bordered, muted): `{owner}/{repo} · {relative}` metadata on top, full release URL on bottom as click-to-copy text (Root's client iframe blocks external navigation, so anchors with `target="_blank"` don't work). Clicking the URL copies it via the Clipboard API and shows a transient "Copied!" confirmation for ~1.5s. `user-select: all` keeps right-click → Copy working as a fallback when the Clipboard API is unavailable.
 - Live updates: a `ReleaseAdded` broadcast prepends the new card with a `300ms` highlight pulse (`--rootsdk-highlight-light` background fading out).
 - Empty state (no repos configured): `<EmptyState title="No repositories yet" body={amIAdmin ? "Add a repository in Settings to start tracking releases." : "An admin hasn't added any repositories yet."} />`.
 - Empty state (repos configured but feed empty): `<EmptyState title="No releases yet" body="Releases from your watched repositories will appear here." />`.

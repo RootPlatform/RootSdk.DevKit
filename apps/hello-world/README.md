@@ -1,3 +1,11 @@
+---
+kind: sample-app
+description: Minimal echo service
+complexity: minimal
+key_patterns:
+  - client-server protobuf round-trip
+---
+
 # hello-world
 
 Minimal echo service. A client sends a string, the server echoes it back and broadcasts the result to all connected clients.

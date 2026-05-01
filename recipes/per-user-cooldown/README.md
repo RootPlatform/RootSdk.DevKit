@@ -1,3 +1,13 @@
+---
+kind: recipe
+category: per-user
+question: How do I rate-limit a per-user action so it can only happen once per N seconds, atomically?
+composes:
+  - server-database
+  - networking-app-services
+exemplified_by: leveling-leaderboard
+---
+
 # Recipe: Per-User Cooldown
 
 > *"How do I rate-limit an action so each user can only do it once per N seconds?"*
@@ -65,7 +75,7 @@ The four cases collapse to two outcomes:
 
 | api-sample | What it teaches | What this recipe uses it for |
 |---|---|---|
-| [`api-samples/server-app-data-store`](../../api-samples/server-app-data-store) | Opening SQLite via `rootServer.dataStore` + running migrations | The `user_cooldowns` table + the atomic UPSERT |
+| [`api-samples/server-database`](../../api-samples/server-database) | Opening SQLite via `rootServer.dataStore` + running migrations | The `user_cooldowns` table + the atomic UPSERT |
 | [`api-samples/networking-app-services`](../../api-samples/networking-app-services) | Custom RPC services + typed errors | One callable RPC (`Claim`) + one typed rejection (`NOT_ELAPSED`) |
 
 The cooldown mechanic is server-side only — no ergonomics-grade UI for "you must wait N seconds" lives in this recipe. Forks that want a button-with-countdown UI are welcome to add a client; the server contract is already shaped to support it (the `cooldown_ends_at` field on the response gives the client an exact deadline).

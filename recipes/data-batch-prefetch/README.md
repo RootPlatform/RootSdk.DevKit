@@ -1,3 +1,13 @@
+---
+kind: recipe
+category: data
+question: How do I batch-prefetch related data (e.g. 50 user profiles for a list of activities) in one call instead of N+1 from the client?
+composes:
+  - server-database
+  - networking-app-services
+exemplified_by: null
+---
+
 # Recipe: Batch-Prefetch Related Data
 
 > *"How do I batch-prefetch related data (e.g., 50 user profiles for a list of activities) in one call instead of N+1 from the client?"*
@@ -34,9 +44,8 @@ The client-side dedup is the part most agents miss. A "batched" client that send
 
 | api-sample | What it teaches | What this recipe uses it for |
 |---|---|---|
-| [`api-samples/server-app-data-store`](../../api-samples/server-app-data-store) | SQLite via `rootServer.dataStore` | Two seeded tables (activities, owners) and a parameterized batch query |
+| [`api-samples/server-database`](../../api-samples/server-database) | SQLite via `rootServer.dataStore` | Two seeded tables (activities, owners) and a parameterized batch query |
 | [`api-samples/networking-app-services`](../../api-samples/networking-app-services) | Custom RPC services + proto wire shapes | The `map<string, OwnerInfo>` response — first recipe to use a proto map |
-| [`api-samples/client-app-services`](../../api-samples/client-app-services) | Calling app services from the client | The two-stage list+batch flow + cache merging |
 
 ## Walkthrough
 

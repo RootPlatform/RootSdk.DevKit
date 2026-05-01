@@ -1,6 +1,6 @@
 // ============================================================================
 // Recipe: App Settings (List Values) — Client
-// Composes: client-app-services + networking-app-services
+// Composes: networking-app-services
 // ============================================================================
 //
 // A list display with admin-only edit affordances:

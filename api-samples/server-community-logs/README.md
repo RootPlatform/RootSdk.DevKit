@@ -1,3 +1,11 @@
+---
+kind: api-sample
+category: server-community-api
+description: Write structured log entries sent to the community, readable by admins in the Root client app settings
+domain: App logging
+key_methods: [send diagnostic messages to community admins]
+---
+
 # API Sample: App Logs
 
 Write structured log entries sent to the community, readable in the app's settings in the Root client by members with the `communityManageApps` permission.
