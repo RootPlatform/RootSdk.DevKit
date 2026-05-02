@@ -21,12 +21,14 @@ The catalogs further down list every concrete item in `apps/`, `bots/`, `recipes
 **Building a bot** (server-only):
 1. Copy `templates/bot/` to your target location.
 2. Load `docs/index.md` (the docs router) and fetch the per-page chunks you need.
-3. Reference `api-samples/` for SDK domain coverage; reference `bots/` for runnable end-to-end examples.
+3. Skim `docs/llms/bot-api-reference/Index.md` to know what types, classes, and enums exist — pull specific reference pages when a type or contract question comes up.
+4. Reference `api-samples/` (per-method), `recipes/` (composition patterns — server-side patterns transfer; per-recipe AGENTS.md flags app-only ones), and `bots/` (runnable end-to-end examples).
 
 **Building an app** (client + server + networking):
 1. Copy `templates/app/`.
 2. Load `docs/index.md` and fetch chunks as needed.
-3. Reference `api-samples/` (every SDK domain, every method) and `apps/` (end-to-end architecture). Each sample's `AGENTS.md` states what it demonstrates and does not demonstrate.
+3. Skim `docs/llms/app-api-reference/{client,server}/Index.md` to know what types, classes, and enums exist — pull specific reference pages when a type or contract question comes up.
+4. Reference `api-samples/` (per-method), `recipes/` (composition patterns), and `apps/` (end-to-end architecture). Each sample's `AGENTS.md` states what it demonstrates and does not demonstrate.
 
 **Not sure which to build?** Read `docs/llms/overview/choose-app-or-bot.md`.
 
