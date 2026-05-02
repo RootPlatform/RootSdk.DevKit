@@ -90,7 +90,7 @@ Complete, runnable bot examples in `bots/`. Server-only — no client UI.
 
 Composition tasks in `recipes/`. Each recipe synthesizes multiple api-samples into a working answer for a real developer goal. Recipes sit between api-samples (per-method primitives) and apps (full architectural exemplars).
 
-Folder names are category-prefixed (e.g. `ui-`, `data-`, `app-settings-`, `chat-`, `external-`, `per-user-`).
+Folder names are category-prefixed (e.g. `ui-`, `data-`, `app-settings-`, `chat-`, `error-`, `external-`, `per-user-`).
 
 <!-- BEGIN: catalog/recipes -->
 | Folder | Question | Composes | Exemplified by |
@@ -102,6 +102,7 @@ Folder names are category-prefixed (e.g. `ui-`, `data-`, `app-settings-`, `chat-
 | `chat-trigger-respond` | How do I make my app respond to user chat messages? | `server-messages` | `apps/leveling-leaderboard` |
 | `data-batch-prefetch` | How do I batch-prefetch related data (e.g. 50 user profiles for a list of activities) in one call instead of N+1 from the client? | `server-database`, `networking-app-services` | — |
 | `data-paginated-list` | How do I paginate a server-side list with cursor-based queries and accumulate pages on the client? | `server-database`, `networking-app-services` | `apps/leveling-leaderboard` |
+| `error-rpc-exceptions` | How do I propagate domain-specific error codes from server to client and let the client branch on them? | `networking-app-services`, `server-key-value-store` | `apps/suggestion-box` |
 | `external-http-fetch` | How do I call an external HTTP API from my server with timeouts and typed error handling? | `networking-app-services` | `apps/github-release-watcher` |
 | `per-user-cooldown` | How do I rate-limit a per-user action so it can only happen once per N seconds, atomically? | `server-database`, `networking-app-services` | `apps/leveling-leaderboard` |
 | `ui-feature-by-role` | How do I gate UI features by role and enforce the same gate server-side on privileged actions? | `client-app-users`, `server-roles`, `server-member-roles`, `server-global-settings`, `networking-app-services` | `apps/leveling-leaderboard` |

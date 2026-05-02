@@ -1,0 +1,32 @@
+{
+  "name": "@rootsdk-recipe/error-rpc-exceptions",
+  "author": "Root Communications, Inc.",
+  "description": "Recipe: propagate domain-specific error codes from server to client via RootServerException + a proto error enum, and branch on them on the client. App-only — bots have no client to surface typed errors to.",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@rootsdk/server-app": "0.18.0-alpha.1",
+    "@rootsdk/client-app": "0.18.0-alpha.1",
+    "@errorrpcexceptions/gen-client": "file:./networking/gen/client",
+    "@errorrpcexceptions/gen-server": "file:./networking/gen/server",
+    "@errorrpcexceptions/gen-shared": "file:./networking/gen/shared"
+  },
+  "devDependencies": {
+    "@rootsdk/dev-tools": "0.18.0-alpha.1",
+    "typescript": "^5.8.2"
+  },
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "clean": "node clean.js"
+  },
+  "workspaces": {
+    "packages": [
+      "./networking",
+      "./server",
+      "./client"
+    ]
+  }
+}

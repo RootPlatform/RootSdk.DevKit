@@ -16,6 +16,7 @@ Recipe folders are category-prefixed so the catalog clusters by problem area:
 | `audio-` | Sound effects, autoplay policy, asset bundling |
 | `chat-` | Triggering on user messages, replying, mentions |
 | `data-` | Database queries, batching, pagination |
+| `error-` | Typed error codes, propagation, client-side branching |
 | `external-` | Calling external HTTP APIs |
 | `per-user-` | Per-user state, cooldowns, rate limits |
 | `ui-` | Client-side gates, role-driven feature exposure |

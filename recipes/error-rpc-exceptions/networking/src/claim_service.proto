@@ -1,0 +1,113 @@
+syntax = "proto3";
+package errorrpcexceptions;
+
+import "rootsdk/types.proto";
+
+// ============================================================================
+// ClaimService — first-to-claim a single name slot.
+//
+// The recipe's lesson is the typed-error contract between server and client:
+//
+//   - The server defines a domain-specific error enum (ClaimError) in this
+//     proto, throws RootServerException(ClaimError.X, "...") on failure,
+//     and the protobuf-ts generator strips the enum prefix on the TS side
+//     so the client matches err.code against ClaimError.X without the
+//     CLAIM_ERROR_ prefix.
+//
+//   - The client catches err with `instanceof RootServerException` and
+//     branches on err.code. The recipe's App.tsx demonstrates three
+//     branching shapes for the same RPC:
+//
+//       1. single-code if      — handle one error, fall through on others
+//       2. multi-code switch   — distinct UI response per error code
+//       3. side-effect branch  — error implies stale cache, restart client
+//
+// The app keeps a single record in KV (`{ name, claimedBy }`) under one
+// key. KV is incidental — what's load-bearing is the error enum + the
+// matching catch-and-branch on the client.
+// ============================================================================
+
+// --- Read --------------------------------------------------------------------
+
+message GetClaimRequest {}
+
+// Empty fields when no name is currently claimed. Both fields are optional
+// so the absence of a claim is unambiguous on the wire.
+message GetClaimResponse {
+  optional string name = 1;
+  optional string claimed_by = 2;
+}
+
+// --- Claim -------------------------------------------------------------------
+
+message ClaimRequest {
+  string name = 1;
+}
+
+message ClaimResponse {
+  string name = 1;
+  string claimed_by = 2;
+}
+
+// --- Release -----------------------------------------------------------------
+
+// No-op when nothing is claimed; the server treats "release without a claim"
+// as success rather than throwing. Keeps the lesson focused on Claim's
+// errors.
+message ReleaseRequest {}
+
+// Empty by convention. Recipes use a real Response message for every RPC
+// (even when there's nothing to return) and reserve `rootsdk.Void` for
+// broadcast RPCs. Mixing the two patterns makes the service contract
+// harder to scan at a glance.
+message ReleaseResponse {}
+
+// --- Broadcasts --------------------------------------------------------------
+
+// Fired on both claim and release. `released = true` with empty name/
+// claimed_by means the slot is now free.
+message NameClaimedEvent {
+  string name = 1;
+  string claimed_by = 2;
+  bool released = 3;
+}
+
+// --- Errors ------------------------------------------------------------------
+//
+// Every value in the enum carries the CLAIM_ERROR_ prefix on the proto side.
+// The protobuf-ts generator strips it on the TS side for both server and
+// client, so both ends use the same short form:
+//
+//   server: throw new RootServerException(ClaimError.NAME_EMPTY, "...")
+//   client: err.code === ClaimError.NAME_EMPTY
+//
+// Mixing prefixed and unprefixed values produces inconsistent TS names —
+// every value gets the full prefix. UNSPECIFIED = 0 is the proto3 default;
+// the SDK reserves negative codes for built-in errors, so domain enums use
+// positive values starting at 1.
+
+enum ClaimError {
+  CLAIM_ERROR_UNSPECIFIED = 0;
+  // Caller submitted an empty name string. Validation error — the client
+  // can prevent this in the UI but the server still validates because
+  // clients are untrusted.
+  CLAIM_ERROR_NAME_EMPTY = 1;
+  // Caller submitted a name longer than 32 characters. Validation error.
+  CLAIM_ERROR_NAME_TOO_LONG = 2;
+  // The name slot is already taken by someone else (or by the caller in a
+  // previous session, before they released it). State conflict — the
+  // client's cache may be stale; one valid response is to restart and
+  // resync.
+  CLAIM_ERROR_NAME_ALREADY_CLAIMED = 3;
+}
+
+// --- Service -----------------------------------------------------------------
+
+service ClaimService {
+  rpc GetClaim(GetClaimRequest) returns (GetClaimResponse);
+  // Throws ClaimError.NAME_EMPTY, NAME_TOO_LONG, or NAME_ALREADY_CLAIMED.
+  rpc Claim(ClaimRequest) returns (ClaimResponse);
+  rpc Release(ReleaseRequest) returns (ReleaseResponse);
+
+  rpc BroadcastNameClaimed(NameClaimedEvent) returns (rootsdk.Void);
+}
