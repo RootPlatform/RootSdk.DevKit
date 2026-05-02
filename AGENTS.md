@@ -26,7 +26,7 @@ The catalogs further down list every concrete item in `apps/`, `bots/`, `recipes
 **Building an app** (client + server + networking):
 1. Copy `templates/app/`.
 2. Load `docs/index.md` and fetch chunks as needed.
-3. Reference `api-samples/` (every SDK domain, every method) and `apps/` (end-to-end architecture). Each sample's `README.md` has a Coverage scope section stating what it does and does not demonstrate.
+3. Reference `api-samples/` (every SDK domain, every method) and `apps/` (end-to-end architecture). Each sample's `AGENTS.md` states what it demonstrates and does not demonstrate.
 
 **Not sure which to build?** Read `docs/llms/overview/choose-app-or-bot.md`.
 
