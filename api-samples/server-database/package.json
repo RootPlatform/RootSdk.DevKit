@@ -8,11 +8,11 @@
     "node": ">=22"
   },
   "dependencies": {
-    "@rootsdk/server-bot": "0.18.0-alpha.1",
+    "@rootsdk/server-bot": "^0.19.1",
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {
-    "@rootsdk/dev-tools": "0.18.0-alpha.1",
+    "@rootsdk/dev-tools": "^0.19.1",
     "@types/sqlite3": "^3.1.11",
     "typescript": "^5.8.2"
   },
