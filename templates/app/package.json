@@ -7,14 +7,14 @@
     "node": ">=22"
   },
   "dependencies": {
-    "@rootsdk/client-app": "^0.21.3",
-    "@rootsdk/server-app": "^0.21.3",
+    "@rootsdk/client-app": "*",
+    "@rootsdk/server-app": "*",
     "@{project}/gen-client": "file:./networking/gen/client",
     "@{project}/gen-server": "file:./networking/gen/server",
     "@{project}/gen-shared": "file:./networking/gen/shared"
   },
   "devDependencies": {
-    "@rootsdk/dev-tools": "^0.21.3",
+    "@rootsdk/dev-tools": "*",
     "typescript": "^5.8.2",
     "@types/node": "^22.10.2"
   },
