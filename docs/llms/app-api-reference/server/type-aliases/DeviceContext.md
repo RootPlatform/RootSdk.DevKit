@@ -13,7 +13,7 @@ Identifies a specific device connection. Base type extended by `Client` and `Cli
 
 ### deviceId?
 
-> `optional` **deviceId**: [`DeviceGuid`](DeviceGuid.md)
+> `optional` **deviceId?**: [`DeviceGuid`](DeviceGuid.md)
 
 The device's unique identifier. Members can be attached on multiple devices simultaneously (for example, desktop and mobile), and each device has its own ID.
 

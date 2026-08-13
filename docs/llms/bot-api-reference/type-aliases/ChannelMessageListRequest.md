@@ -25,7 +25,7 @@ The reference timestamp for pagination. Required. Messages are fetched relative 
 
 ### limit?
 
-> `optional` **limit**: `number`
+> `optional` **limit?**: `number`
 
 ### messageDirectionTake
 

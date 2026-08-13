@@ -13,7 +13,7 @@ Request object for moving a channel to a different position or channel group.
 
 ### beforeChannelId?
 
-> `optional` **beforeChannelId**: [`ChannelGuid`](ChannelGuid.md)
+> `optional` **beforeChannelId?**: [`ChannelGuid`](ChannelGuid.md)
 
 The ID of an existing channel in the destination group that the moved channel should be placed after. The moved channel is inserted immediately after `beforeChannelId` in sort order. Optional.
 

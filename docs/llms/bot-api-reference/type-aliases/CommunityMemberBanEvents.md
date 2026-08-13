@@ -13,7 +13,7 @@ For event name constants, see `CommunityMemberBanEvent`.
 
 ## Properties
 
-### communityMemberBan.created()
+### communityMemberBan.created
 
 > **communityMemberBan.created**: (`evt`: [`CommunityMemberBanCreatedEvent`](CommunityMemberBanCreatedEvent.md)) => `void`
 
@@ -36,7 +36,7 @@ rootServer.community.communityMemberBans.on(CommunityMemberBanEvent.CommunityMem
 });
 ```
 
-### communityMemberBan.deleted()
+### communityMemberBan.deleted
 
 > **communityMemberBan.deleted**: (`evt`: [`CommunityMemberBanDeletedEvent`](CommunityMemberBanDeletedEvent.md)) => `void`
 

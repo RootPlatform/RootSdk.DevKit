@@ -13,7 +13,7 @@ Request object for creating a new channel within a channel group.
 
 ### accessRuleCreates?
 
-> `optional` **accessRuleCreates**: [`AccessRuleCreateRoleOrMemberRequest`](AccessRuleCreateRoleOrMemberRequest.md)[]
+> `optional` **accessRuleCreates?**: [`AccessRuleCreateRoleOrMemberRequest`](AccessRuleCreateRoleOrMemberRequest.md)[]
 
 Optional array of `AccessRuleCreateRoleOrMemberRequest` objects to define initial access rules for the channel. Each rule specifies a role or member and optional permission overlays.
 
@@ -31,13 +31,13 @@ The type of channel to create. Required. Use the `ChannelType` enum values: `Tex
 
 ### description?
 
-> `optional` **description**: `string`
+> `optional` **description?**: `string`
 
 Optional description for the channel.
 
 ### iconTokenUri?
 
-> `optional` **iconTokenUri**: `string`
+> `optional` **iconTokenUri?**: `string`
 
 Optional token URI for the channel icon. Obtain this value from the asset upload process.
 

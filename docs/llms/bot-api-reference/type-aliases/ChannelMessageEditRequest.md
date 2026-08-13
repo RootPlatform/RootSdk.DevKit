@@ -31,6 +31,6 @@ The unique identifier of the message to edit. Required.
 
 ### uris?
 
-> `optional` **uris**: `string`[]
+> `optional` **uris?**: `string`[]
 
 Optional array of URIs for attachments. When provided, replaces the existing attachments on the message.

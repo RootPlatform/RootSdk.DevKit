@@ -9,7 +9,7 @@ summary: Object type with properties: members, members, state, userGroup (Member
 
 ## Properties
 
-### members.added()
+### members.added
 
 > **members.added**: (`event`: [`MemberGroupMembersAddedEvent`](MemberGroupMembersAddedEvent.md)) => `void`
 
@@ -23,7 +23,7 @@ summary: Object type with properties: members, members, state, userGroup (Member
 
 `void`
 
-### members.removed()
+### members.removed
 
 > **members.removed**: (`event`: [`MemberGroupMembersRemovedEvent`](MemberGroupMembersRemovedEvent.md)) => `void`
 
@@ -37,7 +37,7 @@ summary: Object type with properties: members, members, state, userGroup (Member
 
 `void`
 
-### state.changed()
+### state.changed
 
 > **state.changed**: (`event`: [`MemberGroupStateChangedEvent`](MemberGroupStateChangedEvent.md)) => `void`
 
@@ -51,7 +51,7 @@ summary: Object type with properties: members, members, state, userGroup (Member
 
 `void`
 
-### userGroup.empty()
+### userGroup.empty
 
 > **userGroup.empty**: (`event`: [`MemberGroupEmptiedEvent`](MemberGroupEmptiedEvent.md)) => `void`
 

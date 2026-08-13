@@ -19,12 +19,12 @@ Restricts which file types the user can select. See `FileUploadType`.
 
 ### multiple?
 
-> `optional` **multiple**: `boolean`
+> `optional` **multiple?**: `boolean`
 
 Whether the user can select more than one file. Defaults to `false`. Optional.
 
 ### windowTitle?
 
-> `optional` **windowTitle**: `string`
+> `optional` **windowTitle?**: `string`
 
 A custom title for the file picker dialog. Optional.

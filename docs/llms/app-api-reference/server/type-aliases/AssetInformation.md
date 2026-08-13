@@ -23,21 +23,21 @@ The unique identifier of the asset.
 
 A discriminated union describing the asset content. Check `oneofKind` to determine the type:
 
-- `"url"` — A direct download URL (string).
-- `"image"` — An `AssetImage` with resolution variants and thumbnail.
-- `"video"` — An `AssetVideo` with streaming and download URLs.
-- `"file"` — An `AssetFile` with download URL, MIME type, and size.
-- `"invalid"` — The asset failed processing. See `AssetInvalid` for the reason.
-- `undefined` — No link data is available.
+- `"url"`: A direct download URL (string).
+- `"image"`: An `AssetImage` with resolution variants and thumbnail.
+- `"video"`: An `AssetVideo` with streaming and download URLs.
+- `"file"`: An `AssetFile` with download URL, MIME type, and size.
+- `"invalid"`: The asset failed processing. See `AssetInvalid` for the reason.
+- `undefined`: No link data is available.
 
 ### linkExpiresAt?
 
-> `optional` **linkExpiresAt**: `Date`
+> `optional` **linkExpiresAt?**: `Date`
 
 When the download links expire. Optional. After this time, call `AssetClient.get()` again to obtain fresh URLs.
 
 ### preview?
 
-> `optional` **preview**: [`AssetPreview`](AssetPreview.md)
+> `optional` **preview?**: [`AssetPreview`](AssetPreview.md)
 
 Optional preview metadata for the asset. See `AssetPreview`.

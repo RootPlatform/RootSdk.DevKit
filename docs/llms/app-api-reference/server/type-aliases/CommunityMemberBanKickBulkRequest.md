@@ -13,6 +13,6 @@ Request object for kicking multiple members from the community in a single opera
 
 ### userIds?
 
-> `optional` **userIds**: [`UserGuid`](UserGuid.md)[]
+> `optional` **userIds?**: [`UserGuid`](UserGuid.md)[]
 
 Array of user IDs to kick. Optional, but at least one user ID should be provided for the operation to have effect.

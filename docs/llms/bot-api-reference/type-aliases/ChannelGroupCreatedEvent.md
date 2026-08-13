@@ -13,13 +13,13 @@ Event payload emitted when a channel group becomes visible to your code. This in
 
 ### beforeChannelGroupId?
 
-> `optional` **beforeChannelGroupId**: [`ChannelGroupGuid`](ChannelGroupGuid.md)
+> `optional` **beforeChannelGroupId?**: [`ChannelGroupGuid`](ChannelGroupGuid.md)
 
 Indicates where this channel group was inserted. If set, this channel group appears directly above the specified channel group. If undefined, this channel group is at the bottom of the sidebar.
 
 ### channelGroupPermission?
 
-> `optional` **channelGroupPermission**: [`ChannelPermission`](ChannelPermission.md)
+> `optional` **channelGroupPermission?**: [`ChannelPermission`](ChannelPermission.md)
 
 Your code's computed permissions on this channel group. Contains boolean flags indicating which actions your code can perform.
 

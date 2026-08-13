@@ -19,7 +19,7 @@ The unique identifier of the channel where the message was pinned.
 
 ### communityId?
 
-> `optional` **communityId**: [`CommunityGuid`](CommunityGuid.md)
+> `optional` **communityId?**: [`CommunityGuid`](CommunityGuid.md)
 
 The unique identifier of the community. Optional.
 

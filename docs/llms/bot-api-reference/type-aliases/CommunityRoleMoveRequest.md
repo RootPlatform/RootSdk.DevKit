@@ -13,7 +13,7 @@ Request object for changing a role's display position.
 
 ### beforeCommunityRoleId?
 
-> `optional` **beforeCommunityRoleId**: [`CommunityRoleGuid`](CommunityRoleGuid.md)
+> `optional` **beforeCommunityRoleId?**: [`CommunityRoleGuid`](CommunityRoleGuid.md)
 
 The ID of an existing role that the moved role should be placed after. The moved role is inserted immediately after `beforeCommunityRoleId` in sort order. Optional.
 

@@ -39,6 +39,20 @@ A promise that resolves when the role has been assigned.
 
 `RootApiException` with `errorCode` set to `NotFound` if the role or any user does not exist, or `NoPermissionToAdd` if missing required permissions or attempting to assign the `@everyone` role.
 
+### addSelf()
+
+> **addSelf**(`request`: [`CommunityMemberRoleAddSelfRequest`](CommunityMemberRoleAddSelfRequest.md)): `Promise`<`void`>
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `request` | [`CommunityMemberRoleAddSelfRequest`](CommunityMemberRoleAddSelfRequest.md) |
+
+#### Returns
+
+`Promise`<`void`>
+
 ### list()
 
 > **list**(`request`: [`CommunityMemberRoleListRequest`](CommunityMemberRoleListRequest.md)): `Promise`<[`CommunityMemberRoleListResponse`](CommunityMemberRoleListResponse.md)>
@@ -82,6 +96,20 @@ A promise that resolves when the role has been removed.
 #### Throws
 
 `RootApiException` with `errorCode` set to `NotFound` if the role or any user does not exist, or `NoPermissionToDelete` if missing required permissions or attempting to remove the `@everyone` role.
+
+### removeSelf()
+
+> **removeSelf**(`request`: [`CommunityMemberRoleRemoveSelfRequest`](CommunityMemberRoleRemoveSelfRequest.md)): `Promise`<`void`>
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `request` | [`CommunityMemberRoleRemoveSelfRequest`](CommunityMemberRoleRemoveSelfRequest.md) |
+
+#### Returns
+
+`Promise`<`void`>
 
 ### setPrimary()
 

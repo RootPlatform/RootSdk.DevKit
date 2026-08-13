@@ -25,7 +25,7 @@ The video codec. See `AssetVideoCodec`.
 
 ### duration?
 
-> `optional` **duration**: `Duration`
+> `optional` **duration?**: `Duration`
 
 The duration of the video. Optional. A `Duration` with `seconds` (bigint) and `nanos` (number) fields.
 

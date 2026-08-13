@@ -19,12 +19,12 @@ The unique identifier of the parent message.
 
 ### messageContent?
 
-> `optional` **messageContent**: `string`
+> `optional` **messageContent?**: `string`
 
 The text content of the parent message. Optional if the content is no longer available.
 
 ### userId?
 
-> `optional` **userId**: [`UserGuid`](UserGuid.md)
+> `optional` **userId?**: [`UserGuid`](UserGuid.md)
 
 The ID of the user who created the parent message. Optional if the user is no longer available.

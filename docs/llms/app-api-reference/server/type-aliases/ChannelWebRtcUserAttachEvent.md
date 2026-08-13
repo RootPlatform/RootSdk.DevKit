@@ -13,7 +13,7 @@ Event payload emitted when a user joins a voice channel.
 
 ### audioTrackId?
 
-> `optional` **audioTrackId**: `string`
+> `optional` **audioTrackId?**: `string`
 
 The internal WebRTC track ID for the user's microphone. Optional.
 
@@ -25,13 +25,13 @@ The unique identifier of the voice channel.
 
 ### communityId?
 
-> `optional` **communityId**: [`CommunityGuid`](CommunityGuid.md)
+> `optional` **communityId?**: [`CommunityGuid`](CommunityGuid.md)
 
 The unique identifier of the community. Optional.
 
 ### dataChannelName?
 
-> `optional` **dataChannelName**: `string`
+> `optional` **dataChannelName?**: `string`
 
 The name of the user's data channel. Optional.
 
@@ -75,13 +75,13 @@ Whether the user joined in a muted state.
 
 ### screenAudioTrackId?
 
-> `optional` **screenAudioTrackId**: `string`
+> `optional` **screenAudioTrackId?**: `string`
 
 The internal WebRTC track ID for the user's screen share audio. Optional.
 
 ### screenTrackId?
 
-> `optional` **screenTrackId**: `string`
+> `optional` **screenTrackId?**: `string`
 
 The internal WebRTC track ID for the user's screen share video. Optional.
 
@@ -93,6 +93,6 @@ The unique identifier of the user who joined.
 
 ### videoTrackId?
 
-> `optional` **videoTrackId**: `string`
+> `optional` **videoTrackId?**: `string`
 
 The internal WebRTC track ID for the user's camera. Optional.

@@ -13,7 +13,7 @@ Request to create a new channel group in the community.
 
 ### accessRuleCreates?
 
-> `optional` **accessRuleCreates**: [`AccessRuleCreateRoleOrMemberRequest`](AccessRuleCreateRoleOrMemberRequest.md)[]
+> `optional` **accessRuleCreates?**: [`AccessRuleCreateRoleOrMemberRequest`](AccessRuleCreateRoleOrMemberRequest.md)[]
 
 Optional array of access rules to create for this channel group. Each entry specifies a role or member and their permissions.
 

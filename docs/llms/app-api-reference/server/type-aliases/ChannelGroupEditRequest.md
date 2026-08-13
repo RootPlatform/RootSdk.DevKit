@@ -13,7 +13,7 @@ Request to edit an existing channel group.
 
 ### accessRuleUpdate?
 
-> `optional` **accessRuleUpdate**: [`AccessRuleUpdateRequest`](AccessRuleUpdateRequest.md)
+> `optional` **accessRuleUpdate?**: [`AccessRuleUpdateRequest`](AccessRuleUpdateRequest.md)
 
 Optional access rule changes to apply. Use this to add, modify, or remove access rules on the channel group.
 

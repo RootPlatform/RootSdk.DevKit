@@ -13,7 +13,7 @@ A URI reference extracted from message content. URIs can reference users, roles,
 
 ### attachment?
 
-> `optional` **attachment**: [`MessageUriAttachment`](MessageUriAttachment.md)
+> `optional` **attachment?**: [`MessageUriAttachment`](MessageUriAttachment.md)
 
 Metadata for file attachments. Only present when the URI references an uploaded file (`root://asset/` or `root://upload/` URIs). See `MessageUriAttachment` for the structure.
 

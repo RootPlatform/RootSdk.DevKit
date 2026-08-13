@@ -13,7 +13,7 @@ Response object returned when listing voice channel participants.
 
 ### createdAt?
 
-> `optional` **createdAt**: `Date`
+> `optional` **createdAt?**: `Date`
 
 The timestamp when the voice session was created. Optional; may be undefined if no session is active.
 

@@ -21,7 +21,7 @@ Returns the string `sqlite3`.
 
 ### sqlite3?
 
-> `optional` **sqlite3**: `object`
+> `optional` **sqlite3?**: `object`
 
 Provides the `filename` of your SQLite data file. Here's how you access the filename:
 

@@ -13,7 +13,7 @@ For event name constants, see `CommunityEmojiEvent`.
 
 ## Properties
 
-### communityEmoji.created()
+### communityEmoji.created
 
 > **communityEmoji.created**: (`evt`: [`CommunityEmojiCreatedEvent`](CommunityEmojiCreatedEvent.md)) => `void`
 
@@ -36,7 +36,7 @@ rootServer.community.communityEmoji.on(CommunityEmojiEvent.CommunityEmojiCreated
 });
 ```
 
-### communityEmoji.deleted()
+### communityEmoji.deleted
 
 > **communityEmoji.deleted**: (`evt`: [`CommunityEmojiDeletedEvent`](CommunityEmojiDeletedEvent.md)) => `void`
 

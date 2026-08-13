@@ -2,12 +2,12 @@
 path: app-docs/tutorials/showdown-app/overview.md
 audience: app
 category: tutorial
-summary: **Showdown** is a simple, real-time voting App where members choose between two competing options — like _Cats vs.
+summary: **Showdown** is a simple, real-time voting App where members choose between two competing options, like _Cats vs.
 ---
 
 # Tutorial: Showdown App
 
-**Showdown** is a simple, real-time voting App where members choose between two competing options — like _Cats vs. Dogs_ — and see live updates as others vote. It's a good project for learning the core networking code in a Root App. To keep things manageable, the choices will be hardcoded and there won't be any database/persistence.
+**Showdown** is a simple, real-time voting App where members choose between two competing options, like _Cats vs. Dogs_, and see live updates as others vote. It's a good project for learning the core networking code in a Root App. To keep things manageable, the choices will be hardcoded and there won't be any database/persistence.
 
 ## Root concepts covered
 

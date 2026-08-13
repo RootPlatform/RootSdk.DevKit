@@ -13,13 +13,13 @@ Request object for banning a single member from the community.
 
 ### expiresAt?
 
-> `optional` **expiresAt**: `Date`
+> `optional` **expiresAt?**: `Date`
 
 Optional expiration date for the ban. After this date, the ban is no longer enforced. If not provided, the ban is permanent until manually deleted.
 
 ### reason?
 
-> `optional` **reason**: `string`
+> `optional` **reason?**: `string`
 
 Optional reason for the ban. This is stored with the ban record and included in the notification sent to the banned user.
 

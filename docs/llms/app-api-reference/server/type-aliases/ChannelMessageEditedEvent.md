@@ -19,17 +19,17 @@ The ID of the channel containing the message.
 
 ### communityId?
 
-> `optional` **communityId**: [`CommunityGuid`](CommunityGuid.md)
+> `optional` **communityId?**: [`CommunityGuid`](CommunityGuid.md)
 
 ### deletedAt?
 
-> `optional` **deletedAt**: `Date`
+> `optional` **deletedAt?**: `Date`
 
 Timestamp when the message was deleted. Undefined for active messages.
 
 ### editedAt?
 
-> `optional` **editedAt**: `Date`
+> `optional` **editedAt?**: `Date`
 
 Timestamp when the message was last edited.
 
@@ -65,7 +65,7 @@ Optional array of `ParentMessage` objects representing messages this message is 
 
 ### pinnedAt?
 
-> `optional` **pinnedAt**: `Date`
+> `optional` **pinnedAt?**: `Date`
 
 Timestamp when the message was pinned. Undefined if not pinned.
 
@@ -77,7 +77,7 @@ Optional array of `MessageReaction` objects representing reactions on the messag
 
 ### referenceMaps?
 
-> `optional` **referenceMaps**: [`MessageReferenceMaps`](MessageReferenceMaps.md)
+> `optional` **referenceMaps?**: [`MessageReferenceMaps`](MessageReferenceMaps.md)
 
 Optional `MessageReferenceMaps` object containing resolved references for users, channels, roles, and assets mentioned in the message.
 

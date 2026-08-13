@@ -13,7 +13,7 @@ Event payload emitted when a visible channel group's properties or permissions c
 
 ### channelGroupPermission?
 
-> `optional` **channelGroupPermission**: [`ChannelPermission`](ChannelPermission.md)
+> `optional` **channelGroupPermission?**: [`ChannelPermission`](ChannelPermission.md)
 
 Your code's computed permissions on this channel group. Contains boolean flags indicating which actions your code can perform. Only included when your code's permissions on this channel group changed; undefined if only other properties (like the name) were edited.
 

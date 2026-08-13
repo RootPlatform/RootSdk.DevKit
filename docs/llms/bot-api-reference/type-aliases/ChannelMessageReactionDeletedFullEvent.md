@@ -7,7 +7,7 @@ summary: Event payload emitted when all reactions of a given shortcode are remov
 
 > **ChannelMessageReactionDeletedFullEvent** = `object`
 
-Event payload emitted when all reactions of a given shortcode are removed from a message, regardless of which users added them. This is a bulk operation — contrast with `ChannelMessageReactionDeletedEvent`, which fires when a single user removes their own reaction.
+Event payload emitted when all reactions of a given shortcode are removed from a message, regardless of which users added them. This is a bulk operation: contrast with `ChannelMessageReactionDeletedEvent`, which fires when a single user removes their own reaction.
 
 This event only applies to community channels, not direct messages.
 
@@ -21,7 +21,7 @@ The unique identifier of the channel containing the message.
 
 ### communityId?
 
-> `optional` **communityId**: [`CommunityGuid`](CommunityGuid.md)
+> `optional` **communityId?**: [`CommunityGuid`](CommunityGuid.md)
 
 The unique identifier of the community. Optional.
 

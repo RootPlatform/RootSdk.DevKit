@@ -19,7 +19,7 @@ Array of role IDs assigned to this member. Always includes the `@everyone` role.
 
 ### joinedAt?
 
-> `optional` **joinedAt**: `Date`
+> `optional` **joinedAt?**: `Date`
 
 The date and time when the member joined the community.
 
@@ -31,31 +31,31 @@ The member's display name within the community.
 
 ### primaryCommunityRoleId?
 
-> `optional` **primaryCommunityRoleId**: [`CommunityRoleGuid`](CommunityRoleGuid.md)
+> `optional` **primaryCommunityRoleId?**: [`CommunityRoleGuid`](CommunityRoleGuid.md)
 
 The ID of the member's primary role, which determines their displayed role name and color. May be undefined if using the default role.
 
 ### primaryCommunityRoleName?
 
-> `optional` **primaryCommunityRoleName**: `string`
+> `optional` **primaryCommunityRoleName?**: `string`
 
 The display name of the member's primary role. May be undefined.
 
 ### profilePictureAssetUri?
 
-> `optional` **profilePictureAssetUri**: `string`
+> `optional` **profilePictureAssetUri?**: `string`
 
 The URI of the member's profile picture. May be undefined if no picture is set.
 
 ### roleColorHex?
 
-> `optional` **roleColorHex**: `string`
+> `optional` **roleColorHex?**: `string`
 
 The hex color code associated with the member's displayed role color. May be undefined.
 
 ### subscribedAt?
 
-> `optional` **subscribedAt**: `Date`
+> `optional` **subscribedAt?**: `Date`
 
 Reserved for future use. Currently, always undefined.
 

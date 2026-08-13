@@ -83,7 +83,10 @@ Core types: GUIDs, exceptions, and utility classes.
 
 - [RootClient](type-aliases/RootClient.md) - This type is your entry point to the Root client-side APIs.
 - [RootClientAsset](type-aliases/RootClientAsset.md) - Provides methods for uploading files and converting asset URIs into displayable URLs.
+- [RootClientDevice](type-aliases/RootClientDevice.md) - Information about the host environment your app's client is running in.
 - [RootClientLifecycle](type-aliases/RootClientLifecycle.md) - Lifecycle methods for your app's client-side component.
+- [RootClientOS](type-aliases/RootClientOS.md) - Type alias for `"ios"` (Root Core).
+- [RootClientPlatform](type-aliases/RootClientPlatform.md) - Type alias for `"mobile"` (Root Core).
 - [RootClientService](type-aliases/RootClientService.md) - Base type that generated client-side service classes implement.
 - [RootClientTheme](type-aliases/RootClientTheme.md) - Provides access to the host Root client's current theme.
 - [RootClientThemeEvents](type-aliases/RootClientThemeEvents.md) - Event map type for `RootClientTheme`.

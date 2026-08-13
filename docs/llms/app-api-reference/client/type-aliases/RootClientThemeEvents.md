@@ -13,7 +13,7 @@ For event name constants, see `RootClientThemeEvent`.
 
 ## Properties
 
-### theme.update()
+### theme.update
 
 > **theme.update**: (`event`: [`RootThemeMode`](RootThemeMode.md)) => `void`
 

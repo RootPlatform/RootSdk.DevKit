@@ -9,7 +9,7 @@ summary: Restricts which file types the user can select in the file picker opene
 
 Restricts which file types the user can select in the file picker opened by `rootClient.assets.fileUpload()`.
 
-- `"all"` — Any file type.
-- `"text"` — Text files only.
-- `"imageAll"` — Image files only.
-- `"pdf"` — PDF files only.
+- `"all"`: Any file type.
+- `"text"`: Text files only.
+- `"imageAll"`: Image files only.
+- `"pdf"`: PDF files only.

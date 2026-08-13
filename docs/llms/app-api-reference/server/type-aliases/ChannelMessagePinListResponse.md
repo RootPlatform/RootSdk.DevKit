@@ -37,6 +37,6 @@ The number of pinned messages older than the returned set.
 
 ### referenceMaps?
 
-> `optional` **referenceMaps**: [`MessageReferenceMaps`](MessageReferenceMaps.md)
+> `optional` **referenceMaps?**: [`MessageReferenceMaps`](MessageReferenceMaps.md)
 
 Optional `MessageReferenceMaps` object containing resolved references for users, channels, roles, and assets mentioned across all pinned messages.

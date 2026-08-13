@@ -13,7 +13,7 @@ For event name constants, see `ClientEvent`.
 
 ## Properties
 
-### user.attached()
+### user.attached
 
 > **user.attached**: (`event`: [`Client`](Client.md)) => `void`
 
@@ -27,7 +27,7 @@ For event name constants, see `ClientEvent`.
 
 `void`
 
-### user.detached()
+### user.detached
 
 > **user.detached**: (`event`: [`Client`](Client.md)) => `void`
 
@@ -41,7 +41,7 @@ For event name constants, see `ClientEvent`.
 
 `void`
 
-### user.device.attached()
+### user.device.attached
 
 > **user.device.attached**: (`event`: [`ClientContext`](ClientContext.md)) => `void`
 
@@ -55,7 +55,7 @@ For event name constants, see `ClientEvent`.
 
 `void`
 
-### user.device.detached()
+### user.device.detached
 
 > **user.device.detached**: (`event`: [`ClientContext`](ClientContext.md)) => `void`
 

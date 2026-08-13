@@ -13,7 +13,7 @@ Represents a container that organizes channels within a community. Channel group
 
 ### channelGroupPermission?
 
-> `optional` **channelGroupPermission**: [`ChannelPermission`](ChannelPermission.md)
+> `optional` **channelGroupPermission?**: [`ChannelPermission`](ChannelPermission.md)
 
 Your code's computed permissions on this channel group. Contains boolean flags indicating which actions your code can perform (view, create messages, manage files, etc.). This is the final result after applying all access rules.
 

@@ -19,7 +19,7 @@ Represents a key-value pair returned by `KeyValueStore.select()`. Contains the k
 
 ### expiresAt?
 
-> `optional` **expiresAt**: `Date`
+> `optional` **expiresAt?**: `Date`
 
 ### key
 

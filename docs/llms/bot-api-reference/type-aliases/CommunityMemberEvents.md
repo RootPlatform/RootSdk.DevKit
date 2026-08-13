@@ -13,7 +13,7 @@ For event name constants, see `CommunityMemberEvent`.
 
 ## Properties
 
-### communityMember.attach()
+### communityMember.attach
 
 > **communityMember.attach**: (`evt`: [`CommunityMemberAttachEvent`](CommunityMemberAttachEvent.md)) => `void`
 
@@ -36,7 +36,7 @@ rootServer.community.communityMembers.on(CommunityMemberEvent.CommunityMemberAtt
 });
 ```
 
-### communityMember.detach()
+### communityMember.detach
 
 > **communityMember.detach**: (`evt`: [`CommunityMemberDetachEvent`](CommunityMemberDetachEvent.md)) => `void`
 
@@ -59,7 +59,7 @@ rootServer.community.communityMembers.on(CommunityMemberEvent.CommunityMemberDet
 });
 ```
 
-### user.set.profile()
+### user.set.profile
 
 > **user.set.profile**: (`evt`: [`UserSetProfileEvent`](UserSetProfileEvent.md)) => `void`
 

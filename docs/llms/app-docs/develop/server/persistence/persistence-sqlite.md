@@ -15,6 +15,10 @@ Root supports your use of a **SQLite** database:
 - Providing the database filename.
 - Backing up and restoring the database file automatically so you won't lose data if your server restarts.
 
+## Storage limit
+
+Each app or bot instance has limited space for its SQLite database. **Keep your database under 500 MB.**
+
 ## How to use it
 
 You need to add a few dependencies to your `package.json` file:

@@ -19,7 +19,7 @@ The channel group containing the channel.
 
 ### channelPermission?
 
-> `optional` **channelPermission**: [`ChannelPermission`](ChannelPermission.md)
+> `optional` **channelPermission?**: [`ChannelPermission`](ChannelPermission.md)
 
 Optional updated permissions for the channel.
 
@@ -29,13 +29,13 @@ Optional updated permissions for the channel.
 
 ### description?
 
-> `optional` **description**: `string`
+> `optional` **description?**: `string`
 
 Optional updated description.
 
 ### iconAssetUri?
 
-> `optional` **iconAssetUri**: `string`
+> `optional` **iconAssetUri?**: `string`
 
 Optional updated icon URI.
 

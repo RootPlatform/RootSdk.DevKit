@@ -13,7 +13,7 @@ Event payload emitted when a user leaves a voice channel.
 
 ### audioTrackId?
 
-> `optional` **audioTrackId**: `string`
+> `optional` **audioTrackId?**: `string`
 
 The internal WebRTC track ID for the user's microphone. Optional.
 
@@ -25,7 +25,7 @@ The unique identifier of the voice channel.
 
 ### communityId?
 
-> `optional` **communityId**: [`CommunityGuid`](CommunityGuid.md)
+> `optional` **communityId?**: [`CommunityGuid`](CommunityGuid.md)
 
 The unique identifier of the community. Optional.
 
@@ -43,13 +43,13 @@ Whether the user was kicked from the channel. When `false`, the user left volunt
 
 ### screenAudioTrackId?
 
-> `optional` **screenAudioTrackId**: `string`
+> `optional` **screenAudioTrackId?**: `string`
 
 The internal WebRTC track ID for the user's screen share audio. Optional.
 
 ### screenTrackId?
 
-> `optional` **screenTrackId**: `string`
+> `optional` **screenTrackId?**: `string`
 
 The internal WebRTC track ID for the user's screen share video. Optional.
 
@@ -61,6 +61,6 @@ The unique identifier of the user who left.
 
 ### videoTrackId?
 
-> `optional` **videoTrackId**: `string`
+> `optional` **videoTrackId?**: `string`
 
 The internal WebRTC track ID for the user's camera. Optional.

@@ -13,7 +13,7 @@ Contains resolved display names for all references in a message, including user 
 
 ### assets?
 
-> `optional` **assets**: `object`
+> `optional` **assets?**: `object`
 
 Map of general asset URIs to their metadata. Keys are `root://asset/{id}` URIs. Use this to display file attachment information.
 
@@ -29,7 +29,7 @@ Array of channels mentioned in the message. Each entry maps a channel ID to its 
 
 ### imageAssets?
 
-> `optional` **imageAssets**: `object`
+> `optional` **imageAssets?**: `object`
 
 Map of image asset URIs to their metadata. Keys are `root://asset/{id}` URIs. Use this to display image previews or thumbnails.
 

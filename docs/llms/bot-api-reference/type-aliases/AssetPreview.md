@@ -23,10 +23,10 @@ The preview description (e.g., the meta description for a webpage).
 
 A discriminated union with type-specific preview metadata. Check `oneofKind` to determine the type:
 
-- `"audio"` — An `AssetPreviewAudio` with codec, bitrate, and duration.
-- `"video"` — An `AssetPreviewVideo` with dimensions, codec, bitrate, and duration.
-- `"webpage"` — An `AssetPreviewWebpage` with favicon, embed URL, and site name.
-- `undefined` — No type-specific details are available.
+- `"audio"`: An `AssetPreviewAudio` with codec, bitrate, and duration.
+- `"video"`: An `AssetPreviewVideo` with dimensions, codec, bitrate, and duration.
+- `"webpage"`: An `AssetPreviewWebpage` with favicon, embed URL, and site name.
+- `undefined`: No type-specific details are available.
 
 ### previews
 
@@ -48,6 +48,6 @@ The type of preview. See `AssetPreviewType`.
 
 ### updatedAt?
 
-> `optional` **updatedAt**: `Date`
+> `optional` **updatedAt?**: `Date`
 
 When the preview was last generated. Optional.

@@ -125,5 +125,5 @@ The decision is a judgment call. Generally, use **response codes** for soft fail
 ## Summary
 
 * Throw `RootServerException` for unexpected or unrecoverable errors.
-* Use positive codes for your app’s errors. Negative codes are for Root.
+* Use positive codes for your app's errors. Negative codes are for Root.
 * Always catch exceptions on the client to show feedback or retry.

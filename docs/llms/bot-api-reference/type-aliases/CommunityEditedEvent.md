@@ -19,13 +19,13 @@ The unique identifier of the community.
 
 ### defaultChannelId?
 
-> `optional` **defaultChannelId**: [`ChannelGuid`](ChannelGuid.md)
+> `optional` **defaultChannelId?**: [`ChannelGuid`](ChannelGuid.md)
 
 Optional channel ID for the system messages channel.
 
 ### description?
 
-> `optional` **description**: `string`
+> `optional` **description?**: `string`
 
 ### isAgeRestricted
 
@@ -33,7 +33,7 @@ Optional channel ID for the system messages channel.
 
 ### joinThrottle?
 
-> `optional` **joinThrottle**: [`CommunityJoinThrottle`](CommunityJoinThrottle.md)
+> `optional` **joinThrottle?**: [`CommunityJoinThrottle`](CommunityJoinThrottle.md)
 
 Optional updated `CommunityJoinThrottle` configuration.
 
@@ -51,7 +51,7 @@ The user ID of the community owner.
 
 ### pictureAssetUri?
 
-> `optional` **pictureAssetUri**: `string`
+> `optional` **pictureAssetUri?**: `string`
 
 Optional updated URI for the community's picture asset.
 

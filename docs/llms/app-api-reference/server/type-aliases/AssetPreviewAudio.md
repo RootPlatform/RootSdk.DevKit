@@ -25,7 +25,7 @@ The audio codec. See `AssetAudioCodec`.
 
 ### duration?
 
-> `optional` **duration**: `Duration`
+> `optional` **duration?**: `Duration`
 
 The duration of the audio. Optional. A `Duration` with `seconds` (bigint) and `nanos` (number) fields.
 

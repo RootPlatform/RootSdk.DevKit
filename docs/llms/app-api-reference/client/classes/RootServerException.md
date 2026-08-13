@@ -15,7 +15,7 @@ The only exception type that can cross the server-client boundary. You throw it 
 
 ### Constructor
 
-> **new RootServerException**(`code`: `number`, `message`: `string`, `callingFunction`: `Function` | `undefined`): `RootServerException`
+> **new RootServerException**(`code?`: `number`, `message?`: `string`, `callingFunction?`: `Function` | `undefined`): `RootServerException`
 
 #### Parameters
 

@@ -53,6 +53,20 @@ Declare the following permissions in your manifest:
 
 > **Note:** Your code can only assign roles whose permissions are a subset of its own.
 
+### addSelf()
+
+> **addSelf**(`request`: [`CommunityMemberRoleAddSelfRequest`](CommunityMemberRoleAddSelfRequest.md)): `Promise`<`void`>
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `request` | [`CommunityMemberRoleAddSelfRequest`](CommunityMemberRoleAddSelfRequest.md) |
+
+#### Returns
+
+`Promise`<`void`>
+
 ### list()
 
 > **list**(`request`: [`CommunityMemberRoleListRequest`](CommunityMemberRoleListRequest.md)): `Promise`<[`CommunityMemberRoleListResponse`](CommunityMemberRoleListResponse.md)>
@@ -110,6 +124,20 @@ Declare the following permissions in your manifest:
 ```
 
 > **Note:** Your code can only remove roles whose permissions are a subset of its own.
+
+### removeSelf()
+
+> **removeSelf**(`request`: [`CommunityMemberRoleRemoveSelfRequest`](CommunityMemberRoleRemoveSelfRequest.md)): `Promise`<`void`>
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `request` | [`CommunityMemberRoleRemoveSelfRequest`](CommunityMemberRoleRemoveSelfRequest.md) |
+
+#### Returns
+
+`Promise`<`void`>
 
 ### setPrimary()
 

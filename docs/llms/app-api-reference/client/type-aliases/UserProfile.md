@@ -31,6 +31,6 @@ The member's computed online status. See `CommunityUserOnlineStatus`.
 
 ### profilePictureUri?
 
-> `optional` **profilePictureUri**: `string`
+> `optional` **profilePictureUri?**: `string`
 
 The asset URI of the member's profile picture. Optional.

@@ -13,7 +13,7 @@ Event data emitted when a channel becomes visible to your code. This includes ne
 
 ### beforeChannelId?
 
-> `optional` **beforeChannelId**: [`ChannelGuid`](ChannelGuid.md)
+> `optional` **beforeChannelId?**: [`ChannelGuid`](ChannelGuid.md)
 
 Optional ID of the channel that this channel was positioned before.
 
@@ -37,7 +37,7 @@ The type of channel (Text, ThreadedText, Voice, or App).
 
 ### communityAppId?
 
-> `optional` **communityAppId**: [`CommunityAppGuid`](CommunityAppGuid.md)
+> `optional` **communityAppId?**: [`CommunityAppGuid`](CommunityAppGuid.md)
 
 For app channels, the associated community app ID.
 
@@ -47,13 +47,13 @@ For app channels, the associated community app ID.
 
 ### description?
 
-> `optional` **description**: `string`
+> `optional` **description?**: `string`
 
 Optional description of the channel.
 
 ### iconAssetUri?
 
-> `optional` **iconAssetUri**: `string`
+> `optional` **iconAssetUri?**: `string`
 
 Optional URI for the channel icon.
 

@@ -7,7 +7,7 @@ summary: Building a Bot with Root requires a few key steps to set up your Bot's 
 
 # Build your Root Bot
 
-Building a Bot with Root requires a few key steps to set up your Bot's test environment and compile your project. In this guide, we’ll walk you through adding your `DEV_TOKEN` to your project and compiling your code. After going through these steps, your Bot will be ready to run locally.
+Building a Bot with Root requires a few key steps to set up your Bot's test environment and compile your project. In this guide, we'll walk you through adding your `DEV_TOKEN` to your project and compiling your code. After going through these steps, your Bot will be ready to run locally.
 
 ## Add your `DEV_TOKEN` to the project
 
