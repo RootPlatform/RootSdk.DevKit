@@ -8,15 +8,15 @@
     "node": ">=22"
   },
   "dependencies": {
-    "@rootsdk/client-app": "0.18.0-alpha.1",
-    "@rootsdk/client-app-ui": "0.18.0-alpha.1",
-    "@rootsdk/server-app": "0.18.0-alpha.1",
+    "@rootsdk/client-app": "^0.21.3",
+    "@rootsdk/client-app-ui": "^0.21.3",
+    "@rootsdk/server-app": "^0.21.3",
     "@levelingleaderboard/gen-client": "file:./networking/gen/client",
     "@levelingleaderboard/gen-server": "file:./networking/gen/server",
     "@levelingleaderboard/gen-shared": "file:./networking/gen/shared"
   },
   "devDependencies": {
-    "@rootsdk/dev-tools": "0.18.0-alpha.1",
+    "@rootsdk/dev-tools": "^0.21.3",
     "typescript": "^5.8.2"
   },
   "scripts": {
