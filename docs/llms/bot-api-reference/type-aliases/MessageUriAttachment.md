@@ -31,6 +31,6 @@ The MIME type of the file (e.g., `image/png`, `application/pdf`, `video/mp4`).
 
 ### modified?
 
-> `optional` **modified**: `Date`
+> `optional` **modified?**: `Date`
 
 The timestamp when the file was last modified.

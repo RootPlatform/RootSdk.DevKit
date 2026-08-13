@@ -181,7 +181,7 @@ useEffect(() => {
 
 > **mode**: `"single"` | `"multi"` = `"multi"`
 
-The selection mode. Use `"multi"` (default) to allow selecting multiple users and roles simultaneously. Use `"single"` to allow only one selection at a time—selecting a user clears any selected role and vice versa.
+The selection mode. Use `"multi"` (default) to allow selecting multiple users and roles simultaneously. Use `"single"` to allow only one selection at a time: selecting a user clears any selected role and vice versa.
 
 ### selectedRoleIds
 

@@ -25,6 +25,6 @@ The display name of the directory.
 
 ### parentDirectoryId?
 
-> `optional` **parentDirectoryId**: [`DirectoryGuid`](DirectoryGuid.md)
+> `optional` **parentDirectoryId?**: [`DirectoryGuid`](DirectoryGuid.md)
 
 The ID of the parent directory. When undefined, the directory is at the channel's root level.

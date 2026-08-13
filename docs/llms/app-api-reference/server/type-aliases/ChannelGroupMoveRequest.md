@@ -13,7 +13,7 @@ Request to move a channel group to a different position in the sidebar.
 
 ### beforeChannelGroupId?
 
-> `optional` **beforeChannelGroupId**: [`ChannelGroupGuid`](ChannelGroupGuid.md)
+> `optional` **beforeChannelGroupId?**: [`ChannelGroupGuid`](ChannelGroupGuid.md)
 
 The channel group to position this one above. If set, this channel group will appear directly above the specified channel group. Omit to move to the top of the sidebar.
 

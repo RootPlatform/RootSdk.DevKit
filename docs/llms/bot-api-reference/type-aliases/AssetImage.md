@@ -13,7 +13,7 @@ Metadata for an uploaded image asset. Contains links to the image at various res
 
 ### aspectRatio?
 
-> `optional` **aspectRatio**: [`AssetAspectRatio`](AssetAspectRatio.md)
+> `optional` **aspectRatio?**: [`AssetAspectRatio`](AssetAspectRatio.md)
 
 The image's aspect ratio. Optional; see `AssetAspectRatio`.
 

@@ -25,6 +25,6 @@ The display name for the new directory. Required.
 
 ### parentDirectoryId?
 
-> `optional` **parentDirectoryId**: [`DirectoryGuid`](DirectoryGuid.md)
+> `optional` **parentDirectoryId?**: [`DirectoryGuid`](DirectoryGuid.md)
 
 The ID of the parent directory. Optional. When omitted, the directory is created at the channel's root level.

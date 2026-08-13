@@ -29,7 +29,7 @@ Represents a user's device state in a WebRTC voice or video channel. Included in
 
 ### audioTrackId?
 
-> `optional` **audioTrackId**: `string`
+> `optional` **audioTrackId?**: `string`
 
 ### channelId
 
@@ -37,11 +37,11 @@ Represents a user's device state in a WebRTC voice or video channel. Included in
 
 ### communityId?
 
-> `optional` **communityId**: [`CommunityGuid`](CommunityGuid.md)
+> `optional` **communityId?**: [`CommunityGuid`](CommunityGuid.md)
 
 ### dataChannelName?
 
-> `optional` **dataChannelName**: `string`
+> `optional` **dataChannelName?**: `string`
 
 ### deviceId
 
@@ -73,11 +73,11 @@ Represents a user's device state in a WebRTC voice or video channel. Included in
 
 ### screenAudioTrackId?
 
-> `optional` **screenAudioTrackId**: `string`
+> `optional` **screenAudioTrackId?**: `string`
 
 ### screenTrackId?
 
-> `optional` **screenTrackId**: `string`
+> `optional` **screenTrackId?**: `string`
 
 ### userId
 
@@ -85,4 +85,4 @@ Represents a user's device state in a WebRTC voice or video channel. Included in
 
 ### videoTrackId?
 
-> `optional` **videoTrackId**: `string`
+> `optional` **videoTrackId?**: `string`

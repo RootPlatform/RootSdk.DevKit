@@ -13,7 +13,7 @@ Event data emitted when a visible channel is moved to a different position or ch
 
 ### beforeChannelId?
 
-> `optional` **beforeChannelId**: [`ChannelGuid`](ChannelGuid.md)
+> `optional` **beforeChannelId?**: [`ChannelGuid`](ChannelGuid.md)
 
 Optional ID of the channel that this channel is now positioned before.
 
@@ -25,7 +25,7 @@ The new channel group ID (after the move).
 
 ### channelPermission?
 
-> `optional` **channelPermission**: [`ChannelPermission`](ChannelPermission.md)
+> `optional` **channelPermission?**: [`ChannelPermission`](ChannelPermission.md)
 
 Optional updated permissions if they changed due to the move.
 

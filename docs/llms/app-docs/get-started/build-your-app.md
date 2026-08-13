@@ -7,7 +7,7 @@ summary: Building an App with Root requires a few key steps to set up your App's
 
 # Build your Root App
 
-Building an App with Root requires a few key steps to set up your App's test environment and compile your project. In this guide, we’ll walk you through adding your `DEV_TOKEN` to your server project and compiling your App’s source code. After going through these steps, your App will be ready to run locally.
+Building an App with Root requires a few key steps to set up your App's test environment and compile your project. In this guide, we'll walk you through adding your `DEV_TOKEN` to your server project and compiling your App's source code. After going through these steps, your App will be ready to run locally.
 
 ## Add your `DEV_TOKEN` to the server project
 

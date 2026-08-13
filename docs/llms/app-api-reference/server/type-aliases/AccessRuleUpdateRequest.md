@@ -13,18 +13,18 @@ Request object for batch creating, editing, and deleting access rules in a singl
 
 ### creates?
 
-> `optional` **creates**: [`AccessRuleCreateRequest`](AccessRuleCreateRequest.md)[]
+> `optional` **creates?**: [`AccessRuleCreateRequest`](AccessRuleCreateRequest.md)[]
 
 Optional array of `AccessRuleCreateRequest` objects for new access rules to create.
 
 ### deletes?
 
-> `optional` **deletes**: [`AccessRuleDeleteRequest`](AccessRuleDeleteRequest.md)[]
+> `optional` **deletes?**: [`AccessRuleDeleteRequest`](AccessRuleDeleteRequest.md)[]
 
 Optional array of `AccessRuleDeleteRequest` objects for access rules to remove.
 
 ### edits?
 
-> `optional` **edits**: [`AccessRuleEditRequest`](AccessRuleEditRequest.md)[]
+> `optional` **edits?**: [`AccessRuleEditRequest`](AccessRuleEditRequest.md)[]
 
 Optional array of `AccessRuleEditRequest` objects for existing access rules to modify.

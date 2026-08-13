@@ -51,7 +51,7 @@ stateDiagram-v2
 
 You control two things as your server moves through its lifecycle:
 1. Required: call `rootServer.lifecycle.start` to move from **NotRunning** to **Starting**.
-1. Optional: call `rootServer.lifecycle.stop` to move from **Started** to **Stopping** if your code can’t continue.
+1. Optional: call `rootServer.lifecycle.stop` to move from **Started** to **Stopping** if your code can't continue.
 
 ## Lifecycle callbacks
 
@@ -79,7 +79,7 @@ end note
 
 ### Starting
 
-Root invokes your **starting callback** when your server moves into the **Starting** state. Do all your initialization and setup here; Root can’t guarantee the Root APIs are ready before this point.
+Root invokes your **starting callback** when your server moves into the **Starting** state. Do all your initialization and setup here; Root can't guarantee the Root APIs are ready before this point.
 
 Typical things you might do here:
 - Register services.

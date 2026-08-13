@@ -21,23 +21,31 @@ Access this client via `rootServer.community.accessRules`.
 
 > **bulkCreateEditDelete**(`request`: [`AccessRuleBulkCreateEditDeleteRequest`](AccessRuleBulkCreateEditDeleteRequest.md), `eventHandlers?`: `object`): `Promise`<`void`>
 
+Performs batch create, edit, and delete operations on access rules in a single call.
+
 #### Parameters
 
-| Parameter | Type |
-| ------ | ------ |
-| `request` | [`AccessRuleBulkCreateEditDeleteRequest`](AccessRuleBulkCreateEditDeleteRequest.md) |
-| `eventHandlers?` | \{ `channel.created`: [`ChannelCreatedHandler`](ChannelCreatedHandler.md); `channel.deleted`: [`ChannelDeletedHandler`](ChannelDeletedHandler.md); `channel.edited`: [`ChannelEditedHandler`](ChannelEditedHandler.md); `channelGroup.created`: [`ChannelGroupCreatedHandler`](ChannelGroupCreatedHandler.md); `channelGroup.deleted`: [`ChannelGroupDeletedHandler`](ChannelGroupDeletedHandler.md); `channelGroup.edited`: [`ChannelGroupEditedHandler`](ChannelGroupEditedHandler.md); `community.permission.edited`: [`CommunityPermissionEditedHandler`](CommunityPermissionEditedHandler.md); \} |
-| `eventHandlers.channel.created?` | [`ChannelCreatedHandler`](ChannelCreatedHandler.md) |
-| `eventHandlers.channel.deleted?` | [`ChannelDeletedHandler`](ChannelDeletedHandler.md) |
-| `eventHandlers.channel.edited?` | [`ChannelEditedHandler`](ChannelEditedHandler.md) |
-| `eventHandlers.channelGroup.created?` | [`ChannelGroupCreatedHandler`](ChannelGroupCreatedHandler.md) |
-| `eventHandlers.channelGroup.deleted?` | [`ChannelGroupDeletedHandler`](ChannelGroupDeletedHandler.md) |
-| `eventHandlers.channelGroup.edited?` | [`ChannelGroupEditedHandler`](ChannelGroupEditedHandler.md) |
-| `eventHandlers.community.permission.edited?` | [`CommunityPermissionEditedHandler`](CommunityPermissionEditedHandler.md) |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `request` | [`AccessRuleBulkCreateEditDeleteRequest`](AccessRuleBulkCreateEditDeleteRequest.md) | Contains arrays of access rules to create, edit, and delete. |
+| `eventHandlers?` | \{ `channel.created`: [`ChannelCreatedHandler`](ChannelCreatedHandler.md); `channel.deleted`: [`ChannelDeletedHandler`](ChannelDeletedHandler.md); `channel.edited`: [`ChannelEditedHandler`](ChannelEditedHandler.md); `channelGroup.created`: [`ChannelGroupCreatedHandler`](ChannelGroupCreatedHandler.md); `channelGroup.deleted`: [`ChannelGroupDeletedHandler`](ChannelGroupDeletedHandler.md); `channelGroup.edited`: [`ChannelGroupEditedHandler`](ChannelGroupEditedHandler.md); `community.permission.edited`: [`CommunityPermissionEditedHandler`](CommunityPermissionEditedHandler.md); \} | Optional handlers for permission update events. Supported event keys: `channel.created`, `channel.edited`, `channel.deleted`, `channelGroup.created`, `channelGroup.edited`, `channelGroup.deleted`, `community.permission.edited`. |
+| `eventHandlers.channel.created?` | [`ChannelCreatedHandler`](ChannelCreatedHandler.md) | - |
+| `eventHandlers.channel.deleted?` | [`ChannelDeletedHandler`](ChannelDeletedHandler.md) | - |
+| `eventHandlers.channel.edited?` | [`ChannelEditedHandler`](ChannelEditedHandler.md) | - |
+| `eventHandlers.channelGroup.created?` | [`ChannelGroupCreatedHandler`](ChannelGroupCreatedHandler.md) | - |
+| `eventHandlers.channelGroup.deleted?` | [`ChannelGroupDeletedHandler`](ChannelGroupDeletedHandler.md) | - |
+| `eventHandlers.channelGroup.edited?` | [`ChannelGroupEditedHandler`](ChannelGroupEditedHandler.md) | - |
+| `eventHandlers.community.permission.edited?` | [`CommunityPermissionEditedHandler`](CommunityPermissionEditedHandler.md) | - |
 
 #### Returns
 
 `Promise`<`void`>
+
+A promise that resolves when all operations complete.
+
+#### Throws
+
+`RootApiException` with `errorCode` indicating the first failed operation.
 
 ### create()
 

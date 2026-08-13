@@ -13,13 +13,13 @@ Event payload emitted when a user updates any part of their profile (picture, de
 
 ### bannerAssetUri?
 
-> `optional` **bannerAssetUri**: `string`
+> `optional` **bannerAssetUri?**: `string`
 
 The asset URI of the user's profile banner image. Optional.
 
 ### description?
 
-> `optional` **description**: `string`
+> `optional` **description?**: `string`
 
 The user's profile description. Optional.
 
@@ -31,7 +31,7 @@ The asset URI of the user's current profile picture.
 
 ### userDefinedStatus?
 
-> `optional` **userDefinedStatus**: `string`
+> `optional` **userDefinedStatus?**: `string`
 
 The user's custom status text. Optional.
 

@@ -59,6 +59,10 @@ Represents the community where your code is installed. Provides an API to manipu
 
 > **communityEmojis**: [`CommunityEmojiClient`](CommunityEmojiClient.md)
 
+#### communityLinks
+
+> **communityLinks**: [`CommunityLinkClient`](CommunityLinkClient.md)
+
 #### communityMemberBans
 
 > **communityMemberBans**: [`CommunityMemberBanClient`](CommunityMemberBanClient.md)
@@ -78,6 +82,10 @@ Represents the community where your code is installed. Provides an API to manipu
 #### communityRoles
 
 > **communityRoles**: [`CommunityRoleClient`](CommunityRoleClient.md)
+
+#### notifications
+
+> **notifications**: [`NotificationClient`](../classes/NotificationClient.md)
 
 ### dataStore
 

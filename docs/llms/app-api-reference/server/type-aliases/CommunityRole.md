@@ -41,6 +41,10 @@ The unique identifier for the role.
 
 When true, community members can mention this role using `@RoleName` in messages.
 
+### isSelfAssignable
+
+> **isSelfAssignable**: `boolean`
+
 ### name
 
 > **name**: `string`

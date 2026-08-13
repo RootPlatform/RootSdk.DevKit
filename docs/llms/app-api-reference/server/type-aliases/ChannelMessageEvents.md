@@ -13,7 +13,7 @@ For event name constants, see `ChannelMessageEvent`.
 
 ## Properties
 
-### channelMessage.created()
+### channelMessage.created
 
 > **channelMessage.created**: (`evt`: [`ChannelMessageCreatedEvent`](ChannelMessageCreatedEvent.md)) => `void`
 
@@ -36,7 +36,7 @@ rootServer.community.channelMessages.on(ChannelMessageEvent.ChannelMessageCreate
 });
 ```
 
-### channelMessage.deleted()
+### channelMessage.deleted
 
 > **channelMessage.deleted**: (`evt`: [`ChannelMessageDeletedEvent`](ChannelMessageDeletedEvent.md)) => `void`
 
@@ -59,7 +59,7 @@ rootServer.community.channelMessages.on(ChannelMessageEvent.ChannelMessageDelete
 });
 ```
 
-### channelMessage.edited()
+### channelMessage.edited
 
 > **channelMessage.edited**: (`evt`: [`ChannelMessageEditedEvent`](ChannelMessageEditedEvent.md)) => `void`
 
@@ -82,7 +82,7 @@ rootServer.community.channelMessages.on(ChannelMessageEvent.ChannelMessageEdited
 });
 ```
 
-### channelMessage.set.typingIndicator()
+### channelMessage.set.typingIndicator
 
 > **channelMessage.set.typingIndicator**: (`evt`: [`ChannelMessageSetTypingIndicatorEvent`](ChannelMessageSetTypingIndicatorEvent.md)) => `void`
 
@@ -105,7 +105,7 @@ rootServer.community.channelMessages.on(ChannelMessageEvent.ChannelMessageSetTyp
 });
 ```
 
-### channelMessagePin.created()
+### channelMessagePin.created
 
 > **channelMessagePin.created**: (`evt`: [`ChannelMessagePinCreatedEvent`](ChannelMessagePinCreatedEvent.md)) => `void`
 
@@ -128,7 +128,7 @@ rootServer.community.channelMessages.on(ChannelMessageEvent.ChannelMessagePinCre
 });
 ```
 
-### channelMessagePin.deleted()
+### channelMessagePin.deleted
 
 > **channelMessagePin.deleted**: (`evt`: [`ChannelMessagePinDeletedEvent`](ChannelMessagePinDeletedEvent.md)) => `void`
 
@@ -151,7 +151,7 @@ rootServer.community.channelMessages.on(ChannelMessageEvent.ChannelMessagePinDel
 });
 ```
 
-### channelMessageReaction.created()
+### channelMessageReaction.created
 
 > **channelMessageReaction.created**: (`evt`: [`ChannelMessageReactionCreatedEvent`](ChannelMessageReactionCreatedEvent.md)) => `void`
 
@@ -174,7 +174,7 @@ rootServer.community.channelMessages.on(ChannelMessageEvent.ChannelMessageReacti
 });
 ```
 
-### channelMessageReaction.deleted()
+### channelMessageReaction.deleted
 
 > **channelMessageReaction.deleted**: (`evt`: [`ChannelMessageReactionDeletedEvent`](ChannelMessageReactionDeletedEvent.md)) => `void`
 
@@ -197,7 +197,7 @@ rootServer.community.channelMessages.on(ChannelMessageEvent.ChannelMessageReacti
 });
 ```
 
-### channelMessageReaction.deleted.full()
+### channelMessageReaction.deleted.full
 
 > **channelMessageReaction.deleted.full**: (`evt`: [`ChannelMessageReactionDeletedFullEvent`](ChannelMessageReactionDeletedFullEvent.md)) => `void`
 

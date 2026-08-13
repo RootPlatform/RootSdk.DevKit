@@ -39,6 +39,10 @@ An uploaded file (image, video, or document). Contains the actual file data and 
 
 A profile badge displayed on a user's account (e.g., Beta Tester, Verified Developer).
 
+### BillingCore
+
+> **BillingCore**: `41`
+
 ### Channel
 
 > **Channel**: `4`
@@ -188,6 +192,18 @@ A mobile device connected to Root.
 > **Person**: `1`
 
 A user account. Distinct from `CommunityMember`, which represents a user's membership in a specific community.
+
+### Product
+
+> **Product**: `37`
+
+### ProductPrice
+
+> **ProductPrice**: `38`
+
+### Subscription
+
+> **Subscription**: `39`
 
 ### Unknown
 

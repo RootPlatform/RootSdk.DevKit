@@ -19,7 +19,7 @@ The `ChannelOrChannelGroupUuid` identifying the channel or channel group to appl
 
 ### overlay?
 
-> `optional` **overlay**: [`ChannelOverlayPermission`](ChannelOverlayPermission.md)
+> `optional` **overlay?**: [`ChannelOverlayPermission`](ChannelOverlayPermission.md)
 
 Optional `ChannelOverlayPermission` object specifying the permission overrides. Each property can be set to `true` (explicitly allow), `false` (explicitly deny), or left undefined (inherit from role). If not provided, creates an access rule with no explicit overrides.
 

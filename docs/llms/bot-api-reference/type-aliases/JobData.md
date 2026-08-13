@@ -37,6 +37,6 @@ The resource identifier associated with this job, as specified when the job was 
 
 ### tag?
 
-> `optional` **tag**: `string`
+> `optional` **tag?**: `string`
 
 The optional tag associated with this job, as specified when the job was created.

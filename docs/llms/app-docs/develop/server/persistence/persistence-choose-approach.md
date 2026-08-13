@@ -19,8 +19,8 @@ Your key-value pairs are stored in SQLite behind the scenes. Root automatically 
 
 A key-value store works well for:
 
-- **Prototyping** – It’s ready immediately. No tables to define. No database setup.
-- **Simple data** – One-to-one relationships where you don't need complicated queries.
+- **Prototyping**: It's ready immediately. No tables to define. No database setup.
+- **Simple data**: One-to-one relationships where you don't need complicated queries.
 
 ## SQLite
 
@@ -30,8 +30,8 @@ SQLite stores its data in a file. Root provisions the SQLite file for you and ba
 
 A SQLite database is a good choice for:
 
-- **Production storage** – When you need reliable data handling, transactions, and SQL queries.  
-- **Structured data** – When your data must be organized clearly across multiple tables.
+- **Production storage**: When you need reliable data handling, transactions, and SQL queries.  
+- **Structured data**: When your data must be organized clearly across multiple tables.
 
 ## Key differences
 

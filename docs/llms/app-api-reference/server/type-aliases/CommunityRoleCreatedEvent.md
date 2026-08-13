@@ -13,7 +13,7 @@ Event payload emitted when a new role is created in the community.
 
 ### beforeCommunityRoleId?
 
-> `optional` **beforeCommunityRoleId**: [`CommunityRoleGuid`](CommunityRoleGuid.md)
+> `optional` **beforeCommunityRoleId?**: [`CommunityRoleGuid`](CommunityRoleGuid.md)
 
 The ID of the role that appears after this role in the list. May be undefined if this role is at the end of the list.
 
@@ -52,6 +52,10 @@ The unique identifier of the newly created role.
 > **isMentionable**: `boolean`
 
 Whether the role can be mentioned in messages.
+
+### isSelfAssignable
+
+> **isSelfAssignable**: `boolean`
 
 ### name
 

@@ -13,7 +13,7 @@ Event payload emitted when a role's properties are modified.
 
 ### beforeCommunityRoleId?
 
-> `optional` **beforeCommunityRoleId**: [`CommunityRoleGuid`](CommunityRoleGuid.md)
+> `optional` **beforeCommunityRoleId?**: [`CommunityRoleGuid`](CommunityRoleGuid.md)
 
 The ID of the role that appears after this role in the list. May be undefined.
 
@@ -52,6 +52,10 @@ The unique identifier of the edited role.
 > **isMentionable**: `boolean`
 
 The updated mentionable setting.
+
+### isSelfAssignable
+
+> **isSelfAssignable**: `boolean`
 
 ### name
 

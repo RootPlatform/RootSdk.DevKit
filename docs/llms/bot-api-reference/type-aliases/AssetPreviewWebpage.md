@@ -13,18 +13,18 @@ Webpage-specific preview metadata within an `AssetPreview`. Generated when the p
 
 ### embedUrl?
 
-> `optional` **embedUrl**: `string`
+> `optional` **embedUrl?**: `string`
 
 An embeddable URL for the page (e.g., an oEmbed URL for a YouTube video). Optional.
 
 ### favicon?
 
-> `optional` **favicon**: `string`
+> `optional` **favicon?**: `string`
 
 The URL to the site's favicon. Optional.
 
 ### siteName?
 
-> `optional` **siteName**: `string`
+> `optional` **siteName?**: `string`
 
 The name of the website (e.g., "YouTube", "GitHub"). Optional.

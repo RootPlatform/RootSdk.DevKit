@@ -13,13 +13,13 @@ Request object for editing a community's properties.
 
 ### defaultChannelId?
 
-> `optional` **defaultChannelId**: [`ChannelGuid`](ChannelGuid.md)
+> `optional` **defaultChannelId?**: [`ChannelGuid`](ChannelGuid.md)
 
 Optional channel ID for the system messages channel. When set, system messages (such as member join notifications) are posted to this channel. Set to undefined to disable system messages.
 
 ### description?
 
-> `optional` **description**: `string`
+> `optional` **description?**: `string`
 
 ### isAgeRestricted
 
@@ -27,7 +27,7 @@ Optional channel ID for the system messages channel. When set, system messages (
 
 ### joinThrottle?
 
-> `optional` **joinThrottle**: [`CommunityJoinThrottle`](CommunityJoinThrottle.md)
+> `optional` **joinThrottle?**: [`CommunityJoinThrottle`](CommunityJoinThrottle.md)
 
 Optional `CommunityJoinThrottle` configuration to limit how quickly new members can join. The `joinThrottle` fields `refillCount` and `windowInMinutes` must both be greater than zero. Zero values are rejected by the server.
 
@@ -45,7 +45,7 @@ The hex color code for the community picture background. Required.
 
 ### pictureTokenUri?
 
-> `optional` **pictureTokenUri**: `string`
+> `optional` **pictureTokenUri?**: `string`
 
 Optional token URI for the community picture. Only used when `updatePicture` is true. Obtain this value from the asset upload process.
 

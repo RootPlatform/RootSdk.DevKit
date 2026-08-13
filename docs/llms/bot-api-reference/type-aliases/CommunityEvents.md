@@ -13,7 +13,7 @@ For event name constants, see `CommunityEvent`.
 
 ## Properties
 
-### community.edited()
+### community.edited
 
 > **community.edited**: (`evt`: [`CommunityEditedEvent`](CommunityEditedEvent.md)) => `void`
 
@@ -36,7 +36,7 @@ rootServer.community.communities.on(CommunityEvent.CommunityEdited, (evt: Commun
 });
 ```
 
-### community.joined()
+### community.joined
 
 > **community.joined**: (`evt`: [`CommunityJoinedEvent`](CommunityJoinedEvent.md)) => `void`
 
@@ -59,7 +59,7 @@ rootServer.community.communities.on(CommunityEvent.CommunityJoined, (evt: Commun
 });
 ```
 
-### community.leave()
+### community.leave
 
 > **community.leave**: (`evt`: [`CommunityLeaveEvent`](CommunityLeaveEvent.md)) => `void`
 

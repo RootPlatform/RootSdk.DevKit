@@ -27,7 +27,7 @@ flowchart LR
 
 ## Network connection
 
-Your App’s client doesn't connect to the internet directly. All network traffic goes through the Root native client. Root watches the network connection. If it's lost, Root takes over and handles reconnection. Your client doesn't need to manage it.
+Your App's client doesn't connect to the internet directly. All network traffic goes through the Root native client. Root watches the network connection. If it's lost, Root takes over and handles reconnection. Your client doesn't need to manage it.
 
 [Diagram: This diagram shows the relationship between your app's client, the Root native client, and the Internet. The client is nested within a Chromium tab, which is controlled by the Root native client. An arrow shows the client sending a request to the Internet.]
 ```
@@ -49,7 +49,7 @@ There are only two states: **NotRunning** and **Running**. The important concept
 
 ### Normal startup
 
-The user selects the App’s channel. Root creates a new Chromium tab and runs your client code.
+The user selects the App's channel. Root creates a new Chromium tab and runs your client code.
 
 [Diagram: Diagram showing a transition from the NotRunning state to the Running state.]
 ```
@@ -83,4 +83,4 @@ flowchart LR
 * Root starts the client when the user selects your App's channel.
 * The client is unloaded if the user is inactive or the network goes down.
 * When the network comes back, Root reloads your client automatically.
-* You don’t need to manage the browser tab, network status, or reconnect logic, Root handles it for you.
+* You don't need to manage the browser tab, network status, or reconnect logic, Root handles it for you.

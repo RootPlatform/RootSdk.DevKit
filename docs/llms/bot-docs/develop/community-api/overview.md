@@ -25,6 +25,7 @@ Your server accesses community resources through `rootServer.community`, which p
 - **Members**: Look up member information, kick or ban users, manage invites
 - **Roles**: Create and assign roles, manage role permissions
 - **Files**: Upload and manage files in channels
+- **Notifications**: Alert specific members, or mark your channel as active for the community
 
 Each client provides two capabilities:
 
@@ -46,6 +47,5 @@ Your code runs with permissions just like a human member. To create a channel, y
 
 Your code cannot:
 
-- Send push notifications
 - Respond to community join invites
 - Interact with Friends lists

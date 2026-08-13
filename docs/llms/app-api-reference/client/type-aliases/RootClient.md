@@ -17,11 +17,19 @@ This type is your entry point to the Root client-side APIs. Root automatically c
 
 Provides methods to download assets and images from the Root client.
 
+### device
+
+> **device**: [`RootClientDevice`](RootClientDevice.md)
+
 ### lifecycle
 
 > **lifecycle**: [`RootClientLifecycle`](RootClientLifecycle.md)
 
 Lifecycle events for your client-side component.
+
+### links
+
+> **links**: `RootClientLink`
 
 ### theme
 

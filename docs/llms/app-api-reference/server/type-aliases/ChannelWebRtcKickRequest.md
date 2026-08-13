@@ -19,6 +19,6 @@ The unique identifier of the voice channel. Required.
 
 ### userId?
 
-> `optional` **userId**: [`UserGuid`](UserGuid.md)
+> `optional` **userId?**: [`UserGuid`](UserGuid.md)
 
 The unique identifier of the user to kick. Although the type allows this to be omitted, the request has no effect without it.

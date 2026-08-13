@@ -19,7 +19,7 @@ The unique identifier of the voice channel.
 
 ### communityId?
 
-> `optional` **communityId**: [`CommunityGuid`](CommunityGuid.md)
+> `optional` **communityId?**: [`CommunityGuid`](CommunityGuid.md)
 
 The unique identifier of the community. Optional.
 

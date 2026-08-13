@@ -13,7 +13,7 @@ Event payload emitted when a role's display order changes in the community's rol
 
 ### beforeCommunityRoleId?
 
-> `optional` **beforeCommunityRoleId**: [`CommunityRoleGuid`](CommunityRoleGuid.md)
+> `optional` **beforeCommunityRoleId?**: [`CommunityRoleGuid`](CommunityRoleGuid.md)
 
 The role that the moved role was placed after. Undefined if the role was moved to the top of the list. Optional.
 

@@ -13,7 +13,7 @@ For event name constants, see `ChannelEvent`.
 
 ## Properties
 
-### channel.created()
+### channel.created
 
 > **channel.created**: (`evt`: [`ChannelCreatedEvent`](ChannelCreatedEvent.md)) => `void`
 
@@ -36,7 +36,7 @@ rootServer.community.channels.on(ChannelEvent.ChannelCreated, (evt: ChannelCreat
 });
 ```
 
-### channel.deleted()
+### channel.deleted
 
 > **channel.deleted**: (`evt`: [`ChannelDeletedEvent`](ChannelDeletedEvent.md)) => `void`
 
@@ -59,7 +59,7 @@ rootServer.community.channels.on(ChannelEvent.ChannelDeleted, (evt: ChannelDelet
 });
 ```
 
-### channel.edited()
+### channel.edited
 
 > **channel.edited**: (`evt`: [`ChannelEditedEvent`](ChannelEditedEvent.md)) => `void`
 
@@ -82,7 +82,7 @@ rootServer.community.channels.on(ChannelEvent.ChannelEdited, (evt: ChannelEdited
 });
 ```
 
-### channel.moved()
+### channel.moved
 
 > **channel.moved**: (`evt`: [`ChannelMovedEvent`](ChannelMovedEvent.md)) => `void`
 

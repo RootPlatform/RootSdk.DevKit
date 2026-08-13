@@ -13,7 +13,7 @@ For event name constants, see `ChannelFileEvent`.
 
 ## Properties
 
-### channelFile.created()
+### channelFile.created
 
 > **channelFile.created**: (`evt`: [`ChannelFileCreatedEvent`](ChannelFileCreatedEvent.md)) => `void`
 
@@ -36,7 +36,7 @@ rootServer.community.channelFile.on(ChannelFileEvent.ChannelFileCreated, (evt: C
 });
 ```
 
-### channelFile.deleted()
+### channelFile.deleted
 
 > **channelFile.deleted**: (`evt`: [`ChannelFileDeletedEvent`](ChannelFileDeletedEvent.md)) => `void`
 
@@ -59,7 +59,7 @@ rootServer.community.channelFile.on(ChannelFileEvent.ChannelFileDeleted, (evt: C
 });
 ```
 
-### channelFile.edited()
+### channelFile.edited
 
 > **channelFile.edited**: (`evt`: [`ChannelFileEditedEvent`](ChannelFileEditedEvent.md)) => `void`
 
@@ -82,7 +82,7 @@ rootServer.community.channelFile.on(ChannelFileEvent.ChannelFileEdited, (evt: Ch
 });
 ```
 
-### channelFile.moved()
+### channelFile.moved
 
 > **channelFile.moved**: (`evt`: [`ChannelFileMovedEvent`](ChannelFileMovedEvent.md)) => `void`
 

@@ -37,6 +37,6 @@ The number of messages older than the returned set. Use this for pagination to d
 
 ### referenceMaps?
 
-> `optional` **referenceMaps**: [`MessageReferenceMaps`](MessageReferenceMaps.md)
+> `optional` **referenceMaps?**: [`MessageReferenceMaps`](MessageReferenceMaps.md)
 
 Optional `MessageReferenceMaps` object containing resolved references for users, channels, roles, and assets mentioned across all messages in the response.

@@ -13,7 +13,7 @@ For event name constants, see `CommunityMemberRoleEvent`.
 
 ## Properties
 
-### communityMemberRole.created()
+### communityMemberRole.created
 
 > **communityMemberRole.created**: (`evt`: [`CommunityMemberRoleCreatedEvent`](CommunityMemberRoleCreatedEvent.md)) => `void`
 
@@ -36,7 +36,7 @@ rootServer.community.communityMemberRoles.on(CommunityMemberRoleEvent.CommunityM
 });
 ```
 
-### communityMemberRole.deleted()
+### communityMemberRole.deleted
 
 > **communityMemberRole.deleted**: (`evt`: [`CommunityMemberRoleDeletedEvent`](CommunityMemberRoleDeletedEvent.md)) => `void`
 
@@ -59,7 +59,7 @@ rootServer.community.communityMemberRoles.on(CommunityMemberRoleEvent.CommunityM
 });
 ```
 
-### communityMemberRole.set.primary()
+### communityMemberRole.set.primary
 
 > **communityMemberRole.set.primary**: (`evt`: [`CommunityMemberRoleSetPrimaryEvent`](CommunityMemberRoleSetPrimaryEvent.md)) => `void`
 

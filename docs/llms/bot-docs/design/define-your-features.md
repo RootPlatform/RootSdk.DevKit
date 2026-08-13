@@ -7,9 +7,9 @@ summary: Before you write code, take time to plan. This article covers key plann
 
 # Define your Bot's features
 
-Before you write code, take time to plan. This article covers key planning steps tailored for Root Bots. If you’ve built background or automation tools before, you may be able to skim through this.
+Before you write code, take time to plan. This article covers key planning steps tailored for Root Bots. If you've built background or automation tools before, you may be able to skim through this.
 
-By the end of this article, you’ll be able to:
+By the end of this article, you'll be able to:
 
 - **Define the purpose** of your Root Bot  
 - **Choose three core features** for launch  
@@ -26,17 +26,17 @@ Root Bots run in the background and focus on moderation, automation, or other se
 - What specific pain point or repetitive task can it handle?  
 - How will it make things easier for admins, moderators, or members?
 
-If your idea doesn’t automate or simplify part of community management, it might not be the right fit for a Bot.
+If your idea doesn't automate or simplify part of community management, it might not be the right fit for a Bot.
 
 ## Step 2: Choose core features
 
-Once you know what problem you’re solving, define the Bot’s key behaviors. Focus on features that have clear value and minimal complexity.
+Once you know what problem you're solving, define the Bot's key behaviors. Focus on features that have clear value and minimal complexity.
 
 Think about:
 
-- **Triggers** – What events should your Bot listen for?  
-- **Actions** – What should it do in response?  
-- **Automation** – Can it save people time or prevent errors?
+- **Triggers**: What events should your Bot listen for?  
+- **Actions**: What should it do in response?  
+- **Automation**: Can it save people time or prevent errors?
 
 Try to keep your first version small and focused. You can always add more later.
 
@@ -56,7 +56,7 @@ Even without a UI, your Bot still needs a clear structure. Sketch out its lifecy
 
 - What events or schedules trigger the Bot?  
 - What data does it need to work with?  
-- What responses does it send back—if any?
+- What responses does it send back, if any?
 
 This kind of flowchart or checklist will guide your code and help others understand what the Bot is doing.
 
@@ -64,7 +64,7 @@ This kind of flowchart or checklist will guide your code and help others underst
 
 Take your full list of ideas and sort them into:
 
-- What’s essential for your **minimum viable Bot (MVB)**—the smallest version worth deploying  
+- What's essential for your **minimum viable Bot (MVB)**, the smallest version worth deploying  
 - What can wait until after launch  
 
 Focus first on features that deliver immediate value and are easy to test.
@@ -93,4 +93,4 @@ Later, you could add support for multiple roles or time-based conditions.
 
 ## Conclusion
 
-With a clear purpose and focused feature list, you’re ready to build a Root Bot that runs smoothly and solves a real need. You’ve thought through its role, planned its logic, and gathered early feedback.
+With a clear purpose and focused feature list, you're ready to build a Root Bot that runs smoothly and solves a real need. You've thought through its role, planned its logic, and gathered early feedback.

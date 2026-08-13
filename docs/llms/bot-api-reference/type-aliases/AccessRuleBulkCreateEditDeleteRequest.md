@@ -11,12 +11,12 @@ summary: Object type with properties: creates, deletes, edits (Access Rules).
 
 ### creates?
 
-> `optional` **creates**: [`AccessRuleCreateRequest`](AccessRuleCreateRequest.md)[]
+> `optional` **creates?**: [`AccessRuleCreateRequest`](AccessRuleCreateRequest.md)[]
 
 ### deletes?
 
-> `optional` **deletes**: [`AccessRuleDeleteRequest`](AccessRuleDeleteRequest.md)[]
+> `optional` **deletes?**: [`AccessRuleDeleteRequest`](AccessRuleDeleteRequest.md)[]
 
 ### edits?
 
-> `optional` **edits**: [`AccessRuleEditRequest`](AccessRuleEditRequest.md)[]
+> `optional` **edits?**: [`AccessRuleEditRequest`](AccessRuleEditRequest.md)[]

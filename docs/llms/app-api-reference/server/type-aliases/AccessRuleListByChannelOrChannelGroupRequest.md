@@ -13,6 +13,6 @@ Request object for listing all access rules that apply to a specific channel or 
 
 ### channelOrChannelGroupId?
 
-> `optional` **channelOrChannelGroupId**: [`ChannelOrChannelGroupGuid`](ChannelOrChannelGroupGuid.md)
+> `optional` **channelOrChannelGroupId?**: [`ChannelOrChannelGroupGuid`](ChannelOrChannelGroupGuid.md)
 
 Optional `ChannelOrChannelGroupUuid` identifying the channel or channel group to list access rules for. If not provided, returns all access rules in the community.

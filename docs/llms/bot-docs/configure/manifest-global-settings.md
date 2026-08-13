@@ -93,7 +93,7 @@ Each item must include exactly one of the type keys below. The type key determin
 
 ### `roleOrMember`
 
-Picker for community roles and members. The `selectBehavior` value shapes what the admin sees — a single user, multiple users, a single role, multiple roles, or both roles and users. Regardless of which behavior you choose, your server receives a `ReadOnlyMemberGroup` that you can query for membership.
+Picker for community roles and members. The `selectBehavior` value shapes what the admin sees: a single user, multiple users, a single role, multiple roles, or both roles and users. Regardless of which behavior you choose, your server receives a `ReadOnlyMemberGroup` that you can query for membership.
 
 | Property | Type | Description |
 | -------- | ---- | ----------- |

@@ -31,19 +31,19 @@ The type of channel. See `ChannelType` for values: `Text` (1), `ThreadedText` (2
 
 ### communityAppId?
 
-> `optional` **communityAppId**: [`CommunityAppGuid`](CommunityAppGuid.md)
+> `optional` **communityAppId?**: [`CommunityAppGuid`](CommunityAppGuid.md)
 
 For app channels, the ID of the associated community app. Undefined for other channel types.
 
 ### description?
 
-> `optional` **description**: `string`
+> `optional` **description?**: `string`
 
 Optional description of the channel.
 
 ### iconAssetUri?
 
-> `optional` **iconAssetUri**: `string`
+> `optional` **iconAssetUri?**: `string`
 
 Optional URI for the channel icon.
 

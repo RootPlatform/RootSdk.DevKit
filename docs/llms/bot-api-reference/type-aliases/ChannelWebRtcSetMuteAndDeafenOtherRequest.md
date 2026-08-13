@@ -19,13 +19,13 @@ The unique identifier of the voice channel. Required.
 
 ### isDeafened?
 
-> `optional` **isDeafened**: `boolean`
+> `optional` **isDeafened?**: `boolean`
 
 Whether to deafen the user. Optional. Set to `true` to deafen, `false` to undeafen, or omit to leave unchanged.
 
 ### isMuted?
 
-> `optional` **isMuted**: `boolean`
+> `optional` **isMuted?**: `boolean`
 
 Whether to mute the user. Optional. Set to `true` to mute, `false` to unmute, or omit to leave unchanged.
 

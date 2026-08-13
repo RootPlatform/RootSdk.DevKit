@@ -21,7 +21,7 @@ Your **manifest file** defines how your code integrates with the Root platform. 
       "deploy": [
           "dist"
       ],
-      "node_modules": [
+      "nodeModules": [
           "node_modules"
       ]
     }

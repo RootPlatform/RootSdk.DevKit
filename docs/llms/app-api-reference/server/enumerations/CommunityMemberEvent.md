@@ -15,7 +15,7 @@ Enum providing string constants for community member event names. Use these valu
 
 Emitted when a community member becomes present in the community on a device. This happens when:
 
-- **Desktop client:** The user opens the community in a tab (including popout windows). All open tabs are attached simultaneously — switching between tabs does not trigger additional attach/detach events.
+- **Desktop client:** The user opens the community in a tab (including popout windows). All open tabs are attached simultaneously: switching between tabs does not trigger additional attach/detach events.
 - **Mobile client:** The user opens the community (only one community is open at a time).
 - **Apps:** The app's host process connects to the community during deployment or dynamic assignment.
 - **Reconnection:** When a client reconnects after a connection loss, it re-attaches to all previously open communities.
@@ -34,7 +34,7 @@ Emitted when a community member is no longer present in the community on any dev
 - **Leaving or removal:** The user leaves the community, or is kicked/banned.
 - **Apps:** The app's host process disconnects or the community is unassigned.
 
-The event is only broadcast once the user has no remaining attached devices in the community — if they have the same community open on two devices and close one, no detach is emitted.
+The event is only broadcast once the user has no remaining attached devices in the community: if they have the same community open on two devices and close one, no detach is emitted.
 
 ### UserSetProfile
 

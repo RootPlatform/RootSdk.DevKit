@@ -27,7 +27,7 @@ Cross-cutting behaviours, resolution rules, and lifecycle semantics. Load the li
 
 - **How packaging works**: When you push, the CLI: → [Manifest `package`](llms/app-docs/configure/manifest-package.md)
 - **How the developer log works**: When your server writes to stdout or stderr, Root captures the output and makes it visible in the Developer Portal. → [Developer log](llms/app-docs/debug/logging-developer.md)
-- **How Root’s client-server model works**: Root Apps have three main parts that you'll code: → [Plan your App's client-server networking API](llms/app-docs/design/client-server-networking.md)
+- **How Root's client-server model works**: Root Apps have three main parts that you'll code: → [Plan your App's client-server networking API](llms/app-docs/design/client-server-networking.md)
 - **How do permissions work?**: As a developer, you declare the permissions you need, and Root grants them to your code at runtime. → [Choose your permissions](llms/app-docs/design/permissions.md)
 - **What is the client lifecycle?**: The *client lifecycle* is the set of states your App's client moves through while running inside the Root native client. → [Client lifecycle](llms/app-docs/develop/client/client-lifecycle.md)
 - **How it works**: When a RootServerException is thrown by you or by the Root infrastructure, Root serializes it and sends it across the network to your client. → [Exception handling](llms/app-docs/develop/networking/handle-exceptions.md)
@@ -102,7 +102,7 @@ Platform overview and getting started.
 
 Guides for building Root Apps with client UI and server logic.
 
-- [Root App developer home](llms/app-docs/app-home.md) **[guide]**: Welcome to the Root App developer guide. This guide shows you how to build full-featured Apps that run in communities, complete with a user...
+- [Build a Root App](llms/app-docs/app-home.md) **[guide]**: Welcome! Root Apps are full applications that live inside a community, with their own interface, server-side logic, and a private connection between...
 - [Configure](llms/app-docs/configure/index.md) **[guide]**: Configure your code to run on the Root platform.
 - [Debug](llms/app-docs/debug/index.md) **[guide]**: Tools and features for diagnosing issues in your app or bot.
 - [Design](llms/app-docs/design/index.md) **[guide]**: The Root platform enables developers to create powerful automation and integration tools that enhance community collaboration.
@@ -122,7 +122,7 @@ Guides for building Root Apps with client UI and server logic.
 - [Publish](llms/app-docs/publish/index.md) **[guide]**: This section guides you through how to package and publish your App.
 - [App tutorials](llms/app-docs/tutorials/index.md) **[tutorial]**
 - [Showdown App tutorial steps](llms/app-docs/tutorials/showdown-app/index.md) **[tutorial]**: Step-by-step guide for the Showdown App tutorial.
-- [Tutorial: Showdown App](llms/app-docs/tutorials/showdown-app/overview.md) **[tutorial]**: **Showdown** is a simple, real-time voting App where members choose between two competing options — like _Cats vs.
+- [Tutorial: Showdown App](llms/app-docs/tutorials/showdown-app/overview.md) **[tutorial]**: **Showdown** is a simple, real-time voting App where members choose between two competing options, like _Cats vs.
 - [Tasks App tutorial steps](llms/app-docs/tutorials/tasks-app/index.md) **[tutorial]**: Step-by-step guide for the Tasks App tutorial.
 - [Tutorial: Tasks App](llms/app-docs/tutorials/tasks-app/overview.md) **[tutorial]**: **Tasks** is a simple Root App with a React UI and backend service for managing a list of shared tasks.
 
@@ -137,7 +137,7 @@ API reference for Root App development (server and client).
 
 Guides for building Root Bots (server-side automation).
 
-- [Root Bot developer home](llms/bot-docs/bot-home.md) **[guide]**: Welcome to the Root Bot developer guide. This guide shows you how to build Bots that run server-side in a community, without a user interface.
+- [Build a Root Bot](llms/bot-docs/bot-home.md) **[guide]**: Welcome! Root Bots work quietly behind the scenes in a community, no interface required.
 - [Configure](llms/bot-docs/configure/index.md) **[guide]**: Configure your code to run on the Root platform.
 - [Debug](llms/bot-docs/debug/index.md) **[guide]**: Tools and features for diagnosing issues in your app or bot.
 - [Design](llms/bot-docs/design/index.md) **[guide]**: The Root platform enables developers to create powerful automation and integration tools that automate community workflows.
@@ -168,7 +168,7 @@ API reference for Root Bot development.
 
 Troubleshooting and support resources.
 
-- [Root developer support](llms/support/support-home.md) **[guide]**: Join the [Root Developers](https://rootapp.gg/developer) community to ask questions and interact with other developers.
+- [Root developer support](llms/support/support-home.md) **[guide]**: Get help building on Root, whether you want to ask the community or reach the team directly.
 
 ## Optional
 
@@ -187,12 +187,12 @@ Individual articles covering configuration, design, development, and tutorials. 
 - [Plan your App's client-server networking API](llms/app-docs/design/client-server-networking.md) **[guide]**: Root Apps follow a **client-server model** with a **thin client**. Your server does most of the work and is the source of truth for all data.
 - [Define your App's features](llms/app-docs/design/define-your-features.md) **[guide]**: Before you write code, take some time to plan. This article walks through standard planning steps, tailored for Root.
 - [Handle failures in a real-time environment](llms/app-docs/design/handle-real-time-failures.md) **[guide]**: Real-time software, by its nature, involves rapid data changes and constant synchronization. Networking failures and disconnects will happen.
-- [Integrate with the Root platform](llms/app-docs/design/integrate-with-platform.md) **[guide]**: Your App runs inside Root—it should feel like part of Root. That means using the same tools and patterns the platform uses to interact with community...
+- [Integrate with the Root platform](llms/app-docs/design/integrate-with-platform.md) **[guide]**: Your App runs inside Root: it should feel like part of Root. That means using the same tools and patterns the platform uses to interact with...
 - [Is your App right for Root?](llms/app-docs/design/is-your-app-right-for-root.md) **[guide]**: **Root Apps** are multi-user applications with real-time updates that are installed into a community.
 - [Make your App feel collaborative](llms/app-docs/design/make-collaborative.md) **[guide]**: Collaborative Apps share updates in real time. When one member does something, everyone else sees it right away.
 - [Choose your permissions](llms/app-docs/design/permissions.md) **[guide]**: Permissions control which parts of the Root Community API your code can use.
 - [Save data early and often](llms/app-docs/design/save-data-early-and-often.md) **[guide]**: All persistent data in your App should be stored on your server.
-- [Should your App look like Root?](llms/app-docs/design/should-it-look-like-root.md) **[guide]**: Does your App have its own brand colors? Or do you want to match Root’s colors? Either way works. It's your choice.
+- [Should your App look like Root?](llms/app-docs/design/should-it-look-like-root.md) **[guide]**: Does your App have its own brand colors? Or do you want to match Root's colors? Either way works. It's your choice.
 - [Client lifecycle](llms/app-docs/develop/client/client-lifecycle.md) **[guide]**: Root controls when your App's client starts, when it stops, and when it gets reloaded.
 - [Client project overview](llms/app-docs/develop/client/client-project-overview.md) **[guide]**: This section shows how the client side of a Root App is set up.
 - [Design system reference](llms/app-docs/develop/client/design-system-reference.md) **[guide]**: Style your apps to match the Root visual style using CSS color variables, spacing, typography, and component patterns provided by the Root SDK.
@@ -219,6 +219,7 @@ Individual articles covering configuration, design, development, and tutorials. 
 - [Message attachments](llms/app-docs/develop/server/community-api/messaging/attachments.md) **[guide]**: Send and receive messages with file attachments.
 - [Message replies](llms/app-docs/develop/server/community-api/messaging/replies.md) **[guide]**: Send messages that reference other messages, creating conversational context for your responses.
 - [Moderation](llms/app-docs/develop/server/community-api/moderation.md) **[guide]**: Build automated moderation tools that manage members, moderate content, and control voice channels.
+- [Notifications](llms/app-docs/develop/server/community-api/notifications.md) **[guide]**: Alert specific members about something that happened in your app, or show a lightweight activity indicator to the whole community.
 - [Permission update events](llms/app-docs/develop/server/community-api/permission-update-events.md) **[guide]**: Some API operations trigger side effects that modify other resources. This article explains why this happens and how to handle it.
 - [Rate limits](llms/app-docs/develop/server/community-api/rate-limits.md) **[guide]**: Stay under the community API's rate limits with pacing and retry-with-backoff.
 - [Voice channels](llms/app-docs/develop/server/community-api/voice-channels.md) **[guide]**: Monitor and moderate voice channel participants.
@@ -263,7 +264,7 @@ Individual articles covering configuration, design, development, and tutorials. 
 - [Define your Bot's features](llms/bot-docs/design/define-your-features.md) **[guide]**: Before you write code, take time to plan. This article covers key planning steps tailored for Root Bots.
 - [Is Your Bot Right for Root?](llms/bot-docs/design/is-your-bot-right-for-root.md) **[guide]**: Root Bots let you add community features without building a GUI. Bots rely entirely on Root's built-in UI and API for user interaction.
 - [Choose your permissions](llms/bot-docs/design/permissions.md) **[guide]**: Permissions control which parts of the Root Community API your code can use.
-- [Plan your Bot’s communication with the community](llms/bot-docs/design/plan-community-communication.md) **[guide]**: Even without a user interface, your Bot needs a clear communication plan. That includes deciding what to say, who to say it to, and how to send it.
+- [Plan your Bot's communication with the community](llms/bot-docs/design/plan-community-communication.md) **[guide]**: Even without a user interface, your Bot needs a clear communication plan. That includes deciding what to say, who to say it to, and how to send it.
 - [Save data early and often](llms/bot-docs/design/save-data-early-and-often.md) **[guide]**: Your Bot automatically gets a SQLite database. Use it to store anything important.
 - [Bot project overview](llms/bot-docs/develop/bot-project-overview.md) **[guide]**: This section covers how to set up and work with a Root Bot. You'll see how the project is structured, what tools it uses, and how to run it locally...
 - [Access rules](llms/bot-docs/develop/community-api/access-rules.md) **[guide]**: Override channel and channel group permissions for specific roles or members.
@@ -278,6 +279,7 @@ Individual articles covering configuration, design, development, and tutorials. 
 - [Message attachments](llms/bot-docs/develop/community-api/messaging/attachments.md) **[guide]**: Send and receive messages with file attachments.
 - [Message replies](llms/bot-docs/develop/community-api/messaging/replies.md) **[guide]**: Send messages that reference other messages, creating conversational context for your responses.
 - [Moderation](llms/bot-docs/develop/community-api/moderation.md) **[guide]**: Build automated moderation tools that manage members, moderate content, and control voice channels.
+- [Notifications](llms/bot-docs/develop/community-api/notifications.md) **[guide]**: Alert specific members about something that happened in your app, or show a lightweight activity indicator to the whole community.
 - [Permission update events](llms/bot-docs/develop/community-api/permission-update-events.md) **[guide]**: Some API operations trigger side effects that modify other resources. This article explains why this happens and how to handle it.
 - [Rate limits](llms/bot-docs/develop/community-api/rate-limits.md) **[guide]**: Stay under the community API's rate limits with pacing and retry-with-backoff.
 - [Voice channels](llms/bot-docs/develop/community-api/voice-channels.md) **[guide]**: Monitor and moderate voice channel participants.

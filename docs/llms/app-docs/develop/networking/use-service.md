@@ -259,4 +259,4 @@ const onCreated = (event: SuggestionCreatedEvent) => {
 
 ## Conclusion
 
-Once Root generates your client-side service code, using it is straightforward. You import the instance, call methods like `create`, and subscribe to events using standard patterns. The generated code takes care of the network addressing, data transfer, and authentication so you can focus on building your App’s features.
+Once Root generates your client-side service code, using it is straightforward. You import the instance, call methods like `create`, and subscribe to events using standard patterns. The generated code takes care of the network addressing, data transfer, and authentication so you can focus on building your App's features.

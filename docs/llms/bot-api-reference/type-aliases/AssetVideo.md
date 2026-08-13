@@ -13,7 +13,7 @@ Metadata for an uploaded video asset. Provides streaming URLs (HLS and DASH), a 
 
 ### aspectRatio?
 
-> `optional` **aspectRatio**: [`AssetAspectRatio`](AssetAspectRatio.md)
+> `optional` **aspectRatio?**: [`AssetAspectRatio`](AssetAspectRatio.md)
 
 The video's aspect ratio. Optional; see `AssetAspectRatio`.
 
@@ -31,7 +31,7 @@ A direct download URL for the original video file.
 
 ### duration?
 
-> `optional` **duration**: `Duration`
+> `optional` **duration?**: `Duration`
 
 The duration of the video. Optional. A `Duration` with `seconds` (bigint) and `nanos` (number) fields.
 

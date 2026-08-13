@@ -49,7 +49,7 @@ The MIME type of the file (e.g., "image/png", "application/pdf").
 
 ### modifiedAt?
 
-> `optional` **modifiedAt**: `Date`
+> `optional` **modifiedAt?**: `Date`
 
 The timestamp when the file was last modified. Optional.
 

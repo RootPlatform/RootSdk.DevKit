@@ -36,7 +36,7 @@ Root Apps use **CommonJS modules** on the **server** and **ES modules** on the *
 
 - **Server:** Root App servers run in a Node.js environment, where CommonJS is widely supported and compatible with many existing libraries. It's the traditional module system for server-side code.
 
-- **Client:** Root App clients use modern build tools and run in a browser-like environment, which expects ES modules. ES modules are the standard for writing modular, browser-friendly JavaScript—especially in frameworks like React.
+- **Client:** Root App clients use modern build tools and run in a browser-like environment, which expects ES modules. ES modules are the standard for writing modular, browser-friendly JavaScript, especially in frameworks like React.
 
 When Root generates JavaScript for you, it runs the TypeScript compiler multiple times to create CommonJS modules for use on your server and ES modules for your client.
 
@@ -254,4 +254,4 @@ The import locations for the generated code are formed from the `scope` and pack
 
 ## Conclusion
 
-Service generation with Root automates the boilerplate parts of networking. By defining your protobuf files and running `rootsdk build proto`, you get ready-to-use TypeScript code for your client and server—no manual wiring required.
+Service generation with Root automates the boilerplate parts of networking. By defining your protobuf files and running `rootsdk build proto`, you get ready-to-use TypeScript code for your client and server, no manual wiring required.

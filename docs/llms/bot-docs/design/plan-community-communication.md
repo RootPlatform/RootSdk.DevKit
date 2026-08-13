@@ -5,13 +5,13 @@ category: guide
 summary: Even without a user interface, your Bot needs a clear communication plan. That includes deciding what to say, who to say it to, and how to send it.
 ---
 
-# Plan your Bot’s communication with the community
+# Plan your Bot's communication with the community
 
 Even without a user interface, your Bot needs a clear communication plan. That includes deciding what to say, who to say it to, and how to send it.
 
-By the end of this article, you’ll be able to:
+By the end of this article, you'll be able to:
 
-- **Decide what your Bot should communicate**—and what it should stay quiet about  
+- **Decide what your Bot should communicate**, and what it should stay quiet about  
 - **Choose the right channel for each kind of message**  
 - **Avoid over-communicating or disrupting the community**  
 
@@ -23,7 +23,7 @@ Start by asking: **What information does the community need from this Bot?**
 - Does it perform background tasks that only admins care about?  
 - Does it need to respond to user input?
 
-Not every Bot needs to post in public channels. In fact, many don’t.
+Not every Bot needs to post in public channels. In fact, many don't.
 
 ## Step 2: Use the appropriate communication type
 
@@ -33,7 +33,7 @@ Root gives you three ways to communicate:
 |----------------------------|-------------------------|--------------------------------------------------|
 | **Client-side log file**   | Admins only             | You need to share info with community leaders    |
 | **Channel message**        | Visible to members      | The community needs to see the info              |
-| **Create new channel**     | Visible to members      | You’re organizing new discussions or topics      |
+| **Create new channel**     | Visible to members      | You're organizing new discussions or topics      |
 
 Think carefully about which type fits each kind of output. If your Bot is mostly doing automation or moderation, the log file may be all you need.
 
@@ -46,7 +46,7 @@ Split your communication by audience:
 
 Ask yourself for each message: **Does a regular member need to see this?**. If the answer is no, send it to the client-side log.
 
-## Step 4: Don’t overdo it
+## Step 4: Don't overdo it
 
 Even useful messages become noise if you send too many. Some common signs of overcommunication:
 
@@ -68,4 +68,4 @@ This Bot runs member polls and tracks votes. Since the whole point is participat
 
 ## Conclusion
 
-A well-behaved Bot stays useful without being annoying. It doesn’t spam channels. It doesn’t force awkward text input for things that should really have a UI.
+A well-behaved Bot stays useful without being annoying. It doesn't spam channels. It doesn't force awkward text input for things that should really have a UI.

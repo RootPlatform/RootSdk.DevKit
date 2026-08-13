@@ -13,7 +13,7 @@ Encapsulates the timing of a job to be scheduled with the job scheduler.
 
 ### end?
 
-> `optional` **end**: `Date`
+> `optional` **end?**: `Date`
 
 Defines when the job should stop running. If omitted, recurring jobs run indefinitely.
 

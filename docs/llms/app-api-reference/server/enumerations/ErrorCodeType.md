@@ -27,6 +27,10 @@ summary: Enumeration (Error Handling).
 
 > **FailedEmailVerificationCodeTimeout**: `105`
 
+### FailedInvalidRecoveryCode
+
+> **FailedInvalidRecoveryCode**: `107`
+
 ### FailedToAuthenticate
 
 > **FailedToAuthenticate**: `102`
@@ -46,6 +50,10 @@ summary: Enumeration (Error Handling).
 ### FailedToUpload
 
 > **FailedToUpload**: `104`
+
+### FailedUnknownPasskey
+
+> **FailedUnknownPasskey**: `108`
 
 ### LimitExceeded
 
@@ -107,6 +115,10 @@ summary: Enumeration (Error Handling).
 
 > **NotMemberOf**: `6`
 
+### PaymentFailed
+
+> **PaymentFailed**: `5000`
+
 ### PendingFriendshipRequestedSelf
 
 > **PendingFriendshipRequestedSelf**: `200`
@@ -118,6 +130,22 @@ summary: Enumeration (Error Handling).
 ### PolicyAgeRestricted
 
 > **PolicyAgeRestricted**: `401`
+
+### PolicyCannotRevokeCurrentDevice
+
+> **PolicyCannotRevokeCurrentDevice**: `405`
+
+### PolicyChallengeMismatch
+
+> **PolicyChallengeMismatch**: `404`
+
+### PolicyLastPrimaryAuthFactor
+
+> **PolicyLastPrimaryAuthFactor**: `402`
+
+### PolicyUserAlreadyHasPassword
+
+> **PolicyUserAlreadyHasPassword**: `403`
 
 ### PolicyViolationWellKnownPassword
 
@@ -134,6 +162,10 @@ summary: Enumeration (Error Handling).
 ### ServerError
 
 > **ServerError**: `1`
+
+### ServiceUnavailable
+
+> **ServiceUnavailable**: `14`
 
 ### StillProcessing
 
@@ -158,6 +190,10 @@ summary: Enumeration (Error Handling).
 ### Unspecified
 
 > **Unspecified**: `0`
+
+### UploadNotFound
+
+> **UploadNotFound**: `15`
 
 ### WrongType
 

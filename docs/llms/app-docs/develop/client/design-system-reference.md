@@ -164,7 +164,7 @@ a {
 
 ## Spacing
 
-Use consistent spacing values for padding and margins. Pick the smallest value that gives the layout room to breathe — defaulting to larger values for "comfort" usually reads as inflated rather than generous.
+Use consistent spacing values for padding and margins. Pick the smallest value that gives the layout room to breathe: defaulting to larger values for "comfort" usually reads as inflated rather than generous.
 
 | Name | Value | Use for |
 |------|-------|---------|
@@ -235,7 +235,7 @@ Use shadows for modals, dropdowns, and popovers.
 | normal | `400` | Body text, placeholders |
 | medium | `450` | Modal/drawer titles |
 | semibold | `500` | **Default for headings, panel titles, buttons** |
-| bold | `600` | Inline strong emphasis only — single words or short runs within a paragraph |
+| bold | `600` | Inline strong emphasis only: single words or short runs within a paragraph |
 
 Default to `500` for headings and panel titles. Reserve `600` for genuine emphasis inside running text. Using `600` for routine headings reads heavier than Root's first-party UI and makes the page feel shouty.
 
@@ -263,11 +263,11 @@ Use sentence-case bold text in the primary text color, optionally followed by a 
 }
 ```
 
-**Use when:** the header introduces a discrete content section at the page level — for example, "Friendship privacy" introducing a block of options, or "Privacy settings" as the page title.
+**Use when:** the header introduces a discrete content section at the page level, for example, "Friendship privacy" introducing a block of options, or "Privacy settings" as the page title.
 
 ### Sub-section labels inside a container
 
-Use ALL-CAPS, letter-spaced text in secondary color. Use this for labels that mark a sub-section within an already-titled card or panel — INFORMATION, ROLES, USER SETTINGS, etc.
+Use ALL-CAPS, letter-spaced text in secondary color. Use this for labels that mark a sub-section within an already-titled card or panel: INFORMATION, ROLES, USER SETTINGS, etc.
 
 ```css
 .subsection-label {
@@ -447,10 +447,10 @@ Modal dialog container.
 
 **When to choose modal vs inline-edit:**
 
-- **Inline-edit** is the right default for editing a single item that's already on screen — toggling a card between view and edit mode keeps the context, costs no layout shift, and works well at small widths.
+- **Inline-edit** is the right default for editing a single item that's already on screen: toggling a card between view and edit mode keeps the context, costs no layout shift, and works well at small widths.
 - **Modal** is the right choice when the form is browse-and-pick (selecting from a long list of options), when the form is heavy enough that displacing it inline would push other content out of view, or when the action is decisive and demands the user's full focus (confirmations, destructive prompts).
 
-If you choose a modal, ensure it works at 320px width — Root's web client embeds your App in widths that can be narrow.
+If you choose a modal, ensure it works at 320px width: Root's web client embeds your App in widths that can be narrow.
 
 ```css
 .modal-overlay {
@@ -693,7 +693,7 @@ Clickable list item with hover state.
 
 ### selectable-card
 
-Selectable card — a row in a vertical list of options where the user picks one (or several) by clicking. The selected state is signaled by a brand-colored border around the entire row, not just by a filled checkbox or radio indicator. This is the canonical "you've picked this" affordance in Root's UI; a fill-only indicator reads quieter than the rest of the platform.
+Selectable card: a row in a vertical list of options where the user picks one (or several) by clicking. The selected state is signaled by a brand-colored border around the entire row, not just by a filled checkbox or radio indicator. This is the canonical "you've picked this" affordance in Root's UI; a fill-only indicator reads quieter than the rest of the platform.
 
 Use for: a list of mutually-exclusive options (privacy modes, role categories), a list of multi-select options (notification preferences), or any pick-from-a-set surface where the row is the unit of selection.
 
@@ -734,7 +734,7 @@ Use for: a list of mutually-exclusive options (privacy modes, role categories), 
 
 ### status-banner
 
-Inline status banner — tinted background, matching colored border, ALL-CAPS colored title, secondary-color body text. Use for transient status (`UPDATE AVAILABLE`, `Couldn't save`, `Action required`) that needs to stand out from the surrounding content without being a full modal.
+Inline status banner: tinted background, matching colored border, ALL-CAPS colored title, secondary-color body text. Use for transient status (`UPDATE AVAILABLE`, `Couldn't save`, `Action required`) that needs to stand out from the surrounding content without being a full modal.
 
 The recipe uses `color-mix` to derive the background and border tints from a status color, so a single status family (`info`, `warning`, `error`) drives all three coordinated colors. Substitute `info` for `warning` or `error` to recolor.
 
@@ -774,7 +774,7 @@ The recipe uses `color-mix` to derive the background and border tints from a sta
 
 ### sub-setting-row
 
-Sub-setting row — a "modifier" toggle that sits inside a parent section card, typically below the section's primary content. Title and description on the left, switch (or other compact control) on the right. Used for things like "Require verified users" beneath a primary privacy choice, or "Notify when expired" beneath a primary scheduling choice.
+Sub-setting row: a "modifier" toggle that sits inside a parent section card, typically below the section's primary content. Title and description on the left, switch (or other compact control) on the right. Used for things like "Require verified users" beneath a primary privacy choice, or "Notify when expired" beneath a primary scheduling choice.
 
 ```css
 .sub-setting-row {
@@ -851,7 +851,7 @@ Top-level tab bar with a thick brand-colored underline indicating the active tab
 
 ### destructive-section
 
-Destructive-action section — a card dedicated to a single dangerous action (delete, reset, remove). Section label + description on the left, filled red button on the right. Visually separates the action from normal config so members don't trigger it by accident while exploring.
+Destructive-action section: a card dedicated to a single dangerous action (delete, reset, remove). Section label + description on the left, filled red button on the right. Visually separates the action from normal config so members don't trigger it by accident while exploring.
 
 ```css
 .destructive-section {
@@ -965,7 +965,7 @@ Vertical settings sidebar with grouped section labels and an active-item highlig
 
 ### button-quiet
 
-Quiet/secondary button — flat tinted background, no border, smaller padding than the full-pill `button-primary`. Use for inline secondary actions where `button-outline`'s visible border reads too declarative (a "Manage" button next to a list, an "Edit" button inside a card).
+Quiet/secondary button: flat tinted background, no border, smaller padding than the full-pill `button-primary`. Use for inline secondary actions where `button-outline`'s visible border reads too declarative (a "Manage" button next to a list, an "Edit" button inside a card).
 
 Pairs naturally with `button-primary` or `button-danger` as the louder peer in a primary-secondary pair.
 

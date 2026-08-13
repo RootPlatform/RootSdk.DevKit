@@ -19,7 +19,7 @@ The unique identifier of the community where the ban was created.
 
 ### reason?
 
-> `optional` **reason**: `string`
+> `optional` **reason?**: `string`
 
 The ban reason provided by the moderator. Optional.
 

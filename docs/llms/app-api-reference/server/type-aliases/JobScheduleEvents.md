@@ -13,7 +13,7 @@ For event name constants, see `JobScheduleEvent`.
 
 ## Properties
 
-### job()
+### job
 
 > **job**: (`event`: [`JobData`](JobData.md)) => `void`
 
@@ -27,7 +27,7 @@ For event name constants, see `JobScheduleEvent`.
 
 `void`
 
-### job.missed()
+### job.missed
 
 > **job.missed**: (`event`: [`JobData`](JobData.md)) => `void`
 

@@ -11,19 +11,19 @@ summary: Root Apps follow a **client-server model** with a **thin client**. Your
 
 Root Apps follow a **client-server model** with a **thin client**. Your server does most of the work and is the source of truth for all data. You define a networking API, so clients can send actions to the server and receive updates in return.
 
-By the end of this article, you’ll be able to:
+By the end of this article, you'll be able to:
 
 - **Identify** your request-response methods
 - **Identify** your broadcast methods
 - **Group** methods into services
 
-## How Root’s client-server model works
+## How Root's client-server model works
 
 Root Apps have three main parts that you'll code:
 
-- **Client** – Runs inside Root on the member’s device and handles the UI and user input. It sends requests to the server and listens for broadcasts.
-- **Networking** – Your client-server API. Root handles the transport, so you don’t worry about connections, routing, or serialization.
-- **Server** – Runs in the Root cloud and handles all logic and data storage. It serves a single community; every client in that community talks to the same server.
+- **Client**: Runs inside Root on the member's device and handles the UI and user input. It sends requests to the server and listens for broadcasts.
+- **Networking**: Your client-server API. Root handles the transport, so you don't worry about connections, routing, or serialization.
+- **Server**: Runs in the Root cloud and handles all logic and data storage. It serves a single community; every client in that community talks to the same server.
 
 In this article, we'll discuss the networking portion of your App.
 
@@ -48,13 +48,13 @@ To design your methods, start with the data the client needs when it starts. For
 
 In **SuggestionBox**, the users can add new suggestions, edit/delete their own suggestions, and vote on their favorites. You'd create a request-response method for each of these actions. In addition, you'd want to provide a `list()` method the clients use to fetch all current suggestions at startup.
 
-The **Poker** App is similar: every game action—join a table, place a bet, draw a card—triggers a request to the server, and you'd want a method to support each.
+The **Poker** App is similar: every game action (join a table, place a bet, draw a card) triggers a request to the server, and you'd want a method to support each.
 
 ### Broadcast methods
 
 In this pattern, the server pushes updates to clients:
 
-1. You decide when to broadcast—typically after a client action or when a timer expires.  
+1. You decide when to broadcast, typically after a client action or when a timer expires.  
 2. You pick the audience: everyone, a filtered group, or everyone except a few.  
 3. Root sends the message to those clients; you don't need to write the broadcast logic or code.
 

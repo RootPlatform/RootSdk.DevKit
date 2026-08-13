@@ -501,4 +501,4 @@ service SuggestionService {
 
 ## Conclusion
 
-Defining your service is the second step in building a networked App. You use protobuf to describe the messages your clients and server will exchange, and to define the service methods they’ll call. Once you’ve written your service definition, you're ready to compile it into TypeScript code and start implementing the logic.
+Defining your service is the second step in building a networked App. You use protobuf to describe the messages your clients and server will exchange, and to define the service methods they'll call. Once you've written your service definition, you're ready to compile it into TypeScript code and start implementing the logic.

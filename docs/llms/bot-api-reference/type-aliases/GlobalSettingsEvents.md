@@ -11,7 +11,7 @@ Event map type for `GlobalSettings`. This type defines the event signatures for 
 
 ## Properties
 
-### button()
+### button
 
 > **button**: (`event`: [`GlobalSettingButtonEvent`](GlobalSettingButtonEvent.md)) => `void`
 
@@ -27,7 +27,7 @@ Emitted when a community member presses a `button` setting. The listener receive
 
 `void`
 
-### update()
+### update
 
 > **update**: (`event`: [`GlobalSettingsUpdateEvent`](GlobalSettingsUpdateEvent.md)) => `void`
 

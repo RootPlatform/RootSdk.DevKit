@@ -25,6 +25,6 @@ The unique identifier of the moved file.
 
 ### oldDirectoryId?
 
-> `optional` **oldDirectoryId**: [`DirectoryGuid`](DirectoryGuid.md)
+> `optional` **oldDirectoryId?**: [`DirectoryGuid`](DirectoryGuid.md)
 
 The ID of the previous directory. Optional.

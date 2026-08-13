@@ -47,4 +47,4 @@ summary: Object type with properties: channelGroupsCreated, channelGroupsDeleted
 
 ### communityPermission?
 
-> `optional` **communityPermission**: [`CommunityPermission`](CommunityPermission.md)
+> `optional` **communityPermission?**: [`CommunityPermission`](CommunityPermission.md)

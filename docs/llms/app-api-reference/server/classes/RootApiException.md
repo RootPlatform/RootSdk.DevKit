@@ -23,7 +23,7 @@ The specific error code related to the error.
 
 ### id?
 
-> `optional` **id**: [`RootGuid`](../type-aliases/RootGuid.md)
+> `optional` **id?**: [`RootGuid`](../type-aliases/RootGuid.md)
 
 Optional unique identifier for this error instance.
 
@@ -35,7 +35,7 @@ Optional identifier for the parent error, if this error is part of a chain.
 
 ### payload?
 
-> `optional` **payload**: `RootGrpcExceptionPayload`
+> `optional` **payload?**: `RootGrpcExceptionPayload`
 
 The specific payload associated with this error, which can be one of several predefined exception payload types.
 
@@ -53,6 +53,6 @@ Identifier for where the error occurred.
 
 ### whoId?
 
-> `optional` **whoId**: [`UserGuid`](../type-aliases/UserGuid.md)
+> `optional` **whoId?**: [`UserGuid`](../type-aliases/UserGuid.md)
 
 Optional identifier for the entity responsible for the error.

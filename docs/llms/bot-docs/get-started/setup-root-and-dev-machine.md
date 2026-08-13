@@ -37,7 +37,7 @@ Here are the steps to create a Root account:
 1. Start the Root application.
 1. Select the 'Register' option at the bottom of the login screen.
 1. Add your information to the registration page.
-1. Select ‘Register’ to complete the registration process. You’ll be logged in and ready to go.
+1. Select 'Register' to complete the registration process. You'll be logged in and ready to go.
 
 ### Join the Root developer program
 

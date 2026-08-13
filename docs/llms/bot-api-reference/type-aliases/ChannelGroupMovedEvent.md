@@ -13,7 +13,7 @@ Event payload emitted when a visible channel group is moved to a different posit
 
 ### beforeChannelGroupId?
 
-> `optional` **beforeChannelGroupId**: [`ChannelGroupGuid`](ChannelGroupGuid.md)
+> `optional` **beforeChannelGroupId?**: [`ChannelGroupGuid`](ChannelGroupGuid.md)
 
 Indicates the new position. If set, this channel group now appears directly above the specified channel group. If undefined, this channel group is now at the bottom of the sidebar.
 

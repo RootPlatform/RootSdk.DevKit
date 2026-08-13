@@ -13,7 +13,7 @@ For event name constants, see `ChannelWebRtcEvent`.
 
 ## Properties
 
-### channelWebRtcUser.attach()
+### channelWebRtcUser.attach
 
 > **channelWebRtcUser.attach**: (`evt`: [`ChannelWebRtcUserAttachEvent`](ChannelWebRtcUserAttachEvent.md)) => `void`
 
@@ -36,7 +36,7 @@ rootServer.community.channelWebRtcs.on(ChannelWebRtcEvent.ChannelWebRtcUserAttac
 });
 ```
 
-### channelWebRtcUser.detach()
+### channelWebRtcUser.detach
 
 > **channelWebRtcUser.detach**: (`evt`: [`ChannelWebRtcUserDetachEvent`](ChannelWebRtcUserDetachEvent.md)) => `void`
 
@@ -59,7 +59,7 @@ rootServer.community.channelWebRtcs.on(ChannelWebRtcEvent.ChannelWebRtcUserDetac
 });
 ```
 
-### channelWebRtcUserDevice.set.dataChannel()
+### channelWebRtcUserDevice.set.dataChannel
 
 > **channelWebRtcUserDevice.set.dataChannel**: (`evt`: [`ChannelWebRtcUserDeviceSetDataChannelEvent`](ChannelWebRtcUserDeviceSetDataChannelEvent.md)) => `void`
 
@@ -82,7 +82,7 @@ rootServer.community.channelWebRtcs.on(ChannelWebRtcEvent.ChannelWebRtcUserDevic
 });
 ```
 
-### channelWebRtcUserDevice.set.status()
+### channelWebRtcUserDevice.set.status
 
 > **channelWebRtcUserDevice.set.status**: (`evt`: [`ChannelWebRtcUserDeviceSetStatusEvent`](ChannelWebRtcUserDeviceSetStatusEvent.md)) => `void`
 
@@ -105,7 +105,7 @@ rootServer.community.channelWebRtcs.on(ChannelWebRtcEvent.ChannelWebRtcUserDevic
 });
 ```
 
-### channelWebRtcUserDevice.set.transport()
+### channelWebRtcUserDevice.set.transport
 
 > **channelWebRtcUserDevice.set.transport**: (`evt`: [`ChannelWebRtcUserDeviceSetTransportEvent`](ChannelWebRtcUserDeviceSetTransportEvent.md)) => `void`
 

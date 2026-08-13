@@ -15,7 +15,7 @@ summary: Object type with properties: channelId, communityId, deviceId, isAdminD
 
 ### communityId?
 
-> `optional` **communityId**: [`CommunityGuid`](CommunityGuid.md)
+> `optional` **communityId?**: [`CommunityGuid`](CommunityGuid.md)
 
 ### deviceId
 

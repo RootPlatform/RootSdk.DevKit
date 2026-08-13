@@ -21,7 +21,7 @@ Change your own nickname for the community.
 
 > **communityChangeOtherNickname**: `boolean`
 
-Change other members’ nicknames.
+Change other members' nicknames.
 
 ### communityCreateBan
 
@@ -75,7 +75,7 @@ Create, read, update, and delete community member bans.
 
 > **communityManageCommunity**: `boolean`
 
-Manage overall community settings, including the community’s name, description, color, image, and system-messages channel.
+Manage overall community settings, including the community's name, description, color, image, and system-messages channel.
 
 ### communityManageEmojis
 

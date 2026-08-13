@@ -39,7 +39,7 @@ Root Apps follow a **client-server model**, which means they have three main par
 1. **Server:** Your backend that handles business logic and data storage.
 1. **Networking:** Your messages between the client and server.
 
-When you build a Root App, you’ll code all three of these components.
+When you build a Root App, you'll code all three of these components.
 
 ### Client
 
@@ -55,7 +55,7 @@ Consider a _SuggestionBox_ Root App that lets community members make suggestions
 
 The server of a Root App is written in TypeScript and runs inside Node. You'll have access to most core Node.js modules (with some security limitations). You can also pull in third-party packages from registries like [npm](https://www.npmjs.com/).
 
-Root Apps use **SQLite** for persistent data storage on the server side. It's all set up for you; Root even tracks your App’s data file and provides automatic backup/restore. You can pull in the standard SQLite API **sqlite3** to access your database, or you can add a third-party ORM like **sequelize**.
+Root Apps use **SQLite** for persistent data storage on the server side. It's all set up for you; Root even tracks your App's data file and provides automatic backup/restore. You can pull in the standard SQLite API **sqlite3** to access your database, or you can add a third-party ORM like **sequelize**.
 
 In the _SuggestionBox_ example, the server would likely create two tables inside SQLite: `suggestions` and `votes`. The business logic would then track all active suggestions, record votes, prevent double-voting, etc.
 
@@ -111,8 +111,8 @@ Let's use _SuggestionBox_ to show what happens to a Root App during installation
 
 When a community member with the `Manage Apps` permission installs an App into their community, two things happen:
 
-1. **Client** – The installation tooling pushes the App's client to every community members' device.
-1. **Server** – The Root infrastructure creates a single instance of the App's server running inside the Root cloud.
+1. **Client**: The installation tooling pushes the App's client to every community members' device.
+1. **Server**: The Root infrastructure creates a single instance of the App's server running inside the Root cloud.
 
 Here's what the situation would look like after a _Cats_ community installed the _SuggestionBox_ App:
 

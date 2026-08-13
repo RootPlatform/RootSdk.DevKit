@@ -13,7 +13,7 @@ Event payload emitted when a user enables or disables their microphone, camera, 
 
 ### audioTrackId?
 
-> `optional` **audioTrackId**: `string`
+> `optional` **audioTrackId?**: `string`
 
 The internal WebRTC track ID for the user's microphone. Optional; undefined when audio is disabled.
 
@@ -25,7 +25,7 @@ The unique identifier of the voice channel.
 
 ### communityId?
 
-> `optional` **communityId**: [`CommunityGuid`](CommunityGuid.md)
+> `optional` **communityId?**: [`CommunityGuid`](CommunityGuid.md)
 
 The unique identifier of the community. Optional.
 
@@ -37,13 +37,13 @@ The unique identifier of the user's device.
 
 ### screenAudioTrackId?
 
-> `optional` **screenAudioTrackId**: `string`
+> `optional` **screenAudioTrackId?**: `string`
 
 The internal WebRTC track ID for the user's screen share audio. Optional; undefined when not sharing screen audio.
 
 ### screenTrackId?
 
-> `optional` **screenTrackId**: `string`
+> `optional` **screenTrackId?**: `string`
 
 The internal WebRTC track ID for the user's screen share video. Optional; undefined when not screen sharing.
 
@@ -55,6 +55,6 @@ The unique identifier of the user whose tracks changed.
 
 ### videoTrackId?
 
-> `optional` **videoTrackId**: `string`
+> `optional` **videoTrackId?**: `string`
 
 The internal WebRTC track ID for the user's camera. Optional; undefined when camera is off.

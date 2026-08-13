@@ -19,7 +19,7 @@ The ID of the user who created the ban.
 
 ### expiresAt?
 
-> `optional` **expiresAt**: `Date`
+> `optional` **expiresAt?**: `Date`
 
 Optional expiration date for the ban. After this date, the ban is no longer enforced. If not set, the ban is permanent until manually deleted.
 
@@ -31,7 +31,7 @@ The unique identifier for the ban record.
 
 ### reason?
 
-> `optional` **reason**: `string`
+> `optional` **reason?**: `string`
 
 Optional reason for the ban. This is stored with the ban record and included in the notification sent to the banned user.
 

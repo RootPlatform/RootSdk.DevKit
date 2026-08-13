@@ -13,7 +13,7 @@ For event name constants, see `ChannelDirectoryEvent`.
 
 ## Properties
 
-### channelDirectory.created()
+### channelDirectory.created
 
 > **channelDirectory.created**: (`evt`: [`ChannelDirectoryCreatedEvent`](ChannelDirectoryCreatedEvent.md)) => `void`
 
@@ -36,7 +36,7 @@ rootServer.community.channelDirectories.on(ChannelDirectoryEvent.ChannelDirector
 });
 ```
 
-### channelDirectory.deleted()
+### channelDirectory.deleted
 
 > **channelDirectory.deleted**: (`evt`: [`ChannelDirectoryDeletedEvent`](ChannelDirectoryDeletedEvent.md)) => `void`
 
@@ -59,7 +59,7 @@ rootServer.community.channelDirectories.on(ChannelDirectoryEvent.ChannelDirector
 });
 ```
 
-### channelDirectory.edited()
+### channelDirectory.edited
 
 > **channelDirectory.edited**: (`evt`: [`ChannelDirectoryEditedEvent`](ChannelDirectoryEditedEvent.md)) => `void`
 
@@ -82,7 +82,7 @@ rootServer.community.channelDirectories.on(ChannelDirectoryEvent.ChannelDirector
 });
 ```
 
-### channelDirectory.moved()
+### channelDirectory.moved
 
 > **channelDirectory.moved**: (`evt`: [`ChannelDirectoryMovedEvent`](ChannelDirectoryMovedEvent.md)) => `void`
 

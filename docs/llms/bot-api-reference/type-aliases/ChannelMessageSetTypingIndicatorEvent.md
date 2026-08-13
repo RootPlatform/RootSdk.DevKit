@@ -19,13 +19,13 @@ The unique identifier of the channel.
 
 ### communityId?
 
-> `optional` **communityId**: [`CommunityGuid`](CommunityGuid.md)
+> `optional` **communityId?**: [`CommunityGuid`](CommunityGuid.md)
 
 The unique identifier of the community. Optional.
 
 ### createdAt?
 
-> `optional` **createdAt**: `Date`
+> `optional` **createdAt?**: `Date`
 
 When the typing indicator was set. Optional.
 

@@ -19,7 +19,7 @@ The unique identifier of the channel to search in. Required.
 
 ### lastFileId?
 
-> `optional` **lastFileId**: [`FileGuid`](FileGuid.md)
+> `optional` **lastFileId?**: [`FileGuid`](FileGuid.md)
 
 The ID of the last file from the previous page. Optional. Use for pagination to retrieve the next set of results.
 

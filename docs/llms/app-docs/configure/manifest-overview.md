@@ -13,7 +13,53 @@ Your **manifest file** defines how your code integrates with the Root platform. 
 
 ```json
 {
-  App: "TBD"
+  "id": "xxxxxxxxxxxxxxxxxxxxxx",
+  "version": "1.0.0",
+  "package": {
+    "client": {
+      "deploy": "client/dist"
+    },
+    "server": {
+      "launch": "server/dist/main.js",
+      "deploy": [
+        "server/dist",
+        "networking/gen/server"
+      ],
+      "nodeModules": [
+        "server/node_modules"
+      ]
+    }
+  },
+  "settings": {
+    "groups": [
+      {
+        "key": "general",
+        "title": "General",
+        "items": [
+          {
+            "key": "moderators",
+            "title": "Moderators",
+            "description": "Select the roles and members who can moderate this app.",
+            "required": true,
+            "confirmation": "Save",
+            "roleOrMember": {
+              "selectBehavior": "roleMultiAndUserMulti",
+              "userIds": [],
+              "communityRoleIds": []
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "community": {
+      "manageRoles": true
+    },
+    "channel": {
+      "createMessage": true
+    }
+  }
 }
 ```
 
