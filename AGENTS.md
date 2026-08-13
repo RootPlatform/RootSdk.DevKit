@@ -80,6 +80,7 @@ Complete, runnable bot examples in `bots/`. Server-only — no client UI.
 |--------|-------------|-------------|------------|
 | `hello-world` | Echo/ping responder | Message event handling, basic reply | Minimal |
 | `new-member-welcome` | Welcome new members | Member join event subscription | Minimal |
+| `notifications` | Send a platform notification to a member | Notifications, best-effort side effects, field length limits | Minimal |
 | `reset-channel-description` | Channel property management | Channel updates, voice channel events | Minimal |
 | `role-list` | List community roles | Role querying | Minimal |
 | `all-channel-broadcast` | Broadcast to all channels | Channel listing, multi-channel messaging, global settings (member group), per-call error isolation | Moderate |
