@@ -85,6 +85,7 @@ Complete, runnable bot examples in `bots/`. Server-only — no client UI.
 | `role-list` | List community roles | Role querying | Minimal |
 | `all-channel-broadcast` | Broadcast to all channels | Channel listing, multi-channel messaging, global settings (member group), per-call error isolation | Moderate |
 | `role-assignment` | Assign roles to members | Role and member-role APIs, global settings (role picker), per-user counter via key-value store | Moderate |
+| `voice-count` | Show a live participant count on a voice channel | Voice channel events, channel updates, idempotent description rewriting | Moderate |
 <!-- END: catalog/sample-bots -->
 
 ## Recipes
