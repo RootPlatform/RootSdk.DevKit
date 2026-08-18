@@ -164,6 +164,11 @@ async function onTestCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
  * record contents; the contract verified here is "pagination produces the
  * right page boundaries," not "the right rows are seeded" (which is a
  * concern of db.ts, not of the pagination mechanic).
+ *
+ * `search` is passed through so the harness can assert the filtered case,
+ * which is the one that cannot be checked by eye: with 100 seeded rows and a
+ * page size of 20, a client-side filter and a server-side filter look
+ * identical on the first page and diverge only past it.
  */
 async function invoke(
   method: string,
@@ -177,6 +182,7 @@ async function invoke(
           {
             pageSize: (request.pageSize as number) ?? 0,
             cursor: (request.cursor as string) ?? "",
+            search: (request.search as string) ?? "",
           },
           client,
         );

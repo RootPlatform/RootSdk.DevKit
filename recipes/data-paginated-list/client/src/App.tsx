@@ -5,26 +5,47 @@
 //
 // State machine for accumulating pages:
 //
-//   - records[]    — every record fetched so far, in order
-//   - cursor       — the cursor for the NEXT call (empty string on first load)
-//   - loading      — request in flight; disable the button to prevent double-fire
-//   - done         — server returned an empty next_cursor; no more pages
-//   - error        — last error message, if any (display + recover by retrying)
+//   - records[]     — every record fetched so far, in order
+//   - cursor        — the cursor for the NEXT call (empty string on first load)
+//   - loading       — request in flight; disable the button to prevent double-fire
+//   - done          — server returned an empty next_cursor; no more pages
+//   - error         — last error message, if any (display + recover by retrying)
+//   - search        — what the user has typed, updated on every keystroke
+//   - appliedSearch — the debounced term actually sent to the server
 //
-// Initial load happens on mount via useEffect; subsequent loads are user-driven
-// via the "Load more" button. Same fetchPage function for both — the only
-// difference is whether the user clicked something.
+// The client does NOT filter `records`. The server does the filtering, because
+// `records` only holds the pages fetched so far — filtering it locally would
+// search the window instead of the list, and would never find a match beyond
+// the pages already pulled. That bug is invisible while the seed data fits in
+// one page, which is exactly why it survives review.
+//
+// A term change resets pagination: records cleared, cursor cleared, first page
+// re-fetched. Keeping the old cursor would seek into a result set that no
+// longer exists.
+//
+// Why the first page REPLACES and later pages APPEND: it makes the first fetch
+// idempotent, so React.StrictMode's deliberate double-invocation of effects in
+// dev is harmless. An earlier version of this recipe appended on every page and
+// needed a useRef latch to stop the mount effect duplicating records 100…81.
+// Designing the operation to be repeatable beats latching around a repeat.
 //
 // Why we don't auto-load all pages: the recipe's lesson is the explicit pull
 // pattern (each page is a deliberate fetch). Real apps often replace the
 // button with an IntersectionObserver-driven infinite scroll, but the
 // underlying state machine is the same — replace the click handler with the
-// observer callback. We use a button here because it's the simplest visible
-// demonstration of "another page is available."
+// observer callback.
+//
+// If you take the infinite-scroll route, note that it interacts badly with a
+// client-side filter, which is a second reason not to write one: filtering the
+// accumulated pages shrinks the rendered list, which can lift the sentinel out
+// of the viewport, so the observer never fires and the list never grows to
+// contain what the user is looking for. Searching then prevents its own results
+// from loading. With the filter on the server this cannot happen — each term is
+// its own query, starting from its own first page.
 //
 // ============================================================================
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { listServiceClient } from "@datapaginatedlist/gen-client";
 import { Record as RecordMessage } from "@datapaginatedlist/gen-shared";
 
@@ -36,21 +57,28 @@ export const App: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [done, setDone] = useState<boolean>(false);
   const [error, setError] = useState<string | undefined>(undefined);
-  // Latch for the initial-load effect — see useEffect comment below.
-  const initialFetchRef = useRef(false);
+  const [search, setSearch] = useState<string>("");
+  const [appliedSearch, setAppliedSearch] = useState<string>("");
 
-  const fetchPage = async (currentCursor: string): Promise<void> => {
+  const fetchPage = async (
+    currentCursor: string,
+    term: string,
+    mode: "replace" | "append",
+  ): Promise<void> => {
     setLoading(true);
     setError(undefined);
     try {
       const r = await listServiceClient.listRecords({
         pageSize: PAGE_SIZE,
         cursor: currentCursor,
+        search: term,
       });
-      // Append, don't replace. The previous-page records stay; the new page
-      // gets concatenated. This is what makes the "load more" pattern feel
-      // continuous to the user instead of paging in/out.
-      setRecords((prev) => [...prev, ...r.records]);
+      // Later pages append so "load more" feels continuous; the first page of
+      // any query replaces, which both clears the previous term's results and
+      // makes the call safe to repeat.
+      setRecords((prev) =>
+        mode === "replace" ? r.records : [...prev, ...r.records],
+      );
       setCursor(r.nextCursor);
       // Empty next_cursor = end of list. Flip done=true so the button
       // disables itself and we render the end-of-list message.
@@ -62,26 +90,38 @@ export const App: React.FC = () => {
     }
   };
 
-  // Initial load on mount, once. React.StrictMode in dev intentionally
-  // double-invokes effects to surface impure side-effect bugs — without a
-  // guard, fetchPage("") fires twice and the appending setRecords produces
-  // visible duplicates of records 100…81. The useRef latch is the canonical
-  // pattern: refs survive the StrictMode unmount/remount, so the second
-  // invocation no-ops. (Production builds don't double-invoke effects, but
-  // devhost is the canonical local-run path for this recipe, so the dev-mode
-  // duplication would be the first thing a learner sees and questions.)
+  // Debounce the input so a search costs one request per pause rather than one
+  // per keystroke. Clients are rate-limited to 10 app RPCs per second, and a
+  // fast typist exceeds that on a single word without this.
   useEffect(() => {
-    if (initialFetchRef.current) return;
-    initialFetchRef.current = true;
-    void fetchPage("");
+    const timer = setTimeout(() => setAppliedSearch(search.trim()), 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  // One effect covers both the initial load and every term change: appliedSearch
+  // starts as "" so the mount case is simply the first query. Clearing the
+  // cursor here is what stops a stale cursor being paired with a new term.
+  useEffect(() => {
+    setCursor("");
+    setDone(false);
+    void fetchPage("", appliedSearch, "replace");
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [appliedSearch]);
 
   return (
     <main style={pageStyle}>
       <h1 style={{ fontSize: 24, margin: 0 }}>Cursor-Based Pagination</h1>
+      <input
+        value={search}
+        onChange={(event) => setSearch(event.target.value)}
+        placeholder="Search labels"
+        aria-label="Search labels"
+        style={inputStyle}
+      />
+
       <p style={metaStyle}>
         Loaded {records.length} record{records.length === 1 ? "" : "s"}
+        {appliedSearch ? ` matching ${JSON.stringify(appliedSearch)}` : ""}
         {done ? " (end of list)" : ""}
       </p>
 
@@ -98,7 +138,7 @@ export const App: React.FC = () => {
 
       {!done && (
         <button
-          onClick={() => void fetchPage(cursor)}
+          onClick={() => void fetchPage(cursor, appliedSearch, "append")}
           disabled={loading}
           style={buttonStyle}
         >
@@ -107,6 +147,9 @@ export const App: React.FC = () => {
       )}
       {done && records.length > 0 && (
         <p style={endStyle}>You've reached the end.</p>
+      )}
+      {done && records.length === 0 && appliedSearch !== "" && (
+        <p style={endStyle}>Nothing matches {JSON.stringify(appliedSearch)}.</p>
       )}
     </main>
   );
@@ -148,6 +191,18 @@ const timestampStyle: React.CSSProperties = {
   color: "var(--rootsdk-text-tertiary)",
   fontSize: 12,
   marginLeft: 8,
+};
+
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  boxSizing: "border-box",
+  marginTop: 16,
+  padding: "10px 12px",
+  borderRadius: 8,
+  border: "1px solid var(--rootsdk-border)",
+  background: "var(--rootsdk-background-secondary)",
+  color: "var(--rootsdk-text-primary)",
+  fontSize: 14,
 };
 
 const buttonStyle: React.CSSProperties = {

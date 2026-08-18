@@ -103,7 +103,7 @@ Folder names are category-prefixed (e.g. `ui-`, `data-`, `app-settings-`, `chat-
 | `audio-bundled-sfx` | How do I ship and play short sound effects from my client, dealing with the autoplay policy and Vite asset bundling? | — | — |
 | `chat-trigger-respond` | How do I make my app respond to user chat messages? | `server-messages` | `apps/leveling-leaderboard` |
 | `data-batch-prefetch` | How do I batch-prefetch related data (e.g. 50 user profiles for a list of activities) in one call instead of N+1 from the client? | `server-database`, `networking-app-services` | — |
-| `data-paginated-list` | How do I paginate a server-side list with cursor-based queries and accumulate pages on the client? | `server-database`, `networking-app-services` | `apps/leveling-leaderboard` |
+| `data-paginated-list` | How do I paginate a server-side list with cursor-based queries, accumulate pages on the client, and search it without breaking the paging? | `server-database`, `networking-app-services` | `apps/leveling-leaderboard` |
 | `error-rpc-exceptions` | How do I propagate domain-specific error codes from server to client and let the client branch on them? | `networking-app-services`, `server-key-value-store` | `apps/suggestion-box` |
 | `external-http-fetch` | How do I call an external HTTP API from my server with timeouts and typed error handling? | `networking-app-services` | `apps/github-release-watcher` |
 | `per-user-cooldown` | How do I rate-limit a per-user action so it can only happen once per N seconds, atomically? | `server-database`, `networking-app-services` | `apps/leveling-leaderboard` |
