@@ -23,7 +23,7 @@
             "server/dist",
             "networking/gen/server"
           ],
-          "node_modules": [
+          "nodeModules": [
             "server/node_modules"
           ]
         }
@@ -57,7 +57,7 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Package",
       "description": "Deployment and startup configuration for your App's client and server code.",
-      "x-doc-details": "When you push, the CLI reads these paths and creates a .pkg archive containing root-manifest.json, server.tar.gz (from deploy and node_modules), and client.tar.gz (from client.deploy).",
+      "x-doc-details": "When you push, the CLI reads these paths and creates a .pkg archive containing root-manifest.json, server.tar.gz (from deploy and nodeModules), and client.tar.gz (from client.deploy).",
       "type": "object",
       "required": [
         "client",
@@ -87,7 +87,7 @@
           "required": [
             "launch",
             "deploy",
-            "node_modules"
+            "nodeModules"
           ],
           "properties": {
             "launch": {
@@ -110,7 +110,7 @@
                 ]
               ]
             },
-            "node_modules": {
+            "nodeModules": {
               "type": "array",
               "description": "node_modules directories to bundle with your server (production dependencies). The CLI automatically excludes sqlite3 and @rootsdk/dev-tools from the bundle.",
               "items": {
@@ -139,7 +139,7 @@
                 "server/dist",
                 "networking/gen/server"
               ],
-              "node_modules": [
+              "nodeModules": [
                 "server/node_modules"
               ]
             }
