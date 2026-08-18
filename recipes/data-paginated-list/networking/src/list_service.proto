@@ -21,11 +21,23 @@ package datapaginatedlist;
 // next_cursor field. Empty string means "first page". Clients never
 // inspect or construct cursors — they round-trip the value the server
 // gave them. Server owns the encoding (this recipe uses base64-encoded
-// JSON of the last seen id), and is free to change it without breaking
-// clients.
+// JSON of the last seen id AND the search term it was issued under), and
+// is free to change it without breaking clients. A cursor is only meaningful
+// within the query that produced it: pairing one with a different `search`
+// seeks into the middle of a result set it never described, so the server
+// detects the mismatch and starts over.
+//
+// search — optional case-insensitive substring filter, applied by the SERVER
+// against the record label. This field exists because the alternative is a
+// silent bug: a client that fetches a page and filters it locally can only
+// ever find matches inside the page it happens to hold, and there is no
+// error, no empty state, and no symptom until the list outgrows one page.
+// A filtered list is still paginated — the filter narrows what is paged
+// over, it does not replace paging.
 message ListRecordsRequest {
   uint32 page_size = 1;
   string cursor = 2;
+  string search = 3;
 }
 
 // Page response.

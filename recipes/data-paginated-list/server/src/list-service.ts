@@ -23,6 +23,19 @@
 //      ask for "everything" by sending a huge page_size and skipping
 //      pagination entirely.
 //
+//   5. Filtering happens HERE, not on the client. A paginated response is a
+//      window, so a client-side filter over it searches the window rather
+//      than the list. That failure is silent — no error, no empty state,
+//      correct-looking results — and it only appears once the data outgrows
+//      one page, which is long after the code ships.
+//
+//   6. A cursor belongs to the query that issued it. The cursor payload
+//      carries the search term, so a cursor paired with a different term is
+//      recognised as stale and the query restarts from the first page
+//      instead of seeking into a result set the cursor never described.
+//      This is what the opaque-cursor design in (2) buys: the server added
+//      a field to the payload and no client had to change.
+//
 // ============================================================================
 
 import { Client } from "@rootsdk/server-app";
@@ -57,7 +70,13 @@ export class ListService extends ListServiceBase {
     // Number.MAX_SAFE_INTEGER is the sentinel for "no upper bound" so the
     // SQL stays the same shape on every page; we don't need a separate
     // first-page query.
-    const cursorId = decodeCursor(request.cursor);
+    // Normalise once: the same string is used for the SQL parameter and for
+    // the cursor's fingerprint, so they cannot disagree.
+    const search = request.search.trim().toLowerCase();
+
+    // Empty string = first page (no upper bound on id). A cursor issued under
+    // a different search term is treated the same way — see decodeCursor.
+    const cursorId = decodeCursor(request.cursor, search);
 
     // Page query. ORDER BY id DESC means newest first. WHERE id < cursorId
     // is the seek; combined with LIMIT, it returns the next page beyond
@@ -73,20 +92,33 @@ export class ListService extends ListServiceBase {
     // precision — the last full page returns a non-empty cursor that
     // yields [] on the next call. The extra-row variant is the canonical
     // choice for user-facing pagination.)
+    // The filter is part of the same query as the seek, so paging walks the
+    // matching rows rather than walking every row and discarding non-matches.
+    // LOWER(label) LIKE ? is deliberately the plainest thing that works on
+    // sqlite and Postgres alike; a real app with a large table wants an index
+    // built for the comparison it actually performs (a functional index on
+    // LOWER(label), or full-text search), because LIKE '%term%' cannot use a
+    // plain B-tree index on label.
+    const filterSql = search ? "AND LOWER(label) LIKE ?" : "";
+    const params: (number | string)[] = search
+      ? [cursorId, `%${search}%`, pageSize + 1]
+      : [cursorId, pageSize + 1];
+
     const rows = await all<RecordRow>(
       getDb(),
       `SELECT id, created_at, label
        FROM records
        WHERE id < ?
+       ${filterSql}
        ORDER BY id DESC
        LIMIT ?`,
-      [cursorId, pageSize + 1],
+      params,
     );
 
     const hasMore = rows.length > pageSize;
     const pageRows = hasMore ? rows.slice(0, pageSize) : rows;
     const nextCursor = hasMore && pageRows.length > 0
-      ? encodeCursor(pageRows[pageRows.length - 1].id)
+      ? encodeCursor(pageRows[pageRows.length - 1].id, search)
       : "";
 
     const records: RecordMessage[] = pageRows.map((r) => ({
@@ -111,19 +143,28 @@ export const listService = new ListService();
 
 interface CursorPayload {
   id: number;
+  q: string;
 }
 
-function encodeCursor(lastId: number): string {
-  const payload: CursorPayload = { id: lastId };
+function encodeCursor(lastId: number, search: string): string {
+  const payload: CursorPayload = { id: lastId, q: search };
   return Buffer.from(JSON.stringify(payload), "utf8").toString("base64");
 }
 
-function decodeCursor(cursor: string): number {
+// Returns the seek bound, or MAX_SAFE_INTEGER meaning "start from the first
+// page". A cursor whose search term differs from the current request's is
+// stale, not malformed: the client changed what it was searching for while
+// holding a cursor into the old result set. Restarting is the only correct
+// answer — honouring the seek would silently skip every match above it.
+// A well-behaved client resets its own pagination on a term change, so this
+// is defence in depth rather than the primary mechanism.
+function decodeCursor(cursor: string, search: string): number {
   if (!cursor) return Number.MAX_SAFE_INTEGER;
   try {
     const json = Buffer.from(cursor, "base64").toString("utf8");
     const payload = JSON.parse(json) as CursorPayload;
-    if (typeof payload.id === "number" && Number.isFinite(payload.id)) {
+    const sameQuery = (payload.q ?? "") === search;
+    if (sameQuery && typeof payload.id === "number" && Number.isFinite(payload.id)) {
       return payload.id;
     }
   } catch {
