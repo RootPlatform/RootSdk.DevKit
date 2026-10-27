@@ -36,6 +36,29 @@ You can use this idea in other Apps too:
 
 These small updates help everyone feel involved.
 
+## How broadcast delivery works
+
+A broadcast reaches every client that is subscribed to the event in the group you send it to, and that includes the member whose own action caused it. Decide for each broadcast whether the member who acted should receive it.
+
+Your generated broadcast method takes the event, the group of clients to send to, and an optional client to leave out:
+
+```ts
+this.broadcastCreated(event, "all", client);
+```
+
+The third argument removes **one device** from the list rather than one member. If the member who created the suggestion is signed in on both a laptop and a phone, passing their calling client stops the laptop they acted on from receiving the event, and the phone still receives it. Leave the third argument out and the acting device receives the event too.
+
+That distinction decides what your client code can safely do when an event arrives:
+
+| What the event handler does | Safe when the member's own action caused it? |
+| --------------------------- | ------------------------------------------- |
+| Updates cached or displayed data | Yes. The end state is the same whoever acted, so running it twice changes nothing. |
+| Shows something to the member, such as a message, a redirect, a dialog, or moving keyboard focus | No. The member already saw the result of their own action, so this repeats it. |
+
+The second row is the one to design for. A member who deletes a suggestion and gets both "Suggestion deleted" from their own action and "This suggestion was deleted" from the event has seen the same fact reported twice, in a way that reads like a bug. On a second device it is stranger still, because the message arrives on a screen the member is not looking at.
+
+Two things follow. First, pass the calling client to any broadcast whose handler shows something, so the acting device is left out. Second, since that does not cover the member's other devices, a handler that shows something needs to check whether the event describes a change this member just made. [Use a service from the client side](../develop/networking/use-service.md#how-events-from-your-own-actions-work) shows the pattern.
+
 ## Step 2: Choose how to show activity
 
 Real-time activity should be easy to notice. You have a few good options:

@@ -40,6 +40,8 @@ Root uses `RootServerException` to report system-level failures and unhandled se
 
 The system-error codes and when they occur are defined in the `RootServerExceptionType` enum. Root uses **negative numbers** for these error codes.
 
+One of these is worth knowing about while you are designing your services rather than after you hit it. `MessageTooLong` means a message exceeded the 256 KiB limit, and its message names the method and the byte count, for example `Message too long /suggestionbox.SuggestionService/List -> 431689`. The most common cause is a method that returns a whole collection in one response. See [Plan your services](plan-services.md#plan-for-the-message-size-limit) for the limit and how to design around it.
+
 ## Custom errors
 
 Use `RootServerException` to report custom failure information from your server to your client. Use **positive numbers** for your own error codes.

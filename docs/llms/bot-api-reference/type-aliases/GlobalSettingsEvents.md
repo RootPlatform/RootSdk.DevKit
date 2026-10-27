@@ -15,7 +15,7 @@ Event map type for `GlobalSettings`. This type defines the event signatures for 
 
 > **button**: (`event`: [`GlobalSettingButtonEvent`](GlobalSettingButtonEvent.md)) => `void`
 
-Emitted when a community member presses a `button` setting. The listener receives a `GlobalSettingButtonEvent` identifying which button was pressed.
+Never emitted. Root does not support the `button` setting type: the Root clients don't show it, and your server never receives this event.
 
 #### Parameters
 

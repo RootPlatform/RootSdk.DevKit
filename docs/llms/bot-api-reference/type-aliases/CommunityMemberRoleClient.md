@@ -37,7 +37,7 @@ A promise that resolves when the role has been assigned.
 
 #### Throws
 
-`RootApiException` with `errorCode` set to `NotFound` if the role or any user does not exist, or `NoPermissionToAdd` if missing required permissions or attempting to assign the `@everyone` role.
+`RootApiException` with `errorCode` set to `NotFound` if the role or any user does not exist, or `NoPermissionToAdd` if missing required permissions, if the role carries permissions that the caller does not hold through its own roles, or if attempting to assign the `@everyone` role.
 
 ### addSelf()
 
@@ -95,7 +95,7 @@ A promise that resolves when the role has been removed.
 
 #### Throws
 
-`RootApiException` with `errorCode` set to `NotFound` if the role or any user does not exist, or `NoPermissionToDelete` if missing required permissions or attempting to remove the `@everyone` role.
+`RootApiException` with `errorCode` set to `NotFound` if the role or any user does not exist, or `NoPermissionToDelete` if missing required permissions, if the role carries permissions that the caller does not hold through its own roles, or if attempting to remove the `@everyone` role.
 
 ### removeSelf()
 

@@ -21,6 +21,8 @@ Provides methods to download assets and images from the Root client.
 
 > **device**: [`RootClientDevice`](RootClientDevice.md)
 
+Provides information about the device your client is running on.
+
 ### lifecycle
 
 > **lifecycle**: [`RootClientLifecycle`](RootClientLifecycle.md)
@@ -30,6 +32,8 @@ Lifecycle events for your client-side component.
 ### links
 
 > **links**: `RootClientLink`
+
+Provides a method to create a shareable link that opens your app at a specific screen.
 
 ### theme
 

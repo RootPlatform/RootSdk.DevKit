@@ -61,7 +61,7 @@ flowchart LR
 
 Root App clients run in a browser-like environment. They use **ES modules** because they're the standard for writing modular, browser-friendly JavaScript.
 
-The client has access to most browser functionality except for native resources and networking (e.g., you won't be able to access the file system, webcam, audio hardware, or make network calls).
+The client has access to most browser functionality except for native resources and networking (e.g., you won't be able to access the file system, webcam, microphone, or make network calls). Your client can play audio files that ship in its package. See [Audio](audio.md).
 
 ## Local testing
 

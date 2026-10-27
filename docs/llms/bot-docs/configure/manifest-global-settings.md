@@ -171,7 +171,6 @@ rootServer.globalSettings.on("update", (event: GlobalSettingsUpdateEvent) => {
 
 ### `text`
 
-> **Note:** The Root clients don't yet show a UI for this type. Admins can't configure it until client support ships.
 Free-form text input. Your server receives `string | undefined`.
 
 | Property | Type | Description |
@@ -181,7 +180,6 @@ Free-form text input. Your server receives `string | undefined`.
 
 ### `number`
 
-> **Note:** The Root clients don't yet show a UI for this type. Admins can't configure it until client support ships.
 Numeric input. Your server receives `number | undefined`.
 
 | Property | Type | Description |
@@ -193,7 +191,6 @@ Numeric input. Your server receives `number | undefined`.
 
 ### `checkbox`
 
-> **Note:** The Root clients don't yet show a UI for this type. Admins can't configure it until client support ships.
 Boolean toggle. Your server receives `boolean`.
 
 | Property | Type | Description |
@@ -222,7 +219,6 @@ Select one or more channel groups. Your server receives `ChannelGroupGuid[]`.
 
 ### `select`
 
-> **Note:** The Root clients don't yet show a UI for this type. Admins can't configure it until client support ships.
 Dropdown with custom options. Your server receives `string[]`.
 
 | Property | Type | Description |
@@ -260,26 +256,12 @@ Color picker. Your server receives `string | undefined` (hex code).
 
 ### `button`
 
-> **Note:** The Root clients don't yet show a UI for this type. Admins can't configure it until client support ships.
-Action button displayed in settings. No value is sent to your server. Instead, a `button` event fires.
-
-| Property | Type | Description |
-| -------- | ---- | ----------- |
-| `title` | `string` | Text shown on the button. |
-
-**Listen for button presses:**
-
-```ts
-rootServer.globalSettings.on("button", (event: GlobalSettingButtonEvent) => {
-  console.log(`Button pressed: ${event.key}`);
-});
-```
+Root does not support this type. The manifest accepts it, but the Root clients don't show it, and your server never receives a `button` event. To give admins an action to run, add it to a settings screen inside your app.
 
 ## Events
 
-`GlobalSettings` emits two events:
+`GlobalSettings` emits one event:
 
 | Event | Payload | Fires when |
 | ----- | ------- | ---------- |
 | `update` | `GlobalSettingsUpdateEvent` | A community member changes any setting value. |
-| `button` | `GlobalSettingButtonEvent` | A community member presses a `button` setting. |

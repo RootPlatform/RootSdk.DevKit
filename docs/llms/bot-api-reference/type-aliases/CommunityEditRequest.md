@@ -11,6 +11,14 @@ Request object for editing a community's properties.
 
 ## Properties
 
+### bannerTokenUri?
+
+> `optional` **bannerTokenUri?**: `string`
+
+### category?
+
+> `optional` **category?**: [`CommunityCategory`](../enumerations/CommunityCategory.md)
+
 ### defaultChannelId?
 
 > `optional` **defaultChannelId?**: [`ChannelGuid`](ChannelGuid.md)
@@ -54,6 +62,10 @@ Optional token URI for the community picture. Only used when `updatePicture` is 
 > **rejectUnverifiedEmail**: `boolean`
 
 When true, users without verified email addresses cannot join the community. Required.
+
+### updateBanner?
+
+> `optional` **updateBanner?**: `boolean`
 
 ### updatePicture
 

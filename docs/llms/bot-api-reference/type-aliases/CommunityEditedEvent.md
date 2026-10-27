@@ -11,6 +11,14 @@ Event data emitted when a community's properties are modified.
 
 ## Properties
 
+### bannerAssetUri?
+
+> `optional` **bannerAssetUri?**: `string`
+
+### category
+
+> **category**: [`CommunityCategory`](../enumerations/CommunityCategory.md)
+
 ### communityId
 
 > **communityId**: [`CommunityGuid`](CommunityGuid.md)

@@ -19,7 +19,7 @@
           "deploy": [
             "dist"
           ],
-          "node_modules": [
+          "nodeModules": [
             "node_modules"
           ]
         }
@@ -53,7 +53,7 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Package",
       "description": "Deployment and startup configuration for your Bot.",
-      "x-doc-details": "When you push, the CLI reads these paths and creates a .pkg archive containing root-manifest.json and server.tar.gz (from deploy and node_modules). Bots have no client-side component.",
+      "x-doc-details": "When you push, the CLI reads these paths and creates a .pkg archive containing root-manifest.json and server.tar.gz (from deploy and nodeModules). Bots have no client-side component.",
       "type": "object",
       "required": [
         "server"
@@ -65,7 +65,7 @@
           "required": [
             "launch",
             "deploy",
-            "node_modules"
+            "nodeModules"
           ],
           "properties": {
             "launch": {
@@ -87,7 +87,7 @@
                 ]
               ]
             },
-            "node_modules": {
+            "nodeModules": {
               "type": "array",
               "description": "node_modules directories to bundle with your server (production dependencies). The CLI automatically excludes sqlite3 and @rootsdk/dev-tools from the bundle.",
               "items": {
@@ -112,7 +112,7 @@
               "deploy": [
                 "dist"
               ],
-              "node_modules": [
+              "nodeModules": [
                 "node_modules"
               ]
             }

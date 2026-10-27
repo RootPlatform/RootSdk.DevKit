@@ -15,4 +15,4 @@ Request object for marking your code's channel as recently active.
 
 > `optional` **communityId?**: [`CommunityGuid`](CommunityGuid.md)
 
-The community whose channel activity is being set. Optional for single-tenant apps and bots, which default to the community the code is running for. Required for multi-tenant apps.
+The community whose channel activity is being set. Optional. Defaults to the community your code is running for.

@@ -139,6 +139,10 @@ summary: Enumeration (Error Handling).
 
 > **PolicyChallengeMismatch**: `404`
 
+### PolicyCommunityNotDiscoverable
+
+> **PolicyCommunityNotDiscoverable**: `406`
+
 ### PolicyLastPrimaryAuthFactor
 
 > **PolicyLastPrimaryAuthFactor**: `402`
@@ -194,6 +198,14 @@ summary: Enumeration (Error Handling).
 ### UploadNotFound
 
 > **UploadNotFound**: `15`
+
+### WebRtcBackendMismatch
+
+> **WebRtcBackendMismatch**: `6000`
+
+### WebRtcCallBanned
+
+> **WebRtcCallBanned**: `6001`
 
 ### WrongType
 

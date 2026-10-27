@@ -17,6 +17,10 @@ Event data emitted when a message's content is modified.
 
 The ID of the channel containing the message.
 
+### channelName?
+
+> `optional` **channelName?**: `string`
+
 ### communityId?
 
 > `optional` **communityId?**: [`CommunityGuid`](CommunityGuid.md)

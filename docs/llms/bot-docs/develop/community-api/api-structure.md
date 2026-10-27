@@ -31,6 +31,8 @@ export type RootServer =
     channelGroups         : ChannelGroupClient,
     channelMessages       : ChannelMessageClient,
     communities           : CommunityClient,
+    communityEmojis       : CommunityEmojiClient,
+    communityLinks        : CommunityLinkClient,
     communityMemberBans   : CommunityMemberBanClient,
     communityMemberInvites: CommunityMemberInviteClient,
     communityRoles        : CommunityRoleClient,
@@ -39,6 +41,7 @@ export type RootServer =
     channelDirectories    : ChannelDirectoryClient,
     channelFiles          : ChannelFileClient,
     channelWebRtcs        : ChannelWebRtcClient,
+    notifications         : NotificationClient,
   };
   // ...
 }
@@ -94,7 +97,8 @@ export type ChannelMessageEvents =
   'channelMessage.created'            : (evt: ChannelMessageCreatedEvent           ) => void,
   'channelMessage.edited'             : (evt: ChannelMessageEditedEvent            ) => void,
   'channelMessage.deleted'            : (evt: ChannelMessageDeletedEvent           ) => void,
-  'channelMessage.set.typingIndicator': (evt: ChannelMessageSetTypingIndicatorEvent) => void
+  'channelMessage.set.typingIndicator': (evt: ChannelMessageSetTypingIndicatorEvent) => void,
+  'channelMessageReaction.deleted.full': (evt: ChannelMessageReactionDeletedFullEvent) => void
 }
 ```
 
@@ -112,7 +116,8 @@ export enum ChannelMessageEvent
   ChannelMessageCreated            = 'channelMessage.created',
   ChannelMessageEdited             = 'channelMessage.edited',
   ChannelMessageDeleted            = 'channelMessage.deleted',
-  ChannelMessageSetTypingIndicator = 'channelMessage.set.typingIndicator'
+  ChannelMessageSetTypingIndicator  = 'channelMessage.set.typingIndicator',
+  ChannelMessageReactionDeletedFull = 'channelMessageReaction.deleted.full'
 }
 ```
 
@@ -129,3 +134,9 @@ rootServer.community.channelMessages.on(ChannelMessageEvent.ChannelMessageCreate
 //
 rootServer.community.channelMessages.on('channelMessage.created', onCreated);
 ```
+
+### The enum is the complete list
+
+A client's enum names every event that client emits, so it is the list to work from.
+
+The SDK also exports one type per event, such as `ChannelMessageCreatedEvent`. A few of those types belong to events that no client offers, so finding the type is not proof that you can subscribe to it. If the name is not in a client's enum, there is nothing to subscribe to.

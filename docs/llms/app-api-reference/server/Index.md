@@ -48,12 +48,17 @@ Client-side events and lifecycle types.
 Community management, member events, roles, bans, and moderation.
 
 - [CommunityAppLogType](enumerations/CommunityAppLogType.md) - Enum defining severity levels for community app log entries.
+- [CommunityCategory](enumerations/CommunityCategory.md) - Enumeration (Community).
+- [CommunityDiscoverableRequirement](enumerations/CommunityDiscoverableRequirement.md) - Enumeration (Community).
+- [CommunityDiscoverySort](enumerations/CommunityDiscoverySort.md) - Enumeration (Community).
 - [CommunityEmojiEvent](enumerations/CommunityEmojiEvent.md) - Enum providing string constants for community emoji event names.
 - [CommunityEvent](enumerations/CommunityEvent.md) - Enum providing string constants for community event names.
+- [CommunityJoinSource](enumerations/CommunityJoinSource.md) - Enumeration (Community).
 - [CommunityLeaveReason](enumerations/CommunityLeaveReason.md) - Enum indicating why a user left a community.
 - [CommunityMemberBanEvent](enumerations/CommunityMemberBanEvent.md) - Enum providing string constants for community member ban event names.
 - [CommunityMemberEvent](enumerations/CommunityMemberEvent.md) - Enum providing string constants for community member event names.
 - [CommunityMemberRoleEvent](enumerations/CommunityMemberRoleEvent.md) - Enum providing string constants for member role event names.
+- [CommunityMemberSort](enumerations/CommunityMemberSort.md) - Enumeration (Community).
 - [CommunityRoleEvent](enumerations/CommunityRoleEvent.md) - Enum providing string constants for role event names.
 
 #### Content Moderation
@@ -94,6 +99,13 @@ Message types, directions, and related types.
 - [MessageDirectionTake](enumerations/MessageDirectionTake.md) - Controls the direction of message pagination when listing messages with `ChannelMessageClient.list()`.
 - [MessageType](enumerations/MessageType.md) - Enum indicating the type of message.
 
+#### Notifications
+
+Notification types and delivery.
+
+- [NotificationMuteDuration](enumerations/NotificationMuteDuration.md) - Enumeration (Notifications).
+- [NotificationStatus](enumerations/NotificationStatus.md) - Enumeration (Notifications).
+
 #### Root Core
 
 Core types: GUIDs, exceptions, and utility classes.
@@ -106,6 +118,13 @@ Core types: GUIDs, exceptions, and utility classes.
 User profiles, online status, friendships, and direct messages.
 
 - [UserOnlineStatus](enumerations/UserOnlineStatus.md) - A community member's current online status.
+
+#### Voice & WebRTC
+
+Voice channel WebRTC device and user info types.
+
+- [WebRtcBackend](enumerations/WebRtcBackend.md) - Which WebRTC interface a client must use.
+- [WebRtcCallResult](enumerations/WebRtcCallResult.md) - Enumeration (Voice & WebRTC).
 
 ## Classes
 
@@ -395,6 +414,7 @@ Community management, member events, roles, bans, and moderation.
 - [CommunityRoleEvents](type-aliases/CommunityRoleEvents.md) - Event map type for `CommunityRoleClient`.
 - [CommunityRoleGetRequest](type-aliases/CommunityRoleGetRequest.md) - Request object for retrieving a single role by its ID.
 - [CommunityRoleGuid](type-aliases/CommunityRoleGuid.md) - Identifies a role within a community.
+- [CommunityRoleListItem](type-aliases/CommunityRoleListItem.md) - Object type with properties: channelPermission, colorHex, communityPermission, id, ...
 - [CommunityRoleMovedEvent](type-aliases/CommunityRoleMovedEvent.md) - Event payload emitted when a role's display order changes in the community's role list.
 - [CommunityRoleMoveRequest](type-aliases/CommunityRoleMoveRequest.md) - Request object for changing a role's display position.
 
@@ -422,7 +442,7 @@ File references and upload types.
 Community-configurable settings declared in the manifest.
 
 - [GlobalSetting](type-aliases/GlobalSetting.md) - Union type representing any individual setting value.
-- [GlobalSettingButtonEvent](type-aliases/GlobalSettingButtonEvent.md) - Event payload delivered when a community member presses a `button` setting.
+- [GlobalSettingButtonEvent](type-aliases/GlobalSettingButtonEvent.md) - Payload type for the `button` event.
 - [GlobalSettingChannel](type-aliases/GlobalSettingChannel.md) - The value of a `channel` setting: `ChannelGuid[]`.
 - [GlobalSettingChannelGroup](type-aliases/GlobalSettingChannelGroup.md) - The value of a `channelGroup` setting: `ChannelGroupGuid[]`.
 - [GlobalSettingCheckbox](type-aliases/GlobalSettingCheckbox.md) - The value of a `checkbox` setting: `boolean`.
@@ -504,6 +524,7 @@ Core types: GUIDs, exceptions, and utility classes.
 
 User profiles, online status, friendships, and direct messages.
 
+- [UserBadge](type-aliases/UserBadge.md) - Object type with properties: createdAt, id (Users).
 - [UserGuid](type-aliases/UserGuid.md) - Identifies a user, app, or bot account.
 - [UserSetProfileEvent](type-aliases/UserSetProfileEvent.md) - Event payload emitted when a user updates any part of their profile (picture, description, banner, or status).
 

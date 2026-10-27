@@ -17,6 +17,10 @@ Represents a message in a channel.
 
 The ID of the channel containing the message.
 
+### channelName?
+
+> `optional` **channelName?**: `string`
+
 ### communityId?
 
 > `optional` **communityId?**: [`CommunityGuid`](CommunityGuid.md)

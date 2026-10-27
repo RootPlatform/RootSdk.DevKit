@@ -149,13 +149,13 @@ A promise that resolves to the `CommunityRole` object.
 
 ### list()
 
-> **list**(): `Promise`<[`CommunityRole`](CommunityRole.md)[]>
+> **list**(): `Promise`<[`CommunityRoleListItem`](CommunityRoleListItem.md)[]>
 
 Lists all roles in the community, including the default `@everyone` role. Roles are returned sorted by display position.
 
 #### Returns
 
-`Promise`<[`CommunityRole`](CommunityRole.md)[]>
+`Promise`<[`CommunityRoleListItem`](CommunityRoleListItem.md)[]>
 
 A promise that resolves to an array of `CommunityRole` objects.
 
