@@ -17,7 +17,7 @@ At least one target field must resolve to a member. If `userIds`, `communityRole
 
 > `optional` **communityId?**: [`CommunityGuid`](CommunityGuid.md)
 
-The community to send in. Optional for single-tenant apps and bots, which default to the community the code is running for. Required for multi-tenant apps.
+Optional. Defaults to the community your code is running for.
 
 ### communityRoleIds?
 

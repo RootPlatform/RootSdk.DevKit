@@ -1,10 +1,10 @@
 # Root Developer Documentation
 
-> Root is a platform for building real-time, multi-user community applications. Developers build Apps (with a React/TypeScript client UI hosted in a Chromium container, plus a server) or Bots (server-only automation). Server code runs in the Root cloud with built-in SQLite persistence and a community API for messaging, moderation, and events. Apps define custom client-server networking using Protobuf. SDKs: `@rootsdk/server-app`, `@rootsdk/server-bot`, `@rootsdk/client`.
+> Root is a platform for building real-time, multi-user community applications. Developers build Apps (with a React/TypeScript client UI hosted in a Chromium container, plus a server) or Bots (server-only automation). Server code runs in the Root cloud with built-in SQLite persistence and a community API for messaging, moderation, and events. Apps define custom client-server networking using Protobuf. SDKs: `@rootsdk/server-app`, `@rootsdk/server-bot`, `@rootsdk/client-app`.
 
 ## Instructions
 
-- Apps use `@rootsdk/server-app` (server) and `@rootsdk/client` (client). Bots use `@rootsdk/server-bot`.
+- Apps use `@rootsdk/server-app` (server) and `@rootsdk/client-app` (client). Bots use `@rootsdk/server-bot`.
 - TypeScript-first. All examples use TypeScript.
 - Server code runs in the Root cloud. Client code runs in a Chromium container.
 - For real-time data, use event subscriptions, not polling.
@@ -25,12 +25,17 @@ This file is the index. Use it to find the per-page chunk you need under `llms/`
 
 Cross-cutting behaviours, resolution rules, and lifecycle semantics. Load the linked guide when a question is about *how something works* rather than *what types exist*.
 
-- **How packaging works**: When you push, the CLI: → [Manifest `package`](llms/app-docs/configure/manifest-package.md)
+- **How packaging works**: The deploy array can include multiple directories if your compiled output spans more than one folder (e.g., ["server/dist", "networking/gen/server"]). → [Manifest `package`](llms/app-docs/configure/manifest-package.md)
 - **How the developer log works**: When your server writes to stdout or stderr, Root captures the output and makes it visible in the Developer Portal. → [Developer log](llms/app-docs/debug/logging-developer.md)
-- **How Root's client-server model works**: Root Apps have three main parts that you'll code: → [Plan your App's client-server networking API](llms/app-docs/design/client-server-networking.md)
+- **How Root's client-server model works**: In this article, we'll discuss the networking portion of your App. → [Plan your App's client-server networking API](llms/app-docs/design/client-server-networking.md)
+- **How broadcast delivery works**: A broadcast reaches every client that is subscribed to the event in the group you send it to, and that includes the member whose own action caused it. → [Make your App feel collaborative](llms/app-docs/design/make-collaborative.md)
 - **How do permissions work?**: As a developer, you declare the permissions you need, and Root grants them to your code at runtime. → [Choose your permissions](llms/app-docs/design/permissions.md)
+- **How App links work**: Members share App links by pasting them into a channel, so what your link does depends on where it lands and who reads it. → [App links](llms/app-docs/develop/client/app-links.md)
 - **What is the client lifecycle?**: The *client lifecycle* is the set of states your App's client moves through while running inside the Root native client. → [Client lifecycle](llms/app-docs/develop/client/client-lifecycle.md)
 - **How it works**: When a RootServerException is thrown by you or by the Root infrastructure, Root serializes it and sends it across the network to your client. → [Exception handling](llms/app-docs/develop/networking/handle-exceptions.md)
+- **How the message size limit works**: When a message exceeds the limit, Root throws a RootServerException with the code MessageTooLong and a message naming the method and the byte count,... → [Plan your services](llms/app-docs/develop/networking/plan-services.md)
+- **How events from your own actions work**: A broadcast reaches every subscribed client in the group the server sent it to. → [Use a service from the client side](llms/app-docs/develop/networking/use-service.md)
+- **How the client rate limit works**: Root limits how often your client can call your own service methods: 10 requests per second and 512 KiB per second. → [Use a service from the client side](llms/app-docs/develop/networking/use-service.md)
 - **How assets work**: The asset lifecycle involves coordination between your client code and server code: → [Assets](llms/app-docs/develop/server/assets.md)
 - **How client attachment works**: Understanding the event model helps you choose the right events to subscribe to and predict what your code will receive. → [Client attachment](llms/app-docs/develop/server/client-attachment.md)
 - **How access rules work**: When your code creates or modifies access rules, you need to understand how Root combines them with base permissions. → [Access rules](llms/app-docs/develop/server/community-api/access-rules.md)
@@ -45,7 +50,10 @@ Cross-cutting behaviours, resolution rules, and lifecycle semantics. Load the li
 - **How member groups work**: Understanding how membership resolves helps you design groups that stay accurate as your community changes. → [Member groups](llms/app-docs/develop/server/member-groups.md)
 - **Lifecycle callbacks**: The Root API lets you register two lifecycle callbacks that Root invokes when your server enters the corresponding state. → [Server lifecycle](llms/app-docs/develop/server/server-lifecycle.md)
 - **What is the server lifecycle?**: The *lifecycle* is the set of states your server moves through: *NotRunning*, *Starting*, *Started*, and *Stopping*. → [Server lifecycle](llms/app-docs/develop/server/server-lifecycle.md)
-- **How Root Apps work**: Root Apps follow a client-server model, which means they have three main parts: → [Root App overview](llms/app-docs/get-started/app-overview.md)
+- **How native dependencies work**: Packaging does not rebuild native modules. → [Server project overview](llms/app-docs/develop/server/server-project-overview.md)
+- **How the package size limit works**: Your uploaded package cannot exceed 100 MiB. → [Server project overview](llms/app-docs/develop/server/server-project-overview.md)
+- **How Root Apps work**: When you build a Root App, you'll code all three of these components. → [Root App overview](llms/app-docs/get-started/app-overview.md)
+- **How packaging works**: The deploy array can include multiple directories if your compiled output spans more than one folder. → [Manifest `package`](llms/bot-docs/configure/manifest-package.md)
 - **How channel files work**: Understanding the directory structure helps you build file management features. → [Channel files](llms/bot-docs/develop/community-api/files.md)
 
 ## Worked samples
@@ -193,9 +201,12 @@ Individual articles covering configuration, design, development, and tutorials. 
 - [Choose your permissions](llms/app-docs/design/permissions.md) **[guide]**: Permissions control which parts of the Root Community API your code can use.
 - [Save data early and often](llms/app-docs/design/save-data-early-and-often.md) **[guide]**: All persistent data in your App should be stored on your server.
 - [Should your App look like Root?](llms/app-docs/design/should-it-look-like-root.md) **[guide]**: Does your App have its own brand colors? Or do you want to match Root's colors? Either way works. It's your choice.
+- [App links](llms/app-docs/develop/client/app-links.md) **[guide]**: Create a shareable link to a specific place inside your App, so a member can post it in a channel and send other members straight there.
+- [Audio](llms/app-docs/develop/client/audio.md) **[guide]**: Play sound with an `<audio>` element.
 - [Client lifecycle](llms/app-docs/develop/client/client-lifecycle.md) **[guide]**: Root controls when your App's client starts, when it stops, and when it gets reloaded.
 - [Client project overview](llms/app-docs/develop/client/client-project-overview.md) **[guide]**: This section shows how the client side of a Root App is set up.
 - [Design system reference](llms/app-docs/develop/client/design-system-reference.md) **[guide]**: Style your apps to match the Root visual style using CSS color variables, spacing, typography, and component patterns provided by the Root SDK.
+- [Localization](llms/app-docs/develop/client/localization.md) **[guide]**: Show your App's text in the language each member uses Root in.
 - [Root responsive design](llms/app-docs/develop/client/responsive-ui.md) **[guide]**: Root apps are built using modern web technologies like React and TypeScript.
 - [Theme mode](llms/app-docs/develop/client/theme-mode.md) **[guide]**: Detect and respond to the user's theme preference in your App client.
 - [UI component library](llms/app-docs/develop/client/ui-components.md) **[guide]**: Root provides a library of pre-built UI components designed to integrate seamlessly with the Root platform.

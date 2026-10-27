@@ -43,6 +43,10 @@ A profile badge displayed on a user's account (e.g., Beta Tester, Verified Devel
 
 > **BillingCore**: `41`
 
+### Call
+
+> **Call**: `43`
+
 ### Channel
 
 > **Channel**: `4`

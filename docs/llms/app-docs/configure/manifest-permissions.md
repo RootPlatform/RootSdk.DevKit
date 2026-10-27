@@ -108,4 +108,19 @@ The community can use access rule overlays to modify your channel permissions af
 
 For example, suppose your manifest declares `manageFiles` (which includes create, view, and delete). The community can configure an overlay that removes `manageFiles` and adds only `createFile`. Your code will succeed when creating files but the `delete` method will throw `RootApiException` with `errorCode` set to `NoPermissionToDelete`.
 
+## Roles that carry permissions
+
+`manageRoles` does not let your code give out permissions it does not hold through a role. When your code changes a role that carries permissions, Root compares that role's permissions with the permissions of the roles assigned to your code, plus Everyone. Your manifest permissions are not part of this comparison, and neither is `fullControl`.
+
+The comparison applies to these methods when the role carries permissions:
+
+| Method | Error when the comparison fails |
+| ------ | ------------------------------- |
+| `communityMemberRoles.add` | `NoPermissionToAdd` |
+| `communityMemberRoles.remove` | `NoPermissionToDelete` |
+| `communityRoles.edit` (for the permissions you add or change) | `NoPermissionToAdd` |
+| `communityRoles.delete` | `NoPermissionToDelete` |
+
+For your code to assign roles that carry permissions, a community leader must give your code a role that has at least those permissions. If your code assigns roles, say so in your app's description and setup screens.
+
 For guidance on choosing the right permissions, see [Choose your permissions](../design/permissions.md).

@@ -61,6 +61,23 @@ flowchart LR
 
 Root App servers run in a Node.js environment. They use **CommonJS modules** because they're widely supported and compatible with many existing libraries. It's the traditional module system for server-side code. You'll have access to most core Node.js modules (with some security limitations).
 
+Your server runs on **Node 24 on Alpine Linux**, on x64, with no GPU. Alpine uses **musl** rather than glibc, which matters as soon as one of your dependencies ships a compiled binary.
+
+### How native dependencies work
+
+Packaging does not rebuild native modules. `rootsdk build package` archives your `node_modules` exactly as it exists on your development machine, and the Root cloud extracts that archive as it is. Nothing runs `npm rebuild` or `node-gyp` on the host.
+
+So a compiled `.node` binary built on Windows, on macOS, or on a glibc Linux will not load on the Alpine host, and your server fails at startup rather than at packaging time. Two ways to avoid this:
+
+- **Prefer dependencies written in JavaScript or TypeScript.** Most packages that offer a native build also work without one.
+- **If you need a compiled dependency, install it against a matching target**: Node 24, Linux, x64, musl. A WebAssembly build avoids the problem completely, because there is no native binary to load.
+
+### How the package size limit works
+
+Your uploaded package cannot exceed **100 MiB**. This is a limit on the package you upload, not on the data your App stores later, and an upload above it is rejected.
+
+Two things commonly push a package over the limit: bundling large binary assets that belong in the asset pipeline, and shipping the whole of a large dependency when you use one part of it. If you are close to the limit, check what is in `node_modules` before anything else.
+
 ## Local testing
 
 Root App clients can be testing locally by running the `rootsdk-devhost` tool that's part of the Root SDK. There are scripts in the server's `package.json` file to build the server and run the `rootsdk-devhost` tool.

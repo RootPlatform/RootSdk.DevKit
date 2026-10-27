@@ -72,6 +72,32 @@ Here are the recommended parameter and return values for the core suggestion ope
 | `Update` | ID and new text | None |
 | `Delete` | ID              | None |
 
+## Plan for the message size limit
+
+A single Root message cannot exceed **256 KiB** (262,144 bytes). The limit applies to each request, each response, and each broadcast, and it is measured on the _serialized_ message rather than on the size of your objects in memory. Plan your data flow around it now, because designing a paged `List` is much less work than changing one later.
+
+Look again at the recommended return values above. `List` returns an array of every suggestion in the community, which is the kind of response most likely to exceed the limit. Twenty suggestions is a few kilobytes. Twenty thousand suggestions, each with a long text body and a list of voter IDs, is not.
+
+Three practices keep your messages under the limit:
+
+- **Page anything that returns a collection.** Take a count and an offset (or a cursor) as parameters and return one page at a time, rather than returning everything and letting the client decide what to show.
+- **Send references to binary data, not the data itself.** Store uploaded images as assets and put the asset URI in your message. A single embedded image can consume the entire budget on its own.
+- **Return only the fields the screen needs.** A list view rarely needs every field of every row. A detail view can fetch the rest for one item.
+
+Broadcasts have the same limit and need particular care, because a broadcast that sends a whole updated collection grows as the community grows, while a broadcast that sends a single changed object does not.
+
+### How the message size limit works
+
+When a message exceeds the limit, Root throws a `RootServerException` with the code `MessageTooLong` and a message naming the method and the byte count, such as `Message too long /suggestionbox.SuggestionService/List -> 431689`. Where that surfaces depends on which message was too big:
+
+| Oversized message | What happens |
+| ----------------- | ------------ |
+| Request | The client throws before anything is sent, so your calling code catches it and no request reaches the server. |
+| Response | The server throws after building the response, and the client's call rejects with the same code and message. For a fire-and-forget method, which has no response, the error is only recorded in your server logs. |
+| Broadcast | The server throws inside the broadcast call, so your server code sees the error and **the clients receive nothing**. |
+
+Design for this limit rather than trying to test for it, because the failure is easy to miss. The size of a message depends on the data in the community, not on your code, so an App can pass every test, work correctly in every review, and then fail in the first community whose data grows past the limit. There is no warning as a response gets close to it.
+
 ## Record user identity on the server
 
 Every Root user gets a unique ID string when they create their Root account. Almost every service method you code will need to know this user ID so it can track which user made each request.
@@ -130,5 +156,6 @@ On the client side, each broadcast method triggers a unique event. Clients can s
 Good service planning makes your Root App simpler, faster, and easier to build. Keep your services small and organized:
 - Define clear operations
 - Plan how data moves between client and server
+- Keep every message under the 256 KiB limit, and page anything that returns a collection
 - Track member identities
 - Use broadcasts to keep everyone updated.

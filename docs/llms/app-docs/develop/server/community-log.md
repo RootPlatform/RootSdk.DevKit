@@ -47,7 +47,7 @@ Messages are not visible to you as the developer. If you need logs for your own 
 Access the community log client via `rootServer.dataStore.logs.community`. Call the `create` method with a request containing the severity level and message.
 
 ```ts
-import { rootServer, CommunityAppLogType } from "@rootsdk/server";
+import { rootServer, CommunityAppLogType } from "@rootsdk/server-app";
 
 await rootServer.dataStore.logs.community.create({
   communityAppLogType: CommunityAppLogType.Warn,

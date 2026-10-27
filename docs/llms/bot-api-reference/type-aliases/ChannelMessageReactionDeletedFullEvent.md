@@ -31,6 +31,10 @@ The unique identifier of the community. Optional.
 
 The unique identifier of the message the reactions were removed from.
 
+### messageUserId
+
+> **messageUserId**: [`UserGuid`](UserGuid.md)
+
 ### shortcode
 
 > **shortcode**: `string`

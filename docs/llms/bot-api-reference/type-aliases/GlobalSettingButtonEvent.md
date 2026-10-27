@@ -2,12 +2,12 @@
 path: bot-api-reference/type-aliases/GlobalSettingButtonEvent.md
 audience: bot
 category: reference
-summary: Event payload delivered when a community member presses a `button` setting.
+summary: Payload type for the `button` event. Root does not support the `button` setting type, so this event is never emitted.
 ---
 
 > **GlobalSettingButtonEvent** = `object`
 
-Event payload delivered when a community member presses a `button` setting.
+Payload type for the `button` event. Root does not support the `button` setting type, so this event is never emitted.
 
 ## Properties
 
@@ -15,10 +15,10 @@ Event payload delivered when a community member presses a `button` setting.
 
 > **communityId**: [`CommunityGuid`](CommunityGuid.md)
 
-The ID of the community where the button was pressed.
+The ID of the community the event would refer to.
 
 ### key
 
 > **key**: `string`
 
-The full key identifying which button was pressed, in the format `groupKey.itemKey`.
+The full key of the `button` setting, in the format `groupKey.itemKey`.

@@ -62,7 +62,7 @@ You can target members three ways, and you can combine them in a single call:
 
 The SDK resolves roles and member groups into user IDs on your server, merges all three sources into a single set, and sends only user IDs to the platform. Because the set is deduplicated, a member who appears in `userIds` and also holds a targeted role receives one notification, not two.
 
-`communityId` is optional. Single-tenant apps and bots can omit it, and the SDK uses the community the code is running for. Multi-tenant apps must pass it explicitly.
+`communityId` is optional. You can omit it, and the SDK uses the community your code is running for.
 
 ### Target limits
 
@@ -107,6 +107,8 @@ Two further constraints:
 - **Your code must hold a channel in the community.** If it does not, passing `relativeUrl` fails the entire send with `RootApiException` and `errorCode` set to `NoPermissionToCreate`. The notification is not delivered without its link, it is not delivered at all. If your code may run without a channel, retry the send without `relativeUrl` rather than losing the message.
 
 Bots have no client interface to open, so `relativeUrl` does not apply to them.
+
+An App can also create the same kind of link for a member to share, rather than for a notification to open. See App links in the Client section.
 
 ## Set community activity
 

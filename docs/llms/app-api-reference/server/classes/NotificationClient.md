@@ -69,7 +69,7 @@ The platform debounces this to one call per second. Calls arriving within a seco
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `request` | [`NotificationSetActivityRequest`](../type-aliases/NotificationSetActivityRequest.md) | The community to mark active. Omit `communityId` in single-tenant code. |
+| `request` | [`NotificationSetActivityRequest`](../type-aliases/NotificationSetActivityRequest.md) | The community to mark active. `communityId` is optional and defaults to the community your code is running for. |
 
 #### Returns
 

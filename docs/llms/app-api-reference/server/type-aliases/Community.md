@@ -11,6 +11,14 @@ Represents a Root community and its properties.
 
 ## Properties
 
+### bannerAssetUri?
+
+> `optional` **bannerAssetUri?**: `string`
+
+### category
+
+> **category**: [`CommunityCategory`](../enumerations/CommunityCategory.md)
+
 ### communityId
 
 > **communityId**: [`CommunityGuid`](CommunityGuid.md)

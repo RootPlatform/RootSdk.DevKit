@@ -43,7 +43,7 @@ When you build a Root App, you'll code all three of these components.
 
 ### Client
 
-The client of a Root App is a full GUI written in TypeScript using web tech. The client runs inside a browser-like container where it has access to most browser functionality except for native resources (i.e., you won't be able to access the file system, webcam, audio hardware, etc.).
+The client of a Root App is a full GUI written in TypeScript using web tech. The client runs inside a browser-like container where it has access to most browser functionality except for native resources (i.e., you won't be able to access the file system, webcam, microphone, etc.).
 
 You can choose your preferred UI framework like React, Angular, Vue, etc. You can also pull in third-party packages from registries like [npm](https://www.npmjs.com/). 
 

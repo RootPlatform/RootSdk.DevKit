@@ -11,11 +11,31 @@ Event payload emitted every time a community member opens the community on any d
 
 ## Properties
 
+### badges
+
+> **badges**: [`UserBadge`](UserBadge.md)[]
+
+### bannerAssetUri?
+
+> `optional` **bannerAssetUri?**: `string`
+
 ### communityId
 
 > **communityId**: [`CommunityGuid`](CommunityGuid.md)
 
 The unique identifier of the community.
+
+### communityRoleIds
+
+> **communityRoleIds**: [`CommunityRoleGuid`](CommunityRoleGuid.md)[]
+
+### description?
+
+> `optional` **description?**: `string`
+
+### joinedAt?
+
+> `optional` **joinedAt?**: `Date`
 
 ### onlineStatus
 
@@ -23,8 +43,20 @@ The unique identifier of the community.
 
 The member's online status. See `UserOnlineStatus` for possible values.
 
+### profilePictureAssetUri?
+
+> `optional` **profilePictureAssetUri?**: `string`
+
+### userDefinedStatus?
+
+> `optional` **userDefinedStatus?**: `string`
+
 ### userId
 
 > **userId**: [`UserGuid`](UserGuid.md)
 
 The unique identifier of the member who attached.
+
+### username
+
+> **username**: `string`

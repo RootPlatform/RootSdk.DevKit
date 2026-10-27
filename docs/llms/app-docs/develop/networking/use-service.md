@@ -207,6 +207,37 @@ const createdSuggestion: Suggestion = response.suggestion!;
 // Update your UI with the new suggestion this client created ...
 ```
 
+### How the client rate limit works
+
+Root limits how often your client can call your own service methods: **10 requests per second** and **512 KiB per second**. Exceeding either limit causes the next call to fail.
+
+The call throws an error instead of waiting. Root checks the limit in your client before the request is sent, so the request never reaches the server, it is not queued, and it is not retried for you.
+
+```ts
+import { RootServerException, RootServerExceptionType } from "@rootsdk/client-app";
+
+try {
+  await suggestionServiceClient.list({});
+} catch (error) {
+  if (error instanceof RootServerException && error.code === RootServerExceptionType.RateLimitExceeded) {
+    // Wait briefly and retry, or combine this call with others
+  }
+}
+```
+
+These limits apply only to your App's own service methods. Calls to the Root platform APIs, such as `rootClient.user` and `rootClient.asset`, are not counted, and the community API has its own separate limits. See [Rate limits](../server/community-api/rate-limits.md) for those.
+
+The one-second period is fixed rather than rolling. Both counters reset on the first call made after one second has passed, so a group of calls that spans a reset is counted as two separate seconds.
+
+**This limit is most often reached while your App is starting.** A client that sends a request for every panel as it loads can use all ten requests before the member has done anything, so the member's first action is the call that fails. To avoid this:
+
+- Request what the first screen needs, and load the rest when the member navigates to it.
+- Combine related requests into a single method rather than calling several in a loop.
+- Debounce calls driven by typing or dragging, such as a search field or a reorder.
+- Never call a service once per row in a list. Add a method that takes the whole set instead.
+
+The counters are held in the client process, so reloading your App resets them. This makes the problem easy to miss while you are developing, because reloading between attempts clears the counters, while a member who keeps using your App without reloading does not get that reset.
+
 ### Handle exceptions
 
 When a server method throws a `RootServerException`, the client receives it as a catchable exception. Import `RootServerException` from `@rootsdk/client-app` and your error enum from `gen-shared`.
@@ -256,6 +287,49 @@ const onCreated = (event: SuggestionCreatedEvent) => {
   // Update your UI with the new suggestion
 };
 ```
+
+### How events from your own actions work
+
+A broadcast reaches every subscribed client in the group the server sent it to. Your server can leave out the device that made the request, by passing the calling client as the third argument to the broadcast method, but that excludes **one device** and not one member. A member signed in on two devices still receives their own event on the other one. See [Make your App feel collaborative](../../design/make-collaborative.md#how-broadcast-delivery-works) for the delivery rules.
+
+For handlers that only update cached data, this needs no attention. The end state is the same whoever made the change.
+
+For handlers that show something to the member, it does. Your mutation already told the member what happened, so the event handler tells them a second time. To avoid that, record the change while your own request is in flight and let the handler skip the part the member can see.
+
+```ts
+const pendingDeletes = new Set<number>();
+
+export function isPendingDelete(id: number): boolean {
+  return pendingDeletes.has(id);
+}
+
+export async function deleteSuggestion(id: number): Promise<void> {
+  pendingDeletes.add(id);
+  try {
+    await suggestionServiceClient.delete({ id });
+    // Show your own confirmation here, where you know the member is looking
+  } finally {
+    pendingDeletes.delete(id);
+  }
+}
+```
+
+```ts
+const onDeleted = (event: SuggestionDeletedEvent) => {
+  // Always update cached data. It is the same result whoever deleted the suggestion.
+  removeFromCache(event.id);
+
+  // Only the member who did not delete it needs to be told.
+  if (isPendingDelete(event.id)) return;
+
+  showMessage("This suggestion was deleted");
+  navigateToBoard();
+};
+```
+
+Keep the two halves separate as shown. If the handler returns early before updating the cache, the acting member's own view stops being corrected by the server, and the bug that appears later is hard to connect to this code.
+
+This problem stays hidden while a handler is the only place that shows something. It appears the first time someone adds a message or a redirect to the mutation as well, and at that point the cause looks unrelated to the handler that was written months earlier. When you add a visible action to a mutation, check whether the matching event handler already has one.
 
 ## Conclusion
 
