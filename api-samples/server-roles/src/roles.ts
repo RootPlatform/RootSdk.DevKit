@@ -60,11 +60,13 @@ export function initializeRoles(): void {
 // consecutive hyphens. 1-100 characters. Same regex as channel names.
 // colorHex: exactly 7 characters, format #RRGGBB (e.g., "#AABB01").
 // isMentionable: whether the role can be @mentioned in channels.
+// isSelfAssignable: whether members can give themselves the role.
 // communityPermission and channelPermission define the role's default permissions.
 // Requires manageRoles permission on the community.
 export async function createRole(
   name: string,
   isMentionable: boolean,
+  isSelfAssignable: boolean,
   colorHex?: string,
   communityPermission?: CommunityPermission,
   channelPermission?: ChannelPermission,
@@ -72,6 +74,7 @@ export async function createRole(
   const request: CommunityRoleCreateRequest = {
     name,
     isMentionable,
+    isSelfAssignable,
     colorHex,
     communityPermission,
     channelPermission,
@@ -99,6 +102,7 @@ export async function editRole(
   name: string,
   colorHex: string,
   isMentionable: boolean,
+  isSelfAssignable: boolean,
   communityPermission?: CommunityPermission,
   channelPermission?: ChannelPermission,
 ): Promise<CommunityRole> {
@@ -107,6 +111,7 @@ export async function editRole(
     name,
     colorHex,
     isMentionable,
+    isSelfAssignable,
     communityPermission,
     channelPermission,
   };
@@ -158,7 +163,7 @@ async function onRolesCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
     );
 
     // 2. Create a role
-    const role: CommunityRole = await createRole("test-role", true, "#AA00FF");
+    const role: CommunityRole = await createRole("test-role", true, false, "#AA00FF");
     lines.push(`\u2713 created role: ${role.name} (${role.id}) color=${role.colorHex}`);
 
     // 3. Get the role by ID
@@ -171,13 +176,14 @@ async function onRolesCommand(evt: ChannelMessageCreatedEvent): Promise<void> {
       "renamed-role",
       "#FF0000",
       false,
+      fetched.isSelfAssignable,
       fetched.communityPermission,
       fetched.channelPermission,
     );
     lines.push(`\u2713 edited role: name=${edited.name} color=${edited.colorHex}`);
 
     // 5. Create a second role to test move ordering
-    const role2: CommunityRole = await createRole("test-role-two", false, "#00FF00");
+    const role2: CommunityRole = await createRole("test-role-two", false, false, "#00FF00");
     lines.push(`\u2713 created second role: ${role2.name} (${role2.id})`);
 
     // 6. Move the first role before the second

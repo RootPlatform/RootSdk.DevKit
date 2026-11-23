@@ -55,10 +55,10 @@ Each group is scoped to a `(resourceType, resourceId, name)` triple — your app
 
 ## Events
 
-- `MemberGroupServiceEvent.MembersAdded` — users added to effective membership
-- `MemberGroupServiceEvent.MembersRemoved` — users removed from effective membership
-- `MemberGroupServiceEvent.StateChanged` — group configuration changed (users/roles modified)
-- `MemberGroupServiceEvent.UserGroupEmptied` — effective membership became empty
+- `MemberGroupEvent.MembersAdded` — users added to effective membership
+- `MemberGroupEvent.MembersRemoved` — users removed from effective membership
+- `MemberGroupEvent.StateChanged` — group configuration changed (users/roles modified)
+- `MemberGroupEvent.UserGroupEmptied` — effective membership became empty
 
 ## Apps vs Bots
 
@@ -71,7 +71,7 @@ All code is identical between apps (`@rootsdk/server-app`) and bots (`@rootsdk/s
 - **Instance methods** — unique among all SDK services. You get a `MemberGroup` object and call `.addUser()`, `.removeUser()`, etc. directly on it.
 - **WeakRef caching** — the service caches instances via WeakRef. Subsequent `get()` calls return the SAME in-memory object (not a fresh DB read). Mutations on one reference are visible on all references.
 - **`memberUserIds` is computed** — union of direct `userIds` + all users holding any of the `communityRoleIds`. Updated automatically.
-- **`list()` returns `MemberGroupShort`** — snake_case fields (`resource_type`, `resource_id`, `community_id`). All other methods return full `MemberGroup` instances.
+- **`list()` returns `MemberGroupShort`** — fields `id`, `resourceType`, `resourceId`, `communityId` and `name`. All other methods return full `MemberGroup` instances.
 - **`getByName()` returns undefined** if not found. `get()` throws.
 - **`update()` is atomic replacement** — replaces ALL userIds and communityRoleIds at once, not additive.
 - **Events fire on the service** — subscribe via `rootServer.memberGroups.on()`. Event payload types are not exported from the SDK (use TypeScript inference).

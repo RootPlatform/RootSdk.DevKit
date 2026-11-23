@@ -70,6 +70,7 @@ export async function editCommunity(
   name: string,
   pictureHex: string,
   rejectUnverifiedEmail: boolean,
+  isAgeRestricted: boolean,
   defaultChannelId?: ChannelGuid,
 ): Promise<Community> {
   const request: CommunityEditRequest = {
@@ -79,6 +80,7 @@ export async function editCommunity(
     pictureTokenUri: undefined,
     defaultChannelId,
     rejectUnverifiedEmail,
+    isAgeRestricted,
   };
   return rootServer.community.communities.edit(request);
 }
@@ -111,6 +113,7 @@ async function onCommunityCommand(evt: ChannelMessageCreatedEvent): Promise<void
       originalName + "Edited",
       community.pictureHex,
       community.rejectUnverifiedEmail,
+      community.isAgeRestricted,
       community.defaultChannelId,
     );
     lines.push(`✓ edit: renamed to "${edited.name}"`);
@@ -124,6 +127,7 @@ async function onCommunityCommand(evt: ChannelMessageCreatedEvent): Promise<void
       originalName,
       community.pictureHex,
       community.rejectUnverifiedEmail,
+      community.isAgeRestricted,
       community.defaultChannelId,
     );
     lines.push(`✓ edit (restore): name="${restored.name}"`);

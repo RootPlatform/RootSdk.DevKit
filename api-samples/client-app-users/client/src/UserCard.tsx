@@ -25,7 +25,7 @@ import {
 
 // ImageUriResolution is a string literal type, not an enum.
 // Valid values: "original" | "large" | "medium" | "small"
-import type { ImageUriResolution } from "@rootsdk/client-app";
+import { ImageUriResolution } from "@rootsdk/client-app";
 
 // --- HELPERS -----------------------------------------------------------------
 
@@ -49,10 +49,10 @@ function statusLabel(status: CommunityUserOnlineStatus): string {
 
 // Convert an asset URI to a displayable image URL.
 // Uses rootClient.assets.toImageUrl() with "small" resolution for avatars.
-// ImageUriResolution values: "original" | "large" | "medium" | "small"
+// ImageUriResolution values: Original, Large, Medium, Small
 function profilePictureUrl(
   uri: string | undefined,
-  resolution: ImageUriResolution = "small",
+  resolution: ImageUriResolution = ImageUriResolution.Small,
 ): string | undefined {
   if (!uri) return undefined;
   return rootClient.assets.toImageUrl(uri, resolution);

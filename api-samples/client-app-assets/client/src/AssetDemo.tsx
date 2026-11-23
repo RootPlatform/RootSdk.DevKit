@@ -19,7 +19,7 @@
 //   - FileUploadType: "all" | "text" | "imageAll" | "pdf"
 //   - FileUploadRequest: { fileType, multiple?, windowTitle? }
 //   - FileUploadResponse: { tokens: string[] }
-//   - ImageUriResolution: "original" | "large" | "medium" | "small"
+//   - ImageUriResolution: enum with Original, Large, Medium, Small
 //
 // ============================================================================
 
@@ -28,13 +28,13 @@ import React, { useState, useCallback } from "react";
 import {
   rootClient,
   FileUploadResponse,
+  ImageUriResolution,
   RootServerException,
 } from "@rootsdk/client-app";
 
 import type {
   FileUploadType,
   FileUploadRequest,
-  ImageUriResolution,
 } from "@rootsdk/client-app";
 
 // Generated RPC client — import and call directly (no setup needed).
@@ -54,10 +54,10 @@ const FILE_TYPES: FileUploadType[] = ["all", "text", "imageAll", "pdf"];
 
 // All valid image resolutions for toImageUrl.
 const IMAGE_RESOLUTIONS: ImageUriResolution[] = [
-  "original",
-  "large",
-  "medium",
-  "small",
+  ImageUriResolution.Original,
+  ImageUriResolution.Large,
+  ImageUriResolution.Medium,
+  ImageUriResolution.Small,
 ];
 
 // --- COMPONENT ---------------------------------------------------------------
