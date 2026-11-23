@@ -2,12 +2,12 @@
 path: bot-api-reference/type-aliases/MemberGroupShort.md
 audience: bot
 category: reference
-summary: Lightweight member group metadata returned by `MemberGroupService.list()`. Contains identifying information but no membership data.
+summary: Lightweight member group metadata returned by `rootServer.memberGroups.list()`. Contains identifying information but no membership data.
 ---
 
 > **MemberGroupShort** = `object`
 
-Lightweight member group metadata returned by `MemberGroupService.list()`. Contains identifying information but no membership data. To get full membership details, pass the `id` to `MemberGroupService.get()`.
+Lightweight member group metadata returned by `rootServer.memberGroups.list()`. Contains identifying information but no membership data. To get full membership details, pass the `id` to `rootServer.memberGroups.get()`.
 
 ## Properties
 

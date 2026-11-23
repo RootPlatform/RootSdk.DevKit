@@ -2,12 +2,12 @@
 path: app-api-reference/server/type-aliases/MemberGroupMembersAddedEvent.md
 audience: app
 category: reference
-summary: Payload for the `MemberGroupServiceEvent.MembersAdded` event, emitted when users are added to a member group.
+summary: Payload for the `MemberGroupEvent.MembersAdded` event, emitted when users are added to a member group.
 ---
 
 > **MemberGroupMembersAddedEvent** = `object`
 
-Payload for the `MemberGroupServiceEvent.MembersAdded` event, emitted when users are added to a member group.
+Payload for the `MemberGroupEvent.MembersAdded` event, emitted when users are added to a member group.
 
 ## Properties
 

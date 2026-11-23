@@ -78,7 +78,7 @@ Schedule recurring or one-time tasks.
 
 Member group management and events.
 
-- [MemberGroupEvent](enumerations/MemberGroupEvent.md) - Enumeration (Member Groups).
+- [MemberGroupEvent](enumerations/MemberGroupEvent.md) - Enum providing string constants for member group event names.
 
 #### Messages
 
@@ -455,13 +455,13 @@ Simple persistent key-value storage.
 Member group management and events.
 
 - [MemberGroup](type-aliases/MemberGroup.md) - A named collection of individual users and community roles combined into a single audience.
-- [MemberGroupClient](type-aliases/MemberGroupClient.md) - Type alias for `MemberGroupClientBase` (Member Groups).
-- [MemberGroupEmptiedEvent](type-aliases/MemberGroupEmptiedEvent.md) - Payload for the `MemberGroupServiceEvent.UserGroupEmptied` event, emitted when a member group's resolved membership becomes empty.
-- [MemberGroupEvents](type-aliases/MemberGroupEvents.md) - Object type with properties: members, members, state, userGroup (Member Groups).
-- [MemberGroupMembersAddedEvent](type-aliases/MemberGroupMembersAddedEvent.md) - Payload for the `MemberGroupServiceEvent.MembersAdded` event, emitted when users are added to a member group.
-- [MemberGroupMembersRemovedEvent](type-aliases/MemberGroupMembersRemovedEvent.md) - Payload for the `MemberGroupServiceEvent.MembersRemoved` event, emitted when users are removed from a member group.
-- [MemberGroupShort](type-aliases/MemberGroupShort.md) - Lightweight member group metadata returned by `MemberGroupService.list()`.
-- [MemberGroupStateChangedEvent](type-aliases/MemberGroupStateChangedEvent.md) - Payload for the `MemberGroupServiceEvent.StateChanged` event, emitted when a member group's community role list changes.
+- [MemberGroupClient](type-aliases/MemberGroupClient.md) - Manages custom groups of users and community roles.
+- [MemberGroupEmptiedEvent](type-aliases/MemberGroupEmptiedEvent.md) - Payload for the `MemberGroupEvent.UserGroupEmptied` event, emitted when a member group's resolved membership becomes empty.
+- [MemberGroupEvents](type-aliases/MemberGroupEvents.md) - Event map type for `rootServer.memberGroups`.
+- [MemberGroupMembersAddedEvent](type-aliases/MemberGroupMembersAddedEvent.md) - Payload for the `MemberGroupEvent.MembersAdded` event, emitted when users are added to a member group.
+- [MemberGroupMembersRemovedEvent](type-aliases/MemberGroupMembersRemovedEvent.md) - Payload for the `MemberGroupEvent.MembersRemoved` event, emitted when users are removed from a member group.
+- [MemberGroupShort](type-aliases/MemberGroupShort.md) - Lightweight member group metadata returned by `rootServer.memberGroups.list()`.
+- [MemberGroupStateChangedEvent](type-aliases/MemberGroupStateChangedEvent.md) - Payload for the `MemberGroupEvent.StateChanged` event, emitted when a member group's community role list changes.
 
 #### Messages
 
