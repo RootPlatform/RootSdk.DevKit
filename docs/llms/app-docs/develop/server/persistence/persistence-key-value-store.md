@@ -18,7 +18,7 @@ Root automatically creates an instance of the [KeyValueStore](../../../../app-ap
 Here are the key details to keep in mind:
 
 - Keys are always strings  
-- Values can be any type (Root saves them as JSON strings internally)
+- Values can be any type that JSON can represent (Root saves them as JSON strings internally). `undefined`, functions and symbols can't be stored; to remove a key, use `delete`.
 - All method calls are asynchronous.
 
 ## Example
@@ -47,3 +47,7 @@ const updatedXp: number = await rootServer.dataStore.appData.update<number>(
   0 // Default XP to pass to update function if this userId isn't set yet
 );
 ```
+
+## Match keys with a pattern
+
+`select`, `selectValue` and `deleteLike` take a SQL `LIKE` pattern instead of a single key: `%` matches any run of characters and `_` matches one. To match a literal `%` or `_`, put a backslash before it. Matching is case-insensitive for ASCII letters, so `xp:%` also matches `XP:1`.

@@ -23,7 +23,7 @@ Static utility class that provides a subset of `RootGuidUtils` methods. Delegate
 
 > `static` **parse**<`T`>(`strData`: `string`): `T`
 
-Parses a GUID string and returns its `RootGuidType`.
+Converts a GUID string in any supported form to the 22-character form that events and API results use. Accepts the 36-character dashed form (for example, an ID read from a mention URI) and the 22-character form.
 
 #### Type Parameters
 
@@ -41,7 +41,7 @@ Parses a GUID string and returns its `RootGuidType`.
 
 `T`
 
-The `RootGuidType`.
+The GUID in the 22-character form.
 
 ### toMilliseconds()
 

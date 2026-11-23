@@ -37,3 +37,7 @@ To launch your Bot inside `DevHost`, do the following:
 ## Root native client
 
 To see your Bot interacting with the community, you can launch the Root native client and navigate to the community represented in your `DEV_TOKEN`. The starter-code Bot responds to the `/echo` command and replies with the text you include after the command.
+
+## Run the DevHost in a container
+
+The DevHost only accepts connections from your own machine. If you run it inside a Docker container and publish its ports, set `ROOT_DEV_BIND_IP=0.0.0.0` in the container's environment or in your `.env` file so connections from outside the container reach it.

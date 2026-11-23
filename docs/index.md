@@ -176,6 +176,7 @@ API reference for Root Bot development.
 
 Troubleshooting and support resources.
 
+- [SDK release notes](llms/support/sdk-release-notes.md) **[guide]**: Changes in each release of the Root SDK packages: `@rootsdk/server-app`, `@rootsdk/server-bot`, `@rootsdk/client-app` and `@rootsdk/dev-tools`.
 - [Root developer support](llms/support/support-home.md) **[guide]**: Get help building on Root, whether you want to ask the community or reach the team directly.
 
 ## Optional
@@ -251,7 +252,9 @@ Individual articles covering configuration, design, development, and tutorials. 
 - [What's next?](llms/app-docs/get-started/whats-next.md) **[guide]**: You're ready to start building. Your dev setup is done, your Root account is active, and you've seen how Root code is organized.
 - [Package your code](llms/app-docs/publish/package.md) **[guide]**: The `rootsdk build package` command packages your compiled code for distribution. It creates a `.pkg` file based on your `root-manifest.json`.
 - [Register your App](llms/app-docs/publish/register.md) **[guide]**: To register your App with Root, create a project for it in the Root Developer Portal.
-- [Upload your code](llms/app-docs/publish/upload.md) **[guide]**: The `rootsdk upload` command deploys your code to the Root cloud. You must provide the package file path and a valid authentication token.
+- [Pre-release and release](llms/app-docs/publish/release.md) **[guide]**: After you [upload](./upload.md) a package, it appears as a new version on the **Versions** tab of your project in the [Root Developer...
+- [Store listing](llms/app-docs/publish/store-listing.md) **[guide]**: Your store listing is what people see when they find your App or Bot in the Root store: its name, icon, banner, description, screenshots, category...
+- [Upload your code](llms/app-docs/publish/upload.md) **[guide]**: The `rootsdk upload` command deploys your code to the Root cloud. You must provide the package file path and your upload token.
 - [Generate and test App starter code](llms/app-docs/shared/generate-build-test-app.md) **[guide]**: Root supplies a command-line utility named `create-root` that generates starter code.
 - [Add voting support](llms/app-docs/tutorials/showdown-app/add-vote.md) **[tutorial]**: In this section, you'll add voting support. The UI will have two buttons.
 - [Broadcast new votes](llms/app-docs/tutorials/showdown-app/broadcast-votes.md) **[tutorial]**: In this section, you'll notify all other clients whenever one client adds a vote.
@@ -309,7 +312,9 @@ Individual articles covering configuration, design, development, and tutorials. 
 - [What's next?](llms/bot-docs/get-started/whats-next.md) **[guide]**: You're ready to start building. Your dev setup is done, your Root account is active, and you've seen how Root code is organized.
 - [Package your code](llms/bot-docs/publish/package.md) **[guide]**: The `rootsdk build package` command packages your compiled code for distribution. It creates a `.pkg` file based on your `root-manifest.json`.
 - [Register your Bot](llms/bot-docs/publish/register.md) **[guide]**: To register your Bot with Root, create a project for it in the Root Developer Portal.
-- [Upload your code](llms/bot-docs/publish/upload.md) **[guide]**: The `rootsdk upload` command deploys your code to the Root cloud. You must provide the package file path and a valid authentication token.
+- [Pre-release and release](llms/bot-docs/publish/release.md) **[guide]**: After you [upload](./upload.md) a package, it appears as a new version on the **Versions** tab of your project in the [Root Developer...
+- [Store listing](llms/bot-docs/publish/store-listing.md) **[guide]**: Your store listing is what people see when they find your App or Bot in the Root store: its name, icon, banner, description, screenshots, category...
+- [Upload your code](llms/bot-docs/publish/upload.md) **[guide]**: The `rootsdk upload` command deploys your code to the Root cloud. You must provide the package file path and your upload token.
 - [Generate and test Bot starter code](llms/bot-docs/shared/generate-build-test-bot.md) **[guide]**: Root supplies a command-line utility named `create-root` that generates starter code.
 - [Add member nickname](llms/bot-docs/tutorials/announce-bot/add-member-nickname.md) **[tutorial]**: In this section, the main goal is to include the member's nickname in your Bot's response. But first, you'll change the command your Bot looks for.
 - [Generate and test Bot starter code](llms/bot-docs/tutorials/announce-bot/generate-build-test-bot.md) **[tutorial]**: Root supplies a command-line utility named `create-root` that generates starter code.

@@ -66,6 +66,8 @@ Root clients parse these links and render the corresponding emoji image inline.
 
 Standard (built-in) emojis use a simpler URI with just the shortcode wrapped in colons and no ID segment: `[:thumbsup:](root://emoji/:thumbsup:)`.
 
+A shortcode on its own in message text, such as `:thumbsup:`, is not converted to an emoji and appears as plain text. Use the link format above or the Unicode emoji character. Reactions are different: they take the shortcode directly.
+
 ### Parse community emojis from message content
 
 When you read a message via `channelMessages.get()` or `channelMessages.list()`, community emojis appear in the `messageContent` string as Markdown links with `root://emoji/` URIs.

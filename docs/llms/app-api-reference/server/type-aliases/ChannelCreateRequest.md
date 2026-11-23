@@ -33,7 +33,7 @@ The type of channel to create. Required. Use the `ChannelType` enum values: `Tex
 
 > `optional` **description?**: `string`
 
-Optional description for the channel.
+Optional description for the channel. Maximum 256 characters. Allowed characters are letters A to Z, numbers, spaces, and common punctuation. Line breaks, emoji, and letters outside A to Z are not allowed. A description that violates these rules fails with `RequestValidationFailed`.
 
 ### iconTokenUri?
 
@@ -45,7 +45,7 @@ Optional token URI for the channel icon. Obtain this value from the asset upload
 
 > **name**: `string`
 
-The display name for the new channel. Required.
+The display name for the new channel. Required. Must be 1 to 100 characters and contain only letters, numbers, and hyphens. Spaces are not allowed, and the name cannot start or end with a hyphen or contain consecutive hyphens. Uppercase and lowercase letters are both accepted. A name that violates these rules fails with `RequestValidationFailed`. To build a channel name from arbitrary text, replace each run of disallowed characters with a single hyphen and trim leading and trailing hyphens.
 
 ### useChannelGroupPermission
 

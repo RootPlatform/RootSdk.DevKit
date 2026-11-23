@@ -33,9 +33,9 @@ summary: Object type with properties: channelPermission, colorHex, communityPerm
 
 > **isSelfAssignable**: `boolean`
 
-### memberCount
+### memberCount?
 
-> **memberCount**: `number`
+> `optional` **memberCount?**: `number`
 
 ### name
 

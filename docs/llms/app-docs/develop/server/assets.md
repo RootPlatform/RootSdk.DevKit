@@ -51,6 +51,17 @@ sequenceDiagram
 - **Persist file references**: When your app needs to remember which files a user selected across sessions, store the asset URIs in your key-value store.
 - **Embed images in rich content**: When users create content that includes uploaded images (posts, descriptions, etc.), convert the tokens before storing. Otherwise, the images become inaccessible when the tokens expire.
 
+## Limits and lifetime
+
+- **File size.** The Root desktop client accepts files up to 10 MiB from `fileUpload()`. A larger file is left out of the selection and no error is shown. The Root mobile client accepts images up to 10 MB and other files up to 100 MB, and shows an error above that.
+- **File types.** Root detects a file's type from its content, not from its name. Some types cannot be stored, including executables, scripts, web pages, fonts and TIFF images.
+- **Upload tokens.** Convert a token within 8 hours of the upload. After that it can no longer be converted.
+- **Asset URIs.** An asset URI does not expire.
+- **Deleting.** There is no way to delete an asset. Assets stay stored after your App is removed from a community.
+- **Where assets come from.** Only a member's upload from your App's client produces an upload token. Your server cannot upload a file it creates itself.
+- **Upload limits.** Each member can upload a limited number of files and amount of data in a period of time. Above that, an upload is refused with "Too many uploads" until the limit recovers.
+- **Storage quota.** There is no storage quota per App or per community.
+
 ## Converting tokens to assets
 
 Access the asset client through `rootServer.dataStore.assets`:
