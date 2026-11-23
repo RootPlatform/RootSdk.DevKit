@@ -20,7 +20,7 @@ Create, edit, update (batch), get, delete, and list access rules that grant or d
 
 - `accessRules.create(request, eventHandlers?)` — create an access rule for a role/member on a channel/group
 - `accessRules.edit(request, eventHandlers?)` — replace an access rule's overlay permissions
-- `accessRules.update(request, eventHandlers?)` — batch create, edit, and delete rules in one call
+- `accessRules.bulkCreateEditDelete(request, eventHandlers?)` — batch create, edit, and delete rules in one call
 - `accessRules.get(request)` — get an access rule by composite key
 - `accessRules.delete(request, eventHandlers?)` — delete an access rule
 - `accessRules.listByChannelOrChannelGroup(request)` — list all rules for a channel or channel group
@@ -55,6 +55,6 @@ All code is identical between apps (`@rootsdk/server-app`) and bots (`@rootsdk/s
 - **roleOrMemberId** — targets either a community role or an individual member (person or app).
 - **edit() replaces the entire overlay** — not a partial update. To preserve existing permissions, read via get() first and merge.
 - **ChannelOverlayPermission fields are optional booleans** — only set fields override the defaults; unset fields inherit from the role/group.
-- **update() is a batch operation** — create, edit, and delete multiple rules in a single call.
+- **bulkCreateEditDelete() is a batch operation** — create, edit, and delete multiple rules in a single call.
 - **eventHandlers on all mutations** — create, edit, update, and delete all accept eventHandlers. Changing access rules can alter visibility of channels and groups. See the `channels/` api sample for a full explanation of the eventHandlers pattern.
 - **No dedicated events** — access rule changes fire channel/channelGroup/community permission events, not access rule events.

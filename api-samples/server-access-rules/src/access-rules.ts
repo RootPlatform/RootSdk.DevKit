@@ -26,7 +26,7 @@ import {
   CommunityRole,
   AccessRuleCreateRequest,
   AccessRuleEditRequest,
-  AccessRuleUpdateRequest,
+  AccessRuleBulkCreateEditDeleteRequest,
   AccessRuleDeleteRequest,
   AccessRuleGetRequest,
   AccessRuleListByChannelOrChannelGroupRequest,
@@ -125,7 +125,7 @@ export async function editAccessRule(
   return rootServer.community.accessRules.edit(request);
 }
 
-// update() is a batch operation — create, edit, and delete multiple rules in a
+// bulkCreateEditDelete() is a batch operation — create, edit, and delete multiple rules in a
 // single call. All changes are applied together. Each sub-operation follows the
 // same rules as its standalone counterpart.
 // Requires fullControl permission on each target channel or channel group.
@@ -134,8 +134,8 @@ export async function updateAccessRules(
   edits?: AccessRuleEditRequest[],
   deletes?: AccessRuleDeleteRequest[],
 ): Promise<void> {
-  const request: AccessRuleUpdateRequest = { creates, edits, deletes };
-  return rootServer.community.accessRules.update(request);
+  const request: AccessRuleBulkCreateEditDeleteRequest = { creates, edits, deletes };
+  return rootServer.community.accessRules.bulkCreateEditDelete(request);
 }
 
 // No permissions required.

@@ -49,6 +49,26 @@ The `referenceMaps` contains the current names for those entities:
 
 If Alice changed her display name to "Alicia", the `messageContent` would still show `[@Alice]`, but `referenceMaps.users` would show `{ userId: "abc123", name: "Alicia" }`.
 
+## ID formats in mention URIs
+
+IDs in mention URIs are not always in the same form as IDs in events and API results. Root clients write mention URIs with the 36-character dashed form, for example `root://channel/0191f3a2-7c4e-7b1a-9d2f-3e8a5c6b7d10`. Events, API results, and `referenceMaps` use the 22-character form. Both forms identify the same entity, but the strings are not equal, so comparing an ID taken from `messageContent` or `messageUris` with an ID from an event fails.
+
+Convert the ID with `RootGuidConverter.parse()` before you compare it. It returns the 22-character form for either input:
+
+```ts
+import { RootGuidConverter, ChannelGuid } from "@rootsdk/server-app";
+
+function channelIdFromUri(uri: string): ChannelGuid | undefined {
+  const prefix = "root://channel/";
+  if (!uri.startsWith(prefix)) {
+    return undefined;
+  }
+  return RootGuidConverter.parse<ChannelGuid>(uri.slice(prefix.length));
+}
+```
+
+IDs in `referenceMaps` are already in the 22-character form, so you can compare them directly.
+
 ## Why referenceMaps exists
 
 The `messageUris` array tells you *what* was mentioned (via IDs in the URIs), but not the current names. The `messageContent` has display text, but it's frozen from when the message was sent. If you need to show Alice's current name but she renamed herself to "Alicia", you'd have to make an API call to look it up.

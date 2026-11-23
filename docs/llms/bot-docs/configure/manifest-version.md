@@ -15,9 +15,11 @@ Use standard [semver](https://semver.org/) format: `MAJOR.MINOR.PATCH`. Pre-rele
 
 ## Versioning rules
 
-Each push must use a version that is **strictly greater** than the last published version. You cannot reuse a previous version number, and you cannot go backwards. For example, after publishing `1.2.0`, the next push must be `1.2.1` or higher.
+Each upload must use a version that is **strictly greater** than the latest version you've uploaded, whether or not that version was released. You cannot reuse a previous version number, and you cannot go backwards. For example, after uploading `1.2.0`, the next upload must be `1.2.1` or higher.
 
-The version is validated locally by the CLI and again server-side during push. If the version is not greater than the latest published version, the push is rejected.
+`npx rootsdk build package` checks the version's format. The upload compares it with your latest uploaded version and rejects it if it isn't greater.
+
+The version is read from the manifest packed inside the `.pkg` file. After changing `version`, build a new package before you upload. See [Upload your code](../publish/upload.md).
 
 ## Example
 

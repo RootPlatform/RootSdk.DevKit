@@ -6,7 +6,7 @@
 //         .addCommunityRole, .addCommunityRoles, .removeCommunityRole,
 //         .removeCommunityRoles, .update, .isMember
 // Permissions: none (local SQLite service — no manifest permissions needed)
-// Events: MemberGroupServiceEvent.MembersAdded, .MembersRemoved,
+// Events: MemberGroupEvent.MembersAdded, .MembersRemoved,
 //         .StateChanged, .UserGroupEmptied
 // Works in: Apps (@rootsdk/server-app) and Bots (@rootsdk/server-bot)
 //           All code except the import below is identical for both.
@@ -26,7 +26,7 @@
 
 import {
   rootServer,
-  MemberGroupServiceEvent,
+  MemberGroupEvent,
   MemberGroup,
   MemberGroupShort,
   MemberGroupMembersAddedEvent,
@@ -50,10 +50,10 @@ export function initializeMemberGroups(): void {
   const messages = rootServer.community.channelMessages;
 
   // Member group events
-  memberGroups.on(MemberGroupServiceEvent.MembersAdded, onMembersAdded);
-  memberGroups.on(MemberGroupServiceEvent.MembersRemoved, onMembersRemoved);
-  memberGroups.on(MemberGroupServiceEvent.StateChanged, onStateChanged);
-  memberGroups.on(MemberGroupServiceEvent.UserGroupEmptied, onGroupEmptied);
+  memberGroups.on(MemberGroupEvent.MembersAdded, onMembersAdded);
+  memberGroups.on(MemberGroupEvent.MembersRemoved, onMembersRemoved);
+  memberGroups.on(MemberGroupEvent.StateChanged, onStateChanged);
+  memberGroups.on(MemberGroupEvent.UserGroupEmptied, onGroupEmptied);
 
   // Command trigger
   messages.on(ChannelMessageEvent.ChannelMessageCreated, onMemberGroupsCommand);
@@ -102,8 +102,8 @@ export async function deleteMemberGroup(id: CustomMemberGroupGuid): Promise<void
   return rootServer.memberGroups.delete(id);
 }
 
-// Returns MemberGroupShort — a minimal type with snake_case fields
-// (resource_type, resource_id, community_id) because it comes straight
+// Returns MemberGroupShort — a minimal type with the fields
+// (resourceType, resourceId, communityId) because it comes straight
 // from SQLite rows. All other methods return full MemberGroup instances.
 export async function listMemberGroups(): Promise<MemberGroupShort[]> {
   return rootServer.memberGroups.list();
@@ -230,13 +230,13 @@ async function onMemberGroupsCommand(evt: ChannelMessageCreatedEvent): Promise<v
     const isMember = await checkMembership(group, senderId);
     lines.push(`✓ isMember(${senderId}): ${isMember}`);
 
-    // 4. List all groups (returns MemberGroupShort with snake_case fields)
+    // 4. List all groups (returns MemberGroupShort)
     const allGroups: MemberGroupShort[] = await listMemberGroups();
     const found: MemberGroupShort | undefined = allGroups.find((g) => g.id === group.id);
     if (found) {
       lines.push(
-        `✓ list: found group — resource_type=${found.resource_type} ` +
-        `resource_id=${found.resource_id} name=${found.name}`,
+        `✓ list: found group — resourceType=${found.resourceType} ` +
+        `resourceId=${found.resourceId} name=${found.name}`,
       );
     }
 

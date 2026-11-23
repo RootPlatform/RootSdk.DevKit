@@ -63,6 +63,10 @@ Your uploaded package cannot exceed **100 MiB**. This is a limit on the package 
 
 Two things commonly push a package over the limit: bundling large binary assets that belong in the asset pipeline, and shipping the whole of a large dependency when you use one part of it. If you are close to the limit, check what is in `node_modules` before anything else.
 
+### Files on the server's disk
+
+Your server can write files to its disk, but they are not kept. They are lost when Root replaces the container your server runs in. The SDK's SQLite database is the exception: Root keeps it. Store data in the database or the key-value store.
+
 ## Local testing
 
 Root Bots can be tested locally by running the `rootsdk devhost` tool that's part of the Root SDK. There are scripts in the Bot's `package.json` file to build and run your Bot.

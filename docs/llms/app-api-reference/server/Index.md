@@ -17,14 +17,6 @@ File uploads, images, audio, and video asset management.
 - [AssetVideoCodec](enumerations/AssetVideoCodec.md) - The codec of a video asset.
 - [AssetVideoFormat](enumerations/AssetVideoFormat.md) - The container format of a video asset.
 
-#### Billing
-
-Billing and subscription types.
-
-- [BillingPaymentStatus](enumerations/BillingPaymentStatus.md) - Enumeration (Billing).
-- [BillingSubscriptionInterval](enumerations/BillingSubscriptionInterval.md) - Enumeration (Billing).
-- [BillingSubscriptionStatus](enumerations/BillingSubscriptionStatus.md) - Enumeration (Billing).
-
 #### Channels
 
 Channel and channel group management, directories, files, messages, and events.
@@ -49,16 +41,12 @@ Community management, member events, roles, bans, and moderation.
 
 - [CommunityAppLogType](enumerations/CommunityAppLogType.md) - Enum defining severity levels for community app log entries.
 - [CommunityCategory](enumerations/CommunityCategory.md) - Enumeration (Community).
-- [CommunityDiscoverableRequirement](enumerations/CommunityDiscoverableRequirement.md) - Enumeration (Community).
-- [CommunityDiscoverySort](enumerations/CommunityDiscoverySort.md) - Enumeration (Community).
 - [CommunityEmojiEvent](enumerations/CommunityEmojiEvent.md) - Enum providing string constants for community emoji event names.
 - [CommunityEvent](enumerations/CommunityEvent.md) - Enum providing string constants for community event names.
-- [CommunityJoinSource](enumerations/CommunityJoinSource.md) - Enumeration (Community).
 - [CommunityLeaveReason](enumerations/CommunityLeaveReason.md) - Enum indicating why a user left a community.
 - [CommunityMemberBanEvent](enumerations/CommunityMemberBanEvent.md) - Enum providing string constants for community member ban event names.
 - [CommunityMemberEvent](enumerations/CommunityMemberEvent.md) - Enum providing string constants for community member event names.
 - [CommunityMemberRoleEvent](enumerations/CommunityMemberRoleEvent.md) - Enum providing string constants for member role event names.
-- [CommunityMemberSort](enumerations/CommunityMemberSort.md) - Enumeration (Community).
 - [CommunityRoleEvent](enumerations/CommunityRoleEvent.md) - Enum providing string constants for role event names.
 
 #### Content Moderation
@@ -99,13 +87,6 @@ Message types, directions, and related types.
 - [MessageDirectionTake](enumerations/MessageDirectionTake.md) - Controls the direction of message pagination when listing messages with `ChannelMessageClient.list()`.
 - [MessageType](enumerations/MessageType.md) - Enum indicating the type of message.
 
-#### Notifications
-
-Notification types and delivery.
-
-- [NotificationMuteDuration](enumerations/NotificationMuteDuration.md) - Enumeration (Notifications).
-- [NotificationStatus](enumerations/NotificationStatus.md) - Enumeration (Notifications).
-
 #### Root Core
 
 Core types: GUIDs, exceptions, and utility classes.
@@ -118,13 +99,6 @@ Core types: GUIDs, exceptions, and utility classes.
 User profiles, online status, friendships, and direct messages.
 
 - [UserOnlineStatus](enumerations/UserOnlineStatus.md) - A community member's current online status.
-
-#### Voice & WebRTC
-
-Voice channel WebRTC device and user info types.
-
-- [WebRtcBackend](enumerations/WebRtcBackend.md) - Which WebRTC interface a client must use.
-- [WebRtcCallResult](enumerations/WebRtcCallResult.md) - Enumeration (Voice & WebRTC).
 
 ## Classes
 

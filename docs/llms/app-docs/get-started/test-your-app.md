@@ -54,3 +54,16 @@ To launch your App's client, do the following:
 ## Root native client (optional)
 
 If your App uses the Root Community API (e.g., programmatically create messages in community channels), then you can also launch the Root native client and navigate to the community represented in your `DEV_TOKEN`.
+
+## Test from another device or a container
+
+The DevHost only accepts connections from your own machine.
+
+To open your App from a phone or a second computer, or to run the DevHost inside a Docker container, set `ROOT_DEV_BIND_IP` in your server's `.env` file:
+
+```text
+DEV_TOKEN=...
+ROOT_DEV_BIND_IP=0.0.0.0
+```
+
+The DevHost then listens on every network interface, on ports 8080, 8081, 8082 and 8090. For a phone or second computer, also start Vite with `npm run client -- --host` and open the address it prints. Anyone on your network can then reach the DevHost, which makes API calls with your `DEV_TOKEN`.

@@ -21,7 +21,7 @@ Optional `AccessRuleUpdateRequest` object containing access rule changes to appl
 
 > `optional` **description?**: `string`
 
-Optional new description for the channel.
+Optional new description for the channel. Maximum 256 characters. Allowed characters are letters A to Z, numbers, spaces, and common punctuation. Line breaks, emoji, and letters outside A to Z are not allowed. A description that violates these rules fails with `RequestValidationFailed`.
 
 ### iconTokenUri?
 
@@ -39,7 +39,7 @@ The unique identifier of the channel to edit. Required.
 
 > **name**: `string`
 
-The new name for the channel. Required.
+The new name for the channel. Required. Must be 1 to 100 characters and contain only letters, numbers, and hyphens. Spaces are not allowed, and the name cannot start or end with a hyphen or contain consecutive hyphens. Uppercase and lowercase letters are both accepted. A name that violates these rules fails with `RequestValidationFailed`. To build a channel name from arbitrary text, replace each run of disallowed characters with a single hyphen and trim leading and trailing hyphens.
 
 ### updateIcon
 

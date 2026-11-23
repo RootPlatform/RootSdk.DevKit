@@ -11,9 +11,9 @@ Unique identifier for your project, assigned by the [Root Developer Portal](http
 
 ## Where to get it
 
-When you create a project in the Developer Portal, Root generates a unique ID for it. Copy this ID into your manifest. If you used the `create-root` CLI to scaffold your project, the manifest contains a placeholder that you must replace with your real ID.
+When you create a project in the Developer Portal, Root generates a unique ID for it. Copy this ID into your manifest. If you used the `create-root` CLI to scaffold your project, the manifest contains a placeholder (`your-app-id` or `your-bot-id`) that you must replace with your real ID.
 
-The ID format is validated when you run `root manifest verify` and again when you push.
+The ID is checked when you run `npx rootsdk build package` and again when you upload. If the build stops with `The id '...' in root-manifest.json is not an App ID`, the manifest still has the placeholder or an ID that isn't your App ID.
 
 ## Example
 

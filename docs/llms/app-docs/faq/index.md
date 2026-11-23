@@ -57,6 +57,24 @@ Inbound webhooks do not exist. There is no address an outside service can POST t
 ### How do I test my App locally?
 The Root SDK includes the `devhost` command that will run the server side of your App locally on your development machine. The client side of your App will run in a web browser. It's not yet possible to test your App's GUI inside the Root desktop client.
 
+### Why do I have communities ending in -Test or -Staging?
+Root creates them for you when you develop and test.
+
+- A community ending in `-Test` is created when you generate the first `DEV_TOKEN` for an App or Bot. `devhost` runs your code in it. Each App or Bot has one.
+- A community ending in `-Staging` is created the first time you pre-release a version. It is where you install and test pre-releases. You have one for all your Apps and Bots.
+
+See [Pre-release and release](../publish/release.md).
+
+### Why is my App or Bot not in my staging community?
+Root does not install it for you. Open your staging community, open its App Store and install it.
+
+If it is not in that App Store, check these:
+
+- Your organization is certified. Without certification, Root does not create a staging community.
+- The version is in **Pre-release** on the **Versions** tab. The staging App Store lists only Apps and Bots that have a version in Pre-release. After you release a version, it is no longer in Pre-release.
+
+See [Pre-release and release](../publish/release.md).
+
 ## Troubleshooting
 
 ### Can I use my DEV_TOKEN to publish?

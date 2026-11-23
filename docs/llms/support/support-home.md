@@ -28,3 +28,13 @@ Get help building on Root, whether you want to ask the community or reach the te
         description: 'Report a general Root issue or send us feedback through the form.',
       }}
     />
+  
+  
+    <DocCard
+      item={{
+        type: 'link',
+        href: '/docs/support/sdk-release-notes/',
+        label: 'SDK release notes',
+        description: 'What changed in each release of the Root SDK.',
+      }}
+    />

@@ -72,4 +72,4 @@ A `DEV_TOKEN` is a Root-generated token that encapsulates your identity, your au
 
 Don't share your `DEV_TOKEN`; treat it like a password.
 
-Your code will always run in the context of a community. Root automatically creates a test community for your when you generate your first `DEV_TOKEN` for a project. The community will be named after your project name with the suffix `-test` added. If you delete the community, Root will create a new one for you the next time you generate a DEV_TOKEN.
+Your code will always run in the context of a community. Root creates a test community for you when you generate your first `DEV_TOKEN` for a project. It is named after your project with `-Test` at the end. When you generate another `DEV_TOKEN` for the same project, Root uses the same community.
