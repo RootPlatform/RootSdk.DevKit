@@ -2,12 +2,12 @@
 path: bot-api-reference/type-aliases/MemberGroupMembersRemovedEvent.md
 audience: bot
 category: reference
-summary: Payload for the `MemberGroupServiceEvent.MembersRemoved` event, emitted when users are removed from a member group.
+summary: Payload for the `MemberGroupEvent.MembersRemoved` event, emitted when users are removed from a member group.
 ---
 
 > **MemberGroupMembersRemovedEvent** = `object`
 
-Payload for the `MemberGroupServiceEvent.MembersRemoved` event, emitted when users are removed from a member group.
+Payload for the `MemberGroupEvent.MembersRemoved` event, emitted when users are removed from a member group.
 
 ## Properties
 

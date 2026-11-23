@@ -2,10 +2,14 @@
 path: app-api-reference/server/type-aliases/MemberGroupEvents.md
 audience: app
 category: reference
-summary: Object type with properties: members, members, state, userGroup (Member Groups).
+summary: Event map type for `rootServer.memberGroups`. This type defines the event signatures for member group events.
 ---
 
 > **MemberGroupEvents** = `object`
+
+Event map type for `rootServer.memberGroups`. This type defines the event signatures for member group events.
+
+For event name constants, see `MemberGroupEvent`.
 
 ## Properties
 

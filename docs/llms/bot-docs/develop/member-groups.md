@@ -27,7 +27,7 @@ Every member group is identified by three developer-defined strings that form a 
 2. **`resourceId`**: The specific instance within that category.
 3. **`name`**: The group's purpose within that instance. A single resource can have multiple groups with different names.
 
-The combination of all three uniquely identifies a group, and you can look up a group by these three values using `MemberGroupService.getByName()`. Creating a group with a `resourceType`, `resourceId`, and `name` combination that already exists in the community throws an error.
+The combination of all three uniquely identifies a group, and you can look up a group by these three values using `rootServer.memberGroups.getByName()`. Creating a group with a `resourceType`, `resourceId`, and `name` combination that already exists in the community throws an error.
 
 **Example: Project collaboration app**
 
@@ -62,10 +62,10 @@ When you create a member group, you provide a list of user IDs and community rol
 
 Membership updates automatically in response to community changes:
 
-- When a user gains a community role that's in a group, they're added to the resolved membership and a `MemberGroupServiceEvent.MembersAdded` event fires.
-- When a user loses a role (or leaves the community), they're removed from any groups that included them through that role, firing `MemberGroupServiceEvent.MembersRemoved`.
+- When a user gains a community role that's in a group, they're added to the resolved membership and a `MemberGroupEvent.MembersAdded` event fires.
+- When a user loses a role (or leaves the community), they're removed from any groups that included them through that role, firing `MemberGroupEvent.MembersRemoved`.
 - When a community role is deleted, it's removed from all groups that reference it, updating resolved membership accordingly.
-- If these changes cause a group's resolved membership to become empty, a `MemberGroupServiceEvent.UserGroupEmptied` event fires.
+- If these changes cause a group's resolved membership to become empty, a `MemberGroupEvent.UserGroupEmptied` event fires.
 
 You can also modify groups directly using the `MemberGroup` object's methods (`addUser`, `removeUser`, `addCommunityRole`, `removeCommunityRole`, etc.). These changes persist immediately.
 
